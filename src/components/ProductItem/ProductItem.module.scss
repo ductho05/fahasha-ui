@@ -1,0 +1,153 @@
+.wrapper {
+    display: block;
+    padding: 10px 13px 10px 10px;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    min-height: 340px;
+}
+
+.image {
+    position: relative;
+    width: 190px;
+    height: 190px;
+    margin-bottom: 10px;
+
+    img {
+        width: 100%;
+        height: 100%;
+        padding: 0 10px;
+    }
+
+    .discount {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: -8px;
+        right: -12px;
+        width: 36px;
+        height: 36px;
+        border-radius: 100%;
+        background-color: #f7941e;
+        color: #fff;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+}
+.body {
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+}
+
+.name {
+    display: -webkit-box;
+    font-size: 1.4rem;
+    color: #111;
+    line-height: 1.4;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mid_body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 5px 0;
+}
+
+.price {
+    font-size: 1.65rem;
+    line-height: 1.65;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.episodes {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    color: #fff;
+    background-color: #92959b;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.have {
+    width: 68px;
+    height: 22px;
+}
+
+.discount_price {
+    font-size: 1.4rem;
+    color: #888888;
+    text-decoration: line-through;
+}
+
+.rate {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.star {
+    font-size: 1.5rem;
+    color: #e3e5e5;
+}
+.star_active {
+    color: #f6a500;
+}
+
+.rate_number {
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: #f6a500;
+    margin-left: 3px;
+}
+
+.hidden {
+    display: none;
+}
+
+@media (max-width: 1023px) {
+    .image {
+        width: 150px;
+        height: 150px;
+
+        img {
+            width: 100%;
+            height: 100%;
+            padding: 0 10px;
+        }
+
+        .discount {
+            font-size: 1.2rem;
+            right: -28px;
+        }
+    }
+}
+
+@media (max-width: 500px) {
+    .have {
+        width: 50px;
+        height: 22px;
+    }
+
+    .image {
+        width: 150px;
+        height: 150px;
+
+        img {
+            width: 100%;
+            height: 100%;
+            padding: 0 10px;
+        }
+
+        .discount {
+            display: none;
+        }
+    }
+}

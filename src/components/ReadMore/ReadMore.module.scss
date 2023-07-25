@@ -1,0 +1,38 @@
+.content {
+    font-size: 1.43rem;
+    padding: 8px 0;
+    color: #333;
+    line-height: 2.1;
+    text-align: justify;
+}
+
+.toggle {
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    font-weight: 500;
+    margin: 8px;
+    text-align: center;
+
+    .btn_less {
+        display: flex;
+        align-items: flex-end;
+
+        .btn_icon {
+            margin: 0 2px;
+        }
+    }
+}
+
+.ellipsis {
+    overflow: hidden;
+    white-space: wrap;
+    text-overflow: unset;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+.hidden {
+    display: none;
+}

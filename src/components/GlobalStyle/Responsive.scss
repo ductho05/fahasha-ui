@@ -1,0 +1,27 @@
+/* Mobile and Tablet */
+@media (max-width: 1023px) {
+    .hide-on-tablet-mobile {
+        display: none;
+    }
+}
+
+/* Tablet */
+@media (min-width: 740px) and (max-width: 1023px) {
+    .hide-on-tablet {
+        display: none;
+    }
+}
+
+/* Mobile*/
+@media (max-width: 739px) {
+    .hide-on-mobile {
+        display: none;
+    }
+}
+
+/* On Pc */
+@media (min-width: 1024px) {
+    .hide-on-pc {
+        display: none;
+    }
+}

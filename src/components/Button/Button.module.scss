@@ -1,0 +1,45 @@
+.wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 242px;
+    height: 38px;
+    border-radius: var(--border-radius);
+    background-color: #fff;
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    font-size: 1.4rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    + .wrapper {
+        margin-top: 8px;
+    }
+}
+
+.primary {
+    color: #fff;
+    background-color: var(--primary-color);
+}
+
+.disabled {
+    background: linear-gradient(90deg, rgba(224, 224, 224, 1) 0%, rgba(224, 224, 224, 1) 100%);
+    border: none;
+    color: #636363;
+    pointer-events: none;
+}
+
+.facebook {
+    color: #fff;
+    background-color: #1478fc;
+    border: 2px solid #1478fc;
+    padding: 0 10px;
+}
+
+.icon {
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    font-size: 1.8rem;
+    margin-right: 4px;
+}

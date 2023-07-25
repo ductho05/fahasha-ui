@@ -1,0 +1,66 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    background-color: var(--background-color);
+}
+
+.content {
+    width: 100%;
+    margin-top: 6px;
+    padding: 10px;
+}
+
+.notice {
+    font-size: 1.4rem;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    text-align: center;
+    padding: 20px 20px 0 20px;
+    line-height: 1.5;
+}
+
+.dialog_end_session_login {
+    position: relative;
+    padding-bottom: 20px;
+}
+
+.btn_pass {
+    position: absolute;
+    bottom: 10px;
+    left: 23%;
+}
+
+// // Responsive
+// /* Mobile and Tablet */
+// @media (max-width: 1023px) {
+//     .content {
+//         max-width: 1023px;
+//         width: 800px;
+//     }
+// }
+
+// /* Small Tablet */
+// @media (min-width: 400px) and (max-width: 600px) {
+//     .content {
+//         max-width: 600px;
+//         width: 600px;
+//     }
+// }
+
+/* Mobile*/
+@media (max-width: 500px) {
+    .btn_pass {
+        left: 11%;
+    }
+}
+
+/* On Pc */
+@media (min-width: 1024px) {
+    .content {
+        width: 1264px;
+        padding: 0;
+    }
+}

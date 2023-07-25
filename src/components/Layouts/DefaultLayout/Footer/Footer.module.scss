@@ -1,0 +1,351 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    background-color: var(--background-color);
+    padding-top: 20px;
+}
+.heading {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 25px;
+    background-color: #9fa7ab;
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+
+    h5 {
+        font-size: 1.8rem;
+        font-weight: 400;
+        color: #fff;
+        margin: 0 30px 0 10px;
+    }
+
+    .heading_icon {
+        font-size: 2rem;
+        color: #fff;
+    }
+}
+
+.heading_input {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    padding: 2px;
+    height: 44px;
+    border-radius: 4px;
+    width: 635px;
+
+    input {
+        width: 100%;
+        padding: 0 100px 0 15px;
+        font-size: 1.3rem;
+        color: #646464;
+        font-weight: 400;
+    }
+
+    button {
+        position: absolute;
+        right: 4px;
+        bottom: 6%;
+        border: 1px solid #fff;
+        border-radius: 4px;
+        text-align: center;
+        padding: 10px 30px;
+        font-size: 14px;
+        color: #fff;
+        font-weight: 500;
+        background-color: #f7941e;
+        cursor: pointer;
+
+        &:hover {
+            background-color: var(--primary-color);
+        }
+    }
+}
+
+.content {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 40px 0 25px;
+    background-color: #fff;
+}
+
+.content_left {
+    width: 390px;
+    border-right: 1px solid #cecece;
+    img {
+        padding: 10px 15px;
+        margin-bottom: 8px;
+    }
+}
+
+.footer_address {
+    font-size: 1.3rem;
+    line-height: 1.5;
+    margin: 10px 0 20px 10px;
+    padding-right: 15px;
+
+    .congthuong_icon {
+        width: 130px;
+        height: 50px;
+        cursor: pointer;
+    }
+}
+
+.address_detail {
+    padding-top: 5px;
+}
+
+.address_description {
+    padding-top: 5px;
+}
+
+.social_list {
+    display: flex;
+    list-style: none;
+}
+
+.social_item {
+    width: 40px;
+    height: 40px;
+    margin: 0 4px;
+    cursor: pointer;
+}
+
+.footer_download {
+    display: flex;
+    margin-top: 20px;
+}
+
+.gg_play,
+.app_store {
+    img {
+        width: 150px;
+        height: 60px;
+        cursor: pointer;
+    }
+}
+
+// Footer right
+.content_right {
+    padding: 15px 50px;
+}
+
+.footer_item {
+    width: 220px;
+    padding-left: 10px;
+    h3 {
+        font-size: 1.6rem;
+        color: #000;
+        line-height: 2;
+    }
+}
+
+.footer_list_child {
+    list-style: none;
+}
+
+.footer_item_child {
+    font-size: 1.3rem;
+    color: #000;
+    padding: 10px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+
+    &:hover {
+        background-position: 0px -32px;
+        background-image: url(https://cdn0.fahasa.com/skin/frontend/ma_vanese/ma_vanesa2/images/icon-footer.png);
+        background-repeat: no-repeat;
+        padding-left: 25px;
+        color: #ea7696;
+    }
+}
+
+.footer_contact {
+    h3 {
+        font-size: 1.6rem;
+        color: #000;
+        line-height: 2;
+        padding: 10px 0;
+    }
+}
+
+.contact_list {
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.contact_item {
+    display: flex;
+    align-items: center;
+    font-size: 1.4rem;
+    color: #333;
+    margin: 4px 0;
+    .contact_icon {
+        font-size: 1.8rem;
+        margin-right: 6px;
+    }
+}
+
+.service {
+    padding: 10px 0;
+}
+
+.service_item {
+    padding: 10px 0;
+    img {
+        width: 80px;
+        height: 50px;
+        background-size: cover;
+    }
+}
+
+.footer_bot {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    background-color: #fff;
+    padding: 10px 10px 30px 10px;
+
+    p {
+        color: #adadad;
+        font-size: 1.3rem;
+    }
+
+    a {
+        margin: 0 8px;
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+}
+
+// Responsive
+/* Mobile and Tablet */
+@media (max-width: 1023px) {
+    .wrapper {
+        max-width: 1023px;
+        padding-bottom: calc(56px + env(safe-area-inset-bottom, 0));
+    }
+    .content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #f0f0f0;
+    }
+    .heading_input {
+        width: 450px;
+    }
+
+    .content_left {
+        border-right: none;
+    }
+
+    .footer_list {
+        list-style: none;
+    }
+
+    .footer_bot {
+        width: 100%;
+        background-color: #f0f0f0;
+        p {
+            width: 100%;
+            text-align: center;
+            line-height: 1.5;
+            margin: 0;
+        }
+    }
+
+    .service_list {
+        list-style: none;
+        .service_item {
+            img {
+                width: 100px;
+                height: 40px;
+                margin: 0 10px;
+            }
+        }
+    }
+}
+
+/* Small Tablet */
+@media (min-width: 400px) and (max-width: 600px) {
+    .hide-on-small-tablet {
+        display: none;
+    }
+
+    .footer_bot {
+        background-color: #f0f0f0;
+        p {
+            text-align: center;
+            line-height: 1.5;
+            margin: 0;
+        }
+    }
+
+    .contact_item,
+    .footer_item {
+        width: 100px;
+        padding-left: 10px;
+        margin-left: 60px;
+    }
+
+    .footer_contact {
+        h3 {
+            margin-left: 60px;
+        }
+    }
+}
+
+/* Mobile*/
+@media (max-width: 500px) {
+    .hide-on-mobide {
+        display: none;
+    }
+    .contact_item,
+    .footer_item {
+        width: 100px;
+        padding-left: 10px;
+        margin-left: 0px;
+        margin-top: 20px;
+        h3 {
+            width: 100px;
+        }
+    }
+
+    .footer_item_child {
+        width: 100%;
+    }
+
+    .footer_contact {
+        h3 {
+            margin-left: 60px;
+        }
+    }
+
+    .footer_bot {
+        p {
+            margin: 0;
+        }
+    }
+
+    .content_left {
+        width: 100%;
+    }
+}
+
+/* On Pc */
+@media (min-width: 1024px) {
+    .content,
+    .heading {
+        width: 1264px;
+    }
+}
