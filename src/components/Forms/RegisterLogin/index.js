@@ -136,6 +136,7 @@ function RegisterLogin(props) {
             .then(result => {
                 if (result.status == 'OK') {
                     setShowProgress(false)
+                    props.setShowForm(false)
                     if (result.message == 'Email Or Password Not Matched') {
                         setShowDialog(true)
                     } else if (result.message == 'Login Succsess') {
@@ -187,6 +188,7 @@ function RegisterLogin(props) {
             .then(result => {
                 if (result.status == 'OK') {
                     setShowProgress(false)
+                    props.setShowForm(false)
                     dispatch(register(result))
                 } else {
                     console.log(result.message)
@@ -241,6 +243,7 @@ function RegisterLogin(props) {
                                     .then(result => {
                                         if (result.status == 'OK') {
                                             setShowProgress(false)
+                                            props.setShowForm(false)
                                             dispatch(login(result))
                                         }
                                     })
@@ -273,7 +276,9 @@ function RegisterLogin(props) {
                 <CircularProgress color="inherit" />
             </Backdrop>
             <div className={cx('dialog-notice')}>
-                <Dialog open={showDialog}>
+                <Dialog open={showDialog} style={{
+                    zIndex: 10000000
+                }}>
                     <div className={cx('dialog')}>
                         <p className={cx('dialog_icon')}>
                             <FontAwesomeIcon icon={faTriangleExclamation} />

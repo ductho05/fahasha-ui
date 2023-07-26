@@ -496,7 +496,7 @@ function ProductDetail() {
                             <a onClick={handleLogin}>Đăng nhập</a> hoặc
                             <a onClick={handleRegister}>Đăng ký.</a>
                         </p>
-                        <p onClick={handleEval} className={cx('btn_evaluate', 'hide_on_tablet_mobile')}>
+                        <p onClick={handleEval} className={Object.keys(state.user).length > 0 ? cx('btn_evaluate', 'hide_on_tablet_mobile') : cx('hide')}>
                             <Button leftIcon={<FontAwesomeIcon icon={faPen} />}>Viết đánh giá</Button>
                         </p>
                     </div>
@@ -505,7 +505,7 @@ function ProductDetail() {
                         <a onClick={handleLogin}>Đăng nhập</a> hoặc
                         <a onClick={handleRegister}>Đăng ký.</a>
                     </p>
-                    <p onClick={handleEval} className={cx('btn_evaluate_tl-mb', 'hide_on_pc')}>
+                    <p onClick={handleEval} className={Object.keys(state.user).length > 0 ? cx('btn_evaluate_tl-mb', 'hide_on_pc') : cx('hide')}>
                         <Button leftIcon={<FontAwesomeIcon icon={faPen} />}>Viết đánh giá</Button>
                     </p>
 
