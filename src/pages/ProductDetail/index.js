@@ -2,10 +2,12 @@ import { useState, useEffect, useRef } from "react"
 import { useParams } from "react-router-dom"
 import classNames from "classnames/bind"
 import numeral from 'numeral'
+import { toast, ToastContainer } from 'react-toastify'
+import "react-toastify/dist/ReactToastify.css";
 import styles from './ProductDetail.module.scss'
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faMinus, faPlus, faShareNodes, faStar, faCartShopping, faPen } from "@fortawesome/free-solid-svg-icons"
+import { faMinus, faPlus, faShareNodes, faStar, faCartShopping, faPen, faArrowRight } from "@fortawesome/free-solid-svg-icons"
 import { faThumbsUp } from "@fortawesome/free-regular-svg-icons"
 import Button from '../../components/Button'
 import ProductFrame from "../../components/ProductFrame"
@@ -41,6 +43,17 @@ function ProductDetail() {
     const [state, dispatch] = useStore()
     const [showEvalDialog, setShowEvalDialog] = useState(false)
     const commentRef = useRef()
+    const [resultEval, setResultEval] = useState()
+    const [showNolginDialog, setShowNolginDialog] = useState(false)
+
+    useEffect(() => {
+        console.log(resultEval)
+        if (resultEval == true) {
+            toast.success('Đánh giá sản phẩm thành công !')
+        } else if (resultEval == false) {
+            toast.error('Đánh giá sản phẩm thất bại !')
+        }
+    }, [resultEval])
 
     useEffect(() => {
         document.title = 'Chi tiết sản phẩm'
@@ -121,12 +134,14 @@ function ProductDetail() {
         fetchProduct()
         fetchProductNew()
         fetchEvaluate(productId)
-        fetchComments(productId)
     }, [productId])
+
+    useEffect(() => {
+        fetchComments(productId)
+    }, [productId, resultEval])
 
     var lengthComments = comments.length
     var tempArray = Array(lengthComments).fill(1)
-    console.log(tempArray)
     const handleMinus = () => {
         setCurrentQuantity(prev => {
             return prev > 1 ? prev - 1 : 1
@@ -155,47 +170,55 @@ function ProductDetail() {
     }
 
     const handleAddToCart = () => {
-        let oldCats = localstorage.get('carts')
-        let findIndex = oldCats.findIndex(p => p.product._id == product._id)
-        console.log('index', findIndex)
-        if (findIndex !== -1) {
-            oldCats[findIndex].quantity += 1
-            localstorage.set('carts', [
-                ...oldCats,
-            ])
-        } else {
-            localstorage.set('carts', [
-                ...oldCats,
-                {
-                    quantity: currentQuantity,
-                    product: product
-                }
-            ])
-        }
+        if (Object.keys(state.user).length > 0) {
+            let oldCats = localstorage.get('carts')
+            let findIndex = oldCats.findIndex(p => p.product._id == product._id)
+            console.log('index', findIndex)
+            if (findIndex !== -1) {
+                oldCats[findIndex].quantity += 1
+                localstorage.set('carts', [
+                    ...oldCats,
+                ])
+            } else {
+                localstorage.set('carts', [
+                    ...oldCats,
+                    {
+                        quantity: currentQuantity,
+                        product: product
+                    }
+                ])
+            }
 
-        setIsShowDialog(!isShowDialog)
+            setIsShowDialog(!isShowDialog)
+        } else {
+            setShowNolginDialog(true)
+        }
     }
 
     const handleBuyNow = () => {
-        let oldCats = localstorage.get('carts')
-        let findIndex = oldCats.findIndex(p => p.product._id == product._id)
-        console.log('index', findIndex)
-        if (findIndex !== -1) {
-            oldCats[findIndex].quantity += 1
-            localstorage.set('carts', [
-                ...oldCats,
-            ])
-        } else {
-            localstorage.set('carts', [
-                ...oldCats,
-                {
-                    quantity: currentQuantity,
-                    product: product
-                }
-            ])
-        }
+        if (Object.keys(state.user).length > 0) {
+            let oldCats = localstorage.get('carts')
+            let findIndex = oldCats.findIndex(p => p.product._id == product._id)
+            console.log('index', findIndex)
+            if (findIndex !== -1) {
+                oldCats[findIndex].quantity += 1
+                localstorage.set('carts', [
+                    ...oldCats,
+                ])
+            } else {
+                localstorage.set('carts', [
+                    ...oldCats,
+                    {
+                        quantity: currentQuantity,
+                        product: product
+                    }
+                ])
+            }
 
-        navigate('/cart')
+            navigate('/cart')
+        } else {
+            setShowNolginDialog(true)
+        }
     }
 
     const handleCloseDialog = () => {
@@ -215,8 +238,41 @@ function ProductDetail() {
         }
     })
 
+    const handleToLoginPage = () => {
+        navigate('/login-register')
+    }
+
+    const handleCancelGoToLoginPage = () => {
+        setShowNolginDialog(false)
+    }
+
     return (
         <>
+
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
+
+            <Dialog open={showNolginDialog}>
+                <div className={cx('dialog_nologin')}>
+                    <h3 className={cx('dialog_nologin_message')}>Vui lòng đăng nhập trước khi mua hàng</h3>
+                    <div onClick={handleToLoginPage} className={cx('btn_to_login')}>
+                        <p>Trang đăng nhập</p>
+                        <p><FontAwesomeIcon icon={faArrowRight} /></p>
+                    </div>
+                    <p onClick={handleCancelGoToLoginPage} className={cx('btn_cancel_logins')}>Bỏ qua</p>
+                </div>
+            </Dialog>
+
             <Dialog open={isShowDialog}>
                 <div className={cx('dialog_add_to_cart')}>
                     <p className={cx('dialog_success')}>
@@ -231,7 +287,7 @@ function ProductDetail() {
             </Dialog>
 
             <Dialog open={showEvalDialog}>
-                <EvaluateForm setShow={setShowEvalDialog} product={productId} />
+                <EvaluateForm setShow={setShowEvalDialog} product={productId} setResult={setResultEval} />
             </Dialog>
             <div className={cx('wrapper')}>
                 <div className={isShowForm ? cx('visible') : cx('hidden')}>

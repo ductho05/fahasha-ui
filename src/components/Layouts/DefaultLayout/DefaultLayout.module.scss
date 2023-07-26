@@ -1,3 +1,7 @@
+.wrapper {
+    width: 100%;
+}
+
 .container {
     display: flex;
     flex-direction: column;
@@ -59,8 +63,4 @@
 
 /* On Pc */
 @media (min-width: 1024px) {
-    .content {
-        width: 1264px;
-        padding: 0;
-    }
 }

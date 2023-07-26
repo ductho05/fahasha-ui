@@ -210,6 +210,7 @@ function Header() {
                 </div>
                 <div className={cx('content')}>
                     <Link to={'/'}>
+                        <p className={cx('home')}>FAHASHA</p>
                         <img className={cx('logo', 'hide-on-tablet-mobile')} src={images.logo} alt='Fahasa' />
                     </Link>
 

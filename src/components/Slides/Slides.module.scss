@@ -1,12 +1,14 @@
 .wrapper {
     padding: 10px;
+    width: 100%;
 }
 
 .slides {
     position: relative;
-    max-width: 830px;
-    max-height: 316px;
+    width: 100%;
     img {
+        width: 100%;
+        height: 100%;
         border-radius: var(--border-radius);
     }
 }
@@ -69,7 +71,7 @@
 
 .btn_next {
     position: absolute;
-    right: -22.5px;
+    right: -12.5px;
     bottom: 50%;
 
     img {
@@ -150,7 +152,7 @@
 /* Mobile*/
 @media (max-width: 500px) {
     .slides {
-        padding: 0px 14px;
+        padding: 0;
         .slider_thumnail {
             height: 136px;
         }

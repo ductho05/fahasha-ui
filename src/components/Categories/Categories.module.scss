@@ -49,3 +49,16 @@
         }
     }
 }
+
+@media (min-width: 1024px) and (max-width: 1300px) {
+    .category_item {
+        width: 80px;
+        height: 180px;
+    }
+
+    .category_link {
+        p {
+            font-size: 1.4rem;
+        }
+    }
+}

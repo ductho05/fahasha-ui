@@ -82,7 +82,7 @@ function Footer() {
                 </div>
 
                 <div className={cx('content_right')}>
-                    <div className={cx('grid wide')}>
+                    <div className={cx('grid')}>
                         <ul className={cx('row', 'footer_list')}>
                             <li className={cx('col l-4 m-4 c-12', 'footer_item')}>
                                 <h3>DỊCH VỤ</h3>
@@ -147,7 +147,7 @@ function Footer() {
                         </ul>
                     </div>
 
-                    <div className={cx('grid wide', 'footer_contact')}>
+                    <div className={cx('grid', 'footer_contact')}>
                         <h3>LIÊN HỆ</h3>
                         <ul className={cx('row', 'contact_list')}>
                             <li className={cx('col l-4 m-4 c-12', 'contact_item')}>
@@ -174,7 +174,7 @@ function Footer() {
                         </ul>
                     </div>
 
-                    <div className={cx('grid wide', 'service', 'hide-on-mobide', 'hide-on-small-tablet')}>
+                    <div className={cx('grid', 'service', 'hide-on-mobide', 'hide-on-small-tablet')}>
                         <ul className={cx('row', 'service_list')}>
                             <li className={cx('col l-2-4', 'service_item')}>
                                 <img src='https://cdn0.fahasa.com/media/wysiwyg/Logo-NCC/vnpost1.png' />

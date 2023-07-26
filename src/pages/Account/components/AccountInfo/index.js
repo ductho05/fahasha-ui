@@ -11,8 +11,10 @@ import { api } from '../../../../constants'
 import { useStore } from '../../../../stores/hooks'
 import localstorge from '../../../../stores/localstorge'
 import { useNavigate } from 'react-router-dom'
-import { UPDATE } from '../../../../stores/constants'
-import { update } from '../../../../stores/actions'
+import Backdrop from '@mui/material/Backdrop'
+import CircularProgress from '@mui/material/CircularProgress'
+import { toast, ToastContainer } from 'react-toastify'
+import "react-toastify/dist/ReactToastify.css";
 
 const cx = classnames.bind(styles)
 function AccountInfo() {
@@ -29,6 +31,8 @@ function AccountInfo() {
     const [isShowDiallog, setIsShowDiallog] = useState(false)
     const [otp, setOtp] = useState()
     const [inputOTP, setInputOtp] = useState()
+    const [showError, setShowError] = useState(false)
+    const [showProgressUpdate, setShowProgressUpdate] = useState(false)
 
     const handleChangeFullName = (e) => {
         setUser(prev => {
@@ -91,15 +95,10 @@ function AccountInfo() {
                     setUser(result.data)
                 }
             })
-    }, [])
+    }, [showProgressUpdate])
 
     const handleIncorectPass = () => {
-        setErrors(prev => {
-            delete prev.incorrectPassword
-            return {
-                ...prev
-            }
-        })
+        setShowError(false)
     }
 
     const handlePassword = (e) => {
@@ -129,7 +128,7 @@ function AccountInfo() {
 
     useEffect(() => {
         const pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/
-        if (!password.match(pattern)) {
+        if (!password.match(pattern) && password != '') {
             setErrors(prev => {
                 return {
                     ...prev,
@@ -171,7 +170,7 @@ function AccountInfo() {
     const handleUpdateUser = async () => {
         if (currentPassword !== '') {
             bcrypt.compare(currentPassword, user.password, (err, result) => {
-                if (!result) {
+                if (result == false) {
                     setErrors(prev => {
                         return {
                             ...prev,
@@ -191,10 +190,12 @@ function AccountInfo() {
             })
         }
 
-        if (errors.incorrectPassword && currentPassword == '') {
+        if (errors.incorrectPassword) {
+            setShowError(true)
+        } else {
             const formData = new FormData()
             if (password != '') {
-                user.password = password
+                formData.append('password', password)
             }
             if (avatar) {
                 formData.append('images', avatar)
@@ -215,6 +216,7 @@ function AccountInfo() {
                 formData.append('address', user.address)
             }
 
+            setShowProgressUpdate(true)
             await fetch(`${api}/users/update/${user._id}`, {
                 method: 'PUT',
                 body: formData
@@ -222,7 +224,8 @@ function AccountInfo() {
                 .then(response => response.json())
                 .then(result => {
                     if (result.status == 'OK') {
-                        navigate('/')
+                        setShowProgressUpdate(false)
+                        toast.success('Lưu thông tin tài khoản thành công')
                     }
                 })
                 .catch(err => {
@@ -265,6 +268,7 @@ function AccountInfo() {
     }, [email])
 
     const handleSendEmail = () => {
+        setShowProgressUpdate(true)
         fetch(`${api}/users/sendotp`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -273,6 +277,7 @@ function AccountInfo() {
             .then(response => response.json())
             .then(result => {
                 if (result.status == 'OK') {
+                    setShowProgressUpdate(false)
                     setOtp(result.data)
                 }
             })
@@ -305,13 +310,15 @@ function AccountInfo() {
 
     const handleUpdateEmail = () => {
 
+        setShowProgressUpdate(true)
         fetch(`${api}/users?email=${email}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
         })
             .then(response => response.json())
             .then(result => {
-                if (result.status == 'OK') {
+                if (result.status == 'OK' && result.message == 'Found user successfully') {
+                    setShowProgressUpdate(false)
                     setErrors(prev => {
                         return {
                             ...prev,
@@ -329,7 +336,9 @@ function AccountInfo() {
                         .then(response => response.json())
                         .then(result => {
                             if (result.status == 'OK') {
+                                setShowProgressUpdate(false)
                                 setIsShowDiallog(false)
+                                toast.success('Thay đổi tài khoản email thành công')
                             }
                         })
                         .catch(err => console.log(err))
@@ -340,7 +349,21 @@ function AccountInfo() {
 
     return (
         <div className={cx('wrapper')}>
-            <Dialog open={errors.incorrectPassword}>
+
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
+
+            <Dialog open={showError}>
                 <div className={cx('dialog')}>
                     <p className={cx('dialog_icon')}>
                         <FontAwesomeIcon icon={faTriangleExclamation} />
@@ -349,6 +372,13 @@ function AccountInfo() {
                     <p onClick={handleIncorectPass} className={cx('btn_eenter')}>Nhập lại</p>
                 </div>
             </Dialog>
+
+            <Backdrop
+                sx={{ color: '#fff', zIndex: 10000 }}
+                open={showProgressUpdate}
+            >
+                <CircularProgress color="error" />
+            </Backdrop>
 
             <Dialog open={isShowDiallog}>
                 <div className={cx('dialog')}>

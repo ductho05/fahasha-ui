@@ -217,6 +217,10 @@
     }
 }
 
+.dialog-notice {
+    z-index: 100000;
+}
+
 // Responsive
 /* Tablet */
 @media (min-width: 768px) and (max-width: 1023px) {

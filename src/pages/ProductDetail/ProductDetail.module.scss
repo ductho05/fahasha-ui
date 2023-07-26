@@ -613,6 +613,62 @@
     width: 40%;
 }
 
+// Dialog Nologin
+.dialog_nologin {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    min-height: 150px;
+}
+
+.dialog_nologin_message {
+    margin-top: 20px;
+    font-size: 1.4rem;
+    color: #333;
+}
+
+.btn_to_login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--primary-color);
+    width: 140px;
+    height: 30px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 50px;
+
+    &:hover {
+        opacity: 0.8;
+    }
+
+    p {
+        font-size: 1.4rem;
+        color: #333;
+        color: #fff;
+        margin: 0 4px;
+    }
+}
+
+.btn_cancel_logins {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 140px;
+    height: 30px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    background-color: #c1c1c1;
+    font-size: 1.4rem;
+    color: #333;
+
+    &:hover {
+        opacity: 0.8;
+    }
+}
+
 // Responsive
 /* Mobile and Tablet */
 @media (max-width: 1023px) {

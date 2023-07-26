@@ -20,7 +20,7 @@ function OrderDetail() {
     }, [])
 
     useEffect(() => {
-        fetch(`${api}/orders/${orderId}`)
+        fetch(`${api}/orders/id/${orderId}`)
             .then(response => response.json())
             .then(result => {
                 if (result.status == 'OK') {

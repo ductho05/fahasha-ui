@@ -12,8 +12,10 @@ import Button from '../../Button'
 import { logout, noAction } from '../../../stores/actions'
 import localstorge from '../../../stores/localstorge'
 import { api } from '../../../constants'
-import { LOGOUT, LOGIN } from '../../../stores/constants'
+import { LOGOUT, LOGIN, REGISTER } from '../../../stores/constants'
 import { useNavigate } from 'react-router-dom'
+import { toast, ToastContainer } from 'react-toastify'
+import "react-toastify/dist/ReactToastify.css";
 
 const cx = classNames.bind(styles)
 function DefaultLayout(props) {
@@ -40,15 +42,12 @@ function DefaultLayout(props) {
                 .then(response => response.json())
                 .then(result => {
                     if (result.message == 'jwt expired') {
-                        console.log('expried')
                         setExpired(true)
                     } else {
-                        console.log('chưa hết hạn')
                         setExpired(false)
                     }
                 })
                 .catch(() => {
-                    console.log('failed')
                     setExpired(false)
                 })
         }
@@ -68,17 +67,37 @@ function DefaultLayout(props) {
     useEffect(() => {
         if (state.action == LOGOUT) {
             navigate('/')
+            toast.success('Đăng xuất thành công')
             dispatch(noAction())
         } else if (state.action == LOGIN) {
             navigate('/')
+            toast.success('Đăng nhập thành công')
             dispatch(noAction())
+            setExpired(false)
+        } else if (state.action == REGISTER) {
+            navigate('/account/0')
+            toast.success('Đăng ký tài khoản thành công')
+            dispatch(noAction())
+            setExpired(false)
         }
     }, [state])
 
     return (
-        <div>
+        <div className={cx('wrapper')}>
             <Header />
             <div className={cx('container')}>
+                <ToastContainer
+                    position="top-right"
+                    autoClose={5000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="light"
+                />
                 <div className={cx('content')}>
                     <Dialog open={expired}>
                         <div className={cx('dialog_end_session_login')}>

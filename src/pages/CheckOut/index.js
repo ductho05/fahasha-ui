@@ -13,6 +13,8 @@ import numeral from 'numeral'
 import { apiMaps, API_KEY, locationShop } from '../../constants'
 import { useStore } from '../../stores/hooks'
 import localstorage from '../../localstorage'
+import Backdrop from '@mui/material/Backdrop'
+import CircularProgress from '@mui/material/CircularProgress'
 
 const cx = classNames.bind(styles)
 function CheckOut() {
@@ -31,6 +33,7 @@ function CheckOut() {
     const [deliveryTime, setDeliveryTime] = useState('')
     const [order, setOrder] = useState()
     const [state, dispatch] = useStore()
+    const [showProgress, setShowProgress] = useState(false)
 
     const price = listCheckouts.reduce((total, curr) => total + curr.quantity * curr.product.price, 0)
     const quantity = listCheckouts.reduce((total, curr) => total + curr.quantity, 0)
@@ -73,6 +76,7 @@ function CheckOut() {
 
     const submit = (data) => {
         if (data) {
+            setShowProgress(true)
             fetch(`${api}/orders/insert`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -104,6 +108,7 @@ function CheckOut() {
                                         const newCarts = carts.filter(cart => cart.product._id !== orderItem.product)
                                         localstorage.set('carts', newCarts)
                                         setOrder(order)
+                                        setShowProgress(false)
                                     }
                                 })
                                 .catch(err => {
@@ -313,6 +318,12 @@ function CheckOut() {
 
     return (
         <div className={cx('wrapper')}>
+            <Backdrop
+                sx={{ color: '#fff', zIndex: 10000 }}
+                open={showProgress}
+            >
+                <CircularProgress color="error" />
+            </Backdrop>
             <form onSubmit={handleSubmit(submit)}>
                 <div className={cx('shipping_address')}>
                     <h3 className={cx('heading')}>Địa chỉ giao hàng</h3>

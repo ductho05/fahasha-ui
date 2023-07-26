@@ -228,6 +228,10 @@
     }
 }
 
+.service_list {
+    list-style: none;
+}
+
 // Responsive
 /* Mobile and Tablet */
 @media (max-width: 1023px) {
@@ -342,10 +346,16 @@
     }
 }
 
+@media (min-width: 1024px) and (max-width: 1239px) {
+    .wrapper {
+        padding: 10px;
+    }
+
+    .service_list {
+        display: none;
+    }
+}
+
 /* On Pc */
 @media (min-width: 1024px) {
-    .content,
-    .heading {
-        width: 1264px;
-    }
 }

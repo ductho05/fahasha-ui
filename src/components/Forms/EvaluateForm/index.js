@@ -7,15 +7,17 @@ import Button from "../../Button"
 import { useStore } from "../../../stores/hooks"
 import { api } from "../../../constants"
 import { useNavigate } from 'react-router-dom'
+import { Backdrop, CircularProgress } from "@mui/material"
 
 const cx = classNames.bind(styles)
-function EvaluateForm({ setShow, product, orderItem }) {
+function EvaluateForm({ setShow, product, orderItem, setResult }) {
 
     const navigate = useNavigate()
     const [rate, setRate] = useState(0)
     const rates = [1, 2, 3, 4, 5]
     const [content, setContent] = useState('')
     const [state, dispatch] = useStore()
+    const [showProgress, setShowProgress] = useState(false)
 
     const handleClickRate = (value) => {
         setRate(value)
@@ -30,6 +32,7 @@ function EvaluateForm({ setShow, product, orderItem }) {
     }
 
     const handleSubmit = () => {
+        setShowProgress(true)
         fetch(`${api}/evaluates/insert`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -54,11 +57,19 @@ function EvaluateForm({ setShow, product, orderItem }) {
                             .then(result => {
                                 if (result.status == 'OK') {
                                     setShow(false)
+                                    setShowProgress(false)
+                                    setResult(true)
                                 }
                             })
                     } else {
                         setShow(false)
+                        setShowProgress(false)
+                        setResult(true)
                     }
+                } else {
+                    setShow(false)
+                    setShowProgress(false)
+                    setResult(false)
                 }
             })
             .catch(err => {
@@ -68,6 +79,12 @@ function EvaluateForm({ setShow, product, orderItem }) {
 
     return (
         <div className={cx('wrapper')}>
+            <Backdrop
+                sx={{ color: '#fff', zIndex: 10000 }}
+                open={showProgress}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
             <h3 className={cx('heading')}>Viết đánh giá sản phẩm</h3>
             <div className={cx('rate')}>
                 {

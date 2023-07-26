@@ -13,7 +13,7 @@ import { useStore } from '../../../stores/hooks'
 import { api } from '../../../constants'
 import { register, login, noAction } from '../../../stores/actions';
 import { LOGIN, REGISTER } from '../../../stores/constants'
-import { Dialog } from '@mui/material'
+import { Dialog, Backdrop, CircularProgress } from '@mui/material'
 
 // Firebase
 import { signInWithPopup, signInWithRedirect } from 'firebase/auth'
@@ -36,6 +36,7 @@ function RegisterLogin(props) {
     })
     const [otp, setOtp] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
+    const [showProgress, setShowProgress] = useState(false)
 
     const handleTab = (index) => {
         props.setForm(index)
@@ -123,6 +124,7 @@ function RegisterLogin(props) {
     // Login
     const handleLogin = () => {
         const dataLogin = watch()
+        setShowProgress(true)
         fetch(`${api}/users/login`, {
             method: 'POST',
             headers: {
@@ -133,6 +135,7 @@ function RegisterLogin(props) {
             .then((response) => response.json())
             .then(result => {
                 if (result.status == 'OK') {
+                    setShowProgress(false)
                     if (result.message == 'Email Or Password Not Matched') {
                         setShowDialog(true)
                     } else if (result.message == 'Login Succsess') {
@@ -145,6 +148,7 @@ function RegisterLogin(props) {
 
     // Handle Send OTP
     const handleSendOTP = (email) => {
+        setShowProgress(true)
         fetch(`${api}/users/sendotp`, {
             method: 'POST',
             headers: {
@@ -154,6 +158,7 @@ function RegisterLogin(props) {
         })
             .then(response => response.json())
             .then(result => {
+                setShowProgress(false)
                 if (result.status == 'OK') {
                     setOtpServer({
                         message: 'Đã gửi mã OTP đến email của bạn',
@@ -170,6 +175,7 @@ function RegisterLogin(props) {
 
     // Register
     const handleRegister = async (data) => {
+        setShowProgress(true)
         await fetch(`${api}/users/register`, {
             method: 'POST',
             headers: {
@@ -180,6 +186,7 @@ function RegisterLogin(props) {
             .then((response) => response.json())
             .then(result => {
                 if (result.status == 'OK') {
+                    setShowProgress(false)
                     dispatch(register(result))
                 } else {
                     console.log(result.message)
@@ -207,6 +214,7 @@ function RegisterLogin(props) {
     const handleChangePassword = async () => {
         const email = watch('email')
         const password = watch('password')
+        setShowProgress(true)
         await fetch(`${api}/users?email=${email}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
@@ -232,6 +240,7 @@ function RegisterLogin(props) {
                                     .then((response) => response.json())
                                     .then(result => {
                                         if (result.status == 'OK') {
+                                            setShowProgress(false)
                                             dispatch(login(result))
                                         }
                                     })
@@ -257,17 +266,25 @@ function RegisterLogin(props) {
 
     return (
         <div className={cx('wrapper')}>
-            <Dialog open={showDialog}>
-                <div className={cx('dialog')}>
-                    <p className={cx('dialog_icon')}>
-                        <FontAwesomeIcon icon={faTriangleExclamation} />
-                    </p>
-                    <p className={cx('dialog_message')}>
-                        Mật khẩu hoặc email không đúng
-                    </p>
-                    <p onClick={() => setShowDialog(false)} className={cx('dialog_btn')}>Đăng nhập lại</p>
-                </div>
-            </Dialog>
+            <Backdrop
+                sx={{ color: '#fff', zIndex: 10000 }}
+                open={showProgress}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
+            <div className={cx('dialog-notice')}>
+                <Dialog open={showDialog}>
+                    <div className={cx('dialog')}>
+                        <p className={cx('dialog_icon')}>
+                            <FontAwesomeIcon icon={faTriangleExclamation} />
+                        </p>
+                        <p className={cx('dialog_message')}>
+                            Mật khẩu hoặc email không đúng
+                        </p>
+                        <p onClick={() => setShowDialog(false)} className={cx('dialog_btn')}>Đăng nhập lại</p>
+                    </div>
+                </Dialog>
+            </div>
             <div className={cx('form')}>
                 <ul className={indexActive === 2 ? cx('form_headings', 'hide') : cx('form_headings')}>
                     {
