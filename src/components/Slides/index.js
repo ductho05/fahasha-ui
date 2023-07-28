@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import classNames from 'classnames/bind'
 import styles from './Slides.module.scss'
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 const cx = classNames.bind(styles)
 
@@ -47,15 +48,15 @@ function Slides() {
                     onClick={handlePrevSlide}
                     className={cx('btn', 'btn_prev', 'hide-on-tablet-mobile')}
                 >
-                    <img src='https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/ico_arrow_gray.svg' />
+                    <LazyLoadImage src='https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/ico_arrow_gray.svg' />
                 </p>
                 <a href='#'>
-                    <img className={cx('slider_thumnail')} src={slideList[currentIndex].url} />
+                    <LazyLoadImage className={cx('slider_thumnail')} src={slideList[currentIndex].url} />
                 </a>
                 <p
                     onClick={handleNextSlide}
                     className={cx('btn', 'btn_next', 'hide-on-tablet-mobile')}>
-                    <img src='https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/ico_arrow_gray.svg' />
+                    <LazyLoadImage src='https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/ico_arrow_gray.svg' />
                 </p>
                 <ul className={cx('index_slide_list')}>
                     {

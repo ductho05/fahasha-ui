@@ -7,6 +7,7 @@ import ProductFrame from '../../components/ProductFrame'
 import GridProduct from '../../components/GridProduct'
 import ProductSlider from '../../components/ProductSlider'
 import { api, listPathHots, listPathCategory, listPathLearn } from '../../constants'
+import { LazyLoadImage } from 'react-lazy-load-image-component'
 
 // Fake api
 const listPoster = [
@@ -207,7 +208,7 @@ function Home() {
                             listPoster.map((poster, index) =>
                                 <li key={index} className={cx('poster_item')}>
                                     <a href='#'>
-                                        <img src={poster.url} />
+                                        <LazyLoadImage src={poster.url} />
                                     </a>
                                 </li>
                             )
@@ -222,7 +223,7 @@ function Home() {
                         listSlogan.map((slogan, index) =>
                             <li key={index} className={cx('slogan_item')}>
                                 <a href='#'>
-                                    <img src={slogan.url} />
+                                    <LazyLoadImage src={slogan.url} />
                                 </a>
                             </li>
                         )
@@ -236,7 +237,7 @@ function Home() {
                         listMenu.map((item, index) =>
                             <li key={index} className={cx('menu_item')}>
                                 <a href='#' className={cx('menu_item_link')}>
-                                    <img src={item.image} />
+                                    <LazyLoadImage src={item.image} />
                                     <p>{item.title}</p>
                                 </a>
                             </li>
@@ -251,7 +252,7 @@ function Home() {
 
             <div className={cx('trending_product')}>
                 <div className={cx('title')}>
-                    <img src='https://cdn0.fahasa.com/skin/frontend/base/default/images/ico_dealhot.png' />
+                    <LazyLoadImage src='https://cdn0.fahasa.com/skin/frontend/base/default/images/ico_dealhot.png' />
                     <h3>DANH MỤC NỔI BẬT</h3>
                 </div>
 
@@ -272,7 +273,7 @@ function Home() {
 
             <div className={cx('trending_product')}>
                 <div className={cx('title')}>
-                    <img src='https://cdn0.fahasa.com/skin/frontend/base/default/images/ico_dealhot.png' />
+                    <LazyLoadImage src='https://cdn0.fahasa.com/skin/frontend/base/default/images/ico_dealhot.png' />
                     <h3>DỤNG CỤ HỌC TẬP</h3>
                 </div>
 

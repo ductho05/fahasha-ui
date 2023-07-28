@@ -5,6 +5,7 @@ import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 import { faPhone } from '@fortawesome/free-solid-svg-icons';
 import styles from './Footer.module.scss'
 import images from '../../../../assets/images'
+import { LazyLoadImage } from 'react-lazy-load-image-component'
 
 const cx = className.bind(styles)
 function Footer() {
@@ -20,7 +21,7 @@ function Footer() {
             </div>
             <div className={cx('content')}>
                 <div className={cx('content_left')}>
-                    <img src={images.logo} />
+                    <LazyLoadImage src={images.logo} />
                     <div className={cx('footer_address')}>
                         <div className={cx('address_detail')}>
                             <p>Lầu 5, 387-389 Hai Bà Trưng Quận 3 TP HCM</p>
@@ -31,51 +32,51 @@ function Footer() {
                         <div className={cx('address_description')}>
                             <p>Fahasa.com nhận đặt hàng trực tuyến và giao hàng tận nơi. KHÔNG hỗ trợ đặt mua và nhận hàng trực tiếp tại văn phòng cũng như tất cả Hệ Thống Fahasa trên toàn quốc.</p>
                         </div>
-                        <img className={cx('congthuong_icon')} src='https://cdn0.fahasa.com/media/wysiwyg/Logo-NCC/logo-bo-cong-thuong-da-thong-bao1.png' />
+                        <LazyLoadImage className={cx('congthuong_icon')} src='https://cdn0.fahasa.com/media/wysiwyg/Logo-NCC/logo-bo-cong-thuong-da-thong-bao1.png' />
                         <ul className={cx('social_list')}>
                             <li className={cx('social_item')}>
                                 <a href="#">
-                                    <img title='Facebook' src='https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/footer/Facebook-on.png' />
+                                    <LazyLoadImage title='Facebook' src='https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/footer/Facebook-on.png' />
                                 </a>
                             </li>
 
                             <li className={cx('social_item')}>
                                 <a href="#">
-                                    <img title='Instagram' src='https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images//footer/Insta-on.png' />
+                                    <LazyLoadImage title='Instagram' src='https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images//footer/Insta-on.png' />
                                 </a>
                             </li>
 
                             <li className={cx('social_item')}>
                                 <a href="#">
-                                    <img title='Youtube' src='https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images//footer/Youtube-on.png' />
+                                    <LazyLoadImage title='Youtube' src='https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images//footer/Youtube-on.png' />
                                 </a>
                             </li>
 
                             <li className={cx('social_item')}>
                                 <a href="#">
-                                    <img title='Tumblr' src='https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images//footer/tumblr-on.png' />
+                                    <LazyLoadImage title='Tumblr' src='https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images//footer/tumblr-on.png' />
                                 </a>
                             </li>
 
                             <li className={cx('social_item')}>
                                 <a href="#">
-                                    <img title='Twitter' src='https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images//footer/twitter-on.png' />
+                                    <LazyLoadImage title='Twitter' src='https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images//footer/twitter-on.png' />
                                 </a>
                             </li>
 
                             <li className={cx('social_item')}>
                                 <a href="#">
-                                    <img title='Pinterest' src='https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images//footer/pinterest-on.png' />
+                                    <LazyLoadImage title='Pinterest' src='https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images//footer/pinterest-on.png' />
                                 </a>
                             </li>
                         </ul>
 
                         <div className={cx('footer_download')}>
                             <a href='#' className={cx('gg_play')}>
-                                <img src='https://cdn0.fahasa.com/media/wysiwyg/Logo-NCC/android1.png' />
+                                <LazyLoadImage src='https://cdn0.fahasa.com/media/wysiwyg/Logo-NCC/android1.png' />
                             </a>
                             <a href='#' className={cx('app_store')}>
-                                <img src='https://cdn0.fahasa.com/media/wysiwyg/Logo-NCC/appstore1.png' />
+                                <LazyLoadImage src='https://cdn0.fahasa.com/media/wysiwyg/Logo-NCC/appstore1.png' />
                             </a>
                         </div>
                     </div>
@@ -177,43 +178,43 @@ function Footer() {
                     <div className={cx('grid', 'service', 'hide-on-mobide', 'hide-on-small-tablet')}>
                         <ul className={cx('row', 'service_list')}>
                             <li className={cx('col l-2-4', 'service_item')}>
-                                <img src='https://cdn0.fahasa.com/media/wysiwyg/Logo-NCC/vnpost1.png' />
+                                <LazyLoadImage src='https://cdn0.fahasa.com/media/wysiwyg/Logo-NCC/vnpost1.png' />
                             </li>
 
                             <li className={cx('col l-2-4', 'service_item')}>
-                                <img src='https://cdn0.fahasa.com/media/wysiwyg/Logo-NCC/ahamove_logo3.png' />
+                                <LazyLoadImage src='https://cdn0.fahasa.com/media/wysiwyg/Logo-NCC/ahamove_logo3.png' />
                             </li>
 
                             <li className={cx('col l-2-4', 'service_item')}>
-                                <img src='https://cdn0.fahasa.com/media/wysiwyg/Logo-NCC/icon_giao_hang_nhanh1.png' />
+                                <LazyLoadImage src='https://cdn0.fahasa.com/media/wysiwyg/Logo-NCC/icon_giao_hang_nhanh1.png' />
                             </li>
 
                             <li className={cx('col l-2-4', 'service_item')}>
-                                <img src='https://cdn0.fahasa.com/media/wysiwyg/Logo-NCC/icon_snappy1.png' />
+                                <LazyLoadImage src='https://cdn0.fahasa.com/media/wysiwyg/Logo-NCC/icon_snappy1.png' />
                             </li>
 
                             <li className={cx('col l-2-4', 'service_item')}>
-                                <img src='https://cdn0.fahasa.com/media/wysiwyg/Logo-NCC/Logo_ninjavan.png' />
+                                <LazyLoadImage src='https://cdn0.fahasa.com/media/wysiwyg/Logo-NCC/Logo_ninjavan.png' />
                             </li>
 
                             <li className={cx('col l-2-4', 'service_item')}>
-                                <img src='https://cdn0.fahasa.com/media//wysiwyg/Logo-NCC/vnpay_logo.png' />
+                                <LazyLoadImage src='https://cdn0.fahasa.com/media//wysiwyg/Logo-NCC/vnpay_logo.png' />
                             </li>
 
                             <li className={cx('col l-2-4', 'service_item')}>
-                                <img src='https://cdn0.fahasa.com/media//wysiwyg/Logo-NCC/ZaloPay-logo-130x83.png' />
+                                <LazyLoadImage src='https://cdn0.fahasa.com/media//wysiwyg/Logo-NCC/ZaloPay-logo-130x83.png' />
                             </li>
 
                             <li className={cx('col l-2-4', 'service_item')}>
-                                <img src='https://cdn0.fahasa.com/media//wysiwyg/Logo-NCC/momopay.png' />
+                                <LazyLoadImage src='https://cdn0.fahasa.com/media//wysiwyg/Logo-NCC/momopay.png' />
                             </li>
 
                             <li className={cx('col l-2-4', 'service_item')}>
-                                <img src='https://cdn0.fahasa.com/media//wysiwyg/Logo-NCC/shopeepay_logo.png' />
+                                <LazyLoadImage src='https://cdn0.fahasa.com/media//wysiwyg/Logo-NCC/shopeepay_logo.png' />
                             </li>
 
                             <li className={cx('col l-2-4', 'service_item')}>
-                                <img src='https://cdn0.fahasa.com/media//wysiwyg/Logo-NCC/logo_moca_120.jpg' />
+                                <LazyLoadImage src='https://cdn0.fahasa.com/media//wysiwyg/Logo-NCC/logo_moca_120.jpg' />
                             </li>
                         </ul>
                     </div>

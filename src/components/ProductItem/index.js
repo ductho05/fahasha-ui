@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faStar } from "@fortawesome/free-solid-svg-icons"
 import classNames from "classnames/bind"
 import styles from './ProductItem.module.scss'
+import { LazyLoadImage } from 'react-lazy-load-image-component'
 
 const cx = classNames.bind(styles)
 function ProductItem({ product }) {
@@ -12,7 +13,7 @@ function ProductItem({ product }) {
         <Link to={`/product-detail/${product._id}`} state={product._id}
             className={cx('wrapper')}>
             <div className={cx('image')}>
-                <img src={product.images} />
+                <LazyLoadImage src={product.images} />
                 <p className={product.price === product.old_price ? cx('hidden') : cx('discount')}>{(100 - ((product.price / product.old_price) * 100)).toFixed(1)}%</p>
             </div>
             <div className={cx('body')}>
