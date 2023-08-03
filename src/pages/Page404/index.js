@@ -21,12 +21,10 @@ function Page404() {
 
     return (
         <div className={cx('wrapper')}>
-            <div className={cx('left')}>
-                <img src={images.page404} alt='404' />
-            </div>
-            <div className={cx('right')}>
+            <div className={cx('container')}>
+                <p className={cx('title_message')}>Lỗi! Không tìm thấy trang</p>
                 <h3 className={cx('title')}>404</h3>
-                <h3 className={cx('message')}>Không tìm thấy trang bạn muốn truy cập</h3>
+                <p className={cx('message')}>Chúng tôi không thể tìm thấy trang bạn muốn truy cập.</p>
                 <div onClick={handleBackToHome} className={cx('btn')}>
                     <p className={cx('btn_icon')}>
                         <FontAwesomeIcon icon={faArrowLeft} />

@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { publicRoutes, privateRoutes } from './routes/index'
+import { publicRoutes, privateRoutes, notFoundRoute } from './routes/index'
 import DefaultLayout from './components/Layouts/DefaultLayout'
 import ScrollToTop from './components/ScrollToTop';
 import localstorge from './stores/localstorge';
+import { useStore } from './stores/hooks'
 
 function App() {
   const [isLogin, setIsLogin] = useState(localstorge.get().length > 0)
+  const Page404 = notFoundRoute.component
   return (
     <BrowserRouter>
       <ScrollToTop />
@@ -39,6 +41,8 @@ function App() {
               )
             })
           }
+
+          <Route path={notFoundRoute.path} element={<Page404 />} />
         </Routes>
       </div>
     </BrowserRouter>

@@ -18,8 +18,6 @@ const publicRoutes = [
     { path: '/seemore-product/:categoryId', component: SeeMoreProduct },
     { path: '/search/:title', component: SearchProduct },
     { path: '/login-register', component: RegisterLogin },
-    { path: '*', component: Page404 }
-
 ]
 
 // Private Routes
@@ -31,4 +29,6 @@ const privateRoutes = [
     { path: '/order-success/:orderId', component: OrderSuccess },
 ]
 
-export { publicRoutes, privateRoutes }
+const notFoundRoute = { path: '*', component: Page404 }
+
+export { publicRoutes, privateRoutes, notFoundRoute }
