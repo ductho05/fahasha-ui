@@ -33,6 +33,7 @@ function AccountInfo() {
     const [inputOTP, setInputOtp] = useState()
     const [showError, setShowError] = useState(false)
     const [showProgressUpdate, setShowProgressUpdate] = useState(false)
+    const [checked, setChecked] = useState(false)
 
     const handleChangeFullName = (e) => {
         setUser(prev => {
@@ -200,9 +201,6 @@ function AccountInfo() {
             if (avatar) {
                 formData.append('images', avatar)
             }
-            if (password != '') {
-                formData.append('password', password)
-            }
             if (user.fullName != '') {
                 formData.append('fullName', user.fullName)
             }
@@ -226,9 +224,16 @@ function AccountInfo() {
                     if (result.status == 'OK') {
                         setShowProgressUpdate(false)
                         toast.success('Lưu thông tin tài khoản thành công')
+                        setChecked(false)
+                    } else {
+                        setShowProgressUpdate(false)
+                        toast.error('Thất bại! Vui lòng liên hệ Admin')
+                        setChecked(false)
                     }
                 })
                 .catch(err => {
+                    setShowProgressUpdate(false)
+                    toast.error('Lỗi! Vui lòng liên hệ Admin')
                     console.log(err?.message)
                 })
         }
@@ -281,7 +286,9 @@ function AccountInfo() {
                     setOtp(result.data)
                 }
             })
-            .catch(err => console.log(err))
+            .catch(err => {
+                setShowProgressUpdate(false)
+            })
     }
 
     const handleSetValueOTP = (e) => {
@@ -341,11 +348,21 @@ function AccountInfo() {
                                 toast.success('Thay đổi tài khoản email thành công')
                             }
                         })
-                        .catch(err => console.log(err))
+                        .catch(err => {
+                            setShowProgressUpdate(false)
+                        })
                 }
             })
-            .catch(err => console.log(err))
+            .catch(err => {
+                setShowProgressUpdate(false)
+            })
     }
+
+    useEffect(() => {
+        setCurrentPassword('')
+        setPassword('')
+        setConfirmPassword('')
+    }, [checked])
 
     return (
         <div className={cx('wrapper')}>
@@ -525,7 +542,12 @@ function AccountInfo() {
                 </div>
 
                 <div className={cx('form_checkbox')}>
-                    <input id='change' type="checkbox" />
+                    <input
+                        id='change'
+                        type="checkbox"
+                        value={checked}
+                        onChange={() => setChecked(!checked)}
+                    />
                     <label className={cx('label_checkbox')} for="change" >Đổi mật khẩu</label>
                     <div className={cx('change_password')}>
                         <div className={cx('form_group')}>

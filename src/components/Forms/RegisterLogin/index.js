@@ -30,6 +30,7 @@ function RegisterLogin(props) {
     const [typeInput, setTypeInput] = useState('password')
     const [toggleName, setToggleName] = useState('Hiện')
     const [showDialog, setShowDialog] = useState(false)
+    const [showDialogRegister, setShowDialogRegister] = useState(false)
     const [otpServer, setOtpServer] = useState({
         message: '',
         otp: ''
@@ -190,9 +191,15 @@ function RegisterLogin(props) {
                     setShowProgress(false)
                     props.setShowForm(false)
                     dispatch(register(result))
+                } else if (result.status == 'Falure' && result.message == 'User is already') {
+                    setShowProgress(false)
+                    setShowDialogRegister(true)
                 } else {
                     console.log(result.message)
                 }
+            }).catch(() => {
+                setShowProgress(false)
+                setShowDialogRegister(true)
             })
     }
 
@@ -287,6 +294,21 @@ function RegisterLogin(props) {
                             Mật khẩu hoặc email không đúng
                         </p>
                         <p onClick={() => setShowDialog(false)} className={cx('dialog_btn')}>Đăng nhập lại</p>
+                    </div>
+                </Dialog>
+            </div>
+            <div className={cx('dialog-notice')}>
+                <Dialog open={showDialogRegister} style={{
+                    zIndex: 10000000
+                }}>
+                    <div className={cx('dialog')}>
+                        <p className={cx('dialog_icon')}>
+                            <FontAwesomeIcon icon={faTriangleExclamation} />
+                        </p>
+                        <p className={cx('dialog_message')}>
+                            Tài khoản đã tồn tại, email đã được sử dụng
+                        </p>
+                        <p onClick={() => setShowDialogRegister(false)} className={cx('dialog_btn')}>Đăng ký lại</p>
                     </div>
                 </Dialog>
             </div>
