@@ -8,6 +8,7 @@ import GridProduct from '../../components/GridProduct'
 import ProductSlider from '../../components/ProductSlider'
 import { api, listPathHots, listPathCategory, listPathLearn } from '../../constants'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
+import { Skeleton } from '@mui/material'
 
 // Fake api
 const listPoster = [
@@ -120,6 +121,20 @@ const categories = [
     }
 ]
 
+const slideList = [
+    {
+        url: 'https://cdn0.fahasa.com/media/magentothem/banner7/Stem_mainbanner_T6_Slide_840x320.jpg'
+    },
+    {
+        url: 'https://cdn0.fahasa.com/media/magentothem/banner7/CTKMThang6__840x320.jpg'
+    },
+    {
+        url: 'https://cdn0.fahasa.com/media/magentothem/banner7/Fahasasalethu3_mainbanner_Bo1_Slider_840x320.jpg'
+    },
+    {
+        url: 'https://cdn0.fahasa.com/media/magentothem/banner7/MangaWeekT623_Banner_Slide_840x320.jpg'
+    }
+]
 const cx = classNames.bind(styles)
 function Home() {
 
@@ -200,7 +215,7 @@ function Home() {
         <div className={cx('wrapper')}>
             <div className={cx('heading')}>
                 <div className={cx('slider')}>
-                    <Slides></Slides>
+                    <Slides slideList={slideList} />
                 </div>
                 <div className={cx('poster', 'hide-on-tablet-mobile')}>
                     <ul className={cx('poster_list')}>
@@ -252,8 +267,8 @@ function Home() {
 
             <div className={cx('trending_product')}>
                 <div className={cx('title')}>
-                    <LazyLoadImage src='https://cdn0.fahasa.com/skin/frontend/base/default/images/ico_dealhot.png' />
-                    <h3>DANH MỤC NỔI BẬT</h3>
+                    {productsHots.length <= 0 ? <Skeleton animation='wave' /> : <LazyLoadImage src='https://cdn0.fahasa.com/skin/frontend/base/default/images/ico_dealhot.png' />}
+                    {productsHots.length <= 0 ? <Skeleton animation='wave' /> : <h3>DANH MỤC NỔI BẬT</h3>}
                 </div>
 
                 <ProductFrame

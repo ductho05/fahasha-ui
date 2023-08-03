@@ -3,6 +3,7 @@ import classNames from 'classnames/bind'
 import styles from './ProductFrame.module.scss'
 import Button from '../Button'
 import { Link } from 'react-router-dom'
+import Skeleton from 'react-loading-skeleton'
 
 const cx = classNames.bind(styles)
 function ProductFrame({ productList, Component }) {
@@ -26,7 +27,7 @@ function ProductFrame({ productList, Component }) {
                                 key={index}
                                 className={currentTab === index ? cx('tab_item', 'tab_active') : cx('tab_item')}
                             >
-                                {category.title}
+                                {category.title || <Skeleton />}
                             </li>
                         ))
                     }
@@ -48,7 +49,7 @@ function ProductFrame({ productList, Component }) {
 
             <div className={cx('bottom')}>
                 <Link to={`/seemore-product/${categoryId}`}>
-                    <Button>Xem Thêm</Button>
+                    <Button>{'Xem Thêm' || <Skeleton />}</Button>
                 </Link>
             </div>
         </div>
