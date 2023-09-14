@@ -12,7 +12,6 @@ function DropMenu({ options, size, optionSelected, setOptionSelected }) {
     }
 
     const handleSelectOption = (e) => {
-        console.log(e)
         setOptionSelected(
             {
                 title: e.target.innerText,

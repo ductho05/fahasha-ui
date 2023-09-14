@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { publicRoutes, privateRoutes, notFoundRoute } from './routes/index'
+import { publicRoutes, privateRoutes, notFoundRoute, adminRoutes } from './routes/index'
 import DefaultLayout from './components/Layouts/DefaultLayout'
 import ScrollToTop from './components/ScrollToTop';
 import localstorge from './stores/localstorge';
 import { useStore } from './stores/hooks'
+import AdminLayout from './admin/components/layouts/AdminLayout';
 
 function App() {
   const [isLogin, setIsLogin] = useState(localstorge.get().length > 0)
+  const [state, dispatch] = useStore()
   const Page404 = notFoundRoute.component
   return (
     <BrowserRouter>
@@ -37,6 +39,22 @@ function App() {
                   element={isLogin ? <DefaultLayout setIsLogin={setIsLogin}>
                     <Page />
                   </DefaultLayout> : <Navigate to='/login-register' />}
+                />
+              )
+            })
+          }
+
+          {
+            adminRoutes.map((route, index) => {
+              const Page = route.component
+              return (
+                <Route key={index} path={route.path}
+                  element={isLogin && state.user.isManager ?
+                    <AdminLayout>
+                      <Page />
+                    </AdminLayout>
+                    : <Navigate to='/login-register' />
+                  }
                 />
               )
             })
