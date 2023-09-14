@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from 'axios'
 
 import _debounce from 'lodash/debounce';
 
@@ -135,7 +135,7 @@ function Header() {
         } else {
             let newSuggestions = suggestItems
                 .filter((suggestion) => suggestion.name.toLowerCase().includes(inputValue.toLowerCase()))
-                .slice(0, 7);
+                .slice(0, 7)
             setSuggestions(newSuggestions);
             //console.log(suggestItems);
         }
