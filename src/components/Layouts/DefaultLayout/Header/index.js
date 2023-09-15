@@ -24,6 +24,7 @@ import { api } from '../../../../constants';
 import localstorage from '../../../../localstorage';
 import { useStore } from '../../../../stores/hooks';
 import { Input } from '@mui/material';
+import LoginWithFacebook from '../../../LoginWithFacebook';
 
 const cx = classNames.bind(styles);
 
@@ -553,10 +554,9 @@ function Header() {
                                                 Đăng nhập
                                             </Button>
                                             <Button onClick={handleRegister}>Đăng ký</Button>
-                                            <Button leftIcon={<FontAwesomeIcon icon={faFacebookF} />} facebook>
-                                                {' '}
-                                                Đăng nhập bằng facebook
-                                            </Button>
+                                            <p className={cx('btn_facebook')}>
+                                                <LoginWithFacebook />
+                                            </p>
                                         </div>
                                     </PopperWrapper>
                                 </div>
