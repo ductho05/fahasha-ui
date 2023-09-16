@@ -1,6 +1,9 @@
 export const api = 'https://bookstore-api-0a2i.onrender.com/bookstore/api/v1'
 export const apiProvinces = 'https://provinces.open-api.vn/api/?depth=3'
 export const apiMaps = 'https://api.mapbox.com/'
+
+export const listJustWatched = JSON.parse(localStorage.getItem('mycategory')) || [];
+
 export const listPathHots = [
     {
         title: 'Sách mới nhất',

@@ -1,233 +1,251 @@
-import { useState, useEffect, useRef } from "react"
-import { useParams } from "react-router-dom"
-import classNames from "classnames/bind"
-import numeral from 'numeral'
-import { toast, ToastContainer } from 'react-toastify'
-import "react-toastify/dist/ReactToastify.css";
-import styles from './ProductDetail.module.scss'
+import { useState, useEffect, useRef } from 'react';
+import { useParams } from 'react-router-dom';
+import classNames from 'classnames/bind';
+import numeral from 'numeral';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import styles from './ProductDetail.module.scss';
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faMinus, faPlus, faShareNodes, faStar, faCartShopping, faPen, faArrowRight } from "@fortawesome/free-solid-svg-icons"
-import { faThumbsUp } from "@fortawesome/free-regular-svg-icons"
-import Button from '../../components/Button'
-import ProductFrame from "../../components/ProductFrame"
-import ProductSlider from "../../components/ProductSlider"
-import Modal from '../../components/Modal'
-import RegisterLogin from '../../components/Forms/RegisterLogin'
-import { api } from "../../constants"
-import ReadMore from "../../components/ReadMore"
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+    faMinus,
+    faPlus,
+    faShareNodes,
+    faStar,
+    faCartShopping,
+    faPen,
+    faArrowRight,
+} from '@fortawesome/free-solid-svg-icons';
+import { faThumbsUp } from '@fortawesome/free-regular-svg-icons';
+import Button from '../../components/Button';
+import ProductFrame from '../../components/ProductFrame';
+import ProductSlider from '../../components/ProductSlider';
+import Modal from '../../components/Modal';
+import RegisterLogin from '../../components/Forms/RegisterLogin';
+import { api } from '../../constants';
+import ReadMore from '../../components/ReadMore';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
-import { Dialog } from "@mui/material"
-import localstorage from "../../localstorage"
-import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { useStore } from "../../stores/hooks"
-import EvaluateForm from "../../components/Forms/EvaluateForm"
+import { Dialog } from '@mui/material';
+import localstorage from '../../localstorage';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useStore } from '../../stores/hooks';
+import EvaluateForm from '../../components/Forms/EvaluateForm';
 
-const cx = classNames.bind(styles)
+const cx = classNames.bind(styles);
 
 function ProductDetail() {
-    const navigate = useNavigate()
-    const location = useLocation()
-    const { productId } = useParams()
-    const [product, setProduct] = useState({})
-    const [currentQuantity, setCurrentQuantity] = useState(1)
-    const [isShowForm, setIsShowForm] = useState(false)
-    const [isShowDialog, setIsShowDialog] = useState(false)
-    const [indexForm, setIndexForm] = useState(0)
-    const [productNews, setProductNews] = useState([])
-    const [productRelated, setProductRelated] = useState([])
-    const [evaluate, setEvaluate] = useState({})
-    const [comments, setComments] = useState([])
-    const rates = [1, 2, 3, 4, 5]
-    const [state, dispatch] = useStore()
-    const [showEvalDialog, setShowEvalDialog] = useState(false)
-    const commentRef = useRef()
-    const [resultEval, setResultEval] = useState()
-    const [showNolginDialog, setShowNolginDialog] = useState(false)
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { productId } = useParams();
+    const [product, setProduct] = useState({});
+    const [currentQuantity, setCurrentQuantity] = useState(1);
+    const [isShowForm, setIsShowForm] = useState(false);
+    const [isShowDialog, setIsShowDialog] = useState(false);
+    const [indexForm, setIndexForm] = useState(0);
+    const [productNews, setProductNews] = useState([]);
+    const [productRelated, setProductRelated] = useState([]);
+    const [evaluate, setEvaluate] = useState({});
+    const [comments, setComments] = useState([]);
+    const rates = [1, 2, 3, 4, 5];
+    const [state, dispatch] = useStore();
+    const [showEvalDialog, setShowEvalDialog] = useState(false);
+    const commentRef = useRef();
+    const [resultEval, setResultEval] = useState();
+    const [showNolginDialog, setShowNolginDialog] = useState(false);
+
+    var category = JSON.parse(localStorage.getItem('mycategory')) || [];
 
     useEffect(() => {
-        console.log(resultEval)
+        console.log(resultEval);
         if (resultEval == true) {
-            toast.success('Đánh giá sản phẩm thành công !')
+            toast.success('Đánh giá sản phẩm thành công !');
         } else if (resultEval == false) {
-            toast.error('Đánh giá sản phẩm thất bại !')
+            toast.error('Đánh giá sản phẩm thất bại !');
         }
-    }, [resultEval])
+    }, [resultEval]);
 
     useEffect(() => {
-        document.title = 'Chi tiết sản phẩm'
-    }, [])
+        document.title = 'Chi tiết sản phẩm';
+    }, []);
 
     const fetchComments = (productId) => {
         fetch(`${api}/evaluates/product?_id=${productId}`, {
             method: 'POST',
             headers: {
-                "Content-Type": "application/json",
-            }
+                'Content-Type': 'application/json',
+            },
         })
-            .then(response => response.json())
-            .then(result => {
-                setComments(result.data)
-            })
-    }
+            .then((response) => response.json())
+            .then((result) => {
+                setComments(result.data);
+            });
+    };
 
     const fetchEvaluate = (productId) => {
         fetch(`${api}/evaluates/count?_id=${productId}`, {
             method: 'POST',
             headers: {
-                "Content-Type": "application/json",
-            }
+                'Content-Type': 'application/json',
+            },
         })
-            .then(response => response.json())
-            .then(result => {
-                setEvaluate(result.data)
-            })
-    }
+            .then((response) => response.json())
+            .then((result) => {
+                setEvaluate(result.data);
+            });
+    };
 
     const fetchProductRelated = (p) => {
         fetch(`${api}/products/category?category=${p.categoryId._id}&limit=10`, {
             method: 'POST',
             headers: {
-                "Content-Type": "application/json",
-            }
+                'Content-Type': 'application/json',
+            },
         })
-            .then(response => response.json())
-            .then(result => {
-                setProductRelated(prev => {
+            .then((response) => response.json())
+            .then((result) => {
+                getCategory(p)
+                setProductRelated((prev) => {
                     return [
                         {
                             title: p.categoryId.name || '',
-                            products: result.data
-                        }
-                    ]
-                })
-            })
+                            products: result.data,
+                        },
+                    ];
+                });
+            });
+    };
+
+    const getCategory = (p) => {
+        if (category.length > 3) {
+            category.shift();
+        }
+
+        if (!category.includes(p.categoryId._id) && p.categoryId._id != null) {
+            category.push(p.categoryId._id);
+        }
+        localStorage.setItem('mycategory', JSON.stringify(category));
     }
 
     const fetchProduct = () => {
         fetch(`${api}/products/id/${productId}`)
-            .then(response => response.json())
-            .then(result => {
-                setProduct(result.data)
-                fetchProductRelated(result.data)
-            })
-    }
+            .then((response) => response.json())
+            .then((result) => {
+                setProduct(result.data);
+                fetchProductRelated(result.data);
+            });
+    };
 
     const fetchProductNew = () => {
         fetch(`${api}/products/new/10`)
-            .then(response => response.json())
-            .then(result => {
-                setProductNews(prev => {
+            .then((response) => response.json())
+            .then((result) => {
+                setProductNews((prev) => {
                     return [
                         {
                             title: 'Sách mới nhất',
-                            products: result.data
-                        }
-                    ]
-                })
-            })
-    }
+                            products: result.data,
+                        },
+                    ];
+                });
+            });
+    };
 
     useEffect(() => {
-        setProduct({})
-        fetchProduct()
-        fetchProductNew()
-        fetchEvaluate(productId)
-    }, [productId])
+        setProduct({});
+        fetchProduct();
+        fetchProductNew();
+        fetchEvaluate(productId);
+    }, [productId]);
 
     useEffect(() => {
-        fetchComments(productId)
-    }, [productId, resultEval])
+        fetchComments(productId);
+    }, [productId, resultEval]);
 
-    var lengthComments = comments.length
-    var tempArray = Array(lengthComments).fill(1)
+    var lengthComments = comments.length;
+    var tempArray = Array(lengthComments).fill(1);
     const handleMinus = () => {
-        setCurrentQuantity(prev => {
-            return prev > 1 ? prev - 1 : 1
-        })
-    }
+        setCurrentQuantity((prev) => {
+            return prev > 1 ? prev - 1 : 1;
+        });
+    };
     const handlePlus = () => {
-        setCurrentQuantity(prev => {
-            return prev + 1
-        })
-    }
+        setCurrentQuantity((prev) => {
+            return prev + 1;
+        });
+    };
 
     let handleLogin = () => {
-        setIndexForm(prev => {
-            prev = 0
-            return prev
-        })
-        setIsShowForm(true)
-    }
+        setIndexForm((prev) => {
+            prev = 0;
+            return prev;
+        });
+        setIsShowForm(true);
+    };
 
     let handleRegister = () => {
-        setIndexForm(prev => {
-            prev = 1
-            return prev
-        })
-        setIsShowForm(true)
-    }
+        setIndexForm((prev) => {
+            prev = 1;
+            return prev;
+        });
+        setIsShowForm(true);
+    };
 
     const handleAddToCart = () => {
         if (Object.keys(state.user).length > 0) {
-            let oldCats = localstorage.get('carts')
-            let findIndex = oldCats.findIndex(p => p.product._id == product._id)
-            console.log('index', findIndex)
+            let oldCats = localstorage.get('carts');
+            let findIndex = oldCats.findIndex((p) => p.product._id == product._id);
+            console.log('index', findIndex);
             if (findIndex !== -1) {
-                oldCats[findIndex].quantity += 1
-                localstorage.set('carts', [
-                    ...oldCats,
-                ])
+                oldCats[findIndex].quantity += 1;
+                localstorage.set('carts', [...oldCats]);
             } else {
                 localstorage.set('carts', [
                     ...oldCats,
                     {
                         quantity: currentQuantity,
-                        product: product
-                    }
-                ])
+                        product: product,
+                    },
+                ]);
             }
 
-            setIsShowDialog(!isShowDialog)
+            setIsShowDialog(!isShowDialog);
         } else {
-            setShowNolginDialog(true)
+            setShowNolginDialog(true);
         }
-    }
+    };
 
     const handleBuyNow = () => {
         if (Object.keys(state.user).length > 0) {
-            let oldCats = localstorage.get('carts')
-            let findIndex = oldCats.findIndex(p => p.product._id == product._id)
-            console.log('index', findIndex)
+            let oldCats = localstorage.get('carts');
+            let findIndex = oldCats.findIndex((p) => p.product._id == product._id);
+            console.log('index', findIndex);
             if (findIndex !== -1) {
-                oldCats[findIndex].quantity += 1
-                localstorage.set('carts', [
-                    ...oldCats,
-                ])
+                oldCats[findIndex].quantity += 1;
+                localstorage.set('carts', [...oldCats]);
             } else {
                 localstorage.set('carts', [
                     ...oldCats,
                     {
                         quantity: currentQuantity,
-                        product: product
-                    }
-                ])
+                        product: product,
+                    },
+                ]);
             }
 
-            navigate('/cart')
+            navigate('/cart');
         } else {
-            setShowNolginDialog(true)
+            setShowNolginDialog(true);
         }
-    }
+    };
 
     const handleCloseDialog = () => {
-        setIsShowDialog(!isShowDialog)
-    }
+        setIsShowDialog(!isShowDialog);
+    };
 
     const handleEval = () => {
-        setShowEvalDialog(true)
-    }
+        setShowEvalDialog(true);
+    };
 
     useEffect(() => {
         if (location.pathname == `/product-detail/${productId}/comments-detail`) {
@@ -236,19 +254,18 @@ function ProductDetail() {
                 block: 'start',
             });
         }
-    })
+    });
 
     const handleToLoginPage = () => {
-        navigate('/login-register')
-    }
+        navigate('/login-register');
+    };
 
     const handleCancelGoToLoginPage = () => {
-        setShowNolginDialog(false)
-    }
+        setShowNolginDialog(false);
+    };
 
     return (
         <>
-
             <ToastContainer
                 position="top-right"
                 autoClose={5000}
@@ -267,21 +284,27 @@ function ProductDetail() {
                     <h3 className={cx('dialog_nologin_message')}>Vui lòng đăng nhập trước khi mua hàng</h3>
                     <div onClick={handleToLoginPage} className={cx('btn_to_login')}>
                         <p>Trang đăng nhập</p>
-                        <p><FontAwesomeIcon icon={faArrowRight} /></p>
+                        <p>
+                            <FontAwesomeIcon icon={faArrowRight} />
+                        </p>
                     </div>
-                    <p onClick={handleCancelGoToLoginPage} className={cx('btn_cancel_logins')}>Bỏ qua</p>
+                    <p onClick={handleCancelGoToLoginPage} className={cx('btn_cancel_logins')}>
+                        Bỏ qua
+                    </p>
                 </div>
             </Dialog>
 
             <Dialog open={isShowDialog}>
                 <div className={cx('dialog_add_to_cart')}>
-                    <p className={cx('dialog_success')}>
-                        Sản phẩm đã được thêm thành công vào giỏ hàng của bạn
-                    </p>
+                    <p className={cx('dialog_success')}>Sản phẩm đã được thêm thành công vào giỏ hàng của bạn</p>
                     <img src={product.images} />
                     <div className={cx('option_btn')}>
-                        <p onClick={handleCloseDialog} className={cx('btn')}>Chọn Thêm</p>
-                        <Link to='/cart' className={cx('btn')}>Thanh Toán</Link>
+                        <p onClick={handleCloseDialog} className={cx('btn')}>
+                            Chọn Thêm
+                        </p>
+                        <Link to="/cart" className={cx('btn')}>
+                            Thanh Toán
+                        </Link>
                     </div>
                 </div>
             </Dialog>
@@ -295,15 +318,12 @@ function ProductDetail() {
                         <RegisterLogin
                             setShowForm={setIsShowForm}
                             indexForm={indexForm}
-                            setForm={setIndexForm}>
-                        </RegisterLogin>
+                            setForm={setIndexForm}
+                        ></RegisterLogin>
                     </Modal>
                 </div>
                 <div className={Object.keys(product).length > 0 ? cx('hidden') : cx('visible')}>
-                    <Backdrop
-                        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-                        open
-                    >
+                    <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open>
                         <CircularProgress color="inherit" />
                     </Backdrop>
                 </div>
@@ -315,8 +335,10 @@ function ProductDetail() {
                         <div className={cx('product_btn', 'hide_on_tablet_mobile')}>
                             <Button onClick={handleAddToCart} leftIcon={<FontAwesomeIcon icon={faCartShopping} />}>
                                 Thêm vào giỏ hàng
-                            </Button >
-                            <Button onClick={handleBuyNow} primary>Mua ngay</Button>
+                            </Button>
+                            <Button onClick={handleBuyNow} primary>
+                                Mua ngay
+                            </Button>
                         </div>
                     </div>
 
@@ -338,13 +360,14 @@ function ProductDetail() {
                             <span>Thương Hiệu Nhật</span>
                         </p> */}
                         <div className={cx('rate')}>
-                            {
-                                rates.map((rate, index) => (
-                                    <span key={index} className={rate <= product.rate ? cx('star_active', 'rate_star') : cx('rate_star')}>
-                                        <FontAwesomeIcon icon={faStar} />
-                                    </span>
-                                ))
-                            }
+                            {rates.map((rate, index) => (
+                                <span
+                                    key={index}
+                                    className={rate <= product.rate ? cx('star_active', 'rate_star') : cx('rate_star')}
+                                >
+                                    <FontAwesomeIcon icon={faStar} />
+                                </span>
+                            ))}
                             <p className={cx('rate_number')}>({evaluate.total} đánh giá)</p>
                             <p className={cx('btn_share', 'hide_on_pc')}>
                                 <FontAwesomeIcon icon={faShareNodes} />
@@ -353,19 +376,12 @@ function ProductDetail() {
 
                         <div className={cx('mid_content')}>
                             <div className={cx('price')}>
-                                <p className={cx('current_price')}>
-                                    {
-
-                                        numeral(product.price).format('0,0[.]00 VNĐ')
-                                    } đ
-                                </p>
+                                <p className={cx('current_price')}>{numeral(product.price).format('0,0[.]00 VNĐ')} đ</p>
                                 <p className={product.price === product.old_price ? cx('hidden') : cx('old_price')}>
-                                    {
-                                        numeral(product.old_price).format('0,0[.]00 VNĐ')
-                                    } đ
+                                    {numeral(product.old_price).format('0,0[.]00 VNĐ')} đ
                                 </p>
                                 <p className={product.price === product.old_price ? cx('hidden') : cx('discount')}>
-                                    -{(100 - ((product.price / product.old_price) * 100)).toFixed(1)}%
+                                    -{(100 - (product.price / product.old_price) * 100).toFixed(1)}%
                                 </p>
                             </div>
                             <p className={cx('btn_share', 'hide_on_tablet_mobile')}>
@@ -399,22 +415,12 @@ function ProductDetail() {
 
                 <div className={cx('introduction')}>
                     <h3>Fahasa giới thiệu</h3>
-                    <ProductFrame
-                        productList={productNews}
-                        Component={ProductSlider}
-                    >
-
-                    </ProductFrame>
+                    <ProductFrame productList={productNews} Component={ProductSlider}></ProductFrame>
                 </div>
 
                 <div className={cx('introduction')}>
                     <h3>Sách liên quan</h3>
-                    <ProductFrame
-                        productList={productRelated}
-                        Component={ProductSlider}
-                    >
-
-                    </ProductFrame>
+                    <ProductFrame productList={productRelated} Component={ProductSlider}></ProductFrame>
                 </div>
 
                 <div className={cx('infomation')}>
@@ -446,8 +452,15 @@ function ProductDetail() {
                                 </tr>
                             </tbody>
                         </table>
-                        <p>Giá sản phẩm trên Fahasa.com đã bao gồm thuế theo luật hiện hành. Bên cạnh đó, tuỳ vào loại sản phẩm, hình thức và địa chỉ giao hàng mà có thể phát sinh thêm chi phí khác như Phụ phí đóng gói, phí vận chuyển, phụ phí hàng cồng kềnh,...</p>
-                        <span>Chính sách khuyến mãi trên Fahasa.com không áp dụng cho Hệ thống Nhà sách Fahasa trên toàn quốc</span>
+                        <p>
+                            Giá sản phẩm trên Fahasa.com đã bao gồm thuế theo luật hiện hành. Bên cạnh đó, tuỳ vào loại
+                            sản phẩm, hình thức và địa chỉ giao hàng mà có thể phát sinh thêm chi phí khác như Phụ phí
+                            đóng gói, phí vận chuyển, phụ phí hàng cồng kềnh,...
+                        </p>
+                        <span>
+                            Chính sách khuyến mãi trên Fahasa.com không áp dụng cho Hệ thống Nhà sách Fahasa trên toàn
+                            quốc
+                        </span>
                     </div>
 
                     <div className={cx('description')}>
@@ -466,37 +479,57 @@ function ProductDetail() {
                                 <p>/5</p>
                             </h3>
                             <div className={cx('rate')}>
-                                {
-                                    rates.map((item, index) => (
-                                        <span key={index} className={item <= product.rate ? cx('star_active', 'rate_star') : cx('rate_star')}>
-                                            <FontAwesomeIcon icon={faStar} />
-                                        </span>
-                                    ))
-                                }
+                                {rates.map((item, index) => (
+                                    <span
+                                        key={index}
+                                        className={
+                                            item <= product.rate ? cx('star_active', 'rate_star') : cx('rate_star')
+                                        }
+                                    >
+                                        <FontAwesomeIcon icon={faStar} />
+                                    </span>
+                                ))}
                             </div>
                             <p className={cx('rate_number')}>({evaluate.total} đánh giá)</p>
                         </div>
 
                         <div className={cx('rate_percent')}>
-                            {
-                                rates.map((rate, index) => (
-                                    <div key={index} className={cx('rate_percent_item')}>
-                                        <p>{index + 1} Sao</p>
-                                        <div className={cx('review_rating')}>
-                                            <div style={evaluate.total ? { width: `${(evaluate.rate[index] / evaluate.total) * 100}%` } : { width: `0%` }}></div>
-                                        </div>
-                                        <p>{evaluate.total ? ((evaluate.rate[index] / evaluate.total) * 100) : 0} %</p>
+                            {rates.map((rate, index) => (
+                                <div key={index} className={cx('rate_percent_item')}>
+                                    <p>{index + 1} Sao</p>
+                                    <div className={cx('review_rating')}>
+                                        <div
+                                            style={
+                                                evaluate.total
+                                                    ? { width: `${(evaluate.rate[index] / evaluate.total) * 100}%` }
+                                                    : { width: `0%` }
+                                            }
+                                        ></div>
                                     </div>
-                                ))
-                            }
+                                    <p>{evaluate.total ? (evaluate.rate[index] / evaluate.total) * 100 : 0} %</p>
+                                </div>
+                            ))}
                         </div>
 
-                        <p className={Object.keys(state.user).length <= 0 ? cx('nologin', 'hide_on_tablet_mobile') : cx('hide')}>
+                        <p
+                            className={
+                                Object.keys(state.user).length <= 0
+                                    ? cx('nologin', 'hide_on_tablet_mobile')
+                                    : cx('hide')
+                            }
+                        >
                             Chỉ có thành viên mới có thể viết nhận xét.Vui lòng
                             <a onClick={handleLogin}>Đăng nhập</a> hoặc
                             <a onClick={handleRegister}>Đăng ký.</a>
                         </p>
-                        <p onClick={handleEval} className={Object.keys(state.user).length > 0 ? cx('btn_evaluate', 'hide_on_tablet_mobile') : cx('hide')}>
+                        <p
+                            onClick={handleEval}
+                            className={
+                                Object.keys(state.user).length > 0
+                                    ? cx('btn_evaluate', 'hide_on_tablet_mobile')
+                                    : cx('hide')
+                            }
+                        >
                             <Button leftIcon={<FontAwesomeIcon icon={faPen} />}>Viết đánh giá</Button>
                         </p>
                     </div>
@@ -505,7 +538,12 @@ function ProductDetail() {
                         <a onClick={handleLogin}>Đăng nhập</a> hoặc
                         <a onClick={handleRegister}>Đăng ký.</a>
                     </p>
-                    <p onClick={handleEval} className={Object.keys(state.user).length > 0 ? cx('btn_evaluate_tl-mb', 'hide_on_pc') : cx('hide')}>
+                    <p
+                        onClick={handleEval}
+                        className={
+                            Object.keys(state.user).length > 0 ? cx('btn_evaluate_tl-mb', 'hide_on_pc') : cx('hide')
+                        }
+                    >
                         <Button leftIcon={<FontAwesomeIcon icon={faPen} />}>Viết đánh giá</Button>
                     </p>
 
@@ -515,43 +553,44 @@ function ProductDetail() {
                             <li className={cx('comments_tab_item')}>Yêu thích nhất</li>
                         </ul>
 
-
-                        {
-                            tempArray.map((item, index) =>
-                                <div ref={commentRef} className={cx('comments_inner')}>
-                                    <div className={cx('comments_left')}>
-                                        <p className={cx('comments_user')}>{comments[index].user.fullName ? comments[index].user.fullName : comments[index].user.username}</p>
-                                        <p className={cx('comments_day')}>
-                                            {
-                                                new Date(comments[index].createdAt).toLocaleDateString()
-                                            }
-                                        </p>
-                                    </div>
-                                    <div className={cx('comments_right')}>
-                                        <div className={cx('rate')}>
-                                            {
-                                                rates.map((item, indexRate) => (
-                                                    <span key={indexRate} className={item <= comments[index].rate ? cx('star_active', 'rate_star') : cx('rate_star')}>
-                                                        <FontAwesomeIcon icon={faStar} />
-                                                    </span>
-                                                ))
-                                            }
-                                        </div>
-                                        <ReadMore>
-                                            {comments[index].comment}
-                                        </ReadMore>
-                                        <div className={cx('comments_likes')}>
-                                            <p className={cx('like_icon')}>
-                                                <FontAwesomeIcon icon={faThumbsUp} />
-                                            </p>
-                                            thích
-                                            <p className={cx('like_total')}>(2)</p>
-                                        </div>
-                                    </div>
-
+                        {tempArray.map((item, index) => (
+                            <div ref={commentRef} className={cx('comments_inner')}>
+                                <div className={cx('comments_left')}>
+                                    <p className={cx('comments_user')}>
+                                        {comments[index].user.fullName
+                                            ? comments[index].user.fullName
+                                            : comments[index].user.username}
+                                    </p>
+                                    <p className={cx('comments_day')}>
+                                        {new Date(comments[index].createdAt).toLocaleDateString()}
+                                    </p>
                                 </div>
-                            )
-                        }
+                                <div className={cx('comments_right')}>
+                                    <div className={cx('rate')}>
+                                        {rates.map((item, indexRate) => (
+                                            <span
+                                                key={indexRate}
+                                                className={
+                                                    item <= comments[index].rate
+                                                        ? cx('star_active', 'rate_star')
+                                                        : cx('rate_star')
+                                                }
+                                            >
+                                                <FontAwesomeIcon icon={faStar} />
+                                            </span>
+                                        ))}
+                                    </div>
+                                    <ReadMore>{comments[index].comment}</ReadMore>
+                                    <div className={cx('comments_likes')}>
+                                        <p className={cx('like_icon')}>
+                                            <FontAwesomeIcon icon={faThumbsUp} />
+                                        </p>
+                                        thích
+                                        <p className={cx('like_total')}>(2)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
@@ -574,11 +613,13 @@ function ProductDetail() {
                     </p>
                 </li>
                 <li>
-                    <p onClick={handleBuyNow} className={cx('buy_now')}>Mua ngay</p>
+                    <p onClick={handleBuyNow} className={cx('buy_now')}>
+                        Mua ngay
+                    </p>
                 </li>
             </ul>
         </>
-    )
+    );
 }
 
-export default ProductDetail
+export default ProductDetail;
