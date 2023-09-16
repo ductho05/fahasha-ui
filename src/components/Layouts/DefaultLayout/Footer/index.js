@@ -91,9 +91,9 @@ function Footer() {
                                     <li className={cx('footer_item_child')}>
                                         Đăng nhập/Tạo mới tài khoản
                                     </li>
-                                    <li className={cx('footer_item_child')}>
+                                    <a href='/terms-of-service' className={cx('footer_item_child')}>
                                         Điều khoản sử dụng
-                                    </li>
+                                    </a>
                                     <li className={cx('footer_item_child')}>
                                         Chính sách bảo mật thông tin cá nhân
                                     </li>

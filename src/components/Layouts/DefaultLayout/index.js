@@ -24,6 +24,38 @@ function DefaultLayout(props) {
     const [isShowForm, setIsShowForm] = useState(false)
     const [indexForm, setIndexForm] = useState(0)
     const [state, dispatch] = useStore()
+    const [isInteractive, setIsInteractive] = useState(false)
+
+    const handleUserInteraction = () => {
+        setIsInteractive(true)
+    }
+
+    const handleUserInactivity = () => {
+        setIsInteractive(false)
+    }
+
+    useEffect(() => {
+
+        clearInterval(5000)
+
+        setInterval(() => {
+            setIsInteractive(false)
+        }, 5000)
+
+        window.addEventListener('mousemove', handleUserInteraction)
+        window.addEventListener('scroll', handleUserInteraction)
+        window.addEventListener('keydown', handleUserInteraction)
+
+        window.addEventListener('blur', handleUserInactivity)
+
+        return () => {
+            window.removeEventListener('mousemove', handleUserInteraction)
+            window.removeEventListener('scroll', handleUserInteraction)
+            window.removeEventListener('keydown', handleUserInteraction)
+            window.removeEventListener('blur', handleUserInactivity)
+        }
+
+    }, [])
 
     useEffect(() => {
         props.setIsLogin(localstorage.get().length > 0)
@@ -50,13 +82,13 @@ function DefaultLayout(props) {
                     setExpired(false)
                 })
         }
-    }, 60000)
+    }, 6000)
 
     useEffect(() => {
-        if (expired) {
+        if (expired && isInteractive === false) {
             dispatch(logout({}))
         }
-    }, [expired])
+    }, [expired, isInteractive])
 
     const handlePass = () => {
         dispatch(logout({}))
@@ -98,7 +130,7 @@ function DefaultLayout(props) {
                     theme="light"
                 />
                 <div className={cx('content')}>
-                    <Dialog open={expired}>
+                    <Dialog open={expired && isInteractive === false}>
                         <div className={cx('dialog_end_session_login')}>
                             <h1 className={cx('notice')}>Đã hết phiên đăng nhập. Vui lòng đăng nhập lại</h1>
                             <RegisterLogin
