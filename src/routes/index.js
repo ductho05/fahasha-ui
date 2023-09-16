@@ -12,6 +12,7 @@ import Page404 from '../pages/Page404'
 import HomeAdmin from '../admin/pages/HomeAdmin/HomeAdmin'
 import Users from '../admin/pages/Users/Users'
 import UserDetail from '../admin/pages/UserDetail/UserDetail'
+import TermsServices from '../pages/TermsServices'
 
 // Public Routes
 const publicRoutes = [
@@ -21,6 +22,7 @@ const publicRoutes = [
     { path: '/seemore-product/:categoryId', component: SeeMoreProduct },
     { path: '/search/:title', component: SearchProduct },
     { path: '/login-register', component: RegisterLogin },
+    { path: '/terms-of-service', component: TermsServices },
 ]
 
 // Private Routes
