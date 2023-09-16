@@ -145,7 +145,7 @@ function Home() {
     const [productsHots, setProductsHots] = useState([]);
     const [categoryBooks, setCategoryBooks] = useState([]);
     const [learnBooks, setLearnBooks] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         document.title = 'Trang chủ';
@@ -153,11 +153,9 @@ function Home() {
 
     useEffect(() => {
         listPathHots.forEach((item) => {
-            setIsLoading(true)
             fetch(`${api}/products${item.path}`)
                 .then((response) => response.json())
                 .then((products) => {
-                    setIsLoading(false)
                     setProductsHots((prev) => {
                         return [
                             ...prev,
@@ -190,7 +188,6 @@ function Home() {
         // });
 
         listPathCategory.forEach((item) => {
-            setIsLoading(true)
             fetch(`${api}/products/category?${item.path}`, {
                 method: 'POST',
                 headers: {
@@ -200,7 +197,6 @@ function Home() {
             })
                 .then((response) => response.json())
                 .then((products) => {
-                    setIsLoading(false)
                     setCategoryBooks((prev) => {
                         return [
                             ...prev,
@@ -215,7 +211,6 @@ function Home() {
         });
 
         listPathLearn.forEach((item) => {
-            setIsLoading(true)
             fetch(`${api}/products/category?${item.path}`, {
                 method: 'POST',
                 headers: {
@@ -225,7 +220,6 @@ function Home() {
             })
                 .then((response) => response.json())
                 .then((products) => {
-                    setIsLoading(false)
                     setLearnBooks((prev) => {
                         return [
                             ...prev,
@@ -239,6 +233,22 @@ function Home() {
                 .catch((err) => console.log(err));
         });
     }, []);
+
+    useEffect(() => {
+        if (document.readyState === 'complete') {
+            handlLoaded()
+        } else {
+            handleLoading()
+        }
+    }, [])
+
+    const handleLoading = () => {
+        setIsLoading(true)
+    }
+
+    const handlLoaded = () => {
+        setIsLoading(false)
+    }
 
     return (
         <div className={cx('wrapper')}>
@@ -255,7 +265,7 @@ function Home() {
                         {listPoster.map((poster, index) => (
                             <li key={index} className={cx('poster_item')}>
                                 {
-                                    isLoading ? <Skeleton variant='rectangular' animation='wave' width={200} height={200} /> : <a href="#"><LazyLoadImage src={poster.url} /></a>
+                                    isLoading ? <Skeleton variant='rectangular' animation='wave' width={380} height={156} /> : <a href="#"><LazyLoadImage src={poster.url} /></a>
                                 }
 
                             </li>
@@ -267,11 +277,12 @@ function Home() {
             <div className={cx('heading_bottom', 'hide-on-small-tablet', 'hide-on-mobile')}>
                 <ul className={cx('slogan_list')}>
                     {listSlogan.map((slogan, index) => (
-                        <li key={index} className={cx('slogan_item')}>
-                            <a href="#">
-                                <LazyLoadImage src={slogan.url} />
-                            </a>
-                        </li>
+                        isLoading ? <Skeleton variant='rectangular' animation='wave' width={300} height={220} /> :
+                            <li key={index} className={cx('slogan_item')}>
+                                <a href="#">
+                                    <LazyLoadImage src={slogan.url} />
+                                </a>
+                            </li>
                     ))}
                 </ul>
             </div>
