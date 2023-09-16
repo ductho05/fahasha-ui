@@ -1,0 +1,64 @@
+.body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .content {
+        padding: 10px 0;
+        font-size: 1.4rem;
+        color: #999;
+    }
+
+    .total {
+        font-size: 3rem;
+        color: #333;
+        line-height: 1.5;
+        margin: 20px 0;
+    }
+
+    .last_revenue {
+        display: flex;
+        gap: 20px;
+    }
+    .last_item {
+        font-size: 1.4rem;
+        color: #999;
+        line-height: 1.5;
+        text-align: center;
+        font-weight: 600;
+    }
+
+    .last_title {
+        line-height: 1.5;
+    }
+
+    .last_value {
+        font-weight: 600;
+    }
+
+    .yesterday {
+        color: #fe0000;
+    }
+
+    .last_week {
+        color: #fd8d14;
+    }
+
+    .last_month {
+        color: #9f0d7f;
+    }
+}
+
+.total_revenue {
+    font-size: 1.4rem;
+    color: #333;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.sell-today {
+    width: 120px;
+    height: 120px;
+    padding: 10px;
+}

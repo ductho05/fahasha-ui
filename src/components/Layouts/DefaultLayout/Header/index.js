@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from 'axios'
 
 import _debounce from 'lodash/debounce';
 
@@ -24,6 +24,7 @@ import { api } from '../../../../constants';
 import localstorage from '../../../../localstorage';
 import { useStore } from '../../../../stores/hooks';
 import { Input } from '@mui/material';
+import LoginWithFacebook from '../../../LoginWithFacebook';
 
 const cx = classNames.bind(styles);
 
@@ -136,7 +137,7 @@ function Header() {
         } else {
             let newSuggestions = suggestItems
                 .filter((suggestion) => suggestion.name.toLowerCase().includes(inputValue.toLowerCase()))
-                .slice(0, 7);
+                .slice(0, 7)
             setSuggestions(newSuggestions);
             // console.log(suggestItems);
         }
@@ -554,10 +555,9 @@ function Header() {
                                                 Đăng nhập
                                             </Button>
                                             <Button onClick={handleRegister}>Đăng ký</Button>
-                                            <Button leftIcon={<FontAwesomeIcon icon={faFacebookF} />} facebook>
-                                                {' '}
-                                                Đăng nhập bằng facebook
-                                            </Button>
+                                            <p className={cx('btn_facebook')}>
+                                                <LoginWithFacebook />
+                                            </p>
                                         </div>
                                     </PopperWrapper>
                                 </div>

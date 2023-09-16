@@ -18,6 +18,7 @@ import { Dialog, Backdrop, CircularProgress } from '@mui/material'
 // Firebase
 import { signInWithPopup, signInWithRedirect } from 'firebase/auth'
 import { auth, provider } from '../../../FirebaseConfig'
+import LoginWithFacebook from '../../LoginWithFacebook'
 
 const cx = classNames.bind(styles)
 function RegisterLogin(props) {
@@ -369,9 +370,10 @@ function RegisterLogin(props) {
                         <p className={props.isAccountPage ? cx('hide') : cx('visible')}>
                             <Button onClick={() => props.setShowForm(false)}>Bỏ qua</Button>
                         </p>
-                        <p onClick={handleLoginFacebook}>
+                        {/* <p onClick={handleLoginFacebook}>
                             <Button leftIcon={<FontAwesomeIcon icon={faFacebookF} />} facebook > Đăng nhập bằng facebook</Button>
-                        </p>
+                        </p> */}
+                        <LoginWithFacebook />
                     </div>
                 </form>
 

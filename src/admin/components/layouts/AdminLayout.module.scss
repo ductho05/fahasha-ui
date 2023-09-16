@@ -1,0 +1,15 @@
+.wrapper {
+    display: flex;
+
+    .wrapper::-webkit-scrollbar {
+        display: none;
+    }
+
+    .navbar {
+        flex: 1;
+    }
+
+    .container {
+        flex: 5;
+    }
+}

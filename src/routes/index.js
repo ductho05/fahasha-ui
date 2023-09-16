@@ -9,6 +9,9 @@ import RegisterLogin from '../pages/RegisterLoginPage'
 import OrderSuccess from '../pages/OrderSuccess'
 import OrderDetail from '../pages/OrderDetail'
 import Page404 from '../pages/Page404'
+import HomeAdmin from '../admin/pages/HomeAdmin/HomeAdmin'
+import Users from '../admin/pages/Users/Users'
+import UserDetail from '../admin/pages/UserDetail/UserDetail'
 
 // Public Routes
 const publicRoutes = [
@@ -29,6 +32,13 @@ const privateRoutes = [
     { path: '/order-success/:orderId', component: OrderSuccess },
 ]
 
+// Admin routes
+const adminRoutes = [
+    { path: '/admin', component: HomeAdmin },
+    { path: '/admin/user', component: Users },
+    { path: '/admin/user/:userId', component: UserDetail },
+]
+
 const notFoundRoute = { path: '*', component: Page404 }
 
-export { publicRoutes, privateRoutes, notFoundRoute }
+export { publicRoutes, privateRoutes, notFoundRoute, adminRoutes }
