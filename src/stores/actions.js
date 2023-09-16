@@ -1,35 +1,35 @@
-import { REGISTER, LOGIN, LOGOUT, UPDATE, NOACTION } from "./constants";
+import { REGISTER, LOGIN, LOGOUT, NOACTION } from './constants';
 
 export const register = (payload) => {
     return {
         type: REGISTER,
-        payload
-    }
-}
+        payload,
+    };
+};
 
 export const login = (payload) => {
     return {
         type: LOGIN,
-        payload
-    }
-}
+        payload,
+    };
+};
 
 export const logout = (payload) => {
     return {
         type: LOGOUT,
-        payload
-    }
-}
+        payload,
+    };
+};
 
 export const update = (payload) => {
     return {
         type: LOGOUT,
-        payload
-    }
-}
+        payload,
+    };
+};
 
 export const noAction = () => {
     return {
-        type: NOACTION
-    }
-}
+        type: NOACTION,
+    };
+};

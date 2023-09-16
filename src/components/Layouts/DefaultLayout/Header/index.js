@@ -67,11 +67,12 @@ function Header() {
     }, []);
 
     useEffect(() => {
-        console.log('a');
         fetch(`${api}/products`)
             .then((response) => response.json())
             .then((result) => {
-                setProducts(result.data);
+                setProducts(result.data.splice(0, 20));
+                console.log(products);
+                console.log('Call api');
             })
             .catch((err) => console.log(err));
     }, [keyTextSearch]);
@@ -138,7 +139,7 @@ function Header() {
                 .filter((suggestion) => suggestion.name.toLowerCase().includes(inputValue.toLowerCase()))
                 .slice(0, 7)
             setSuggestions(newSuggestions);
-            //console.log(suggestItems);
+            // console.log(suggestItems);
         }
         setKeyTextSearch(inputValue);
         // console.log(products);
