@@ -127,11 +127,6 @@ function TableCart() {
         });
         return tong;
     }
-    const dataa = [
-        {
-            author: 'ducanh',
-        },
-    ];
 
     const columns = [
         {
@@ -339,7 +334,9 @@ function TableCart() {
                 return {
                     children: (
                         <Typography.Link onClick={() => handleDelete(record.key)}>
-                            <DeleteOutlined style={{ color: '#333', fontSize: '1.8rem', display: 'flex', padding: '0 0 0 20px' }} />
+                            <DeleteOutlined
+                                style={{ color: '#333', fontSize: '1.8rem', display: 'flex', padding: '0 0 0 20px' }}
+                            />
                         </Typography.Link>
                     ),
                 };
