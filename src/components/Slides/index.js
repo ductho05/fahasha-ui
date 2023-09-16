@@ -38,17 +38,14 @@ function Slides(props) {
                     onClick={handlePrevSlide}
                     className={cx('btn', 'btn_prev', 'hide-on-tablet-mobile')}
                 >
-                    <Skeleton width={'100%'} height={'100%'} />
                     <LazyLoadImage src='https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/ico_arrow_gray.svg' />
                 </p>
                 <a href='#'>
-                    <Skeleton width={'100%'} height={'100%'} />
                     <LazyLoadImage className={cx('slider_thumnail')} src={props.slideList[currentIndex].url} />
                 </a>
                 <p
                     onClick={handleNextSlide}
                     className={cx('btn', 'btn_next', 'hide-on-tablet-mobile')}>
-                    <Skeleton width={'100%'} height={'100%'} />
                     <LazyLoadImage src='https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/ico_arrow_gray.svg' />
                 </p>
                 <ul className={cx('index_slide_list')}>

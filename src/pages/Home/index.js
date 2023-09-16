@@ -11,6 +11,7 @@ import ProductSlider from '../../components/ProductSlider';
 import { api, listPathHots, listPathCategory, listPathLearn, listJustWatched } from '../../constants';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { Skeleton } from '@mui/material';
+import "react-loading-skeleton/dist/skeleton.css";
 
 // Fake api
 const listPoster = [
@@ -144,6 +145,7 @@ function Home() {
     const [productsHots, setProductsHots] = useState([]);
     const [categoryBooks, setCategoryBooks] = useState([]);
     const [learnBooks, setLearnBooks] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         document.title = 'Trang chủ';
@@ -151,9 +153,11 @@ function Home() {
 
     useEffect(() => {
         listPathHots.forEach((item) => {
+            setIsLoading(true)
             fetch(`${api}/products${item.path}`)
                 .then((response) => response.json())
                 .then((products) => {
+                    setIsLoading(false)
                     setProductsHots((prev) => {
                         return [
                             ...prev,
@@ -186,6 +190,7 @@ function Home() {
         // });
 
         listPathCategory.forEach((item) => {
+            setIsLoading(true)
             fetch(`${api}/products/category?${item.path}`, {
                 method: 'POST',
                 headers: {
@@ -195,6 +200,7 @@ function Home() {
             })
                 .then((response) => response.json())
                 .then((products) => {
+                    setIsLoading(false)
                     setCategoryBooks((prev) => {
                         return [
                             ...prev,
@@ -209,6 +215,7 @@ function Home() {
         });
 
         listPathLearn.forEach((item) => {
+            setIsLoading(true)
             fetch(`${api}/products/category?${item.path}`, {
                 method: 'POST',
                 headers: {
@@ -218,6 +225,7 @@ function Home() {
             })
                 .then((response) => response.json())
                 .then((products) => {
+                    setIsLoading(false)
                     setLearnBooks((prev) => {
                         return [
                             ...prev,
@@ -236,15 +244,20 @@ function Home() {
         <div className={cx('wrapper')}>
             <div className={cx('heading')}>
                 <div className={cx('slider')}>
-                    <Slides slideList={slideList} />
+                    {
+                        isLoading ? <Skeleton variant='rectangular' animation='wave' height={400} cx={{
+                            width: '100%'
+                        }} /> : <Slides slideList={slideList} />
+                    }
                 </div>
                 <div className={cx('poster', 'hide-on-tablet-mobile')}>
                     <ul className={cx('poster_list')}>
                         {listPoster.map((poster, index) => (
                             <li key={index} className={cx('poster_item')}>
-                                <a href="#">
-                                    <LazyLoadImage src={poster.url} />
-                                </a>
+                                {
+                                    isLoading ? <Skeleton variant='rectangular' animation='wave' width={200} height={200} /> : <a href="#"><LazyLoadImage src={poster.url} /></a>
+                                }
+
                             </li>
                         ))}
                     </ul>
@@ -282,19 +295,19 @@ function Home() {
 
             <div className={cx('trending_product')}>
                 <div className={cx('title')}>
-                    {productsHots.length <= 0 ? (
-                        <Skeleton animation="wave" />
+                    {isLoading ? (
+                        <Skeleton animation="wave" variant='circular' width={24} height={24} />
                     ) : (
                         <LazyLoadImage src="https://cdn0.fahasa.com/skin/frontend/base/default/images/ico_dealhot.png" />
                     )}
-                    {productsHots.length <= 0 ? <Skeleton animation="wave" /> : <h3>DANH MỤC NỔI BẬT</h3>}
+                    <h3 className='min-w-[170px]'>{isLoading ? <Skeleton variant='text' sx={{ fontSize: '1.4rem' }} animation="wave" /> : 'DANH MỤC NỔI BẬT'}</h3>
                 </div>
 
-                <ProductFrame productList={productsHots} Component={GridProduct}></ProductFrame>
+                <ProductFrame isLoading={isLoading} productList={productsHots} Component={GridProduct} />
             </div>
 
             <div className={cx('textboook')}>
-                <ProductFrame productList={categoryBooks} Component={ProductSlider}></ProductFrame>
+                <ProductFrame isLoading={isLoading} productList={categoryBooks} Component={ProductSlider} />
             </div>
 
             <div className={cx('trending_product')}>
@@ -311,7 +324,7 @@ function Home() {
                     <h3>DỤNG CỤ HỌC TẬP</h3>
                 </div>
 
-                <ProductFrame productList={learnBooks} Component={GridProduct}></ProductFrame>
+                <ProductFrame isLoading={isLoading} productList={learnBooks} Component={GridProduct}></ProductFrame>
             </div>
         </div>
     );

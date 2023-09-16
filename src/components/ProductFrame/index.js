@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 import Skeleton from 'react-loading-skeleton'
 
 const cx = classNames.bind(styles)
-function ProductFrame({ productList, Component }) {
+function ProductFrame({ isLoading, productList, Component }) {
 
     const title = productList.reduce((acc, item) => {
         return item.title ? acc += 1 : acc
@@ -22,13 +22,15 @@ function ProductFrame({ productList, Component }) {
                 <ul className={cx('tabs_list')}>
                     {
                         productList.map((category, index) => (
-                            <li
+
+                            isLoading ? <Skeleton animation='wave' variant="rounded" width={120} height={38} /> : <li
                                 onClick={() => handleTab(index)}
                                 key={index}
                                 className={currentTab === index ? cx('tab_item', 'tab_active') : cx('tab_item')}
                             >
-                                {category.title || <Skeleton />}
+                                {category.title}
                             </li>
+
                         ))
                     }
                 </ul>
@@ -39,7 +41,7 @@ function ProductFrame({ productList, Component }) {
                 {
                     productList.map((category, index) => (
                         <div key={index} className={currentTab === index ? cx('product_list', 'content_active') : cx('product_list')}>
-                            <Component products={category.products}>
+                            <Component isLoading={isLoading} products={category.products}>
 
                             </Component>
                         </div>
@@ -49,7 +51,9 @@ function ProductFrame({ productList, Component }) {
 
             <div className={cx('bottom')}>
                 <Link to={`/seemore-product/${categoryId}`}>
-                    <Button>{'Xem Thêm' || <Skeleton />}</Button>
+                    {
+                        isLoading ? <Skeleton variant="rounded" animation='wave' width={242} height={38} /> : <Button>Xem Thêm</Button>
+                    }
                 </Link>
             </div>
         </div>

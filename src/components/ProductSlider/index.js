@@ -6,7 +6,7 @@ import styles from './ProductSlider.module.scss';
 import ProductItem from '../ProductItem';
 
 const cx = classNames.bind(styles);
-function ProductSlider({ products }) {
+function ProductSlider({ isLoading, products }) {
     const responsive = {
         superLargeDesktop: {
             breakpoint: { max: 4000, min: 3000 },
@@ -33,7 +33,7 @@ function ProductSlider({ products }) {
         <div className={cx('wrapper')}>
             <Carousel responsive={responsive}>
                 {products.map((product, index) => (
-                    <ProductItem key={index} product={product} />
+                    isLoading ? <ProductItem.Loading /> : <ProductItem key={index} product={product} />
                 ))}
             </Carousel>
         </div>
