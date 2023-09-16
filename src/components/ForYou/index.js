@@ -22,7 +22,6 @@ function ForYou({ limit }) {
                 )
                 .then((res) => {
                     newArr.push(...res.data.data);
-                    console.log('Asafas', newArr);
                 })
                 .catch((err) => {
                     console.log(err);
