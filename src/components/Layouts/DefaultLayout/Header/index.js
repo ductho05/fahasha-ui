@@ -616,7 +616,9 @@ function Header() {
                                     <img src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/ico_cart_gray.svg" />
                                     <label>Giỏ hàng</label>
                                     <p className={Object.keys(user).length > 0 ? cx('num_carts') : cx('hide')}>
-                                        {localstorage.get(`myCart_${state.user._id}`).items.length}
+                                        {Object.keys(localstorage.get(`myCart_${state.user._id}`)).length
+                                            ? localstorage.get(`myCart_${state.user._id}`).items.length
+                                            : 0}
                                     </p>
                                 </Link>
                                 <Tippy
