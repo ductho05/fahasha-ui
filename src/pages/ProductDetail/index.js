@@ -78,7 +78,7 @@ function ProductDetail() {
     const fetchComments = (productId) => {
         setLoading(true)
         if (currentTab === 0) {
-            fetch(`http://127.0.0.1:3000/bookstore/api/v1/evaluates/product?_id=${productId}`, {
+            fetch(`${api}/evaluates/product?_id=${productId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -93,7 +93,7 @@ function ProductDetail() {
                     setLoading(false)
                 })
         } else {
-            fetch(`http://127.0.0.1:3000/bookstore/api/v1/evaluates/product?_id=${productId}&sort=asc`, {
+            fetch(`${api}/evaluates/product?_id=${productId}&sort=asc`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
