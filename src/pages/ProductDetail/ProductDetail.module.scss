@@ -81,11 +81,6 @@
 .rate {
     display: flex;
     align-items: center;
-    padding: 8px 0;
-
-    p {
-        margin-bottom: 6px;
-    }
 }
 
 .rate_star {
@@ -517,6 +512,11 @@
     border-bottom: 2px solid var(--primary-color);
 }
 
+.list_comment {
+    max-height: 1000px;
+    overflow-y: scroll;
+}
+
 .comments_inner {
     display: flex;
     padding-top: 20px;
@@ -527,14 +527,25 @@
 }
 
 .comments_user {
-    font-size: 1.43rem;
-    font-weight: 500;
-    color: #333;
+    display: flex;
+    align-items: flex-end;
     margin: 4px 0;
+
+    .user_info {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .name {
+        font-size: 1.43rem;
+        font-weight: 600;
+        color: #333;
+    }
 }
 
 .comments_day {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     color: #7a7e7f;
     font-weight: 400;
     margin: 4px 0;
@@ -551,6 +562,10 @@
     font-size: 1.8rem;
     cursor: pointer;
     margin-right: 4px;
+}
+
+.liked {
+    color: var(--primary-color);
 }
 
 .like_total {

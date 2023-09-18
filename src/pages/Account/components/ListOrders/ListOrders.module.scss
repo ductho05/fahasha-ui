@@ -23,6 +23,8 @@
 }
 .order_list {
     list-style: none;
+    max-height: 100vh;
+    overflow-y: scroll;
 }
 
 .order_item {

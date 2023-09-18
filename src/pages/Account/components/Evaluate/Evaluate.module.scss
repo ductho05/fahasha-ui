@@ -1,3 +1,9 @@
+.list {
+    list-style: none;
+    max-height: 100vh;
+    overflow-y: scroll;
+}
+
 .tab_list {
     display: flex;
     list-style: none;
