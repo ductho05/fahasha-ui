@@ -1,6 +1,6 @@
 import Home from '../pages/Home/index'
 import ProductDetail from '../pages/ProductDetail/index'
-import Cart from '../pages/Cart/index'
+import TableCart from '../pages/Cart/TableCart'
 import Account from '../pages/Account'
 import SeeMoreProduct from '../pages/SeeMoreProduct'
 import CheckOut from '../pages/CheckOut'
@@ -25,22 +25,23 @@ const publicRoutes = [
     { path: '/terms-of-service', component: TermsServices },
 ]
 
+
 // Private Routes
 const privateRoutes = [
-    { path: '/cart', component: Cart },
+    { path: '/cart', component: TableCart },
     { path: '/checkout', component: CheckOut },
     { path: '/account/:index', component: Account },
     { path: '/account/order/detail/:orderId', component: OrderDetail },
     { path: '/order-success/:orderId', component: OrderSuccess },
-]
+];
 
 // Admin routes
 const adminRoutes = [
     { path: '/admin', component: HomeAdmin },
     { path: '/admin/user', component: Users },
     { path: '/admin/user/:userId', component: UserDetail },
-]
+];
 
-const notFoundRoute = { path: '*', component: Page404 }
+const notFoundRoute = { path: '*', component: Page404 };
 
-export { publicRoutes, privateRoutes, notFoundRoute, adminRoutes }
+export { publicRoutes, privateRoutes, notFoundRoute, adminRoutes };

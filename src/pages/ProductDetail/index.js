@@ -132,7 +132,7 @@ function ProductDetail() {
         })
             .then((response) => response.json())
             .then((result) => {
-                getCategory(p)
+                getCategory(p);
                 setProductRelated((prev) => {
                     return [
                         {
@@ -153,7 +153,7 @@ function ProductDetail() {
             category.push(p.categoryId._id);
         }
         localStorage.setItem('mycategory', JSON.stringify(category));
-    }
+    };
 
     const fetchProduct = () => {
         setLoading(true)
@@ -208,48 +208,72 @@ function ProductDetail() {
         });
     };
 
+    let handleLogin = () => {
+        setIndexForm((prev) => {
+            prev = 0;
+            return prev;
+        });
+        setIsShowForm(true);
+    };
+
+    let handleRegister = () => {
+        setIndexForm((prev) => {
+            prev = 1;
+            return prev;
+        });
+        setIsShowForm(true);
+    };
+
+    function checkCart(pops) {
+        const { cart, item } = pops;
+
+        for (const element of cart.items) {
+            if (element.id === item.id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function addCart() {
+        const user = JSON.parse(localStorage.getItem('user'));
+        const namecart = `myCart_${state.user._id}`;
+        var myCart = JSON.parse(localStorage.getItem(namecart));
+
+        const cart = {
+            id: state.user._id,
+            items: myCart ? myCart.items : [],
+        };
+
+        var item = {
+            id: productId,
+            count: 1,
+        };
+        if (checkCart({ cart, item })) {
+            for (const element of cart.items) {
+                if (element.id === item.id) {
+                    element.count++;
+                }
+            }
+        } else {
+            cart.items.push(item);
+        }
+        myCart = cart;
+        localStorage.setItem(namecart, JSON.stringify(myCart));
+    }
+
     const handleAddToCart = () => {
         if (Object.keys(state.user).length > 0) {
-            let oldCats = localstorage.get('carts');
-            let findIndex = oldCats.findIndex((p) => p.product._id == product._id);
-            console.log('index', findIndex);
-            if (findIndex !== -1) {
-                oldCats[findIndex].quantity += 1;
-                localstorage.set('carts', [...oldCats]);
-            } else {
-                localstorage.set('carts', [
-                    ...oldCats,
-                    {
-                        quantity: currentQuantity,
-                        product: product,
-                    },
-                ]);
-            }
+            addCart();
 
             setIsShowDialog(!isShowDialog);
         } else {
             setShowNolginDialog(true);
         }
     };
-
     const handleBuyNow = () => {
         if (Object.keys(state.user).length > 0) {
-            let oldCats = localstorage.get('carts');
-            let findIndex = oldCats.findIndex((p) => p.product._id == product._id);
-            console.log('index', findIndex);
-            if (findIndex !== -1) {
-                oldCats[findIndex].quantity += 1;
-                localstorage.set('carts', [...oldCats]);
-            } else {
-                localstorage.set('carts', [
-                    ...oldCats,
-                    {
-                        quantity: currentQuantity,
-                        product: product,
-                    },
-                ]);
-            }
-
+            addCart();
             navigate('/cart');
         } else {
             setShowNolginDialog(true);
