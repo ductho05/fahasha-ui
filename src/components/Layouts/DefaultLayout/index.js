@@ -1,117 +1,115 @@
-import Header from './Header'
-import Footer from './Footer'
-import classNames from 'classnames/bind'
-import styles from './DefaultLayout.module.scss'
-import { isExpired, isLogin } from '../../../stores/account'
-import { useEffect, useState } from 'react'
-import { Dialog } from "@mui/material"
-import RegisterLogin from '../../Forms/RegisterLogin'
-import localstorage from '../../../stores/localstorge'
-import { useStore } from '../../../stores/hooks'
-import Button from '../../Button'
-import { logout, noAction } from '../../../stores/actions'
-import localstorge from '../../../stores/localstorge'
-import { api } from '../../../constants'
-import { LOGOUT, LOGIN, REGISTER } from '../../../stores/constants'
-import { useNavigate } from 'react-router-dom'
-import { toast, ToastContainer } from 'react-toastify'
-import "react-toastify/dist/ReactToastify.css";
+import Header from './Header';
+import Footer from './Footer';
+import classNames from 'classnames/bind';
+import styles from './DefaultLayout.module.scss';
+import { isExpired, isLogin } from '../../../stores/account';
+import { useEffect, useState } from 'react';
+import { Dialog } from '@mui/material';
+import RegisterLogin from '../../Forms/RegisterLogin';
+import localstorage from '../../../stores/localstorge';
+import { useStore } from '../../../stores/hooks';
+import Button from '../../Button';
+import { logout, noAction } from '../../../stores/actions';
+import localstorge from '../../../stores/localstorge';
+import { api } from '../../../constants';
+import { LOGOUT, LOGIN, REGISTER } from '../../../stores/constants';
+import { useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const cx = classNames.bind(styles)
+const cx = classNames.bind(styles);
 function DefaultLayout(props) {
-    const navigate = useNavigate()
-    const [expired, setExpired] = useState(false)
-    const [isShowForm, setIsShowForm] = useState(false)
-    const [indexForm, setIndexForm] = useState(0)
-    const [state, dispatch] = useStore()
-    const [isInteractive, setIsInteractive] = useState(false)
+    const navigate = useNavigate();
+    const [expired, setExpired] = useState(false);
+    const [isShowForm, setIsShowForm] = useState(false);
+    const [indexForm, setIndexForm] = useState(0);
+    const [state, dispatch] = useStore();
+    const [isInteractive, setIsInteractive] = useState(false);
 
     const handleUserInteraction = () => {
-        setIsInteractive(true)
-    }
+        setIsInteractive(true);
+    };
 
     const handleUserInactivity = () => {
-        setIsInteractive(false)
-    }
+        setIsInteractive(false);
+    };
 
     useEffect(() => {
-
-        clearInterval(5000)
+        clearInterval(5000);
 
         setInterval(() => {
-            setIsInteractive(false)
-        }, 5000)
+            setIsInteractive(false);
+        }, 5000);
 
-        window.addEventListener('mousemove', handleUserInteraction)
-        window.addEventListener('scroll', handleUserInteraction)
-        window.addEventListener('keydown', handleUserInteraction)
+        window.addEventListener('mousemove', handleUserInteraction);
+        window.addEventListener('scroll', handleUserInteraction);
+        window.addEventListener('keydown', handleUserInteraction);
 
-        window.addEventListener('blur', handleUserInactivity)
+        window.addEventListener('blur', handleUserInactivity);
 
         return () => {
-            window.removeEventListener('mousemove', handleUserInteraction)
-            window.removeEventListener('scroll', handleUserInteraction)
-            window.removeEventListener('keydown', handleUserInteraction)
-            window.removeEventListener('blur', handleUserInactivity)
-        }
-
-    }, [])
+            window.removeEventListener('mousemove', handleUserInteraction);
+            window.removeEventListener('scroll', handleUserInteraction);
+            window.removeEventListener('keydown', handleUserInteraction);
+            window.removeEventListener('blur', handleUserInactivity);
+        };
+    }, []);
 
     useEffect(() => {
-        props.setIsLogin(localstorage.get().length > 0)
-    }, [state])
+        props.setIsLogin(localstorage.get().length > 0);
+    }, [state]);
     setInterval(() => {
         if (isLogin()) {
-            let token = localstorge.get()
+            let token = localstorge.get();
             fetch(`${api}/users/profile`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ token: token })
+                body: JSON.stringify({ token: token }),
             })
-                .then(response => response.json())
-                .then(result => {
+                .then((response) => response.json())
+                .then((result) => {
                     if (result.message == 'jwt expired') {
-                        setExpired(true)
+                        setExpired(true);
                     } else {
-                        setExpired(false)
+                        setExpired(false);
                     }
                 })
                 .catch(() => {
-                    setExpired(false)
-                })
+                    setExpired(false);
+                });
         }
-    }, 6000)
+    }, 6000);
 
     useEffect(() => {
         if (expired && isInteractive === false) {
-            dispatch(logout({}))
+            dispatch(logout({}));
         }
-    }, [expired, isInteractive])
+    }, [expired, isInteractive]);
 
     const handlePass = () => {
-        dispatch(logout({}))
-        setExpired(false)
-    }
+        dispatch(logout({}));
+        setExpired(false);
+    };
 
     useEffect(() => {
         if (state.action == LOGOUT) {
-            navigate('/')
-            toast.success('Đăng xuất thành công')
-            dispatch(noAction())
+            navigate('/');
+            toast.success('Đăng xuất thành công');
+            dispatch(noAction());
         } else if (state.action == LOGIN) {
-            navigate('/')
-            toast.success('Đăng nhập thành công')
-            dispatch(noAction())
-            setExpired(false)
+            navigate('/');
+            toast.success('Đăng nhập thành công');
+            dispatch(noAction());
+            setExpired(false);
         } else if (state.action == REGISTER) {
-            navigate('/account/0')
-            toast.success('Đăng ký tài khoản thành công')
-            dispatch(noAction())
-            setExpired(false)
+            navigate('/account/0');
+            toast.success('Đăng ký tài khoản thành công');
+            dispatch(noAction());
+            setExpired(false);
         }
-    }, [state])
+    }, [state]);
 
     return (
         <div className={cx('wrapper')}>
@@ -140,7 +138,7 @@ function DefaultLayout(props) {
                                 isAccountPage={true}
                             />
                             <p onClick={handlePass} className={cx('btn_pass')}>
-                                <Button >Bỏ qua</Button>
+                                <Button>Bỏ qua</Button>
                             </p>
                         </div>
                     </Dialog>
@@ -149,7 +147,7 @@ function DefaultLayout(props) {
             </div>
             <Footer />
         </div>
-    )
+    );
 }
 
-export default DefaultLayout
+export default DefaultLayout;

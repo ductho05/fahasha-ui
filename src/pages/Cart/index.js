@@ -8,14 +8,17 @@ import { faMinus, faPlus, faArrowRight } from '@fortawesome/free-solid-svg-icons
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons';
 import Button from '../../components/Button';
 import localstorage from '../../localstorage';
+import { useStore } from '../../stores/hooks';
 import numeral from 'numeral';
 
 const cx = classNames.bind(styles);
 function Cart() {
     const [isCheckAll, setIsCheckAll] = useState(false);
     const [totalPrice, setTotalPrice] = useState(0);
-    const [listCarts, setListCarts] = useState(localstorage.get('carts'));
-    const [listCheck, setListCheck] = useState(() => new Array(localstorage.get('carts').length).fill(false));
+    const [state, dispatch] = useStore();
+    const namecart = `myCart_${state.user._id}`;
+    const [listCarts, setListCarts] = useState(localstorage.get(namecart));
+    const [listCheck, setListCheck] = useState(() => new Array(localstorage.get(namecart).length).fill(false));
     const [listCheckouts, setListCheckouts] = useState([]);
 
     const toggleCheck = () => {

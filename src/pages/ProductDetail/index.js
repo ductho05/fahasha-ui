@@ -201,7 +201,7 @@ function ProductDetail() {
         return false;
     }
 
-    function addCart() {
+    function addCart(num) {
         const user = JSON.parse(localStorage.getItem('user'));
         const namecart = `myCart_${state.user._id}`;
         var myCart = JSON.parse(localStorage.getItem(namecart));
@@ -213,12 +213,13 @@ function ProductDetail() {
 
         var item = {
             id: productId,
-            count: 1,
+            count: num,
+            isGetcheckout: 0,
         };
         if (checkCart({ cart, item })) {
             for (const element of cart.items) {
                 if (element.id === item.id) {
-                    element.count++;
+                    element.count += num;
                 }
             }
         } else {
@@ -230,16 +231,16 @@ function ProductDetail() {
 
     const handleAddToCart = () => {
         if (Object.keys(state.user).length > 0) {
-            addCart();
-
-            setIsShowDialog(!isShowDialog);
+            addCart(currentQuantity);
+            toast.success('Đã thêm sản phẩm vào giỏ hàng');
+            //setIsShowDialog(!isShowDialog);
         } else {
             setShowNolginDialog(true);
         }
     };
     const handleBuyNow = () => {
         if (Object.keys(state.user).length > 0) {
-            addCart();
+            addCart(currentQuantity);
             navigate('/cart');
         } else {
             setShowNolginDialog(true);
