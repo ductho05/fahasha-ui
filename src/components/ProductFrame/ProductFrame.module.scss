@@ -56,6 +56,11 @@
     display: none;
 }
 
+.loading {
+    display: flex;
+    justify-content: center;
+}
+
 // Responsive
 /* Mobile and Tablet */
 @media (max-width: 1023px) {

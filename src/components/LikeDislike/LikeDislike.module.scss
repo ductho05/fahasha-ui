@@ -1,0 +1,76 @@
+.comments_likes {
+    display: flex;
+    align-items: flex-end;
+    font-size: 1.43rem;
+    color: #7a7e7f;
+}
+
+.like_icon {
+    font-size: 1.8rem;
+    cursor: pointer;
+    margin-right: 4px;
+}
+
+.liked {
+    color: var(--primary-color);
+}
+
+.like_total {
+    margin-left: 4px;
+}
+
+// Dialog Nologin
+.dialog_nologin {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    min-height: 150px;
+}
+
+.dialog_nologin_message {
+    margin-top: 20px;
+    font-size: 1.4rem;
+    color: #333;
+}
+
+.btn_to_login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--primary-color);
+    width: 140px;
+    height: 30px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 50px;
+
+    &:hover {
+        opacity: 0.8;
+    }
+
+    p {
+        font-size: 1.4rem;
+        color: #333;
+        color: #fff;
+        margin: 0 4px;
+    }
+}
+
+.btn_cancel_logins {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 140px;
+    height: 30px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    background-color: #c1c1c1;
+    font-size: 1.4rem;
+    color: #333;
+
+    &:hover {
+        opacity: 0.8;
+    }
+}

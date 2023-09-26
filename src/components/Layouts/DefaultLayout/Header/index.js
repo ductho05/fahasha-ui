@@ -159,16 +159,24 @@ function Header() {
         if (e.keyCode === 13) {
             navigate(`/search/${keyTextSearch}`);
             let oldHistoty = localstorage.get('historys');
-            localstorage.set('historys', [...oldHistoty, keyTextSearch]);
+            const findHistory = oldHistoty.find(h => h === keyTextSearch)
+            if (!findHistory) {
+                localstorage.set('historys', [...oldHistoty, keyTextSearch]);
+            }
             setSuggestSearch(false);
+            setKeyTextSearch('')
         }
     };
 
     const handleSearch = () => {
         navigate(`/search/${keyTextSearch}`);
         let oldHistoty = localstorage.get('historys');
-        localstorage.set('historys', [...oldHistoty, keyTextSearch]);
+        const findHistory = oldHistoty.find(h => h === keyTextSearch)
+        if (!findHistory) {
+            localstorage.set('historys', [...oldHistoty, keyTextSearch]);
+        }
         setSuggestSearch(false);
+        setKeyTextSearch('')
     };
 
     const handleClickItemSuggest = (id) => {

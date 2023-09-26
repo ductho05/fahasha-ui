@@ -6,6 +6,7 @@ import DropMenu from '../../components/DropMenu'
 import Paging from '../../components/Paging'
 import GridProduct from '../../components/GridProduct'
 import { optionsArange, optionsNumProduct, api } from '../../constants'
+import { Backdrop, CircularProgress } from '@mui/material'
 
 const cx = className.bind(styles)
 function SeeMoreProduct() {
@@ -14,6 +15,7 @@ function SeeMoreProduct() {
     if (categoryId == 0) {
         categoryId = ''
     }
+    const [showProgress, setShowProgress] = useState(false)
     const [products, setProducts] = useState([])
     const [pages, setPages] = useState([])
     const [numPages, setNumPages] = useState(0)
@@ -58,10 +60,16 @@ function SeeMoreProduct() {
     }
 
     const fetchProduct = () => {
+        setShowProgress(true)
         fetch(`${api}/products/?category=${categoryId}&perPage=${optionSelected.value}&page=${currentPage}&filter=${optionSelectedFilter.value}&sort=${optionSelectedFilter.type}`)
             .then(response => response.json())
             .then(result => {
+                setShowProgress(false)
                 setProducts(result.data)
+            })
+            .catch(err => {
+                setShowProgress(false)
+                console.error(err.message)
             })
     }
     useEffect(() => {
@@ -72,6 +80,9 @@ function SeeMoreProduct() {
 
     return (
         <div className={cx('wrapper')}>
+            <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={showProgress}>
+                <CircularProgress color="inherit" />
+            </Backdrop>
             <div className={cx('fillter')}>
                 <div className={cx('fillter_arange')}>
                     <p>Sắp xếp theo:</p>
@@ -97,7 +108,7 @@ function SeeMoreProduct() {
                 <GridProduct products={products} />
             </div>
 
-            <div className={numPages > 1 ? cx('bottom') : cx('hidden')}>
+            <div className={numPages > 1 || !showProgress ? cx('bottom') : cx('hidden')}>
                 <Paging
                     numPages={numPages}
                     pages={pages}

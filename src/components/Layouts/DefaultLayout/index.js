@@ -98,6 +98,7 @@ function DefaultLayout(props) {
             navigate('/');
             toast.success('Đăng xuất thành công');
             dispatch(noAction());
+            setExpired(false);
         } else if (state.action == LOGIN) {
             navigate('/');
             toast.success('Đăng nhập thành công');

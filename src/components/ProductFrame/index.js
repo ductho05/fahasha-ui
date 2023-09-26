@@ -4,6 +4,7 @@ import styles from './ProductFrame.module.scss'
 import Button from '../Button'
 import { Link } from 'react-router-dom'
 import Skeleton from 'react-loading-skeleton'
+import CircularProgress from '@mui/material/CircularProgress';
 
 const cx = classNames.bind(styles)
 function ProductFrame({ isLoading, productList, Component }) {
@@ -46,6 +47,11 @@ function ProductFrame({ isLoading, productList, Component }) {
                             </Component>
                         </div>
                     ))
+                }
+                {
+                    productList.length <= 0 && <div className={cx('loading')}>
+                        <CircularProgress />
+                    </div>
                 }
             </div>
 

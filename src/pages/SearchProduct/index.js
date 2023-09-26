@@ -6,11 +6,13 @@ import DropMenu from '../../components/DropMenu'
 import Paging from '../../components/Paging'
 import GridProduct from '../../components/GridProduct'
 import { optionsArange, api } from '../../constants'
+import { Backdrop, CircularProgress } from '@mui/material'
 
 const cx = className.bind(styles)
 function SearchProduct() {
     const { title } = useParams()
     const [products, setProducts] = useState([])
+    const [loading, setLoading] = useState(false)
 
     const [optionSelectedFilter, setOptionSelectedFilter] = useState(
         {
@@ -25,31 +27,46 @@ function SearchProduct() {
     }, [])
 
     useEffect(() => {
+        setLoading(true)
         fetch(`${api}/products/title/${title}`)
             .then(response => response.json())
             .then(result => {
+                setLoading(false)
                 setProducts(result.data)
+            })
+            .catch(err => {
+                setLoading(false)
             })
     }, [title])
 
     useEffect(() => {
-        if (optionSelectedFilter.type === 'asc' && optionSelectedFilter.value === 'price') {
-            products.sort((a, b) => a.price - b.price)
-        } else if (optionSelectedFilter.type === 'desc' && optionSelectedFilter.value === 'price') {
-            products.sort((a, b) => b.price - a.price)
-        } else if (optionSelectedFilter.type === 'desc' && optionSelectedFilter.value === 'sold') {
-            products.sort((a, b) => b.sold - a.sold)
-        } else if (optionSelectedFilter.type === 'desc' && optionSelectedFilter.value === 'rate') {
-            products.sort((a, b) => b.rate - a.rate)
-        }
-        setProducts(prev => {
-            return [
-                ...prev
-            ]
-        })
+        setLoading(true)
+        setTimeout(() => {
+            if (optionSelectedFilter.type === 'asc' && optionSelectedFilter.value === 'price') {
+                products.sort((a, b) => a.price - b.price)
+            } else if (optionSelectedFilter.type === 'desc' && optionSelectedFilter.value === 'price') {
+                products.sort((a, b) => b.price - a.price)
+            } else if (optionSelectedFilter.type === 'desc' && optionSelectedFilter.value === 'sold') {
+                products.sort((a, b) => b.sold - a.sold)
+            } else if (optionSelectedFilter.type === 'desc' && optionSelectedFilter.value === 'rate') {
+                products.sort((a, b) => b.rate - a.rate)
+            }
+
+            setLoading(false)
+            setProducts(prev => {
+                return [
+                    ...prev
+                ]
+            })
+        }, 3000)
+
+        return () => clearTimeout()
     }, [optionSelectedFilter])
     return (
         <div className={cx('wrapper')}>
+            <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={loading}>
+                <CircularProgress color="inherit" />
+            </Backdrop>
             <div className={cx('result')}>
                 <h3>Kết quả tìm kiếm với:</h3>
                 <p>{`${title}(${products.length} kết quả)`}</p>

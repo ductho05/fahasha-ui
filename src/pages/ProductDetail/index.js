@@ -5,6 +5,7 @@ import numeral from 'numeral';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import styles from './ProductDetail.module.scss';
+import Avatar from '@mui/material/Avatar';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -13,10 +14,8 @@ import {
     faShareNodes,
     faStar,
     faCartShopping,
-    faPen,
     faArrowRight,
 } from '@fortawesome/free-solid-svg-icons';
-import { faThumbsUp } from '@fortawesome/free-regular-svg-icons';
 import Button from '../../components/Button';
 import ProductFrame from '../../components/ProductFrame';
 import ProductSlider from '../../components/ProductSlider';
@@ -31,8 +30,14 @@ import localstorage from '../../localstorage';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useStore } from '../../stores/hooks';
 import EvaluateForm from '../../components/Forms/EvaluateForm';
+import LikeDislike from '../../components/LikeDislike';
 
 const cx = classNames.bind(styles);
+
+const tabs = [
+    "Mới nhất",
+    "Yêu thích nhất",
+]
 
 function ProductDetail() {
     const navigate = useNavigate();
@@ -53,6 +58,8 @@ function ProductDetail() {
     const commentRef = useRef();
     const [resultEval, setResultEval] = useState();
     const [showNolginDialog, setShowNolginDialog] = useState(false);
+    const [currentTab, setCurrentTab] = useState(0);
+    const [loading, setLoading] = useState(false)
 
     var category = JSON.parse(localStorage.getItem('mycategory')) || [];
 
@@ -69,16 +76,38 @@ function ProductDetail() {
     }, []);
 
     const fetchComments = (productId) => {
-        fetch(`${api}/evaluates/product?_id=${productId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-            .then((response) => response.json())
-            .then((result) => {
-                setComments(result.data);
-            });
+        setLoading(true)
+        if (currentTab === 0) {
+            fetch(`${api}/evaluates/product?_id=${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then((response) => response.json())
+                .then((result) => {
+                    setLoading(false)
+                    setComments(result.data);
+                })
+                .catch(err => {
+                    setLoading(false)
+                })
+        } else {
+            fetch(`${api}/evaluates/product?_id=${productId}&sort=asc`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then((response) => response.json())
+                .then((result) => {
+                    setLoading(false)
+                    setComments(result.data);
+                })
+                .catch(err => {
+                    setLoading(false)
+                })
+        }
     };
 
     const fetchEvaluate = (productId) => {
@@ -127,12 +156,17 @@ function ProductDetail() {
     };
 
     const fetchProduct = () => {
+        setLoading(true)
         fetch(`${api}/products/id/${productId}`)
             .then((response) => response.json())
             .then((result) => {
+                setLoading(false)
                 setProduct(result.data);
                 fetchProductRelated(result.data);
-            });
+            })
+            .catch((error) => {
+                setLoading(false)
+            })
     };
 
     const fetchProductNew = () => {
@@ -159,7 +193,7 @@ function ProductDetail() {
 
     useEffect(() => {
         fetchComments(productId);
-    }, [productId, resultEval]);
+    }, [productId, resultEval, currentTab]);
 
     var lengthComments = comments.length;
     var tempArray = Array(lengthComments).fill(1);
@@ -251,10 +285,6 @@ function ProductDetail() {
         setIsShowDialog(!isShowDialog);
     };
 
-    const handleEval = () => {
-        setShowEvalDialog(true);
-    };
-
     useEffect(() => {
         if (location.pathname == `/product-detail/${productId}/comments-detail`) {
             commentRef?.current?.scrollIntoView({
@@ -271,6 +301,10 @@ function ProductDetail() {
     const handleCancelGoToLoginPage = () => {
         setShowNolginDialog(false);
     };
+
+    const handleTab = (index) => {
+        setCurrentTab(index);
+    }
 
     return (
         <>
@@ -289,7 +323,7 @@ function ProductDetail() {
 
             <Dialog open={showNolginDialog}>
                 <div className={cx('dialog_nologin')}>
-                    <h3 className={cx('dialog_nologin_message')}>Vui lòng đăng nhập trước khi mua hàng</h3>
+                    <h3 className={cx('dialog_nologin_message')}>Vui lòng đăng nhập để mua hàng</h3>
                     <div onClick={handleToLoginPage} className={cx('btn_to_login')}>
                         <p>Trang đăng nhập</p>
                         <p>
@@ -330,8 +364,8 @@ function ProductDetail() {
                         ></RegisterLogin>
                     </Modal>
                 </div>
-                <div className={Object.keys(product).length > 0 ? cx('hidden') : cx('visible')}>
-                    <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open>
+                <div className={cx('visible')}>
+                    <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={loading}>
                         <CircularProgress color="inherit" />
                     </Backdrop>
                 </div>
@@ -519,86 +553,57 @@ function ProductDetail() {
                             ))}
                         </div>
 
-                        <p
-                            className={
-                                Object.keys(state.user).length <= 0
-                                    ? cx('nologin', 'hide_on_tablet_mobile')
-                                    : cx('hide')
-                            }
-                        >
-                            Chỉ có thành viên mới có thể viết nhận xét.Vui lòng
-                            <a onClick={handleLogin}>Đăng nhập</a> hoặc
-                            <a onClick={handleRegister}>Đăng ký.</a>
-                        </p>
-                        <p
-                            onClick={handleEval}
-                            className={
-                                Object.keys(state.user).length > 0
-                                    ? cx('btn_evaluate', 'hide_on_tablet_mobile')
-                                    : cx('hide')
-                            }
-                        >
-                            <Button leftIcon={<FontAwesomeIcon icon={faPen} />}>Viết đánh giá</Button>
-                        </p>
                     </div>
-                    <p className={Object.keys(state.user).length <= 0 ? cx('nologin', 'hide_on_pc') : cx('hide')}>
-                        Chỉ có thành viên mới có thể viết nhận xét.Vui lòng
-                        <a onClick={handleLogin}>Đăng nhập</a> hoặc
-                        <a onClick={handleRegister}>Đăng ký.</a>
-                    </p>
-                    <p
-                        onClick={handleEval}
-                        className={
-                            Object.keys(state.user).length > 0 ? cx('btn_evaluate_tl-mb', 'hide_on_pc') : cx('hide')
-                        }
-                    >
-                        <Button leftIcon={<FontAwesomeIcon icon={faPen} />}>Viết đánh giá</Button>
-                    </p>
 
                     <div className={lengthComments > 0 ? cx('comments') : cx('hidden')}>
                         <ul className={cx('comments_tab')}>
-                            <li className={cx('comments_tab_item', 'comments_tab_active')}>Mới nhất</li>
-                            <li className={cx('comments_tab_item')}>Yêu thích nhất</li>
+                            {
+                                tabs.map((tab, index) => (
+                                    <li key={index} onClick={() => handleTab(index)} className={currentTab === index ? cx('comments_tab_item', 'comments_tab_active') : cx('comments_tab_item')}>{tab}</li>
+                                ))
+                            }
+
                         </ul>
 
-                        {tempArray.map((item, index) => (
-                            <div ref={commentRef} className={cx('comments_inner')}>
-                                <div className={cx('comments_left')}>
-                                    <p className={cx('comments_user')}>
-                                        {comments[index].user.fullName
-                                            ? comments[index].user.fullName
-                                            : comments[index].user.username}
-                                    </p>
-                                    <p className={cx('comments_day')}>
-                                        {new Date(comments[index].createdAt).toLocaleDateString()}
-                                    </p>
-                                </div>
-                                <div className={cx('comments_right')}>
-                                    <div className={cx('rate')}>
-                                        {rates.map((item, indexRate) => (
-                                            <span
-                                                key={indexRate}
-                                                className={
-                                                    item <= comments[index].rate
-                                                        ? cx('star_active', 'rate_star')
-                                                        : cx('rate_star')
-                                                }
-                                            >
-                                                <FontAwesomeIcon icon={faStar} />
-                                            </span>
-                                        ))}
+                        <div className={cx('list_comment')}>
+                            {tempArray.map((item, index) => (
+                                <div key={index} ref={commentRef} className={cx('comments_inner')}>
+                                    <div className={cx('comments_left')}>
+                                        <div className={cx('comments_user')}>
+                                            <Avatar alt="Avatar" src={comments[index].user.images} />
+                                            <div className='user_info'>
+                                                <p className={cx('name')}>
+                                                    {comments[index].user.fullName
+                                                        ? comments[index].user.fullName
+                                                        : comments[index].user.username}
+                                                </p>
+                                                <p className={cx('comments_day')}>
+                                                    {new Date(comments[index].updatedAt).toLocaleDateString()}
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <ReadMore>{comments[index].comment}</ReadMore>
-                                    <div className={cx('comments_likes')}>
-                                        <p className={cx('like_icon')}>
-                                            <FontAwesomeIcon icon={faThumbsUp} />
-                                        </p>
-                                        thích
-                                        <p className={cx('like_total')}>(2)</p>
+                                    <div className={cx('comments_right')}>
+                                        <div className={cx('rate')}>
+                                            {rates.map((item, indexRate) => (
+                                                <span
+                                                    key={indexRate}
+                                                    className={
+                                                        item <= comments[index].rate
+                                                            ? cx('star_active', 'rate_star')
+                                                            : cx('rate_star')
+                                                    }
+                                                >
+                                                    <FontAwesomeIcon icon={faStar} />
+                                                </span>
+                                            ))}
+                                        </div>
+                                        <ReadMore>{comments[index].comment}</ReadMore>
+                                        <LikeDislike user={state.user} comment={comments[index]} />
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
