@@ -8,7 +8,7 @@ import classNames from 'classnames/bind';
 import styles from './CheckOut.module.scss';
 import { useForm, useController } from 'react-hook-form';
 import { apiProvinces, api } from '../../constants';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, Redirect } from 'react-router-dom';
 import numeral from 'numeral';
 import { apiMaps, API_KEY, locationShop } from '../../constants';
 import { useStore } from '../../stores/hooks';
@@ -95,59 +95,72 @@ function CheckOut() {
     }, [order]);
 
     const submit = (data) => {
-        console.log('data', data);
+        console.log('data123', data);
         if (data) {
-            setShowProgress(true);
-            fetch(`${api}/orders/insert`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-            })
-                .then((response) => response.json())
-                .then((result) => {
-                    console.log('dataresult', result);
-                    if (result.status == 'OK') {
-                        const order = result.data;
-                        const orderItems = listCheckouts.map((item) => {
-                            return {
-                                quantity: item.quantity,
-                                price: item.product.price * item.quantity,
-                                order: result.data._id,
-                                product: item.product._id,
-                            };
-                        });
-
-                        orderItems.forEach((orderItem) => {
-                            fetch(`${api}/orderitems/insert`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(orderItem),
-                            })
-                                .then((response) => response.json())
-                                .then((result) => {
-                                    if (result.status == 'OK') {
-                                        console.log('orderItem.produc', orderItem);
-                                        const carts = localStorage.getItem(namecart)
-                                            ? JSON.parse(localStorage.getItem(namecart))
-                                            : [];
-                                        const newCarts = {
-                                            id: state.user._id,
-                                            items: carts.items.filter((cart) => cart.id !== orderItem.product)
-                                        }
-                                        localstorage.set(namecart, newCarts);
-                                        setOrder(order);
-                                        setShowProgress(false);
-                                    }
-                                })
-                                .catch((err) => {
-                                    console.log(err);
-                                });
-                        });
-                    }
+            if (data.payment_method == 'Thanh toán bằng VNPay') {
+                fetch(`${api}/orders/create_payment_url?amount=${data.price}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                 })
-                .catch((err) => {
-                    console.log('err', err);
-                });
+                    .then((response) => response.json())
+                    .then((result) => {
+                        window.location.href = result.data;
+                    });
+            } else {
+                setShowProgress(true);
+                fetch(`${api}/orders/insert`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                })
+                    .then((response) => response.json())
+                    .then((result) => {
+                        console.log('dataresult', result);
+                        if (result.status == 'OK') {
+                            const order = result.data;
+                            const orderItems = listCheckouts.map((item) => {
+                                return {
+                                    quantity: item.quantity,
+                                    price: item.product.price * item.quantity,
+                                    order: result.data._id,
+                                    product: item.product._id,
+                                };
+                            });
+
+                            orderItems.forEach((orderItem) => {
+                                fetch(`${api}/orderitems/insert`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify(orderItem),
+                                })
+                                    .then((response) => response.json())
+                                    .then((result) => {
+                                        if (result.status == 'OK') {
+                                            console.log('orderItem.produc', orderItem);
+                                            const carts = localStorage.getItem(namecart)
+                                                ? JSON.parse(localStorage.getItem(namecart))
+                                                : [];
+                                            const newCarts = {
+                                                id: state.user._id,
+                                                items: carts.items.filter((cart) => cart.id !== orderItem.product),
+                                            };
+                                            localstorage.set(namecart, newCarts);
+                                            setOrder(order);
+                                            setShowProgress(false);
+                                        }
+                                    })
+                                    .catch((err) => {
+                                        console.log(err);
+                                    });
+                            });
+                        }
+                    })
+                    .catch((err) => {
+                        console.log('err', err);
+                    });
+            }
         }
     };
 
@@ -542,11 +555,22 @@ function CheckOut() {
                         <input
                             {...paymentMethodController.field}
                             type="radio"
-                            id="payment_method"
+                            id="payment_method1"
                             value="Thanh toán bằng tiền mặt khi nhận hàng"
                         />
-                        <label for="payment_method" className={cx('payment_label')}>
+                        <label for="payment_method1" className={cx('payment_label')}>
                             Thanh toán bằng tiền mặt khi nhận hàng
+                        </label>
+                    </div>
+                    <div className={cx('payment_content')}>
+                        <input
+                            {...paymentMethodController.field}
+                            type="radio"
+                            id="payment_method2"
+                            value="Thanh toán bằng VNPay"
+                        />
+                        <label for="payment_method2" className={cx('payment_label')}>
+                            Thanh toán bằng VNPay
                         </label>
                     </div>
                     <p className={cx('form_error', 'error_radio')}>{errors.payment_method?.message}</p>
