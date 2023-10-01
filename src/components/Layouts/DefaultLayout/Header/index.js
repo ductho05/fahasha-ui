@@ -74,8 +74,6 @@ function Header() {
             .then((response) => response.json())
             .then((result) => {
                 setProducts(result.data.splice(0, 20));
-                console.log(products);
-                console.log('Call api');
             })
             .catch((err) => console.log(err));
     }, [keyTextSearch]);
@@ -159,24 +157,24 @@ function Header() {
         if (e.keyCode === 13) {
             navigate(`/search/${keyTextSearch}`);
             let oldHistoty = localstorage.get('historys');
-            const findHistory = oldHistoty.find(h => h === keyTextSearch)
+            const findHistory = oldHistoty.find((h) => h === keyTextSearch);
             if (!findHistory) {
                 localstorage.set('historys', [...oldHistoty, keyTextSearch]);
             }
             setSuggestSearch(false);
-            setKeyTextSearch('')
+            setKeyTextSearch('');
         }
     };
 
     const handleSearch = () => {
         navigate(`/search/${keyTextSearch}`);
         let oldHistoty = localstorage.get('historys');
-        const findHistory = oldHistoty.find(h => h === keyTextSearch)
+        const findHistory = oldHistoty.find((h) => h === keyTextSearch);
         if (!findHistory) {
             localstorage.set('historys', [...oldHistoty, keyTextSearch]);
         }
         setSuggestSearch(false);
-        setKeyTextSearch('')
+        setKeyTextSearch('');
     };
 
     const handleClickItemSuggest = (id) => {

@@ -1,20 +1,21 @@
 import { useEffect, useRef, useState } from 'react';
 import moment from 'moment';
 import 'moment/locale/vi';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleXmark, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames/bind';
 import styles from './CheckOut.module.scss';
 import { useForm, useController } from 'react-hook-form';
 import { apiProvinces, api } from '../../constants';
-import { Link, useNavigate, Redirect } from 'react-router-dom';
+import { Link, useNavigate, Redirect, useLocation } from 'react-router-dom';
 import numeral from 'numeral';
 import { apiMaps, API_KEY, locationShop } from '../../constants';
 import { useStore } from '../../stores/hooks';
 import localstorage from '../../localstorage';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+
+import Page404 from '../Page404';
 
 const cx = classNames.bind(styles);
 function CheckOut() {
@@ -32,16 +33,34 @@ function CheckOut() {
     const [order, setOrder] = useState();
     const [state, dispatch] = useStore();
     const [showProgress, setShowProgress] = useState(false);
+    const location = useLocation();
     const namecart = `myCart_${state.user._id}`;
+    const statusVNPayCheckout = `statusVNPayCheckout_${state.user._id}`;
     const product = localStorage.getItem(namecart) ? JSON.parse(localStorage.getItem(namecart)).items : [];
+    const dataCheckout = localStorage.getItem(statusVNPayCheckout)
+        ? JSON.parse(localStorage.getItem(statusVNPayCheckout))
+        : {};
     const mycheckout = product.filter((phantu) => phantu.isGetcheckout == 1);
 
-    // Get list product to checkout
+    if (mycheckout.length == 0) {
+        navigate('/cart');
+    }
+
+    useEffect(() => {
+        if (order) {
+            localstorage.set('curent_checkoutid', order._id);
+            navigate(`/order-success/${order._id}`);
+        }
+    }, [order]);
     useEffect(() => {
         mycheckout.map((item) => {
             fetch(`${api}/products/id/${item.id}`)
                 .then((response) => response.json())
                 .then((products) => {
+                    // newCheckout.push({
+                    //     product: products.data,
+                    //     quantity: item.count,
+                    // });
                     setListCheckouts((prev1) => {
                         return [
                             ...prev1,
@@ -55,6 +74,97 @@ function CheckOut() {
                 .catch((err) => console.log(err));
         });
     }, []);
+
+    const addCheckout = (data, type) => {
+        setShowProgress(true);
+        fetch(`${api}/orders/insert`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        })
+            .then((response) => response.json())
+            .then((result) => {
+                if (result.status == 'OK') {
+                    const order = result.data;
+                    let item_order_checkout = [];
+                    if (type == 'vnp') {
+                        item_order_checkout = localStorage.getItem('item_order_checkout')
+                            ? JSON.parse(localStorage.getItem('item_order_checkout'))
+                            : [];
+                    } else if (type == 'cash') {
+                        item_order_checkout = listCheckouts;
+                    }
+                    const orderItems = item_order_checkout.map((item) => {
+                        return {
+                            quantity: item.quantity,
+                            price: item.product.price * item.quantity,
+                            order: result.data._id,
+                            product: item.product._id,
+                        };
+                    });
+                    if (item_order_checkout.length) {
+                        orderItems.forEach((orderItem) => {
+                            fetch(`${api}/orderitems/insert`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(orderItem),
+                            })
+                                .then((response) => response.json())
+                                .then((result) => {
+                                    if (result.status == 'OK') {
+                                        const carts = localStorage.getItem(namecart)
+                                            ? JSON.parse(localStorage.getItem(namecart))
+                                            : [];
+                                        const newCarts = {
+                                            id: state.user._id,
+                                            items: carts.items.filter((cart) => cart.id !== orderItem.product),
+                                        };
+                                        localstorage.set(namecart, newCarts);
+                                        setShowProgress(false);
+                                        setOrder(order);
+                                    }
+                                })
+                                .catch((err) => {
+                                    console.log(err);
+                                });
+                        });
+                    } else {
+                        setShowProgress(false);
+                        setOrder(order);
+                    }
+                } else {
+                    setShowProgress(false);
+                    //setOrder(order);
+                }
+            })
+            .catch((err) => {});
+    };
+
+    // Chuyển hướng đến trang khác sau khi thanh toán bên VNpay
+    useEffect(() => {
+        // Lấy chuỗi truy vấn (query string) sau dấu "?"
+        const queryString = window.location.search;
+        // Phân tích chuỗi truy vấn để lấy các tham số
+        const urlParams = new URLSearchParams(queryString);
+        // Lấy giá trị của tham số "name"
+        const signed = urlParams.get('signed');
+        const status = urlParams.get('status');
+        if (JSON.stringify(dataCheckout) !== '{}' && dataCheckout.signed === signed) {
+            delete dataCheckout.signed;
+            localStorage.removeItem('is_order_success_page');
+            switch (status) {
+                case '00':
+                    addCheckout(dataCheckout, 'vnp');
+                    break;
+                case '24':
+                    navigate(`/order-success/err-E24`);
+                    break;
+                default:
+            }
+        }
+    }, []);
+    // Get list product to checkout
+
     const price = listCheckouts.reduce((total, curr) => total + curr.quantity * curr.product.price, 0);
     const quantity = listCheckouts.reduce((total, curr) => total + curr.quantity, 0);
     useEffect(() => {
@@ -88,16 +198,10 @@ function CheckOut() {
         }
     }, []);
 
-    useEffect(() => {
-        if (order) {
-            navigate(`/order-success/${order._id}`);
-        }
-    }, [order]);
-
     const submit = (data) => {
-        console.log('data123', data);
         if (data) {
             if (data.payment_method == 'Thanh toán bằng VNPay') {
+                localstorage.set('item_order_checkout', listCheckouts);
                 fetch(`${api}/orders/create_payment_url?amount=${data.price}`, {
                     method: 'POST',
                     headers: {
@@ -106,60 +210,12 @@ function CheckOut() {
                 })
                     .then((response) => response.json())
                     .then((result) => {
+                        data.signed = result.signed;
+                        localstorage.set(statusVNPayCheckout, data);
                         window.location.href = result.data;
                     });
             } else {
-                setShowProgress(true);
-                fetch(`${api}/orders/insert`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data),
-                })
-                    .then((response) => response.json())
-                    .then((result) => {
-                        console.log('dataresult', result);
-                        if (result.status == 'OK') {
-                            const order = result.data;
-                            const orderItems = listCheckouts.map((item) => {
-                                return {
-                                    quantity: item.quantity,
-                                    price: item.product.price * item.quantity,
-                                    order: result.data._id,
-                                    product: item.product._id,
-                                };
-                            });
-
-                            orderItems.forEach((orderItem) => {
-                                fetch(`${api}/orderitems/insert`, {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify(orderItem),
-                                })
-                                    .then((response) => response.json())
-                                    .then((result) => {
-                                        if (result.status == 'OK') {
-                                            console.log('orderItem.produc', orderItem);
-                                            const carts = localStorage.getItem(namecart)
-                                                ? JSON.parse(localStorage.getItem(namecart))
-                                                : [];
-                                            const newCarts = {
-                                                id: state.user._id,
-                                                items: carts.items.filter((cart) => cart.id !== orderItem.product),
-                                            };
-                                            localstorage.set(namecart, newCarts);
-                                            setOrder(order);
-                                            setShowProgress(false);
-                                        }
-                                    })
-                                    .catch((err) => {
-                                        console.log(err);
-                                    });
-                            });
-                        }
-                    })
-                    .catch((err) => {
-                        console.log('err', err);
-                    });
+                addCheckout(data, 'cash');
             }
         }
     };
