@@ -14,6 +14,8 @@ import Users from '../admin/pages/Users/Users'
 import UserDetail from '../admin/pages/UserDetail/UserDetail'
 import TermsServices from '../pages/TermsServices'
 import Review from '../admin/pages/Review/Review'
+import AutoFlashSale from '../admin/pages/UseFul/AutoFlashSale'
+import CostumFlashSale from '../admin/pages/UseFul/CostumFlashSale'
 // Public Routes
 const publicRoutes = [
     { path: '/', component: Home },

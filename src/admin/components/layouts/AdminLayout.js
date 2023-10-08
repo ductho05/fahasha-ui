@@ -4,6 +4,7 @@ import styles from './AdminLayout.module.scss';
 import SideBar from './SideBar/Sidebar';
 import NavBar from './NavBar/NavBar';
 import { api } from '../../../constants';
+import { Scrollbar } from 'react-scrollbars-custom';
 const cx = classNames.bind(styles);
 function AdminLayout({ children }) {
     useEffect(() => {
