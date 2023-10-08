@@ -93,19 +93,22 @@ function HomeAdmin() {
     const [optionSelected, setOptionSelected] = useState(options[0]);
 
     return (
-        <Scrollbar width={200} height={600}>
-            <div className={cx('wrapper')}>
-                <div className={cx('widgits')}>
-                    {dataWidgets.map((widget, index) => (
-                        <Widget key={index} widget={widget} />
-                    ))}
+        <div className={cx('wrapper')}>
+            <div className={cx('widgits')}>
+                {dataWidgets.map((widget, index) => (
+                    <Widget key={index} widget={widget} />
+                ))}
+            </div>
+            <div className={cx('chart')}>
+                <div className={cx('left')}>
+                    <ProgressChart />
                 </div>
                 <div className={cx('right')}>
                     <div className={cx('heading')}>
-                        <h3 className={cx('income_title')} >Thu nhập</h3>
+                        <h3 className={cx('income_title')}>Thu nhập</h3>
                         <DropMenu
                             options={options}
-                            size='small'
+                            size="small"
                             optionSelected={optionSelected}
                             setOptionSelected={setOptionSelected}
                         />
@@ -117,23 +120,7 @@ function HomeAdmin() {
             <div className={cx('table')}>
                 <OrdersLatesTable rows={[]} />
             </div>
-            <div className={cx('right')}>
-                <div className={cx('heading')}>
-                    <h3 className={cx('income_title')}>Thu nhập</h3>
-                    <DropMenu
-                        options={options}
-                        size="small"
-                        optionSelected={optionSelected}
-                        setOptionSelected={setOptionSelected}
-                    />
-                </div>
-                <IncomeChart data={dataIncomes} size={2 / 1} />
-            </div>
-
-            <div className={cx('table')}>
-                <OrdersLatesTable rows={[]} />
-            </div>
-        </Scrollbar >
+        </div>
     );
 }
 

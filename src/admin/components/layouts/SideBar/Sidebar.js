@@ -55,7 +55,7 @@ const tabList = [
                 name: 'Vận chuyển',
             },
 
-        
+
 
             {
                 id: 5,
@@ -83,7 +83,7 @@ const tabList = [
                 id: 8,
                 icon: LoyaltyIcon,
                 name: 'Flash Sale',
-                link: '/admin/flashsale',
+                link: '/admin/flashsale/auto',
             },
         ],
     },
