@@ -12,6 +12,8 @@ import Page404 from '../pages/Page404';
 import HomeAdmin from '../admin/pages/HomeAdmin/HomeAdmin';
 import Users from '../admin/pages/Users/Users';
 import UserDetail from '../admin/pages/UserDetail/UserDetail';
+import AutoFlashSale from '../admin/pages/UseFul/AutoFlashSale';
+import CostumFlashSale from '../admin/pages/UseFul/CostumFlashSale';
 import TermsServices from '../pages/TermsServices';
 
 // Public Routes
@@ -39,6 +41,8 @@ const adminRoutes = [
     { path: '/admin', component: HomeAdmin },
     { path: '/admin/user', component: Users },
     { path: '/admin/user/:userId', component: UserDetail },
+    { path: '/admin/flashsale/auto', component: AutoFlashSale },
+    { path: '/admin/flashsale/custom', component: CostumFlashSale },
 ];
 
 const notFoundRoute = { path: '*', component: Page404 };

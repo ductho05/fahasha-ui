@@ -30,6 +30,7 @@ function CheckOut() {
     const [distance, setDistance] = useState(0);
     const [shippingCost, setShippingCost] = useState(0);
     const [deliveryTime, setDeliveryTime] = useState('');
+    const [isSubmit, setIsSubmit] = useState(false);
     const [order, setOrder] = useState();
     const [state, dispatch] = useStore();
     const [showProgress, setShowProgress] = useState(false);
@@ -41,6 +42,8 @@ function CheckOut() {
         ? JSON.parse(localStorage.getItem(statusVNPayCheckout))
         : {};
     const mycheckout = product.filter((phantu) => phantu.isGetcheckout == 1);
+    const price = listCheckouts.reduce((total, curr) => total + curr.quantity * curr.product.price, 0);
+    const quantity = listCheckouts.reduce((total, curr) => total + curr.quantity, 0);
 
     if (mycheckout.length == 0) {
         navigate('/cart');
@@ -52,6 +55,7 @@ function CheckOut() {
             navigate(`/order-success/${order._id}`);
         }
     }, [order]);
+
     useEffect(() => {
         mycheckout.map((item) => {
             fetch(`${api}/products/id/${item.id}`)
@@ -133,8 +137,9 @@ function CheckOut() {
                         setOrder(order);
                     }
                 } else {
+                    //console.log('da vao roi ne 2', result);
                     setShowProgress(false);
-                    //setOrder(order);
+                    navigate(`/order-success/err-E99`);
                 }
             })
             .catch((err) => {});
@@ -154,6 +159,7 @@ function CheckOut() {
             localStorage.removeItem('is_order_success_page');
             switch (status) {
                 case '00':
+                    //console.log('ban la ai');
                     addCheckout(dataCheckout, 'vnp');
                     break;
                 case '24':
@@ -165,8 +171,6 @@ function CheckOut() {
     }, []);
     // Get list product to checkout
 
-    const price = listCheckouts.reduce((total, curr) => total + curr.quantity * curr.product.price, 0);
-    const quantity = listCheckouts.reduce((total, curr) => total + curr.quantity, 0);
     useEffect(() => {
         fetch(apiProvinces)
             .then((response) => response.json())
@@ -200,8 +204,10 @@ function CheckOut() {
 
     const submit = (data) => {
         if (data) {
+            console.log('abc', data);
             if (data.payment_method == 'Thanh toán bằng VNPay') {
                 localstorage.set('item_order_checkout', listCheckouts);
+
                 fetch(`${api}/orders/create_payment_url?amount=${data.price}`, {
                     method: 'POST',
                     headers: {
@@ -407,10 +413,17 @@ function CheckOut() {
     }, [distance]);
 
     useEffect(() => {
-        setValue('quantity', quantity);
-        setValue('price', price + shippingCost);
+        setValue(
+            'quantity',
+            listCheckouts.reduce((total, curr) => total + curr.quantity, 0),
+        );
+        setValue(
+            'price',
+            listCheckouts.reduce((total, curr) => total + curr.quantity * curr.product.price, 0) + shippingCost,
+        );
         setValue('shippingCost', shippingCost);
-    }, [shippingCost]);
+        console.log('abc ne');
+    }, [isSubmit]);
 
     useEffect(() => {
         setValue('deliveryDate', deliveryTime);
@@ -683,7 +696,18 @@ function CheckOut() {
                             </p>
                             <p>Quay về giỏ hàng</p>
                         </Link>
-                        <input type="submit" value="Xác nhận thanh toán" className={cx('btn_checkout')} />
+                        <input
+                            type="submit"
+                            value="Xác nhận thanh toán"
+                            className={cx('btn_checkout')}
+                            style={{
+                                backgroundColor: price ? '#c92127' : 'GrayText',
+                            }}
+                            disabled={price == 0}
+                            onClick={() => {
+                                setIsSubmit(!isSubmit);
+                            }}
+                        />
                     </div>
                 </div>
             </form>

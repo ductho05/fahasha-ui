@@ -138,10 +138,10 @@ const slideList = [
         url: 'https://cdn0.fahasa.com/media/magentothem/banner7/MangaWeekT623_Banner_Slide_840x320.jpg',
     },
 ];
+
 const cx = classNames.bind(styles);
 function Home() {
     var category = JSON.parse(localStorage.getItem('mycategory')) || [];
-
     const [productsHots, setProductsHots] = useState([]);
     const [categoryBooks, setCategoryBooks] = useState([]);
     const [learnBooks, setLearnBooks] = useState([]);

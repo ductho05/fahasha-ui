@@ -1,0 +1,148 @@
+.gift-current {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #ff685f;
+  width: 90%;
+  margin: 1% auto;
+  border-radius: 10px;
+  padding: 2%;
+}
+
+.gift-current__title {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.gift-current__text {
+  font-size: 2rem;
+  font-family: "Roboto", sans-serif;
+  color: #ffe818;
+  font-weight: bold;
+  flex: 3;
+  text-align: center;
+}
+
+.gift-current__time {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.gift-current__time__title {
+  font-size: 2rem;
+  font-family: "Roboto", sans-serif;
+  color: #fff;
+  margin: auto;
+}
+
+.gift-current__content {
+  margin: 2% 0;
+  width: 100%;
+  height: 100%;
+}
+
+.content {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.item-gift {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 10px;
+  margin: 1%;
+  padding: 2%;
+  width: 25%;
+}
+
+.item-content {
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .item-content__title {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-size: 1.2rem;
+    text-align: center;
+    font-family: "Roboto", sans-serif;
+    color: #000000;
+    height: 4rem;
+    font-weight: 100;
+    margin: auto
+  }
+
+  .item-content__price {
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    span {
+      font-size: 1rem;
+      font-family: "Roboto", sans-serif;
+      color: #e32218;
+      font-weight: 600;
+      text-decoration: underline;
+    }
+
+  }
+}
+
+.item-content__price > .price__new {
+  font-size: 1.8rem;
+  font-family: "Roboto", sans-serif;
+  color: #e32218;
+  font-weight: 600;
+
+}
+
+.item-content__price > .price__old {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  .price {
+    font-size: 0.8rem;
+    font-family: "Roboto", sans-serif;
+    color: #5b5a5a;
+    font-weight: 100;
+    margin: 0 10%;
+    text-decoration: line-through;
+
+  }
+
+  .sale {
+    font-size: 0.7rem;
+    font-family: "Roboto", sans-serif;
+    color: #e32218;
+    font-weight: 600;
+    background-color: #eccfcd;
+    border-radius: 15%;
+    padding: 0 2%;
+  }
+}
+
+.zoom-in {
+  transition: all 0.2s ease-in-out;
+}
+
+.zoom-in:hover {
+  transform: scale(1.1);
+}
