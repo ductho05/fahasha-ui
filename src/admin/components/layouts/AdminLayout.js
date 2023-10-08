@@ -2,6 +2,7 @@ import classNames from "classnames/bind"
 import styles from './AdminLayout.module.scss'
 import SideBar from "./SideBar/Sidebar"
 import NavBar from "./NavBar/NavBar"
+import { Scrollbar } from 'react-scrollbars-custom';
 
 const cx = classNames.bind(styles)
 function AdminLayout({ children }) {
@@ -10,10 +11,13 @@ function AdminLayout({ children }) {
             <div className={cx('navbar')}>
                 <SideBar />
             </div>
-            <div className={cx('container')}>
+            <Scrollbar
+                style={{ width: 250, height: 600 }}
+                className={cx('container')}
+            >
                 <NavBar />
                 {children}
-            </div>
+            </Scrollbar>
         </div>
     )
 }

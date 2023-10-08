@@ -49,11 +49,10 @@ const LoginWithFacebook = () => {
     return (
         <>
             <LoginSocialFacebook
-                appId='321007967144195'
+                appId='1325947341377754'
                 onResolve={handleLogin}
                 onReject={handleError}
             >
-                {/* <FacebookLoginButton className={cx('')} /> */}
                 <Button leftIcon={<FontAwesomeIcon icon={faFacebookF} />} facebook > Đăng nhập bằng facebook</Button>
             </LoginSocialFacebook>
             <Backdrop
