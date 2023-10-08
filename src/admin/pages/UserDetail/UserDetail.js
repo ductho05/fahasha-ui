@@ -8,6 +8,10 @@ import { Dialog } from '@mui/material'
 import Button from '../../../components/Button'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { useForm, useController } from 'react-hook-form'
+import { useParams } from 'react-router-dom'
+import { api } from '../../../constants'
+import { toast, ToastContainer } from 'react-toastify'
+import "react-toastify/dist/ReactToastify.css";
 
 const cx = classNames.bind(styles)
 const dataIncomes = [
@@ -62,12 +66,19 @@ const options = [
 
 function UserDetail() {
 
+    const { userId } = useParams()
+    const [user, setUser] = useState({})
     const [optionSelected, setOptionSelected] = useState(options[0])
     const [showDialog, setShowDialog] = useState(false)
     const [avatar, setAvatar] = useState({})
+    const [orders, setOrders] = useState([])
 
     const handleClickEdit = () => {
         setShowDialog(true)
+        setValue("fullName", user.fullName)
+        setValue("email", user.email)
+        setValue("phone", user.phone)
+        setValue("address", user.address)
     }
 
     const handleCloseEdit = () => {
@@ -75,6 +86,34 @@ function UserDetail() {
         setAvatar({})
         setShowDialog(false)
     }
+
+    useEffect(() => {
+        fetch(`${api}/users/${userId}`)
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === "OK") {
+                    setUser(result.data)
+                }
+            })
+            .catch(err => console.error(err.message))
+    }, [showDialog])
+
+    useEffect(() => {
+        fetch('http://127.0.0.1:3000/bookstore/api/v1/orders/user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ user: userId })
+        })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === "OK") {
+                    setOrders(result.data)
+                }
+            })
+            .catch(err => console.error(err.message))
+    }, [])
 
     useEffect(() => {
 
@@ -95,24 +134,21 @@ function UserDetail() {
         clearErrors,
         control,
         formState: { errors },
-        handleSubmit
+        handleSubmit,
+        setValue
     } = useForm({
         mode: 'onBlur'
     })
 
     const nameController = useController({
         name: 'fullName',
-        control,
-        rules: {
-            required: 'Thông tin này không được để trống'
-        }
+        control
     })
 
     const emailController = useController({
         name: 'email',
         control,
         rules: {
-            required: 'Thông tin này không được để trống',
             pattern: {
                 value: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
                 message: 'Email không đúng định dạng'
@@ -121,34 +157,57 @@ function UserDetail() {
     })
 
     const phoneController = useController({
-        name: 'phone',
-        control,
-        rules: {
-            required: 'Thông tin này không được để trống'
-        }
+        name: 'phoneNumber',
+        control
     })
 
     const addressController = useController({
         name: 'address',
-        control,
-        rules: {
-            required: 'Thông tin này không được để trống'
-        }
+        control
     })
 
     const handleSave = (data) => {
         const formData = new FormData()
-        Object.keys(data).forEach((key, value) => {
-            formData.append(key, value)
+        Object.keys(data).forEach(key => {
+            formData.append(key, data[key])
         })
         if (Object.keys(avatar).length > 0) {
             formData.append('images', avatar)
         }
-
+        fetch(`${api}/users/update/${userId}`, {
+            method: 'PUT',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === "OK") {
+                    setShowDialog(false)
+                    toast.success('Thay đổi thông tin tài khoản thành công!')
+                } else {
+                    setShowDialog(false)
+                    toast.error('Thất bại! Có lỗi xảy ra')
+                }
+            })
+            .catch(err => {
+                setShowDialog(false)
+                toast.error(err.message)
+            })
     }
 
     return (
         <div className={cx('wrapper')}>
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
             <Dialog open={showDialog}>
                 <div className={cx('dialog')}>
                     <p className={cx('btn_close')} onClick={handleCloseEdit}>
@@ -158,7 +217,7 @@ function UserDetail() {
                     <form onSubmit={handleSubmit(handleSave)} className={cx('dialog_content')}>
                         <div className={cx('left')}>
                             <div className={cx('images')}>
-                                <img src={avatar.preview ? avatar.preview : 'https://res.cloudinary.com/dgntuytuu/image/upload/v1690363555/book-store/gmldbxptgqxbhsxocowd.jpg'} alt='Avatar' />
+                                <img src={avatar.preview ? avatar.preview : user?.images} alt='Avatar' />
                                 <div className={cx('btn_channge')}>
                                     <label for="image">Sửa</label>
                                     <input type='file' id='image' onChange={(e) => handlePreview(e)} />
@@ -222,13 +281,12 @@ function UserDetail() {
                     <p className={cx('btnEdit')} onClick={handleClickEdit}>Chỉnh sửa</p>
                     <h3 className={cx('title')}>Thông tin người dùng</h3>
                     <div className={cx('content')}>
-                        <img className={cx('avatar')} src='https://res.cloudinary.com/dgntuytuu/image/upload/v1690363555/book-store/gmldbxptgqxbhsxocowd.jpg' alt='Avatar' />
+                        <img className={cx('avatar')} src={user?.images} alt='Avatar' />
                         <div className={cx('description')}>
-                            <h3 className={cx('name')}>Ninh Đức Thọ</h3>
-                            <p className={cx('info_other')}>Email: 20110730@student.hcmute.edu.vn</p>
-                            <p className={cx('info_other')}>Số điện thoại: 0877404581</p>
-                            <p className={cx('info_other')}>Địa chỉ: 28/11 đường số 1 Phước Long B, Tp.Thủ Đức, Thành Phố Hồ Chí Minh</p>
-                            <p className={cx('info_other')}>Quốc gia: Việt Nam</p>
+                            <h3 className={cx('name')}>{user?.fullName}</h3>
+                            <p className={cx('info_other')}>Email: {user?.email}</p>
+                            <p className={cx('info_other')}>Số điện thoại: {user?.phoneNumber}</p>
+                            <p className={cx('info_other')}>Địa chỉ: {user?.address}</p>
                         </div>
                     </div>
                 </div>
@@ -247,7 +305,7 @@ function UserDetail() {
                 </div>
             </div>
             <div className={cx('bottom')}>
-                <OrdersLatesTable />
+                <OrdersLatesTable rows={orders} />
             </div>
         </div>
     )

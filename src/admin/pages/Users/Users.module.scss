@@ -1,5 +1,6 @@
 .wrapper {
     padding: 20px;
+    position: relative;
 }
 
 .heading {
@@ -20,6 +21,29 @@
         font-weight: 400;
         margin-left: 10px;
     }
+}
+
+.ismanager {
+    padding: 6px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    width: 90px;
+}
+
+.manager {
+    background-color: #5da7db;
+}
+
+.customer {
+    background-color: #e8aa42;
+}
+
+.null {
+    color: red;
+    font-weight: 500;
 }
 
 .btn_add_new {
@@ -47,9 +71,165 @@
 }
 
 .image {
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     border: 1px solid var(--border-color);
     object-fit: cover;
+}
+
+// Dialog
+.dialog_add_user {
+    padding: 10px 20px;
+    width: 40vw;
+}
+
+.dialog_title {
+    font-size: 2.4rem;
+    text-transform: uppercase;
+    color: var(--primary-color);
+    text-align: center;
+    padding-top: 10px;
+}
+
+.input {
+    width: 100%;
+    color: #333;
+    margin-top: 20px;
+}
+
+.label {
+    font-size: 1.6rem;
+    color: #333;
+    text-align: left;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.avatar {
+    display: flex;
+    align-items: center;
+
+    img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: 2px solid var(--primary-color);
+        margin: 10px 0;
+        overflow: hidden;
+        object-fit: cover;
+    }
+
+    .edit_avatar {
+        margin-right: 20px;
+
+        label {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            text-transform: capitalize;
+            font-size: 1.4rem;
+            cursor: pointer;
+            width: 120px;
+            height: 30px;
+            border-radius: 6px;
+        }
+
+        input[type='file'] {
+            visibility: hidden;
+            width: 0px;
+            height: 0px;
+            cursor: pointer;
+        }
+
+        .icon {
+            margin-right: 6px;
+        }
+    }
+}
+
+.form_radio {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.radio {
+    input[type='radio'] {
+        display: none;
+
+        &:checked ~ label::after {
+            border-color: var(--primary-color);
+        }
+
+        &:checked ~ label::before {
+            content: '';
+            position: absolute;
+            left: 5px;
+            bottom: 8px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+        }
+    }
+
+    label {
+        position: relative;
+        font-size: 1.2rem;
+        color: #555;
+        padding: 4px 20px 4px 30px;
+        cursor: pointer;
+
+        &::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 3px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid #b3b3b3;
+        }
+    }
+}
+
+.buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0;
+}
+
+.btn_close {
+    position: absolute;
+    right: 4px;
+    top: 4px;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &:hover {
+        background-color: #ced4da;
+    }
+
+    .btn_icon {
+        font-size: 2rem;
+        color: #555;
+    }
+}
+
+.hidden {
+    display: none;
+}
+
+.icon_password {
+    color: #333;
+    cursor: pointer;
+    margin: 0 8px;
 }

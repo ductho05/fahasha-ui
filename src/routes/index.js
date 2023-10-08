@@ -13,6 +13,7 @@ import HomeAdmin from '../admin/pages/HomeAdmin/HomeAdmin'
 import Users from '../admin/pages/Users/Users'
 import UserDetail from '../admin/pages/UserDetail/UserDetail'
 import TermsServices from '../pages/TermsServices'
+import Review from '../admin/pages/Review/Review'
 
 // Public Routes
 const publicRoutes = [
@@ -40,6 +41,7 @@ const adminRoutes = [
     { path: '/admin', component: HomeAdmin },
     { path: '/admin/user', component: Users },
     { path: '/admin/user/:userId', component: UserDetail },
+    { path: '/admin/reviews', component: Review },
 ];
 
 const notFoundRoute = { path: '*', component: Page404 };

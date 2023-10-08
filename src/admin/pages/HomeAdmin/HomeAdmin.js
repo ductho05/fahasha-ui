@@ -119,7 +119,7 @@ function HomeAdmin() {
                 </div>
 
                 <div className={cx('table')}>
-                    <OrdersLatesTable />
+                    <OrdersLatesTable rows={[]} />
                 </div>
             </div>
         </Scrollbar>

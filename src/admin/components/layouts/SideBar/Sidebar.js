@@ -11,7 +11,8 @@ import StackedLineChartOutlinedIcon from '@mui/icons-material/StackedLineChartOu
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import AccountBoxOutlinedIcon from '@mui/icons-material/AccountBoxOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
-import { Scrollbar } from 'react-scrollbars-custom'
+import { Scrollbar } from 'react-scrollbars-custom';
+import ReviewsIcon from '@mui/icons-material/Reviews';
 
 const cx = classNames.bind(styles)
 const tabList = [
@@ -39,7 +40,7 @@ const tabList = [
             {
                 id: 2,
                 icon: Inventory2OutlinedIcon,
-                name: 'Sản phẩm'
+                name: 'Sản phẩm',
             },
             {
                 id: 3,
@@ -51,18 +52,24 @@ const tabList = [
                 icon: LocalShippingOutlinedIcon,
                 name: 'Vận chuyển'
             },
+            {
+                id: 5,
+                icon: ReviewsIcon,
+                name: 'Đánh giá',
+                link: '/admin/reviews'
+            },
         ]
     },
     {
         type: 'useful',
         tabs: [
             {
-                id: 5,
+                id: 6,
                 icon: StackedLineChartOutlinedIcon,
                 name: 'Thống kê'
             },
             {
-                id: 6,
+                id: 7,
                 icon: NotificationsNoneOutlinedIcon,
                 name: 'Thông báo'
             }
@@ -72,12 +79,12 @@ const tabList = [
         type: 'users',
         tabs: [
             {
-                id: 7,
+                id: 8,
                 icon: AccountBoxOutlinedIcon,
                 name: 'Thông tin tài khoản'
             },
             {
-                id: 8,
+                id: 9,
                 icon: LogoutOutlinedIcon,
                 name: 'Đăng xuất'
             }
