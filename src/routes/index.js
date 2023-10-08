@@ -1,21 +1,19 @@
-import Home from '../pages/Home/index';
-import ProductDetail from '../pages/ProductDetail/index';
-import TableCart from '../pages/Cart/TableCart';
-import Account from '../pages/Account';
-import SeeMoreProduct from '../pages/SeeMoreProduct';
-import CheckOut from '../pages/CheckOut';
-import SearchProduct from '../pages/SearchProduct';
-import RegisterLogin from '../pages/RegisterLoginPage';
-import OrderSuccess from '../pages/OrderSuccess';
-import OrderDetail from '../pages/OrderDetail';
-import Page404 from '../pages/Page404';
-import HomeAdmin from '../admin/pages/HomeAdmin/HomeAdmin';
-import Users from '../admin/pages/Users/Users';
-import UserDetail from '../admin/pages/UserDetail/UserDetail';
-import AutoFlashSale from '../admin/pages/UseFul/AutoFlashSale';
-import CostumFlashSale from '../admin/pages/UseFul/CostumFlashSale';
-import TermsServices from '../pages/TermsServices';
-
+import Home from '../pages/Home/index'
+import ProductDetail from '../pages/ProductDetail/index'
+import TableCart from '../pages/Cart/TableCart'
+import Account from '../pages/Account'
+import SeeMoreProduct from '../pages/SeeMoreProduct'
+import CheckOut from '../pages/CheckOut'
+import SearchProduct from '../pages/SearchProduct'
+import RegisterLogin from '../pages/RegisterLoginPage'
+import OrderSuccess from '../pages/OrderSuccess'
+import OrderDetail from '../pages/OrderDetail'
+import Page404 from '../pages/Page404'
+import HomeAdmin from '../admin/pages/HomeAdmin/HomeAdmin'
+import Users from '../admin/pages/Users/Users'
+import UserDetail from '../admin/pages/UserDetail/UserDetail'
+import TermsServices from '../pages/TermsServices'
+import Review from '../admin/pages/Review/Review'
 // Public Routes
 const publicRoutes = [
     { path: '/', component: Home },
@@ -41,8 +39,12 @@ const adminRoutes = [
     { path: '/admin', component: HomeAdmin },
     { path: '/admin/user', component: Users },
     { path: '/admin/user/:userId', component: UserDetail },
+
     { path: '/admin/flashsale/auto', component: AutoFlashSale },
     { path: '/admin/flashsale/custom', component: CostumFlashSale },
+
+    { path: '/admin/reviews', component: Review },
+
 ];
 
 const notFoundRoute = { path: '*', component: Page404 };

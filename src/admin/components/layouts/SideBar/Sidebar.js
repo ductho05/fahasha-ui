@@ -14,6 +14,9 @@ import AccountBoxOutlinedIcon from '@mui/icons-material/AccountBoxOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { Scrollbar } from 'react-scrollbars-custom';
 
+import ReviewsIcon from '@mui/icons-material/Reviews';
+
+
 const cx = classNames.bind(styles);
 const tabList = [
     {
@@ -51,23 +54,33 @@ const tabList = [
                 icon: LocalShippingOutlinedIcon,
                 name: 'Vận chuyển',
             },
-        ],
+
+        
+
+            {
+                id: 5,
+                icon: ReviewsIcon,
+                name: 'Đánh giá',
+                link: '/admin/reviews'
+            },
+        ]
+
     },
     {
         type: 'useful',
         tabs: [
             {
-                id: 5,
+                id: 6,
                 icon: StackedLineChartOutlinedIcon,
                 name: 'Thống kê',
             },
             {
-                id: 6,
+                id: 7,
                 icon: NotificationsNoneOutlinedIcon,
                 name: 'Thông báo',
             },
             {
-                id: 7,
+                id: 8,
                 icon: LoyaltyIcon,
                 name: 'Flash Sale',
                 link: '/admin/flashsale',
@@ -78,20 +91,19 @@ const tabList = [
         type: 'users',
         tabs: [
             {
-                id: 8,
-                icon: AccountBoxOutlinedIcon,
-                name: 'Thông tin tài khoản',
-            },
-
-            {
                 id: 9,
-                icon: LogoutOutlinedIcon,
-                name: 'Đăng xuất',
-                link: '/',
+                icon: AccountBoxOutlinedIcon,
+                name: 'Thông tin tài khoản'
             },
-        ],
+            {
+                id: 10,
+                icon: LogoutOutlinedIcon,
+                name: 'Đăng xuất'
+            }
+        ]
     },
-];
+]
+
 function SideBar() {
     const [currentTab, setCurrentTab] = useState(0);
 
