@@ -50,6 +50,7 @@ function Header() {
     const [user, setUser] = useState({});
     const [notice, setNotice] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const productQuality = 7;
 
     useEffect(() => {
         if (state.user) {
@@ -70,22 +71,6 @@ function Header() {
     }, []);
 
     useEffect(() => {
-        fetch(`${api}/products`)
-            .then((response) => response.json())
-            .then((result) => {
-                setProducts(result.data.splice(0, 20));
-            })
-            .catch((err) => console.log(err));
-    }, [keyTextSearch]);
-
-    useEffect(() => {
-        // fetch(`${api}/products`)
-        //     .then((response) => response.json())
-        //     .then((result) => {
-        //         setProducts(result.data);
-        //     })
-        //     .catch((err) => console.log(err));
-
         fetch(`${api}/products/bestseller-limit`)
             .then((response) => response.json())
             .then((result) => {
@@ -102,7 +87,20 @@ function Header() {
             .catch((err) => console.log(err));
     }, []);
 
-    const suggestItems = products.map((product) => ({ id: product._id, name: product.title, image: product.images }));
+    useEffect(() => {
+        if (keyTextSearch == '') {
+            setProducts([]);
+        } else {
+            axios
+                .get(`${api}/products?title=${keyTextSearch}&num=${productQuality}`)
+                .then((res) => {
+                    setProducts(res.data.data);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
+    }, [keyTextSearch]);
 
     let handleOnFocus = () => {
         setSuggestSearch(true);
@@ -133,25 +131,15 @@ function Header() {
     };
 
     function handleDebounceFn(inputValue) {
-        if (inputValue == '') {
-            setSuggestions([]);
-        } else {
-            let newSuggestions = suggestItems
-                .filter((suggestion) => suggestion.name.toLowerCase().includes(inputValue.toLowerCase()))
-                .slice(0, 7);
-            setSuggestions(newSuggestions);
-            // console.log(suggestItems);
-        }
         setKeyTextSearch(inputValue);
-        // console.log(products);
     }
 
     const debounceFn = useCallback(_debounce(handleDebounceFn, 700), []);
 
-    const handleChangeValue = (event) => {
-        const inputValue = event.target.value;
+    function handleChangeValue(event) {
+        const inputValue = event.target?.value;
         debounceFn(inputValue);
-    };
+    }
 
     const handleKeyDown = (e) => {
         if (e.keyCode === 13) {
@@ -391,32 +379,32 @@ function Header() {
                                             <PopperWrapper>
                                                 <div className={cx('search_content')}>
                                                     <div
-                                                        className={
-                                                            suggestions.length > 0 ? cx('suggestions') : cx('hide')
-                                                        }
+                                                        className={products.length > 0 ? cx('suggestions') : cx('hide')}
                                                     >
                                                         <div className={cx('suggestions_heading')}>
                                                             <img src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/ico_searchtrending_black.svg" />
                                                             <h3>Gợi ý</h3>
                                                         </div>
                                                         <ul className={cx('suggestions_list')}>
-                                                            {suggestions.map((suggestion, index) => (
+                                                            {products.map((suggestion, index) => (
                                                                 <li
                                                                     onClick={() =>
-                                                                        handleClickItemSuggest(suggestion.id)
+                                                                        handleClickItemSuggest(suggestion._id)
                                                                     }
                                                                     key={index}
                                                                     className={cx('suggestions_item')}
                                                                 >
-                                                                    <img src={suggestion.image} />
-                                                                    <p className={cx('item_name')}>{suggestion.name}</p>
+                                                                    <img src={suggestion.images} />
+                                                                    <p className={cx('item_name')}>
+                                                                        {suggestion.title}
+                                                                    </p>
                                                                 </li>
                                                             ))}
                                                         </ul>
                                                     </div>
                                                     <div
                                                         className={
-                                                            suggestions.length > 0 ||
+                                                            products.length > 0 ||
                                                             localstorage.get('historys').length <= 0
                                                                 ? cx('hide')
                                                                 : cx('keywords_hot')
@@ -450,7 +438,7 @@ function Header() {
                                                     </div>
                                                     <div
                                                         className={
-                                                            suggestions.length > 0 ? cx('hide') : cx('keywords_hot')
+                                                            products.length > 0 ? cx('hide') : cx('keywords_hot')
                                                         }
                                                     >
                                                         <div className={cx('hot_heading')}>

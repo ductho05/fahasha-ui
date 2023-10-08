@@ -1,0 +1,17 @@
+.btn_add_new {
+    border-radius: 4px;
+    border: 1px solid rgb(44, 46, 46);
+    font-weight: 600;
+    cursor: pointer;
+    padding: 10px;
+    background-color: rgba(0, 223, 162, 0.2);
+    border: 1px solid rgb(0, 223, 162);
+    margin-right: 10px;
+    .btn_icon_set {
+        font-size: 3rem;
+        color: rgb(0, 223, 162);
+    }
+    &:hover {
+        box-shadow: 0px 0px 10px rgba(0, 223, 162, 0.5); /* Đặt box-shadow khi hover */
+    }
+}

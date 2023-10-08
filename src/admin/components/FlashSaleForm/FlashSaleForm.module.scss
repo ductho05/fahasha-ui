@@ -1,0 +1,15 @@
+/* Tùy chỉnh Radio.Button */
+.ant-radio-button-wrapper {
+    border: 1px solid #d9d9d9; /* Viền */
+    border-radius: 4px; /* Góc bo tròn */
+    margin-right: 8px; /* Khoảng cách giữa các nút radio */
+}
+
+/* Tùy chỉnh Radio.Button khi chọn */
+.ant-radio-button-wrapper-checked {
+    background-color: #1890ff; /* Màu nền khi được chọn */
+    border-color: #1890ff; /* Viền khi được chọn */
+    color: #fff; /* Màu chữ khi được chọn */
+}
+
+/* Tùy chỉnh vùng chứa Radio.Group */

@@ -1,23 +1,24 @@
-import { useEffect } from "react"
-import { useNavigate } from 'react-router-dom'
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
-import classNames from "classnames/bind"
-import styles from './Page404.module.scss'
-import images from "../../assets/images"
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import classNames from 'classnames/bind';
+import styles from './Page404.module.scss';
+import images from '../../assets/images';
 
-const cx = classNames.bind(styles)
+const cx = classNames.bind(styles);
 function Page404() {
+    localStorage.removeItem('temporary_data');
 
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     useEffect(() => {
-        document.title = 'Không tìm thấy trang truy cập'
-    }, [])
+        document.title = 'Không tìm thấy trang truy cập';
+    }, []);
 
     const handleBackToHome = () => {
-        navigate('/')
-    }
+        navigate('/');
+    };
 
     return (
         <div className={cx('wrapper')}>
@@ -33,7 +34,7 @@ function Page404() {
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
-export default Page404
+export default Page404;

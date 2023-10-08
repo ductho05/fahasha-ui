@@ -62,7 +62,7 @@ function OrderSuccess() {
             content:
                 'Giao dịch không thành công do: KH nhập sai mật khẩu thanh toán quá số lần quy định. Xin quý khách vui lòng thực hiện lại giao dịch',
         },
-        { code: 'E99', content: 'Các lỗi khác (lỗi còn lại, không có trong danh sách mã lỗi đã liệt kê)' },
+        { code: 'E99', content: 'Hệ thống đã xảy ra lỗi trong quá trình lưu đơn hàng, tiền sẽ được hoàn trả lại trong 7 ngày làm việc. Quý khách vui lòng thử thanh toán lại sau!' },
     ];
     localStorage.removeItem('item_order_checkout');
     localStorage.removeItem(statusVNPayCheckout);

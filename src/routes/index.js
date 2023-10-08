@@ -14,7 +14,6 @@ import Users from '../admin/pages/Users/Users'
 import UserDetail from '../admin/pages/UserDetail/UserDetail'
 import TermsServices from '../pages/TermsServices'
 import Review from '../admin/pages/Review/Review'
-
 // Public Routes
 const publicRoutes = [
     { path: '/', component: Home },
@@ -40,7 +39,12 @@ const adminRoutes = [
     { path: '/admin', component: HomeAdmin },
     { path: '/admin/user', component: Users },
     { path: '/admin/user/:userId', component: UserDetail },
+
+    { path: '/admin/flashsale/auto', component: AutoFlashSale },
+    { path: '/admin/flashsale/custom', component: CostumFlashSale },
+
     { path: '/admin/reviews', component: Review },
+
 ];
 
 const notFoundRoute = { path: '*', component: Page404 };
