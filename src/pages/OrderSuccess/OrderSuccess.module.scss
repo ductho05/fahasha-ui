@@ -9,15 +9,18 @@
 .heading {
     display: flex;
     justify-content: center;
+    margin: 8% 0 0 0;
     align-items: center;
-    height: 150px;
     font-size: 12rem;
     color: #6eccaf;
 }
 
 .dialog_notice {
     font-size: 2rem;
+    width: 80%;
+    line-height: 1.5;
     text-align: center;
+    margin: 0 auto; /* Để căn giữa theo chiều ngang */
 }
 
 .btns {
@@ -50,8 +53,8 @@
 
 @media (max-width: 500px) {
     .dialog {
-        min-width: 300px;
-        min-height: 400px;
+        min-width: 200px;
+        min-height: 300px;
     }
 
     .dialog_notice {

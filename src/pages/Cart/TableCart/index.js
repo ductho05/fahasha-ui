@@ -20,15 +20,12 @@ function TableCart() {
     const numeral = require('numeral');
     const [state, dispatch] = useStore();
     const cx = classname.bind(styles);
-    //const user = JSON.parse(localStorage.getItem("user"));
     const namecart = `myCart_${state.user._id}`;
     const [code, setCode] = useState('');
     const [discount, setDiscount] = useState(0);
     const product = localStorage.getItem(namecart) ? JSON.parse(localStorage.getItem(namecart)).items : [];
     const [data, setData] = useState([]);
-    const [listCheckouts, setListCheckouts] = useState([]);
-    const newArr = [];
-    // const [messageApi, contextHolder] = message.useMessage();
+    const [selectedRowKeys, setSelectedRowKeys] = useState(GetLocalCart);
     const info = (coupon) => {
         message.info({
             content: coupon,
@@ -50,25 +47,12 @@ function TableCart() {
             discount: 30,
         },
     ];
-    // let api = localStorage.getItem(namecart) ? 'https://backoffice.nodemy.vn/api/products?populate=*' : '';
-    // product.map((item, index) => {
-    //     api += `&filters[slug][$contains]=${item.id}`;
-    // });
 
     useEffect(() => {
         product.forEach((item) => {
             fetch(`${api}/products/id/${item.id}`)
                 .then((response) => response.json())
                 .then((products) => {
-                    setListCheckouts((prev1) => {
-                        return [
-                            ...prev1,
-                            {
-                                product: products.data,
-                                quantity: item.count,
-                            },
-                        ];
-                    });
                     setData((prev) => {
                         return [
                             ...prev,
@@ -87,10 +71,34 @@ function TableCart() {
         });
     }, []);
 
-    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+
+    // Lấy trạng thái chọn mua từ local
+    function GetLocalCart() {
+        var initIscheckout = [];
+        product.map((item, index) => {
+            if (item.isGetcheckout == 1) {
+                initIscheckout.push(item.id);
+            }
+        });
+        return initIscheckout;
+    }
+
+    // Update trạng thái chọn mua trong giỏ hàng lên local
+    const updateLocalCart = (newSelectedRowKeys) => {
+        var myCart = JSON.parse(localStorage.getItem(namecart));
+        product.map((item, index) => {
+            if (newSelectedRowKeys.includes(item.id)) {
+                myCart.items[index].isGetcheckout = 1;
+            } else {
+                myCart.items[index].isGetcheckout = 0;
+            }
+        });
+        localStorage.setItem(namecart, JSON.stringify(myCart));
+    };
 
     const onSelectChange = (newSelectedRowKeys) => {
         setSelectedRowKeys(newSelectedRowKeys);
+        updateLocalCart(newSelectedRowKeys);
     };
     const rowSelection = {
         selectedRowKeys,
@@ -446,12 +454,12 @@ function TableCart() {
 
                     <Button
                         disabled={TongThanhToan() <= 0}
-                        className={cx('btn-checkout')}
+                        className={cx('btn-checkout')}                        
                         style={{
                             transition: 'background-color 0.3s', // Hiệu ứng hover
                         }}
                     >
-                        <Link to="/checkout" state={{ listCheckouts: listCheckouts }}>
+                        <Link to="/checkout">
                             Thanh toán
                         </Link>
                     </Button>

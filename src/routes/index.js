@@ -24,8 +24,7 @@ const publicRoutes = [
     { path: '/search/:title', component: SearchProduct },
     { path: '/login-register', component: RegisterLogin },
     { path: '/terms-of-service', component: TermsServices },
-]
-
+];
 
 // Private Routes
 const privateRoutes = [
