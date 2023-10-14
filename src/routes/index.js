@@ -16,6 +16,9 @@ import TermsServices from '../pages/TermsServices'
 import Review from '../admin/pages/Review/Review'
 import AutoFlashSale from '../admin/pages/UseFul/AutoFlashSale'
 import CostumFlashSale from '../admin/pages/UseFul/CostumFlashSale'
+import Order from '../admin/pages/Order'
+import Product from '../admin/pages/Product'
+import UpdateProduct from '../admin/pages/UpdateProduct'
 // Public Routes
 const publicRoutes = [
     { path: '/', component: Home },
@@ -46,6 +49,9 @@ const adminRoutes = [
     { path: '/admin/flashsale/custom', component: CostumFlashSale },
 
     { path: '/admin/reviews', component: Review },
+    { path: '/admin/orders', component: Order },
+    { path: '/admin/products', component: Product },
+    { path: '/admin/update-product/:pid', component: UpdateProduct },
 
 ];
 

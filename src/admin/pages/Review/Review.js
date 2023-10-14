@@ -5,8 +5,7 @@ import EnhancedTable from "../../components/Table/EnhancedTable"
 import { Rating } from "@mui/material"
 import { api } from '../../../constants'
 import LinearProgress from '@mui/material/LinearProgress';
-import { Link } from 'react-router-dom';
-import { View } from '../../components/Button/Button';
+import { Backdrop } from "@mui/material"
 
 const cx = classNames.bind(styles)
 
@@ -44,29 +43,46 @@ const columns = [
 
 function Review() {
     const [rows, setRows] = useState([])
+    const [loading, setLoading] = useState(false)
     useEffect(() => {
+        setLoading(true)
         fetch(`${api}/evaluates/get`)
             .then(response => response.json())
             .then(result => {
+                setLoading(false)
                 setRows(result.data)
             })
-            .catch(err => console.log(err))
+            .catch(err => {
+                setLoading(false)
+                console.log(err)
+            })
     }, [])
 
     return (
         <div className={cx('wrapper')}>
+            <Backdrop
+                sx={{ color: '#fff', zIndex: 10000 }}
+                open={loading}
+            />
             <div className={cx('heading')}>
                 <h3>Quản lý đánh giá</h3>
             </div>
             {
-                rows.length <= 0 &&
+                loading &&
                 <div>
                     <LinearProgress />
                 </div>
             }
-            <div className={cx('table')}>
-                <EnhancedTable columns={columns} rows={rows} actions={{}} />
-            </div>
+
+            {
+                rows.length > 0 ?
+                    <div className={cx('table')}>
+                        <EnhancedTable columns={columns} rows={rows} actions={{}} />
+                    </div>
+                    : <div className={cx('nodata')}>
+                        <p className={cx('nodata_label')}>Dữ liệu trống!</p>
+                    </div>
+            }
         </div>
     )
 }

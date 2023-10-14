@@ -20,11 +20,11 @@ export default function EnhancedTable({ columns, rows }) {
                     initialState={{
                         pagination: {
                             paginationModel: {
-                                pageSize: 10,
+                                pageSize: 6,
                             },
                         },
                     }}
-                    pageSizeOptions={[10, 20]}
+                    pageSizeOptions={[6, 12]}
                     checkboxSelection
                     slots={{
                         toolbar: CustomToolbar,

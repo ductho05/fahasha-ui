@@ -23,7 +23,7 @@ function AdminLayout({ children }) {
                 <SideBar />
             </div>
             <Scrollbar
-                style={{ width: 250, height: 600 }}
+                style={{ width: 250, height: '100vh' }}
                 className={cx('container')}
             >
                 <NavBar />

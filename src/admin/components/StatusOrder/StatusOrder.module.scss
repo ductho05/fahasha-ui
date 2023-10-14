@@ -1,0 +1,29 @@
+.status {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 20px;
+    border: 1px solid #3ccf4e;
+    color: #3ccf4e;
+    border-radius: 4px;
+    background-color: rgba(60, 207, 78, 0.05);
+    cursor: pointer;
+
+    &:hover {
+        background-color: rgba(60, 207, 78, 0.5);
+    }
+}
+
+.disabled {
+    pointer-events: none;
+}
+
+.icon {
+    margin-left: 4px;
+}
+
+.cancle {
+    border-color: #d71313;
+    color: #d71313;
+    background-color: rgba(215, 19, 19, 0.05);
+}

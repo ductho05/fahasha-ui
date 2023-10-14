@@ -57,3 +57,17 @@
     color: red;
     font-weight: 500;
 }
+
+.nodata {
+    min-height: 50vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.nodata_label {
+    padding: 10px 20px;
+    border: 1px solid #687eff;
+    background-color: rgba(104, 126, 255, 0.5);
+    border-radius: 4px;
+    color: #687eff;
+}
