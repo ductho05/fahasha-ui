@@ -35,16 +35,19 @@ export default function EnhancedTable({ columns, rows, func, isStatus, ischeckbo
                     initialState={{
                         pagination: {
                             paginationModel: {
-                                pageSize: 10,
+                                pageSize: 6,
                             },
                         },
                     }}
-                    pageSizeOptions={[10, 20, 50, 100]}
+                    //pageSizeOptions={[10, 20, 50, 100]}
                     checkboxSelection={ischeckboxSelection !== undefined ? ischeckboxSelection : true}
                     onRowSelectionModelChange={(newRowSelectionModel) => {
                         setRowSelectionModel(newRowSelectionModel);
                     }}
                     rowSelectionModel={rowSelectionModel}
+
+                    pageSizeOptions={[6, 12]}
+                    
                     slots={{
                         toolbar: CustomToolbar,
                         pagination: CustomPagination,

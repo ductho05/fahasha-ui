@@ -5,7 +5,7 @@ import SideBar from './SideBar/Sidebar';
 import NavBar from './NavBar/NavBar';
 import { api } from '../../../constants';
 import { Progress } from 'antd';
-import lottie from 'lottie-web';
+import { Scrollbar } from 'react-scrollbars-custom';
 const cx = classNames.bind(styles);
 function AdminLayout({ children }) {
     const container = useRef(null);
@@ -116,11 +116,12 @@ function AdminLayout({ children }) {
             <div className={cx('wrapper')}>
                 <div className={cx('navbar')}>
                     <SideBar />
-                </div>
-                <div className={cx('container')}>
+                </div>             
+
+                <Scrollbar style={{ width: 250, height: '100vh' }} className={cx('container')}>
                     <NavBar />
                     {children}
-                </div>
+                </Scrollbar>
             </div>
         </>
     );

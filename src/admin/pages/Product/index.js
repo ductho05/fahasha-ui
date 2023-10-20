@@ -1,62 +1,54 @@
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from 'react'
 import classNames from "classnames/bind"
-import styles from './Users.module.scss'
-import EnhancedTable from "../../components/Table/EnhancedTable"
-import { api } from '../../../constants'
-import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
-import { Delete, View } from '../../components/Button/Button';
+import styles from './Product.module.scss'
+import EnhancedTable from '../../components/Table/EnhancedTable';
+import { api } from '../../../constants';
+import { Rating } from "@mui/material"
+import LinearProgress from '@mui/material/LinearProgress';
+import numeral from 'numeral';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import { toast, ToastContainer } from 'react-toastify'
 import "react-toastify/dist/ReactToastify.css";
+import { Delete, Update } from '../../components/Button/Button';
 import { Link } from 'react-router-dom';
-import LinearProgress from '@mui/material/LinearProgress';
-import { Dialog, TextField, InputAdornment } from "@mui/material"
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import DropMenu from "../../../components/DropMenu"
-import Button from "../../../components/Button"
-import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
-import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import { useForm } from "react-hook-form"
+import { Dialog, TextField } from "@mui/material"
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DemoItem } from '@mui/x-date-pickers/internals/demo';
-import { CircularProgress, Backdrop } from "@mui/material"
+import { CircularProgress, Backdrop } from "@mui/material";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import Button from "../../../components/Button";
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import Dropdown from 'react-multilevel-dropdown';
 
 const cx = classNames.bind(styles)
+function Product() {
 
-const options = [
-    {
-        title: 'Quản lý',
-        value: true,
-        type: ''
-    },
-    {
-        title: 'Khách hàng',
-        value: false,
-        type: ''
-    }
-]
-
-function Users() {
-    const [rows, setRows] = useState([])
-    const [avatar, setAvatar] = useState()
     const [showDialog, setShowDialog] = useState(false)
-    const [showPassword, setShowPassword] = useState(false)
-    const [birth, setBirth] = useState()
+    const [published, setPublished] = useState()
+    const [rows, setRows] = React.useState([])
+    const [avatar, setAvatar] = useState()
     const [loading, setLoading] = useState(false)
     const [isAction, setIsAction] = useState(false)
-    const [gender, setGender] = useState()
-    const [isInsert, setIsInsert] = useState(false)
-    const [role, setRole] = useState({
-        title: '-- Chọn --',
-        value: '',
-        type: ''
+    const [options, setOptions] = useState([])
+    const [categoryName, setCategoryName] = useState({
+        name: "--Chọn loại sản phẩm--",
+        value: ""
     })
 
     const columns = [
+        {
+            field: 'title',
+            headerName: 'Sản phẩm',
+            sortable: false,
+            editable: true,
+            width: 240,
+            renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : "Trống"}</p>
+        },
         {
             field: 'images',
             headerName: 'Images',
@@ -65,31 +57,42 @@ function Users() {
             renderCell: (params) => <img className={cx('image')} src={params.value} />
         },
         {
-            field: 'fullName',
-            headerName: 'Tên đầy đủ',
+            field: 'author',
+            headerName: 'Tác giả',
+            sortable: false,
+            editable: true,
+            width: 180,
+            renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : "Trống"}</p>
+        },
+        {
+            field: 'published_date',
+            headerName: 'Ngày xuất bản',
             width: 160,
             sortable: false,
             renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : "Trống"}</p>
         },
         {
-            field: 'birth',
-            headerName: 'Ngày sinh',
-            width: 160,
-            renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : "Trống"}</p>
-        },
-        {
-            field: 'email',
-            headerName: 'Email',
+            field: 'price',
+            headerName: 'Giá hiện tại(đ)',
+            width: 100,
             sortable: false,
-            width: 280,
-            renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : "Trống"}</p>
+            renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? numeral(params.value).format('0,0[.]00 VNĐ') : "Trống"}</p>
         },
         {
-            field: 'isManager',
-            headerName: 'Chức vụ',
-            width: 120,
-            renderCell: (params) => <p className={params.value ? cx('ismanager', 'manager') : cx('ismanager', 'customer')}>{params.value ? "Quản lý" : "Khách hàng"}</p>
+            field: 'old_price',
+            headerName: 'Giá cũ(đ)',
+            width: 100,
+            sortable: false,
+            renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? numeral(params.value).format('0,0[.]00 VNĐ') : "Trống"}</p>
         },
+        {
+            field: 'rate',
+            headerName: 'Đánh giá',
+            width: 160,
+            sortable: true,
+            renderCell: (params) => <Rating name="read-only" value={params.value} readOnly />
+        },
+
         {
             field: '_id',
             headerName: 'Hành động',
@@ -100,21 +103,25 @@ function Users() {
                 const handleOnCLick = (e) => {
                     e.stopPropagation();
                 }
-
                 const handleDelete = () => {
-                    fetch(`${api}/users/delete/${params.value}`, {
-                        method: 'DELETE'
+                    setLoading(true)
+                    setIsAction(true)
+                    fetch(`${api}/products/delete/${params.value}`, {
+                        method: 'GET'
                     })
                         .then(response => response.json())
                         .then(result => {
                             if (result.status === 'OK') {
-                                setIsAction(prev => !prev)
                                 toast.success('Xóa thành công!')
                             } else {
                                 toast.error(result.message)
                             }
+                            setLoading(false)
+                            setIsAction(false)
                         })
                         .catch(err => {
+                            setLoading(false)
+                            setIsAction(false)
                             toast.error(err.message)
                         })
                 }
@@ -123,7 +130,7 @@ function Users() {
                     <p onClick={() => {
                         confirmAlert({
                             title: 'Xác nhận xóa?',
-                            message: 'Tài khoản này sẽ bị xóa khỏi hệ thống!',
+                            message: 'Sản phẩm này sẽ bị xóa khỏi hệ thống!',
                             buttons: [
                                 {
                                     label: 'Đồng ý',
@@ -140,8 +147,8 @@ function Users() {
                     }}>
                         <Delete />
                     </p>
-                    <Link to={`/admin/user/${params.row._id}`}>
-                        <View />
+                    <Link to={`/admin/update-product/${params.row._id}`}>
+                        <Update />
                     </Link>
                 </div>
             }
@@ -151,23 +158,78 @@ function Users() {
     const {
         register,
         handleSubmit,
-        watch,
         reset
     } = useForm()
 
-    useEffect(() => {
+    React.useEffect(() => {
         setLoading(true)
-        fetch(`${api}/users`)
+        fetch(`${api}/products`)
             .then(response => response.json())
             .then(result => {
-                setLoading(false)
-                setRows(result.data)
+                if (result.status === "OK") {
+                    setLoading(false)
+                    setRows(result.data)
+                } else {
+                    setLoading(false)
+                }
             })
-            .catch(err => {
+            .catch(error => {
                 setLoading(false)
-                console.log(err)
+                console.log(error.message)
             })
     }, [isAction])
+
+    useEffect(() => {
+        fetch(`${api}/categories`)
+            .then(response => response.json())
+            .then(result => {
+                if (result.status == "OK") {
+                    setOptions(result.data)
+                }
+            })
+            .catch(err => console.log(err.message))
+    }, [])
+
+    const onSubmit = (data) => {
+        const formData = new FormData()
+        Object.keys(data).forEach(key => {
+            formData.append(key, data[key])
+        })
+        if (categoryName.value !== "") {
+            formData.append("categoryId", categoryName.value)
+        }
+        if (avatar) {
+            formData.append("images", avatar)
+        }
+        if (published) {
+            formData.append("published_date", published)
+        }
+        setLoading(true)
+        setIsAction(true)
+        fetch(`${api}/products/add`, {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(result => {
+
+                if (result.status === "OK") {
+                    toast.success("Thêm mới sản phẩm thành công")
+                } else {
+                    toast.error(result.message)
+                }
+                setIsAction(false)
+                setLoading(false)
+                setShowDialog(false)
+            })
+            .catch(err => {
+                setIsAction(false)
+                setLoading(false)
+                setShowDialog(false)
+                toast.error(err.message)
+            })
+
+    }
 
     useEffect(() => {
         return () => {
@@ -184,66 +246,18 @@ function Users() {
         }
     }
 
-    const handleChangeGender = (gender) => {
-        setGender(gender)
-    }
-
-    const onSubmit = (data) => {
-        const formData = new FormData()
-        Object.keys(data).forEach(key => {
-            formData.append(key, data[key])
-        })
-        if (avatar) {
-            formData.append('images', avatar)
-        }
-        if (role.value !== '') {
-            formData.append('isManager', role.value)
-        }
-        if (birth) {
-            formData.append('birth', birth)
-        }
-        if (gender) {
-            formData.append('gender', gender)
-        }
-        setLoading(true)
-        fetch(`${api}/users/insert`, {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.json())
-            .then(result => {
-                if (result.status === 'OK') {
-                    setIsAction(prev => !prev)
-                    setShowDialog(false)
-                    setLoading(false)
-                    toast.success("Thêm mới tài khoản thành công!")
-                } else {
-                    setShowDialog(false)
-                    setLoading(false)
-                    toast.success(`Error! ${result.message}`)
-                }
-            })
-            .catch(err => {
-                setShowDialog(false)
-                setLoading(false)
-                toast.success(`Error! ${err.message}`)
-            })
-
-    }
-
     const handleShowDialog = () => {
         reset()
         if (avatar) {
             URL.revokeObjectURL(avatar.preview)
             setAvatar()
         }
-        setRole({
-            title: '-- Chọn --',
-            value: '',
-            type: ''
+        setCategoryName({
+            name: "--Chọn loại sản phẩm--",
+            value: ""
         })
+        setPublished()
         setShowDialog(true)
-        setGender()
     }
 
     return (
@@ -267,12 +281,12 @@ function Users() {
                     <p className={cx('btn_close')} onClick={() => setShowDialog(false)}>
                         <CloseOutlinedIcon className={cx('btn_icon')} />
                     </p>
-                    <h1 className={cx("dialog_title")}>Thêm mới tài khoản</h1>
-                    <p className={cx('label')}>Tên tài khoản</p>
+                    <h1 className={cx("dialog_title")}>Thêm mới sản phẩm</h1>
+                    <p className={cx('label')}>Tên sản phẩm</p>
                     <TextField
-                        {...register('fullName')}
+                        {...register('title')}
                         fullWidth
-                        placeholder='Nhập tên tài khoản'
+                        placeholder='Nhập tên sản phẩm'
                         size='medium'
                         style={{
                             outline: 'none',
@@ -300,11 +314,11 @@ function Users() {
                             }
                         }}
                     />
-                    <p className={cx('label')}>Email</p>
+                    <p className={cx('label')}>Tác giả</p>
                     <TextField
-                        {...register('email')}
+                        {...register('author')}
                         fullWidth
-                        placeholder='Nhập email'
+                        placeholder='Nhập tên tác giả'
                         size='medium'
                         style={{
                             outline: 'none',
@@ -332,11 +346,11 @@ function Users() {
                             }
                         }}
                     />
-                    <p className={cx('label')}>Số điện thoại</p>
+                    <p className={cx('label')}>Giá hiện tại</p>
                     <TextField
-                        {...register('phoneNumber')}
+                        {...register('price')}
                         fullWidth
-                        placeholder='Nhập số điện thoại'
+                        placeholder='Nhập giá hiện tại'
                         size='medium'
                         style={{
                             outline: 'none',
@@ -364,50 +378,11 @@ function Users() {
                             }
                         }}
                     />
-                    <p className={cx('label')}>Mật khẩu</p>
+                    <p className={cx('label')}>Giá cũ</p>
                     <TextField
-                        {...register('password')}
-                        type={showPassword ? "text" : "password"}
+                        {...register('old_price')}
                         fullWidth
-                        placeholder='Nhập mật khẩu'
-                        size='medium'
-                        style={{
-                            outline: 'none',
-                        }}
-                        sx={{
-
-                            "& .MuiOutlinedInput-root": {
-                                border: '1px solid #1363DF',
-                                borderRadius: "4px",
-                                padding: "0",
-                                height: "40px",
-                            },
-                            "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-                                border: "none"
-                            }
-                        }}
-                        InputProps={{
-                            style: {
-                                color: "#333",
-                                fontSize: "14px",
-                                marginBottom: '16px',
-                                backgroundColor: "#fff"
-                            },
-                            endAdornment: (
-                                <InputAdornment position="end" className={watch('password') === '' || !watch('password') ? cx('hidden') : cx('visible')}>
-                                    {
-                                        showPassword ? <VisibilityOutlinedIcon onClick={() => setShowPassword(prev => !prev)} className={cx("icon_password")} />
-                                            : <VisibilityOffOutlinedIcon onClick={() => setShowPassword(prev => !prev)} className={cx("icon_password")} />
-                                    }
-                                </InputAdornment>
-                            )
-                        }}
-                    />
-                    <p className={cx('label')}>Địa chỉ</p>
-                    <TextField
-                        {...register('address')}
-                        fullWidth
-                        placeholder='Nhập địa chỉ'
+                        placeholder='Nhập giá cũ'
                         size='medium'
                         style={{
                             outline: 'none',
@@ -435,16 +410,13 @@ function Users() {
                             }
                         }}
                     />
-                    <p className={cx('label')}>Ngày sinh</p>
+                    <p className={cx('label')}>Năm xuất bản</p>
                     <LocalizationProvider fullWidth dateAdapter={AdapterDayjs}>
                         <DemoItem>
                             <DatePicker
-                                value={birth}
-                                onChange={(e) => setBirth(e.format("MM-DD-YYYY"))}
+                                value={published}
+                                onChange={(e) => setPublished(e.format("YYYY-MM-DD"))}
                                 fullWidth
-                                style={{
-                                    outline: 'none',
-                                }}
                                 sx={{
                                     "& .MuiOutlinedInput-root": {
                                         border: '1px solid #1363DF',
@@ -473,37 +445,73 @@ function Users() {
                         </DemoItem>
                     </LocalizationProvider>
                     <p className={cx('label')}></p>
-                    <p className={cx('label')}>Giới tính</p>
-                    <div className={cx('form_radio')}>
-                        <div className={cx('radio')}>
-                            <input
-                                id='radio'
-                                type="radio"
-                                checked={gender == 'male'}
-                                onChange={() => handleChangeGender('male')}
-                            />
-                            <label for='radio'>Nam</label>
-                        </div>
-
-                        <div className={cx('radio')}>
-                            <input
-                                id='radio_female'
-                                type="radio"
-                                checked={gender == 'female'}
-                                onChange={() => handleChangeGender('female')}
-                            />
-                            <label for='radio_female'>Nữ</label>
-                        </div>
-                    </div>
-                    <p className={cx('label')}>Chức vụ</p>
-                    <DropMenu
-                        options={options}
-                        size="big"
-                        optionSelected={role}
-                        setOptionSelected={setRole}
+                    <p className={cx('label')}>Loại sản phẩm</p>
+                    <Dropdown
+                        position="top-right"
+                        title={categoryName.name}
+                        menuClassName={cx("dropmenu")}
+                        buttonClassName={cx("category")}
+                        buttonVariant="special-success"
+                        wrapperClassName={cx("submenu")}
+                    >
+                        {
+                            options.map((option, index) => (
+                                <Dropdown.Item key={index}>
+                                    {option._id}
+                                    <Dropdown.Submenu
+                                        position="right-top"
+                                        className={cx("submenu")}
+                                    >
+                                        {
+                                            option.categories.map((category, index) => (
+                                                <Dropdown.Item key={index} onClick={() => setCategoryName({ name: category.name, value: category._id })}>
+                                                    {category.name}
+                                                </Dropdown.Item>
+                                            ))
+                                        }
+                                    </Dropdown.Submenu>
+                                </Dropdown.Item>
+                            ))
+                        }
+                    </Dropdown>
+                    <p className={cx('label')}></p>
+                    <p className={cx('label')}>Mô tả</p>
+                    <TextField
+                        {...register('description')}
+                        multiline
+                        maxRows={5}
+                        fullWidth
+                        placeholder='Mô tả sản phẩm...'
+                        size='medium'
+                        style={{
+                            outline: 'none',
+                        }}
+                        sx={{
+                            "& .MuiOutlinedInput-root": {
+                                border: '1px solid #1363DF',
+                                borderRadius: "4px",
+                                padding: "5px 5px 5px 10px",
+                                minHeight: "120px",
+                                maxHeight: "100vh"
+                            },
+                            "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
+                                border: "none"
+                            },
+                            "& .MuiInputBase-input": {
+                                backgroundColor: 'transparent'
+                            }
+                        }}
+                        InputProps={{
+                            style: {
+                                color: "#333",
+                                fontSize: "14px",
+                                marginBottom: '16px',
+                                backgroundColor: "#fff"
+                            }
+                        }}
                     />
                     <p className={cx('label')}></p>
-                    <p className={cx('label')}>Ảnh đại diện</p>
+                    <p className={cx('label')}>Hình ảnh</p>
                     <div className={cx('avatar')}>
                         <p className={cx('edit_avatar')}>
                             <label for="image">
@@ -528,10 +536,10 @@ function Users() {
                 sx={{ color: '#fff', zIndex: 10000 }}
                 open={loading}
             >
-                {isInsert && <CircularProgress color="error" />}
+                {isAction && <CircularProgress color="error" />}
             </Backdrop>
             <div className={cx('heading')}>
-                <h3>Quản lý tài khoản</h3>
+                <h3>Quản lý sản phẩm</h3>
                 <p onClick={handleShowDialog} className={cx('btn_add_new')}>
                     <AddCircleOutlineOutlinedIcon className={cx('btn_icon')} />
                     <span>Thêm mới</span>
@@ -543,11 +551,16 @@ function Users() {
                     <LinearProgress />
                 </div>
             }
-            <div className={cx('table')}>
-                <EnhancedTable columns={columns} rows={rows} />
-            </div>
+            {
+                rows.length > 0 ? <div className={cx('table')}>
+                    <EnhancedTable columns={columns} rows={rows} />
+                </div>
+                    : <div className={cx('nodata')}>
+                        <p className={cx('nodata_label')}>Dữ liệu trống!</p>
+                    </div>
+            }
         </div>
     )
 }
 
-export default Users
+export default Product

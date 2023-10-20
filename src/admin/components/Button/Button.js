@@ -2,6 +2,7 @@ import classNames from 'classnames/bind'
 import styles from './Button.module.scss'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
+import BorderColorIcon from '@mui/icons-material/BorderColor';
 const cx = classNames.bind(styles)
 
 function Delete() {
@@ -23,4 +24,14 @@ function View() {
     )
 }
 
-export { Delete, View }
+function Update() {
+
+    return (
+        <div className={cx('btn', 'edit')}>
+            <BorderColorIcon className={cx('icon', 'edit')} />
+            <p className={cx('title')}>Sửa</p>
+        </div>
+    )
+}
+
+export { Delete, View, Update }

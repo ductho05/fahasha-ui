@@ -42,18 +42,19 @@ const tabList = [
                 id: 2,
                 icon: Inventory2OutlinedIcon,
                 name: 'Sản phẩm',
+                link: '/admin/products'
             },
             {
                 id: 3,
                 icon: ViewStreamOutlinedIcon,
                 name: 'Đơn hàng',
+                link: '/admin/orders'
             },
             {
                 id: 4,
                 icon: LocalShippingOutlinedIcon,
                 name: 'Vận chuyển',
             },
-
             {
                 id: 5,
                 icon: ReviewsIcon,
@@ -79,7 +80,7 @@ const tabList = [
                 id: 8,
                 icon: LoyaltyIcon,
                 name: 'Flash Sale',
-                link: '/admin/flashsale',
+                link: '/admin/flashsale/auto',
             },
         ],
     },
