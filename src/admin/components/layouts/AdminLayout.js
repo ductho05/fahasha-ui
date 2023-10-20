@@ -106,24 +106,26 @@ function AdminLayout({ children }) {
         }
     }, [isLoaded]);
 
+    console.log('AA', !(isLoaded.flashsales && isLoaded.products) && !localStorage.getItem('temporary_data'));
+
     return (
         <>
-            {!(isLoaded.flashsales && isLoaded.products) && !localStorage.getItem('temporary_data') ? (
+            {!(isLoaded.flashsales && isLoaded.products) && !localStorage.getItem('temporary_data') && (
                 <div className={cx('wrapper-loading')}>
                     <div className={cx('animation-loading')} ref={container}></div>
                 </div>
-            ) :
-
-            <div className={cx('wrapper')}>
-                <div className={cx('navbar')}>
-                    <SideBar />
-                </div>             
-
-                <Scrollbar style={{ width: 250, height: '100vh' }} className={cx('container')}>
-                    <NavBar />
-                    {children}
-                </Scrollbar>
-            </div>}
+            )}
+            {!(!(isLoaded.flashsales && isLoaded.products) && !localStorage.getItem('temporary_data')) && (
+                <div className={cx('wrapper')}>
+                    <div className={cx('navbar')}>
+                        <SideBar />
+                    </div>
+                    <Scrollbar style={{ width: 250, height: '100vh' }} className={cx('container')}>
+                        <NavBar />
+                        {children}
+                    </Scrollbar>
+                </div>
+            )}
         </>
     );
 }
