@@ -6,6 +6,7 @@ import NavBar from './NavBar/NavBar';
 import { api } from '../../../constants';
 import { Progress } from 'antd';
 import { Scrollbar } from 'react-scrollbars-custom';
+import lottie from 'lottie-web';
 const cx = classNames.bind(styles);
 function AdminLayout({ children }) {
     const container = useRef(null);
@@ -107,11 +108,11 @@ function AdminLayout({ children }) {
 
     return (
         <>
-            {!(isLoaded.flashsales && isLoaded.products) && !localStorage.getItem('temporary_data') && (
+            {!(isLoaded.flashsales && isLoaded.products) && !localStorage.getItem('temporary_data') ? (
                 <div className={cx('wrapper-loading')}>
                     <div className={cx('animation-loading')} ref={container}></div>
                 </div>
-            )}
+            ) :
 
             <div className={cx('wrapper')}>
                 <div className={cx('navbar')}>
@@ -122,7 +123,7 @@ function AdminLayout({ children }) {
                     <NavBar />
                     {children}
                 </Scrollbar>
-            </div>
+            </div>}
         </>
     );
 }
