@@ -1,0 +1,41 @@
+.btn_add_new {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 16%;
+
+    height: 35px;
+    border-radius: 4px;
+    color: rgb(0, 223, 162);
+    background-color: rgba(0, 223, 162, 0.2);
+    border: 1px solid rgb(0, 223, 162);
+    font-weight: 600;
+    cursor: pointer;
+    margin-right: 10px;
+
+    .btn_icon {
+        font-size: 1.8rem;
+        margin-right: 8px;
+    }
+}
+
+.text-container {
+    font-size: large;
+    font-weight: 600;
+}
+.animation-loading {
+    height: 150px;
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin: 5% 5%;
+}
+
+.help-icon {
+    color: #464646;
+    margin: 5px 0 0 5px;
+    cursor: pointer;
+}

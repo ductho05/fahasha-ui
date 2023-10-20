@@ -5,7 +5,6 @@ import ProductItem from '../ProductItem'
 const cx = classNames.bind(styles)
 function GridProduct({ isLoading, products }) {
 
-    console.log("isloading", isLoading)
     return (
         <div className={cx('grid wide', 'wrapper')}>
             <div className={cx('row')}>

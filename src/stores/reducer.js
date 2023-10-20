@@ -42,7 +42,7 @@ function Reducer(state, action) {
 
         case LOGIN:
             localstorge.set(action.payload.token);
-            console.log('login');
+         
             return {
                 ...state,
                 user: action.payload.data,
@@ -52,7 +52,6 @@ function Reducer(state, action) {
 
         case LOGOUT:
             localstorge.delete();
-            console.log('logout');
             return {
                 ...state,
                 user: {},

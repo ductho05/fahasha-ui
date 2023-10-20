@@ -16,7 +16,6 @@ import { Scrollbar } from 'react-scrollbars-custom';
 
 import ReviewsIcon from '@mui/icons-material/Reviews';
 
-
 const cx = classNames.bind(styles);
 const tabList = [
     {
@@ -55,16 +54,13 @@ const tabList = [
                 name: 'Vận chuyển',
             },
 
-        
-
             {
                 id: 5,
                 icon: ReviewsIcon,
                 name: 'Đánh giá',
-                link: '/admin/reviews'
+                link: '/admin/reviews',
             },
-        ]
-
+        ],
     },
     {
         type: 'useful',
@@ -93,16 +89,17 @@ const tabList = [
             {
                 id: 9,
                 icon: AccountBoxOutlinedIcon,
-                name: 'Thông tin tài khoản'
+                name: 'Thông tin tài khoản',
+                link: '/account/0',
             },
             {
                 id: 10,
                 icon: LogoutOutlinedIcon,
-                name: 'Đăng xuất'
-            }
-        ]
+                name: 'Đăng xuất',
+            },
+        ],
     },
-]
+];
 
 function SideBar() {
     const [currentTab, setCurrentTab] = useState(0);
@@ -120,7 +117,7 @@ function SideBar() {
                 <div className={cx('bottom')}>
                     <ul className={cx('items')}>
                         {tabList.map((tabItem, typeindex) => (
-                            <>
+                            <div key={typeindex}>
                                 <p className={cx('name')}>{tabItem.type}</p>
                                 {tabItem.tabs.map((tab, index) => {
                                     const Icon = tab.icon;
@@ -136,7 +133,7 @@ function SideBar() {
                                         </Link>
                                     );
                                 })}
-                            </>
+                            </div>
                         ))}
                     </ul>
                     <p className={cx('name')}>Theme</p>

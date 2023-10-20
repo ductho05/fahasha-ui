@@ -1,74 +1,104 @@
-import { useState, useEffect } from 'react'
-import { useForm, useController } from "react-hook-form"
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react';
+import { useForm, useController } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 
-import classNames from "classnames/bind"
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import classNames from 'classnames/bind';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebookF } from '@fortawesome/free-brands-svg-icons';
-import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons'
+import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 
-import styles from './RegisterLogin.module.scss'
-import Button from "../../Button"
-import { useStore } from '../../../stores/hooks'
-import { api } from '../../../constants'
+import styles from './RegisterLogin.module.scss';
+import Button from '../../Button';
+import { useStore } from '../../../stores/hooks';
+import { api } from '../../../constants';
 import { register, login, noAction } from '../../../stores/actions';
-import { LOGIN, REGISTER } from '../../../stores/constants'
-import { Dialog, Backdrop, CircularProgress } from '@mui/material'
+import { LOGIN, REGISTER } from '../../../stores/constants';
+import { Dialog, Backdrop, CircularProgress } from '@mui/material';
 
 // Firebase
-import { signInWithPopup, signInWithRedirect } from 'firebase/auth'
-import { auth, provider } from '../../../FirebaseConfig'
-import LoginWithFacebook from '../../LoginWithFacebook'
+import { signInWithPopup, signInWithRedirect } from 'firebase/auth';
+import { auth, provider } from '../../../FirebaseConfig';
+import LoginWithFacebook from '../../LoginWithFacebook';
 
-const cx = classNames.bind(styles)
+import { WarningOutlined } from '@ant-design/icons';
+import { notification } from 'antd';
+
+const cx = classNames.bind(styles);
 function RegisterLogin(props) {
+    const navigate = useNavigate();
+    const [state, dispatch] = useStore();
 
-    const navigate = useNavigate()
-    const [state, dispatch] = useStore()
-
-    const tabNames = ['Đăng nhập', 'Đăng ký']
-    const indexActive = props.indexForm
-    const [typeInput, setTypeInput] = useState('password')
-    const [toggleName, setToggleName] = useState('Hiện')
-    const [showDialog, setShowDialog] = useState(false)
-    const [showDialogRegister, setShowDialogRegister] = useState(false)
+    const tabNames = ['Đăng nhập', 'Đăng ký'];
+    const indexActive = props.indexForm;
+    const [typeInput, setTypeInput] = useState('password');
+    const [toggleName, setToggleName] = useState('Hiện');
+    const [showDialog, setShowDialog] = useState(false);
+    const [showDialogRegister, setShowDialogRegister] = useState(false);
     const [otpServer, setOtpServer] = useState({
         message: '',
-        otp: ''
-    })
-    const [otp, setOtp] = useState('')
-    const [confirmPassword, setConfirmPassword] = useState('')
-    const [showProgress, setShowProgress] = useState(false)
+        otp: '',
+    });
+    const [otp, setOtp] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [showProgress, setShowProgress] = useState(false);
+    const [noti_api, contextHolder] = notification.useNotification();
+    const openNotification = (noti) => {
+        noti_api.open({
+            style: {
+                // màu background của cảnh báo
+                backgroundColor: '#fff',
+            },
+            // tự đóng sau 1.5s
+            duration: 2.5,
+            message: 'Thông báo',
+            description: noti,
+            icon: (
+                <WarningOutlined
+                    style={{
+                        //màu vàng cảnh báo
+                        color: '#faad14',
+                    }}
+                />
+            ),
+        });
+    };
+
+    useEffect(() => {
+        if (localStorage.getItem('denied-permission-notify')) {
+            openNotification(localStorage.getItem('denied-permission-notify'));
+            localStorage.removeItem('denied-permission-notify');
+        }
+    }, []);
 
     const handleTab = (index) => {
-        props.setForm(index)
-        setValue('email', '')
-        setValue('password', '')
-        clearErrors('email')
-        clearErrors('password')
-        clearErrors('confirmPassword')
+        props.setForm(index);
+        setValue('email', '');
+        setValue('password', '');
+        clearErrors('email');
+        clearErrors('password');
+        clearErrors('confirmPassword');
         setOtpServer({
             message: '',
-            otp: ''
-        })
-        setConfirmPassword(prev => {
-            return ''
-        })
-        setOtp('')
-    }
+            otp: '',
+        });
+        setConfirmPassword((prev) => {
+            return '';
+        });
+        setOtp('');
+    };
 
     const handleForgotPassword = () => {
-        props.setForm(2)
-    }
+        props.setForm(2);
+    };
 
     const toggleInput = () => {
-        setTypeInput(prev => {
-            return prev === 'password' ? 'text' : 'password'
-        })
-        setToggleName(prev => {
-            return prev === 'Hiện' ? 'Ẩn' : 'Hiện'
-        })
-    }
+        setTypeInput((prev) => {
+            return prev === 'password' ? 'text' : 'password';
+        });
+        setToggleName((prev) => {
+            return prev === 'Hiện' ? 'Ẩn' : 'Hiện';
+        });
+    };
 
     // Validate Form
     const {
@@ -78,10 +108,10 @@ function RegisterLogin(props) {
         watch,
         setValue,
         setError,
-        clearErrors
+        clearErrors,
     } = useForm({
-        mode: 'onBlur'
-    })
+        mode: 'onBlur',
+    });
 
     const emailController = useController({
         name: 'email',
@@ -90,250 +120,251 @@ function RegisterLogin(props) {
             required: 'Thông tin này không được để trống',
             pattern: {
                 value: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
-                message: 'Email không đúng định dạng. Vui lòng nhập lại'
-            }
+                message: 'Email không đúng định dạng. Vui lòng nhập lại',
+            },
         },
-    })
+    });
 
     const passwordController = useController({
         name: 'password',
         control,
         rules: {
             required: 'Thông tin này không được để trống',
-            pattern: indexActive === 1 ? {
-                value: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/,
-                message: 'Vui lòng nhập: trên 8 ký tự. Chứa 0-9, a-z, A-Z và 1 ký tự đặc biệt'
-            } : {}
+            pattern:
+                indexActive === 1
+                    ? {
+                          value: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/,
+                          message: 'Vui lòng nhập: trên 8 ký tự. Chứa 0-9, a-z, A-Z và 1 ký tự đặc biệt',
+                      }
+                    : {},
         },
-    })
+    });
 
     useEffect(() => {
         if (confirmPassword != passwordController.field.value) {
             setError('confirmPassword', { type: 'manual', message: 'Mật khẩu không khớp' });
         } else {
-            clearErrors('confirmPassword')
+            clearErrors('confirmPassword');
         }
-    }, [confirmPassword])
+    }, [confirmPassword]);
 
     useEffect(() => {
         if (otp != otpServer.otp) {
             setError('otp', { type: 'manual', message: 'Mã OTP không đúng' });
         } else {
-            clearErrors('otp')
+            clearErrors('otp');
         }
-    }, [otp])
+    }, [otp]);
 
     // Login
     const handleLogin = () => {
-        const dataLogin = watch()
-        setShowProgress(true)
+        const dataLogin = watch();
+        setShowProgress(true);
         fetch(`${api}/users/login`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify(dataLogin)
+            body: JSON.stringify(dataLogin),
         })
             .then((response) => response.json())
-            .then(result => {
+            .then((result) => {
                 if (result.status == 'OK') {
-                    setShowProgress(false)
-                    props.setShowForm(false)
+                    setShowProgress(false);
+                    props.setShowForm(false);
                     if (result.message == 'Email Or Password Not Matched') {
-                        setShowDialog(true)
+                        setShowDialog(true);
                     } else if (result.message == 'Login Succsess') {
-                        dispatch(login(result))
+                        dispatch(login(result));
                     }
                 }
             })
-            .catch(error => console.log(error))
-    }
+            .catch((error) => console.log(error));
+    };
 
     // Handle Send OTP
     const handleSendOTP = (email) => {
-        setShowProgress(true)
+        setShowProgress(true);
         fetch(`${api}/users/sendotp`, {
             method: 'POST',
             headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email: email })
+            body: JSON.stringify({ email: email }),
         })
-            .then(response => response.json())
-            .then(result => {
-                setShowProgress(false)
+            .then((response) => response.json())
+            .then((result) => {
+                setShowProgress(false);
                 if (result.status == 'OK') {
                     setOtpServer({
                         message: 'Đã gửi mã OTP đến email của bạn',
-                        otp: result.data
-                    })
+                        otp: result.data,
+                    });
                 } else {
                     setOtpServer({
                         message: 'Gửi mã OTP thất bại. Vui lòng kiểm tra lại địa chỉ email',
-                        otp: ''
-                    })
+                        otp: '',
+                    });
                 }
-            })
-    }
+            });
+    };
 
     // Register
     const handleRegister = async (data) => {
-        setShowProgress(true)
+        setShowProgress(true);
         await fetch(`${api}/users/register`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
         })
             .then((response) => response.json())
-            .then(result => {
+            .then((result) => {
                 if (result.status == 'OK') {
-                    setShowProgress(false)
-                    props.setShowForm(false)
-                    dispatch(register(result))
+                    setShowProgress(false);
+                    props.setShowForm(false);
+                    dispatch(register(result));
                 } else if (result.status == 'Falure' && result.message == 'User is already') {
-                    setShowProgress(false)
-                    setShowDialogRegister(true)
+                    setShowProgress(false);
+                    setShowDialogRegister(true);
                 } else {
-                    console.log(result.message)
+                    console.log(result.message);
                 }
-            }).catch(() => {
-                setShowProgress(false)
-                setShowDialogRegister(true)
             })
-    }
+            .catch(() => {
+                setShowProgress(false);
+                setShowDialogRegister(true);
+            });
+    };
 
     useEffect(() => {
         if (state.action == REGISTER) {
-            navigate(`/account/${0}`)
-            dispatch(noAction())
+            navigate(`/account/${0}`);
+            dispatch(noAction());
         } else if (state.action == LOGIN) {
-            navigate('/')
-            dispatch(noAction())
+            navigate('/');
+            dispatch(noAction());
         }
-    }, [state])
+    }, [state]);
 
     const handleCancel = () => {
-        setValue('email', '')
-        clearErrors('password')
-        clearErrors('confirmPassword')
-        props.setForm(0)
-    }
+        setValue('email', '');
+        clearErrors('password');
+        clearErrors('confirmPassword');
+        props.setForm(0);
+    };
 
     const handleChangePassword = async () => {
-        const email = watch('email')
-        const password = watch('password')
-        setShowProgress(true)
+        const email = watch('email');
+        const password = watch('password');
+        setShowProgress(true);
         await fetch(`${api}/users?email=${email}`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json' },
         })
-            .then(response => response.json())
-            .then(result => {
+            .then((response) => response.json())
+            .then((result) => {
                 if (result.status == 'OK') {
                     fetch(`${api}/users/update/${result.data._id}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ password: password })
+                        body: JSON.stringify({ password: password }),
                     })
-                        .then(response => response.json())
-                        .then(result => {
+                        .then((response) => response.json())
+                        .then((result) => {
                             if (result.status == 'OK') {
                                 fetch(`${api}/users/login`, {
                                     method: 'POST',
                                     headers: {
-                                        'Content-Type': 'application/json'
+                                        'Content-Type': 'application/json',
                                     },
-                                    body: JSON.stringify({ email: email, password: password })
+                                    body: JSON.stringify({ email: email, password: password }),
                                 })
                                     .then((response) => response.json())
-                                    .then(result => {
+                                    .then((result) => {
                                         if (result.status == 'OK') {
-                                            setShowProgress(false)
-                                            props.setShowForm(false)
-                                            dispatch(login(result))
+                                            setShowProgress(false);
+                                            props.setShowForm(false);
+                                            dispatch(login(result));
                                         }
                                     })
-                                    .catch((error) => console.log(error))
+                                    .catch((error) => console.log(error));
                             }
                         })
-                        .catch(err => console.log(err))
+                        .catch((err) => console.log(err));
                 }
             })
-            .catch(err => console.log(err))
-    }
+            .catch((err) => console.log(err));
+    };
 
     const handleLoginFacebook = (event) => {
-        event.preventDefault()
-        signInWithPopup(auth, provider).then(result => {
-            console.log('OK')
-            console.log(result)
-        }).catch(err => {
-            console.log('Lỗi')
-            console.log(err)
-        })
-    }
+        event.preventDefault();
+        signInWithPopup(auth, provider)
+            .then((result) => {})
+            .catch((err) => {});
+    };
 
     return (
         <div className={cx('wrapper')}>
-            <Backdrop
-                sx={{ color: '#fff', zIndex: 10000 }}
-                open={showProgress}
-            >
+            {contextHolder}
+            <Backdrop sx={{ color: '#fff', zIndex: 10000 }} open={showProgress}>
                 <CircularProgress color="inherit" />
             </Backdrop>
             <div className={cx('dialog-notice')}>
-                <Dialog open={showDialog} style={{
-                    zIndex: 10000000
-                }}>
+                <Dialog
+                    open={showDialog}
+                    style={{
+                        zIndex: 10000000,
+                    }}
+                >
                     <div className={cx('dialog')}>
                         <p className={cx('dialog_icon')}>
                             <FontAwesomeIcon icon={faTriangleExclamation} />
                         </p>
-                        <p className={cx('dialog_message')}>
-                            Mật khẩu hoặc email không đúng
+                        <p className={cx('dialog_message')}>Mật khẩu hoặc email không đúng</p>
+                        <p onClick={() => setShowDialog(false)} className={cx('dialog_btn')}>
+                            Đăng nhập lại
                         </p>
-                        <p onClick={() => setShowDialog(false)} className={cx('dialog_btn')}>Đăng nhập lại</p>
                     </div>
                 </Dialog>
             </div>
             <div className={cx('dialog-notice')}>
-                <Dialog open={showDialogRegister} style={{
-                    zIndex: 10000000
-                }}>
+                <Dialog
+                    open={showDialogRegister}
+                    style={{
+                        zIndex: 10000000,
+                    }}
+                >
                     <div className={cx('dialog')}>
                         <p className={cx('dialog_icon')}>
                             <FontAwesomeIcon icon={faTriangleExclamation} />
                         </p>
-                        <p className={cx('dialog_message')}>
-                            Tài khoản đã tồn tại, email đã được sử dụng
+                        <p className={cx('dialog_message')}>Tài khoản đã tồn tại, email đã được sử dụng</p>
+                        <p onClick={() => setShowDialogRegister(false)} className={cx('dialog_btn')}>
+                            Đăng ký lại
                         </p>
-                        <p onClick={() => setShowDialogRegister(false)} className={cx('dialog_btn')}>Đăng ký lại</p>
                     </div>
                 </Dialog>
             </div>
             <div className={cx('form')}>
                 <ul className={indexActive === 2 ? cx('form_headings', 'hide') : cx('form_headings')}>
-                    {
-                        tabNames.map((tabName, index) => {
-                            return (
-                                <li
-                                    onClick={() => handleTab(index)}
-                                    key={index}
-                                    className={indexActive === index ? cx('tab_item', 'tab_active') :
-                                        cx('tab_item')
-                                    }
-                                >
-                                    {tabName}
-                                </li>
-                            )
-                        })
-                    }
+                    {tabNames.map((tabName, index) => {
+                        return (
+                            <li
+                                onClick={() => handleTab(index)}
+                                key={index}
+                                className={indexActive === index ? cx('tab_item', 'tab_active') : cx('tab_item')}
+                            >
+                                {tabName}
+                            </li>
+                        );
+                    })}
                 </ul>
-                <form onSubmit={handleSubmit(handleLogin)} className={indexActive === 0 ? cx('form_body', 'content_active') :
-                    cx('form_body')
-                }>
+                <form
+                    onSubmit={handleSubmit(handleLogin)}
+                    className={indexActive === 0 ? cx('form_body', 'content_active') : cx('form_body')}
+                >
                     <label>Email</label>
                     <div className={errors.email ? cx('form_input', 'form_error') : cx('form_input')}>
                         <input
@@ -341,7 +372,8 @@ function RegisterLogin(props) {
                             onBlur={emailController.field.onBlur}
                             className={cx('input_content')}
                             spellCheck={false}
-                            placeholder="Nhập email" />
+                            placeholder="Nhập email"
+                        />
                     </div>
                     <p className={cx('error_message')}>{errors.email?.message}</p>
 
@@ -352,19 +384,22 @@ function RegisterLogin(props) {
                             onBlur={passwordController.field.onBlur}
                             className={cx('input_content')}
                             type={typeInput}
-                            placeholder="Nhập mật khẩu" />
-                        <p className={cx('input_end')} onClick={toggleInput}>{toggleName}</p>
+                            placeholder="Nhập mật khẩu"
+                        />
+                        <p className={cx('input_end')} onClick={toggleInput}>
+                            {toggleName}
+                        </p>
                     </div>
                     <p className={cx('error_message')}>{errors.password?.message}</p>
 
-                    <p className={cx('forgot_pass')} onClick={handleForgotPassword}>Quên mật khẩu?</p>
+                    <p className={cx('forgot_pass')} onClick={handleForgotPassword}>
+                        Quên mật khẩu?
+                    </p>
 
                     <div className={cx('form_btn')}>
                         <p onClick={handleLogin}>
-                            <Button
-                                primary
-                                disabled={!(watch('email') && watch('password'))}
-                            >Đăng nhập
+                            <Button primary disabled={!(watch('email') && watch('password'))}>
+                                Đăng nhập
                             </Button>
                         </p>
                         <p className={props.isAccountPage ? cx('hide') : cx('visible')}>
@@ -377,9 +412,10 @@ function RegisterLogin(props) {
                     </div>
                 </form>
 
-                <form onSubmit={handleSubmit(handleRegister)} className={indexActive === 1 ? cx('form_body', 'content_active') :
-                    cx('form_body')
-                }>
+                <form
+                    onSubmit={handleSubmit(handleRegister)}
+                    className={indexActive === 1 ? cx('form_body', 'content_active') : cx('form_body')}
+                >
                     <label>Email</label>
                     <div className={errors.email ? cx('form_input', 'form_error') : cx('form_input')}>
                         <input
@@ -387,8 +423,11 @@ function RegisterLogin(props) {
                             onBlur={emailController.field.onBlur}
                             className={cx('input_content')}
                             spellCheck={false}
-                            placeholder="Nhập email" />
-                        <p onClick={() => handleSendOTP(watch('email'))} className={cx('input_end')}>Gửi mã OTP</p>
+                            placeholder="Nhập email"
+                        />
+                        <p onClick={() => handleSendOTP(watch('email'))} className={cx('input_end')}>
+                            Gửi mã OTP
+                        </p>
                     </div>
                     <p className={cx('error_message')}>{errors.email?.message}</p>
                     <p className={cx('form_message')}>{otpServer?.message}</p>
@@ -399,7 +438,9 @@ function RegisterLogin(props) {
                             value={otp}
                             onChange={(e) => setOtp(e.target.value)}
                             className={cx('input_content')}
-                            spellCheck={false} placeholder="6 ký tự" />
+                            spellCheck={false}
+                            placeholder="6 ký tự"
+                        />
                     </div>
                     <p className={cx('error_message')}>{errors.otp?.message}</p>
 
@@ -410,8 +451,11 @@ function RegisterLogin(props) {
                             onBlur={passwordController.field.onBlur}
                             className={cx('input_content')}
                             type={typeInput}
-                            placeholder="Nhập mật khẩu" />
-                        <p className={cx('input_end')} onClick={toggleInput}>{toggleName}</p>
+                            placeholder="Nhập mật khẩu"
+                        />
+                        <p className={cx('input_end')} onClick={toggleInput}>
+                            {toggleName}
+                        </p>
                     </div>
                     <p className={cx('error_message')}>{errors.password?.message}</p>
 
@@ -420,16 +464,27 @@ function RegisterLogin(props) {
                         <input
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            onBlur={() => { if (confirmPassword == '') setError('confirmPassword', { type: 'manual', message: 'Thông tin này không được để trống' }) }}
+                            onBlur={() => {
+                                if (confirmPassword == '')
+                                    setError('confirmPassword', {
+                                        type: 'manual',
+                                        message: 'Thông tin này không được để trống',
+                                    });
+                            }}
                             className={cx('input_content')}
                             type={typeInput}
-                            placeholder="Nhập lại mật khẩu" />
-                        <p className={cx('input_end')} onClick={toggleInput}>{toggleName}</p>
+                            placeholder="Nhập lại mật khẩu"
+                        />
+                        <p className={cx('input_end')} onClick={toggleInput}>
+                            {toggleName}
+                        </p>
                     </div>
                     <p className={cx('error_message')}>{errors.confirmPassword?.message}</p>
 
                     <div className={cx('form_btn')}>
-                        <Button primary disabled={!(watch('email') && watch('password') && !errors.confirmPassword)}>Đăng ký</Button>
+                        <Button primary disabled={!(watch('email') && watch('password') && !errors.confirmPassword)}>
+                            Đăng ký
+                        </Button>
                         <p className={props.isAccountPage ? cx('hide') : cx('visible')}>
                             <Button onClick={() => props.setShowForm(false)}>Bỏ qua</Button>
                         </p>
@@ -444,10 +499,13 @@ function RegisterLogin(props) {
                         </div>
                     </div>
                 </form>
-                <h3 className={indexActive === 2 ? cx('forgot_pass_heading') : cx('forgot_pass_heading', 'hide')}>KHÔI PHỤC MẬT KHẨU</h3>
-                <form onSubmit={handleSubmit(handleChangePassword)} className={indexActive === 2 ? cx('form_body', 'content_active') :
-                    cx('form_body')
-                }>
+                <h3 className={indexActive === 2 ? cx('forgot_pass_heading') : cx('forgot_pass_heading', 'hide')}>
+                    KHÔI PHỤC MẬT KHẨU
+                </h3>
+                <form
+                    onSubmit={handleSubmit(handleChangePassword)}
+                    className={indexActive === 2 ? cx('form_body', 'content_active') : cx('form_body')}
+                >
                     <label>Email</label>
                     <div className={errors.email ? cx('form_input', 'form_error') : cx('form_input')}>
                         <input
@@ -455,8 +513,11 @@ function RegisterLogin(props) {
                             onBlur={emailController.field.onBlur}
                             className={cx('input_content')}
                             spellCheck={false}
-                            placeholder="Nhập email" />
-                        <p onClick={() => handleSendOTP(watch('email'))} className={cx('input_end')}>Gửi mã OTP</p>
+                            placeholder="Nhập email"
+                        />
+                        <p onClick={() => handleSendOTP(watch('email'))} className={cx('input_end')}>
+                            Gửi mã OTP
+                        </p>
                     </div>
                     <p className={cx('error_message')}>{errors.email?.message}</p>
                     <p className={cx('form_message')}>{otpServer?.message}</p>
@@ -467,7 +528,9 @@ function RegisterLogin(props) {
                             value={otp}
                             onChange={(e) => setOtp(e.target.value)}
                             className={cx('input_content')}
-                            spellCheck={false} placeholder="6 ký tự" />
+                            spellCheck={false}
+                            placeholder="6 ký tự"
+                        />
                     </div>
                     <p className={cx('error_message')}>{errors.otp?.message}</p>
 
@@ -478,8 +541,11 @@ function RegisterLogin(props) {
                             onBlur={passwordController.field.onBlur}
                             className={cx('input_content')}
                             type={typeInput}
-                            placeholder="Nhập mật khẩu" />
-                        <p className={cx('input_end')} onClick={toggleInput}>{toggleName}</p>
+                            placeholder="Nhập mật khẩu"
+                        />
+                        <p className={cx('input_end')} onClick={toggleInput}>
+                            {toggleName}
+                        </p>
                     </div>
                     <p className={cx('error_message')}>{errors.password?.message}</p>
 
@@ -488,19 +554,26 @@ function RegisterLogin(props) {
                         <input
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            onBlur={() => { if (confirmPassword == '') setError('confirmPassword', { type: 'manual', message: 'Thông tin này không được để trống' }) }}
+                            onBlur={() => {
+                                if (confirmPassword == '')
+                                    setError('confirmPassword', {
+                                        type: 'manual',
+                                        message: 'Thông tin này không được để trống',
+                                    });
+                            }}
                             className={cx('input_content')}
                             type={typeInput}
-                            placeholder="Nhập lại mật khẩu" />
-                        <p className={cx('input_end')} onClick={toggleInput}>{toggleName}</p>
+                            placeholder="Nhập lại mật khẩu"
+                        />
+                        <p className={cx('input_end')} onClick={toggleInput}>
+                            {toggleName}
+                        </p>
                     </div>
                     <p className={cx('error_message')}>{errors.confirmPassword?.message}</p>
                     <div className={cx('form_btn')}>
                         <p onClick={handleChangePassword}>
-                            <Button
-                                disabled={errors.confirmPassword || watch('password') == ''}
-                                primary
-                            >Xác nhận
+                            <Button disabled={errors.confirmPassword || watch('password') == ''} primary>
+                                Xác nhận
                             </Button>
                         </p>
                         <p className={cx('visible')}>
@@ -510,7 +583,7 @@ function RegisterLogin(props) {
                 </form>
             </div>
         </div>
-    )
+    );
 }
 
-export default RegisterLogin
+export default RegisterLogin;

@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react"
-import RegisterLogin from "../../components/Forms/RegisterLogin"
+import { useState, useEffect } from 'react';
+import RegisterLogin from '../../components/Forms/RegisterLogin';
 
 function RegisterLoginPage() {
-    const [isShowForm, setIsShowForm] = useState(false)
-    const [indexForm, setIndexForm] = useState(0)
+    const [isShowForm, setIsShowForm] = useState(false);
+    const [indexForm, setIndexForm] = useState(0);
 
     useEffect(() => {
-        document.title = 'Đăng nhập/Đăng ký'
-    }, [])
+        document.title = 'Đăng nhập/Đăng ký';
+    }, []);
 
     return (
         <div>
@@ -16,10 +16,9 @@ function RegisterLoginPage() {
                 indexForm={indexForm}
                 setForm={setIndexForm}
                 isAccountPage={true}
-            >
-            </RegisterLogin>
+            ></RegisterLogin>
         </div>
-    )
+    );
 }
 
-export default RegisterLoginPage
+export default RegisterLoginPage;

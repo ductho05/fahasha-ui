@@ -137,7 +137,6 @@ function CheckOut() {
                         setOrder(order);
                     }
                 } else {
-                    //console.log('da vao roi ne 2', result);
                     setShowProgress(false);
                     navigate(`/order-success/err-E99`);
                 }
@@ -159,7 +158,6 @@ function CheckOut() {
             localStorage.removeItem('is_order_success_page');
             switch (status) {
                 case '00':
-                    //console.log('ban la ai');
                     addCheckout(dataCheckout, 'vnp');
                     break;
                 case '24':
@@ -204,7 +202,6 @@ function CheckOut() {
 
     const submit = (data) => {
         if (data) {
-            console.log('abc', data);
             if (data.payment_method == 'Thanh toán bằng VNPay') {
                 localstorage.set('item_order_checkout', listCheckouts);
 
@@ -422,7 +419,7 @@ function CheckOut() {
             listCheckouts.reduce((total, curr) => total + curr.quantity * curr.product.price, 0) + shippingCost,
         );
         setValue('shippingCost', shippingCost);
-        console.log('abc ne');
+
     }, [isSubmit]);
 
     useEffect(() => {

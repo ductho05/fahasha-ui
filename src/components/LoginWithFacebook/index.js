@@ -14,7 +14,7 @@ const LoginWithFacebook = () => {
     const [progress, setProgress] = useState(false)
 
     const handleLogin = (response) => {
-        console.log(response)
+    
         setProgress(true)
         fetch(`${api}/users/login/facebook`, {
             method: 'POST',
@@ -28,7 +28,6 @@ const LoginWithFacebook = () => {
         })
             .then(response => response.json())
             .then(result => {
-                console.log("result: ", result)
                 if (result.status === "OK") {
                     setProgress(false)
                     dispatch(login(result))

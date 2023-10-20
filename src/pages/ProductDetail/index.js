@@ -8,14 +8,7 @@ import styles from './ProductDetail.module.scss';
 import Avatar from '@mui/material/Avatar';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-    faMinus,
-    faPlus,
-    faShareNodes,
-    faStar,
-    faCartShopping,
-    faArrowRight,
-} from '@fortawesome/free-solid-svg-icons';
+import { faMinus, faPlus, faShareNodes, faStar, faCartShopping, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import Button from '../../components/Button';
 import ProductFrame from '../../components/ProductFrame';
 import ProductSlider from '../../components/ProductSlider';
@@ -34,10 +27,7 @@ import LikeDislike from '../../components/LikeDislike';
 
 const cx = classNames.bind(styles);
 
-const tabs = [
-    "Mới nhất",
-    "Yêu thích nhất",
-]
+const tabs = ['Mới nhất', 'Yêu thích nhất'];
 
 function ProductDetail() {
     const navigate = useNavigate();
@@ -59,7 +49,7 @@ function ProductDetail() {
     const [resultEval, setResultEval] = useState();
     const [showNolginDialog, setShowNolginDialog] = useState(false);
     const [currentTab, setCurrentTab] = useState(0);
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
 
     var category = JSON.parse(localStorage.getItem('mycategory')) || [];
 
@@ -76,7 +66,7 @@ function ProductDetail() {
     }, []);
 
     const fetchComments = (productId) => {
-        setLoading(true)
+        setLoading(true);
         if (currentTab === 0) {
             fetch(`${api}/evaluates/product?_id=${productId}`, {
                 method: 'POST',
@@ -86,12 +76,12 @@ function ProductDetail() {
             })
                 .then((response) => response.json())
                 .then((result) => {
-                    setLoading(false)
+                    setLoading(false);
                     setComments(result.data);
                 })
-                .catch(err => {
-                    setLoading(false)
-                })
+                .catch((err) => {
+                    setLoading(false);
+                });
         } else {
             fetch(`${api}/evaluates/product?_id=${productId}&sort=asc`, {
                 method: 'POST',
@@ -101,12 +91,12 @@ function ProductDetail() {
             })
                 .then((response) => response.json())
                 .then((result) => {
-                    setLoading(false)
+                    setLoading(false);
                     setComments(result.data);
                 })
-                .catch(err => {
-                    setLoading(false)
-                })
+                .catch((err) => {
+                    setLoading(false);
+                });
         }
     };
 
@@ -156,17 +146,17 @@ function ProductDetail() {
     };
 
     const fetchProduct = () => {
-        setLoading(true)
+        setLoading(true);
         fetch(`${api}/products/id/${productId}`)
             .then((response) => response.json())
             .then((result) => {
-                setLoading(false)
+                setLoading(false);
                 setProduct(result.data);
                 fetchProductRelated(result.data);
             })
             .catch((error) => {
-                setLoading(false)
-            })
+                setLoading(false);
+            });
     };
 
     const fetchProductNew = () => {
@@ -304,7 +294,7 @@ function ProductDetail() {
 
     const handleTab = (index) => {
         setCurrentTab(index);
-    }
+    };
 
     return (
         <>
@@ -507,7 +497,6 @@ function ProductDetail() {
 
                     <div className={cx('description')}>
                         <h5>{product.title}</h5>
-
                         <ReadMore>{product.desciption}</ReadMore>
                     </div>
                 </div>
@@ -552,17 +541,23 @@ function ProductDetail() {
                                 </div>
                             ))}
                         </div>
-
                     </div>
 
                     <div className={lengthComments > 0 ? cx('comments') : cx('hidden')}>
                         <ul className={cx('comments_tab')}>
-                            {
-                                tabs.map((tab, index) => (
-                                    <li key={index} onClick={() => handleTab(index)} className={currentTab === index ? cx('comments_tab_item', 'comments_tab_active') : cx('comments_tab_item')}>{tab}</li>
-                                ))
-                            }
-
+                            {tabs.map((tab, index) => (
+                                <li
+                                    key={index}
+                                    onClick={() => handleTab(index)}
+                                    className={
+                                        currentTab === index
+                                            ? cx('comments_tab_item', 'comments_tab_active')
+                                            : cx('comments_tab_item')
+                                    }
+                                >
+                                    {tab}
+                                </li>
+                            ))}
                         </ul>
 
                         <div className={cx('list_comment')}>
@@ -571,7 +566,7 @@ function ProductDetail() {
                                     <div className={cx('comments_left')}>
                                         <div className={cx('comments_user')}>
                                             <Avatar alt="Avatar" src={comments[index].user.images} />
-                                            <div className='user_info'>
+                                            <div className="user_info">
                                                 <p className={cx('name')}>
                                                     {comments[index].user.fullName
                                                         ? comments[index].user.fullName

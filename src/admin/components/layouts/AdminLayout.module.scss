@@ -13,3 +13,12 @@
         flex: 5;
     }
 }
+.wrapper-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Chiều cao 100% của màn hình */
+}
+.animation-loading {
+    width: 30%;
+}

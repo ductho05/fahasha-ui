@@ -1,0 +1,45 @@
+@keyframes colorChange {
+    0% {
+        color: rgb(255, 21, 0);
+    }
+    10% {
+        color: rgb(255, 166, 0);
+    }
+    20% {
+        color: rgb(4, 255, 0);
+    }
+    30% {
+        color: rgb(0, 132, 255);
+    }
+    40% {
+        color: rgb(0, 60, 255);
+    }
+    50% {
+        color: rgb(0, 255, 251);
+    }
+    60% {
+        color: rgb(0, 55, 255);
+    }
+    70% {
+        color: rgb(106, 0, 255);
+    }
+    80% {
+        color: rgb(255, 0, 255);
+    }
+    90% {
+        color: rgb(255, 0, 136);
+    }
+    100% {
+        color: rgb(255, 0, 0);
+    }
+}
+
+.flashSaleText {
+    font-weight: bold;
+    animation: colorChange 4s linear infinite;
+}
+
+.noflashSaleText {
+    font-weight: 500;
+    color: rgb(255, 0, 0);
+}

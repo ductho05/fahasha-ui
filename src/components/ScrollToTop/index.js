@@ -12,7 +12,6 @@ export default function ScrollToTop() {
 
         // Kiểm tra xem URL có chứa từ "admin" hay không
         if (!currentPath.includes('admin')) {
-            console.log('currentUrl', currentPath);
             // Nếu không có, xóa dữ liệu trong Local Storage
             localStorage.removeItem('temporary_data');
         }

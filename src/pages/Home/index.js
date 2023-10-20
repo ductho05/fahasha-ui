@@ -169,23 +169,7 @@ function Home() {
                 .catch((err) => console.log(err));
         });
 
-        // listJustWatched.forEach((item) => {
-        //     fetch(`${api}/products/category?category=${item}`)
-        //         .then((response) => response.json())
-        //         .then((products) => {
-        //             setWatchedBooks((prev) => {
-        //                 return [
-        //                     ...prev,
-        //                     {
-        //                         products: products.data,
-        //                     },
-        //                 ];
-        //             });
-        //         })
-        //         .catch((err) => {
-        //             console.log(err);
-        //         });
-        // });
+    
 
         listPathCategory.forEach((item) => {
             fetch(`${api}/products/category?${item.path}`, {

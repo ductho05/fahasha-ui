@@ -1,47 +1,47 @@
-import { useState, useEffect } from "react";
-import classNames from "classnames/bind";
+import { useState, useEffect } from 'react';
+import classNames from 'classnames/bind';
 
-import styles from './Account.module.scss'
-import AccountInfo from "./components/AccountInfo";
-import ListOrders from "./components/ListOrders";
-import Evaluate from "./components/Evaluate";
-import Notifition from "./components/Notifition";
+import styles from './Account.module.scss';
+import AccountInfo from './components/AccountInfo';
+import ListOrders from './components/ListOrders';
+import Evaluate from './components/Evaluate';
+import Notifition from './components/Notifition';
 
-import { logout } from "../../stores/actions";
-import { useNavigate, useParams } from "react-router-dom";
-import { useStore } from "../../stores/hooks";
-import { LOGOUT } from "../../stores/constants";
+import { logout } from '../../stores/actions';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useStore } from '../../stores/hooks';
+import { LOGOUT } from '../../stores/constants';
+import FlashSale from '../../admin/pages/UseFul/FlashSale';
 
-const cx = classNames.bind(styles)
-const listTabs = ['Thông tin tài khoản', 'Đơn hàng của tôi', 'Nhận xét của tôi', 'Thông báo']
+const cx = classNames.bind(styles);
+const listTabs = ['Thông tin tài khoản', 'Đơn hàng của tôi', 'Nhận xét của tôi', 'Thông báo'];
 function Account() {
-
-    const { index } = useParams()
-    const navigate = useNavigate()
-    const [currentIndex, setCurrentIndex] = useState(0)
-    const [state, dispatch] = useStore()
+    const { index } = useParams();
+    const navigate = useNavigate();
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [state, dispatch] = useStore();
 
     const handleLogout = () => {
-        dispatch(logout({}))
-    }
+        dispatch(logout({}));
+    };
 
     useEffect(() => {
-        document.title = 'Tài khoản'
-    }, [])
+        document.title = 'Tài khoản';
+    }, []);
 
     useEffect(() => {
-        setCurrentIndex(index)
-    }, [index])
+        setCurrentIndex(index);
+    }, [index]);
 
     useEffect(() => {
         if (state.action == LOGOUT) {
-            navigate('/')
+            navigate('/');
         }
-    }, [state])
+    }, [state]);
 
     const handleTabClick = (index) => {
-        setCurrentIndex(index)
-    }
+        setCurrentIndex(index);
+    };
 
     return (
         <>
@@ -50,17 +50,29 @@ function Account() {
                     <div className={cx('left')}>
                         <h3 className={cx('heading')}>Tài khoản</h3>
                         <ul className={cx('feature_list')}>
-                            {
-                                listTabs.map((tab, index) => (
-                                    <li
-                                        onClick={() => handleTabClick(index)}
-                                        className={index == currentIndex ? cx('feature_item', 'active') : cx('feature_item')}
-                                    >
-                                        {tab}
-                                    </li>
-                                ))
-                            }
-                            <li onClick={handleLogout} className={cx('feature_item')}>Đăng xuất</li>
+                            {listTabs.map((tab, index) => (
+                                <li
+                                    onClick={() => handleTabClick(index)}
+                                    className={
+                                        index == currentIndex ? cx('feature_item', 'active') : cx('feature_item')
+                                    }
+                                >
+                                    {tab}
+                                </li>
+                            ))}
+                            {state.user.isManager && (
+                                <li
+                                    onClick={() => {
+                                        navigate('/admin');
+                                    }}
+                                    className={cx('feature_item')}
+                                >
+                                    Quản lý hệ thống
+                                </li>
+                            )}
+                            <li onClick={handleLogout} className={cx('feature_item')}>
+                                Đăng xuất
+                            </li>
                         </ul>
                     </div>
 
@@ -84,7 +96,7 @@ function Account() {
                 </div>
             </div>
         </>
-    )
+    );
 }
 
 export default Account;

@@ -41,6 +41,28 @@ function FlashSaleForm({ props, hideFunc }) {
     };
     const { products } = props;
 
+    const [selectedDate, setSelectedDate] = useState(null);
+
+    const handleDateChange = (date) => {
+        setSelectedDate(date);
+    };
+
+    const formatDateToString = (date) => {
+        if (date) {
+            // Sử dụng phương thức toISOString để định dạng ngày thành chuỗi ISO
+            return date.toISOString().slice(0, 10); // Lấy YYYY-MM-DD
+        }
+        return ''; // Trả về chuỗi rỗng nếu date là null
+    };
+
+    // // ham them product vao flashsale de luu vao localstorage
+    const addFlashsaleToLocal = (product) => {
+        const data = localStorage.getItem('temporary_data');
+        const { flashsales } = JSON.parse(data);
+        const newFlashsales = [...flashsales, product];
+        localStorage.setItem('temporary_data', JSON.stringify({ ...JSON.parse(data), flashsales: newFlashsales }));
+    };
+
     const addFlashSale = (values, products) => {
         setShowProgress(true);
         products.map((item, index) => {
@@ -53,6 +75,8 @@ function FlashSaleForm({ props, hideFunc }) {
                 .then((response) => response.json())
                 .then((result) => {
                     if (result.status == 'OK') {
+                        //addFlashsaleToLocal(result.data);
+                        localStorage.setItem('isFlashsaleLoading', true);
                         setShowProgress(false);
                         hideFunc({
                             status: 'success',
@@ -65,7 +89,9 @@ function FlashSaleForm({ props, hideFunc }) {
                         hideFunc({
                             status: 'error',
                             title: 'Thiết đặt không thành công',
-                            subTitle: 'Đã có lỗi xãy ra trong quá trình thiết đặt, vui lòng kiểm tra kết nối mạng!',
+                            subTitle: result.message
+                                ? result.message
+                                : 'Đã có lỗi xãy ra trong quá trình thiết đặt, vui lòng kiểm tra kết nối mạng!',
                         });
                     }
                 })
@@ -76,18 +102,21 @@ function FlashSaleForm({ props, hideFunc }) {
         });
     };
     const onFinish = (values) => {
-        values.date_sale = moment(values.date_sale).format('YYYY-MM-DD');
+        //values.date_sale = moment(values.date_sale).format('YYYY-MM-DD');
+        values.date_sale = formatDateToString(selectedDate);
+
         addFlashSale(values, products);
     };
 
-    const handleSetToday = (values) => {
+    const handleAutoSetting = (values) => {
         var gioHienTai = new Date();
         formRef.current.setFieldsValue({
             num_sale: 100,
             current_sale: 40,
-            date_sale: moment(),
+            date_sale: moment(gioHienTai),
             point_sale: Math.floor(gioHienTai.getHours() / 3),
         });
+        setSelectedDate(gioHienTai);
     };
 
     return (
@@ -139,7 +168,7 @@ function FlashSaleForm({ props, hideFunc }) {
                         },
                     ]}
                 >
-                    <DatePicker />
+                    <DatePicker selected={selectedDate} onChange={handleDateChange} />
                 </Form.Item>
 
                 <Form.Item name="current_sale" label="Giảm giá">
@@ -164,9 +193,21 @@ function FlashSaleForm({ props, hideFunc }) {
                                 required: true,
                                 message: 'Vui lòng nhập số lượng!',
                             },
+                            {
+                                type: 'number',
+                                min: 1,
+
+                                message: 'Số lượng sản phẩm phải là số nguyên dương.',
+                            },
+                            {
+                                type: 'number',
+
+                                max: 200,
+                                message: 'Số lượng Flashsale tối đa trong 1 khung giờ là 200.',
+                            },
                         ]}
                     >
-                        <InputNumber min={1} max={200} />
+                        <InputNumber />
                     </Form.Item>
                     <span
                         className="ant-form-text"
@@ -187,11 +228,14 @@ function FlashSaleForm({ props, hideFunc }) {
                         span: 12,
                         offset: 12,
                     }}
+                    style={{
+                        margin: '30px 0 0 0',
+                    }}
                 >
                     <Space>
                         <Button
                             // htmlType="reset"
-                            onClick={handleSetToday}
+                            onClick={handleAutoSetting}
                         >
                             Tự động
                         </Button>

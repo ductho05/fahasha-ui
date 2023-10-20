@@ -4,7 +4,9 @@ const images = {
     fire: require('../images/fire-icon.jpg'),
     down: require('../images/down.svg'),
     cash: require('../images/cash.png'),
-    page404: require('../images/page404.png')
+    page404: require('../images/page404.png'),
+    autoflashsale: require('../images/auto_flashsale.png'),
+    customflashsale: require('../images/custom_flashsale.png'),
 }
 
 export default images

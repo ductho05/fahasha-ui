@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import classNames from 'classnames/bind';
-import { api } from '../../../../constants';
-import SimpleItem from '../../../components/SimpleItem';
+import { api } from '../../../../../constants';
+import SimpleItem from '../../../../components/SimpleItem';
 import styles from './CostumFlashSale.module.scss';
-import EnhancedTable from '../../../components/Table/EnhancedTable';
+import EnhancedTable from '../../../../components/Table/EnhancedTable';
+import StateFlashSale from '../../../../components/StateFlashSale';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
-import FlashSaleModal from '../../../components/FlashSaleModal';
+import FlashSaleModal from '../../../../components/FlashSaleModal';
 import { Divider, Form, Radio, Skeleton, Space, Switch, Alert } from 'antd';
 import Marquee from 'react-fast-marquee';
 const cx = classNames.bind(styles);
@@ -15,8 +16,9 @@ function CostumFlashSale() {
         // categoryId là đối tượng danh mục
         // Thực hiện logic để lấy tên danh mục từ categoryId
         // Trả về tên danh mục
-        return categoryId ? categoryId.name : ''; // Ví dụ: Lấy name từ đối tượng danh mục
+        return categoryId ? categoryId.name : '[Khác]'; // Ví dụ: Lấy name từ đối tượng danh mục
     };
+
     const columns = [
         // { field: '_id', headerName: 'ID', width: 230 },
         // {
@@ -28,13 +30,16 @@ function CostumFlashSale() {
         //         return params ? <img className={cx('image')} src={params.value} /> : <Skeleton.Image active={true} />;
         //     },
         // },
-        { field: 'title', headerName: 'Tên sách', width: 200, sortable: false },
+        { field: 'title', headerName: 'Tên sách', width: 250, sortable: false },
         {
             field: 'author',
             headerName: 'Tác giả',
             sortable: false,
             editable: false,
             width: 150,
+            renderCell: (params) => {
+                return <p>{params.value ? params.value : '[Không có thông tin]'}</p>;
+            },
         },
         {
             field: 'categoryId',
@@ -49,7 +54,7 @@ function CostumFlashSale() {
             headerName: 'Giá gốc',
             sortable: true,
             editable: false,
-            width: 120,
+            width: 110,
             valueFormatter: (params) => {
                 const price = params.value; // Giá gốc từ dữ liệu
                 if (typeof price === 'number') {
@@ -64,11 +69,20 @@ function CostumFlashSale() {
             },
         },
         {
+            field: 'price',
+            headerName: 'Đang giảm',
+            editable: false,
+            width: 110,
+            renderCell: (params) => {
+                return <p>{Math.ceil(((params.row.old_price - params.value) * 100) / params.row.old_price)} %</p>;
+            },
+        },
+        {
             field: 'rate',
             headerName: 'Đánh giá',
             sortable: true,
             editable: false,
-            width: 120,
+            width: 110,
             renderCell: (params) => {
                 return <p>{params.value} sao</p>;
             },
@@ -78,41 +92,39 @@ function CostumFlashSale() {
             headerName: 'Đã bán',
             sortable: true,
             editable: false,
-            width: 120,
+            width: 110,
         },
         {
-            field: 'status',
-            headerName: 'Tình trạng',
+            field: '_id',
+            headerName: 'Trạng thái',
             sortable: false,
             editable: false,
-            width: 120,
+            width: 110,
+            renderCell: (params) => {
+                return <StateFlashSale params={params.value} isToggle={isToggle} />;
+            },
         },
     ];
 
     const [suggestFlash, setSuggestFlash] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [isLoading2, setIsLoading2] = useState(false);
 
-    const handelLoading = () => {
-        setIsLoading(!isLoading);
-    };
-
-    const handelSetting = () => {
-        setIsLoading(!isLoading);
-    };
+    const [isToggle, setIsToggle] = useState(false); // khi bấm nút tiếp tục thì gọi hàm này để \tắt chọn những sản phẩm đã chọn
 
     const [rows, setRows] = useState([]);
     useEffect(() => {
-        const randomNumber = Math.floor(Math.random() * 70) + 1;
-        fetch(`${api}/products`)
-            .then((response) => response.json())
-            .then((result) => {
-                setRows(result.data);
-            })
-            .catch((err) => console.log(err));
+        if (localStorage.getItem('temporary_data')) {
+            var data = JSON.parse(localStorage.getItem('temporary_data')).products;
+            setRows(data);
+        } else {
+            fetch(`${api}/products`)
+                .then((response) => response.json())
+                .then((result) => {
+                    setRows(result.data);
+                })
+                .catch((err) => console.log(err));
+        }
     }, []);
 
-    console.log(rows);
     return (
         <div className={cx('wrapper')}>
             <div className={cx('top')}>
@@ -139,7 +151,7 @@ function CostumFlashSale() {
                         message={
                             <Marquee pauseOnHover gradient={false}>
                                 {`Hướng dẫn: Chọn sản phẩm ở bảng bên dưới. Bạn có thể sử dụng bộ lọc bằng cách nhấn vào icon 3 chấm ở đầu mỗi cột, sau đó nhấn
-                                icon xanh để tiến hành thiết lập FlashSale________`}
+                                nút mũi tên xanh để tiến hành thiết lập FlashSale.________`}
                             </Marquee>
                         }
                         style={{
@@ -151,11 +163,24 @@ function CostumFlashSale() {
                     {/* <p className={cx('btn_load')} onClick={handelLoading}>
                         <AutorenewIcon className={cx('btn_icon_load')} />
                     </p> */}
-                    <FlashSaleModal props={{ products: suggestFlash }} handelLoading={handelLoading} />
+                    <FlashSaleModal
+                        props={{ products: suggestFlash }}
+                        func={setIsToggle}
+                        isStatus={{
+                            isToggle: isToggle,
+                        }}
+                    />
                 </div>
             </div>
             <div className={cx('table')}>
-                <EnhancedTable columns={columns} rows={rows} />
+                <EnhancedTable
+                    columns={columns}
+                    rows={rows}
+                    func={setSuggestFlash}
+                    isStatus={{
+                        isToggle: isToggle,
+                    }}
+                />
             </div>
         </div>
     );

@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames/bind';
-import { api } from '../../../../constants';
-import SimpleItem from '../../../components/SimpleItem';
+import { api } from '../../../../../constants';
+import SimpleItem from '../../../../components/SimpleItem';
 import styles from './AutoFlashSale.module.scss';
 
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import { Divider, Form, Radio, Skeleton, Space, Switch, Alert } from 'antd';
 import Marquee from 'react-fast-marquee';
-import FlashSaleModal from '../../../components/FlashSaleModal';
+import FlashSaleModal from '../../../../components/FlashSaleModal';
 
 const cx = classNames.bind(styles);
 
@@ -29,28 +29,23 @@ function shuffleArray(array) {
 
 function AutoFlashSale() {
     const [suggestFlash, setSuggestFlash] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [isLoading2, setIsLoading2] = useState(false);
-    // var data = JSON.parse(localStorage.getItem('temporary_data'));
+    const [isLoading, setIsLoading] = useState(false); // loading cho button
+    const [isLoading2, setIsLoading2] = useState(false); // loading cho sản phẩm để hiển thị skeleton
+
     useEffect(() => {
-        //const randomNumberpage = Math.floor(Math.random() * 10) + 1;
-        // const randomNumberperPage = Math.floor((Math.random() * 1000) / randomNumberpage) + 14;
-        //?page=${1}&perPage=${randomNumberperPage}&filter=sold&sort=asc&num=14
-        //
         if (localStorage.getItem('temporary_data')) {
-            var data = JSON.parse(localStorage.getItem('temporary_data'));
+            var data = JSON.parse(localStorage.getItem('temporary_data')).products;
             setIsLoading2(true);
             setTimeout(() => {
-                setSuggestFlash(getRandomElementsWithBias(data, 14));
+                setSuggestFlash(getRandomElementsWithBias(data.slice(0, 200), 14));
                 setIsLoading2(false);
             }, 500); // 1000 milliseconds tương đương với 1 giây
         } else {
             setIsLoading2(true);
-            fetch(`${api}/products?page=${1}&perPage=${1000}&filter=sold&sort=asc&num=200`)
+            fetch(`${api}/products?filter=sold&sort=asc`)
                 .then((response) => response.json())
                 .then((flashsales) => {
-                    localStorage.setItem('temporary_data', JSON.stringify(flashsales.data));
-                    setSuggestFlash(getRandomElementsWithBias(flashsales.data, 14));
+                    setSuggestFlash(getRandomElementsWithBias(flashsales.data.slice(0, 200), 14));
                     setIsLoading2(false);
                 })
                 .catch((err) => console.log(err));
@@ -58,10 +53,6 @@ function AutoFlashSale() {
     }, [isLoading]);
 
     const handelLoading = () => {
-        setIsLoading(!isLoading);
-    };
-
-    const handelSetting = () => {
         setIsLoading(!isLoading);
     };
 
@@ -90,7 +81,7 @@ function AutoFlashSale() {
                         type="info"
                         message={
                             <Marquee pauseOnHover gradient={false}>
-                                {`Hướng dẫn: Hệ thống gợi ý sản phẩm đang có xu hướng tồn kho. Nhấn icon xám để lấy sản phẩm khác, nhấn
+                                {`Hướng dẫn: Hệ thống gợi ý sản phẩm đang có xu hướng tồn kho. Nhấn icon vàng để lấy sản phẩm khác, nhấn
                                 icon xanh để tiến hành thiết lập FlashSale________`}
                             </Marquee>
                         }
@@ -103,7 +94,15 @@ function AutoFlashSale() {
                     <p className={cx('btn_load')} onClick={handelLoading}>
                         <AutorenewIcon className={cx('btn_icon_load')} />
                     </p>
-                    <FlashSaleModal props={{ products: suggestFlash }} handelLoading={handelLoading} />
+                    {!isLoading2 ? (
+                        <FlashSaleModal
+                            props={{ products: suggestFlash }}
+                            handelLoading={handelLoading}
+                            disabled={true}
+                        />
+                    ) : (
+                        <FlashSaleModal />
+                    )}
                 </div>
             </div>
             <div className={cx('content')}>

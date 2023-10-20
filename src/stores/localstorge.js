@@ -36,7 +36,7 @@ export default {
                 });
         }
 
-        console.log('get user', user);
+    
         return user;
     },
 };

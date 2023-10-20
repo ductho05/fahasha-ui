@@ -1,9 +1,15 @@
-import { GridToolbarContainer, GridToolbarFilterButton, GridToolbarColumnsButton, GridToolbarDensitySelector, GridToolbarExport } from '@mui/x-data-grid'
-import classNames from 'classnames/bind'
-import styles from './CustomToolBar.module.scss'
+import {
+    GridToolbarContainer,
+    GridToolbarFilterButton,
+    GridToolbarColumnsButton,
+    GridToolbarDensitySelector,
+    GridToolbarExport,
+} from '@mui/x-data-grid';
+import classNames from 'classnames/bind';
+import styles from './CustomToolBar.module.scss';
 
-const cx = classNames.bind(styles)
-function CustomToolbar() {
+const cx = classNames.bind(styles);
+function CustomToolbar({ selectedData, onGetSelectedData }) {
     return (
         <GridToolbarContainer className={cx('toolbar')}>
             <GridToolbarExport
@@ -24,4 +30,4 @@ function CustomToolbar() {
     );
 }
 
-export default CustomToolbar
+export default CustomToolbar;
