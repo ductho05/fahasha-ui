@@ -1,0 +1,30 @@
+.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 25px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-right: 16px;
+}
+
+.icon {
+    margin-right: 4px;
+    font-size: 1.8rem;
+}
+
+.title {
+    font-size: 1.3rem;
+    font-weight: 500;
+}
+
+.delete {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.edit {
+    background-color: #73aafa;
+    color: #fff;
+}

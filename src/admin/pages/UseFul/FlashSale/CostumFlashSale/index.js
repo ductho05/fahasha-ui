@@ -180,6 +180,7 @@ function CostumFlashSale() {
                     isStatus={{
                         isToggle: isToggle,
                     }}
+                    pageSize={12}
                 />
             </div>
         </div>

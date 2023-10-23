@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 export default function ScrollToTop() {
     const { pathname } = useLocation();
@@ -15,6 +15,7 @@ export default function ScrollToTop() {
             // Nếu không có, xóa dữ liệu trong Local Storage
             localStorage.removeItem('temporary_data');
         }
+        if (!currentPath.includes('admin/flashsale')) localStorage.removeItem('isCheckboxDeleteFS');
     }, [location.pathname]);
     useEffect(() => {
         window.scrollTo(0, 0);

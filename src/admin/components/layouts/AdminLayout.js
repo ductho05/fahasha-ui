@@ -88,7 +88,7 @@ function AdminLayout({ children }) {
                 })
                 .catch((err) => console.log(err));
 
-            fetch(`${api}/flashsales`)
+            fetch(`${api}/flashsales?sort=reverse`)
                 .then((response) => response.json())
                 .then((result) => {
                     setData((prev) => ({ ...prev, flashsales: result.data }));
