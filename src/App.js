@@ -7,15 +7,16 @@ import localstorge from './stores/localstorge';
 import { useStore } from './stores/hooks';
 import { Button, notification, Space } from 'antd';
 import AdminLayout from './admin/components/layouts/AdminLayout';
+import ServiceWorkerNotifi from './service/ServiceWorkerNotifi';
 
 function DeniedPermission({ type }) {
     type == 'admin'
         ? localStorage.setItem(
-              'denied-permission-notify',
+            'denied-permission-notify',
 
-              `Bạn không có quyền truy cập vào trang này.
+            `Bạn không có quyền truy cập vào trang này.
     Vui lòng đăng nhập với quyền Admin`,
-          )
+        )
         : localStorage.setItem('denied-permission-notify', `Vui lòng đăng nhập để sử dụng tính năng này`);
     return <Navigate to="/login-register" />;
 }
@@ -25,6 +26,8 @@ function App() {
     const [state, dispatch] = useStore();
     const Page404 = notFoundRoute.component;
     const [api, contextHolder] = notification.useNotification();
+
+    ServiceWorkerNotifi()
 
     return (
         <BrowserRouter>

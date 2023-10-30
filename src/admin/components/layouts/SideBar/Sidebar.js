@@ -75,12 +75,13 @@ const tabList = [
                 id: 7,
                 icon: NotificationsNoneOutlinedIcon,
                 name: 'Thông báo',
+                link: '/admin/notifications'
             },
             {
                 id: 8,
                 icon: LoyaltyIcon,
                 name: 'Flash Sale',
-                link: '/admin/flashsale/auto',
+                link: '/admin/flashsale',
             },
         ],
     },

@@ -13,22 +13,22 @@ function AdminLayout({ children }) {
     const [isLoaded, setIsLoaded] = useState(
         localStorage.getItem('temporary_data')
             ? {
-                  products: true,
-                  flashsales: true,
-              }
+                products: true,
+                flashsales: true,
+            }
             : {
-                  products: false,
-                  flashsales: false,
-              },
+                products: false,
+                flashsales: false,
+            },
     );
     const [percent, setPercent] = useState(0);
     const [data, setData] = useState(
         localStorage.getItem('temporary_data')
             ? JSON.parse(localStorage.getItem('temporary_data'))
             : {
-                  products: [],
-                  flashsales: [],
-              },
+                products: [],
+                flashsales: [],
+            },
     );
 
     // useEffect(() => {
@@ -108,22 +108,25 @@ function AdminLayout({ children }) {
 
     return (
         <>
-            {!(isLoaded.flashsales && isLoaded.products) && !localStorage.getItem('temporary_data') ? (
+            {!(isLoaded.flashsales && isLoaded.products) && !localStorage.getItem('temporary_data') && (
                 <div className={cx('wrapper-loading')}>
                     <div className={cx('animation-loading')} ref={container}></div>
                 </div>
-            ) :
+            )}
 
-            <div className={cx('wrapper')}>
-                <div className={cx('navbar')}>
-                    <SideBar />
-                </div>             
+            {
+                !(!(isLoaded.flashsales && isLoaded.products) && !localStorage.getItem('temporary_data')) &&
+                <div className={cx('wrapper')}>
+                    <div className={cx('navbar')}>
+                        <SideBar />
+                    </div>
 
-                <Scrollbar style={{ width: 250, height: '100vh' }} className={cx('container')}>
-                    <NavBar />
-                    {children}
-                </Scrollbar>
-            </div>}
+                    <Scrollbar style={{ width: 250, height: '100vh' }} className={cx('container')}>
+                        <NavBar />
+                        {children}
+                    </Scrollbar>
+                </div>
+            }
         </>
     );
 }

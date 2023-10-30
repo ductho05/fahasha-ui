@@ -4,7 +4,6 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'rec
 import images from '../../../../assets/images';
 import { autocompleteClasses } from '@mui/material';
 import SimpleItem from '../../SimpleItem';
-import { VictoryBar, VictoryChart, VictoryAxis, VictoryTheme } from 'victory';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import TuneIcon from '@mui/icons-material/Tune';
 import { useEffect } from 'react';
