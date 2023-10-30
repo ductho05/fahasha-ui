@@ -3,7 +3,7 @@ import CustomToolbar from './Components/CustomToolBar.js';
 import CustomPagination from './Components/CustomPagonation';
 import { useState, useEffect } from 'react';
 
-export default function EnhancedTable({ columns, rows, func, isStatus, ischeckboxSelection }) {
+export default function EnhancedTable({ columns, rows, func, isStatus, ischeckboxSelection, pageSize }) {
     const exe = func !== undefined && isStatus !== undefined;
     const [rowSelectionModel, setRowSelectionModel] = useState([]);
     useEffect(() => {
@@ -35,19 +35,16 @@ export default function EnhancedTable({ columns, rows, func, isStatus, ischeckbo
                     initialState={{
                         pagination: {
                             paginationModel: {
-                                pageSize: 6,
+                                pageSize: pageSize ? pageSize : 6,
                             },
                         },
                     }}
-                    //pageSizeOptions={[10, 20, 50, 100]}
+                    pageSizeOptions={[6, 12, 24, 48, 96]}
                     checkboxSelection={ischeckboxSelection !== undefined ? ischeckboxSelection : true}
                     onRowSelectionModelChange={(newRowSelectionModel) => {
                         setRowSelectionModel(newRowSelectionModel);
                     }}
                     rowSelectionModel={rowSelectionModel}
-
-                    pageSizeOptions={[6, 12]}
-                    
                     slots={{
                         toolbar: CustomToolbar,
                         pagination: CustomPagination,

@@ -88,7 +88,7 @@ function AdminLayout({ children }) {
                 })
                 .catch((err) => console.log(err));
 
-            fetch(`${api}/flashsales`)
+            fetch(`${api}/flashsales?sort=reverse`)
                 .then((response) => response.json())
                 .then((result) => {
                     setData((prev) => ({ ...prev, flashsales: result.data }));
@@ -106,6 +106,8 @@ function AdminLayout({ children }) {
         }
     }, [isLoaded]);
 
+    console.log('AA', !(isLoaded.flashsales && isLoaded.products) && !localStorage.getItem('temporary_data'));
+
     return (
         <>
             {!(isLoaded.flashsales && isLoaded.products) && !localStorage.getItem('temporary_data') && (
@@ -113,20 +115,17 @@ function AdminLayout({ children }) {
                     <div className={cx('animation-loading')} ref={container}></div>
                 </div>
             )}
-
-            {
-                !(!(isLoaded.flashsales && isLoaded.products) && !localStorage.getItem('temporary_data')) &&
+            {!(!(isLoaded.flashsales && isLoaded.products) && !localStorage.getItem('temporary_data')) && (
                 <div className={cx('wrapper')}>
                     <div className={cx('navbar')}>
                         <SideBar />
                     </div>
-
                     <Scrollbar style={{ width: 250, height: '100vh' }} className={cx('container')}>
                         <NavBar />
                         {children}
                     </Scrollbar>
                 </div>
-            }
+            )}
         </>
     );
 }

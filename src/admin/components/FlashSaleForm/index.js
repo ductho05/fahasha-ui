@@ -49,8 +49,13 @@ function FlashSaleForm({ props, hideFunc }) {
 
     const formatDateToString = (date) => {
         if (date) {
-            // Sử dụng phương thức toISOString để định dạng ngày thành chuỗi ISO
-            return date.toISOString().slice(0, 10); // Lấy YYYY-MM-DD
+            date = date.$d ? date.$d : date;
+            const year = date.getUTCFullYear();
+            const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+            const day = date.toString().slice(8, 10);
+            const utcTimeString = `${year}-${month}-${day}`;
+            return utcTimeString;
+            // return date.toISOString().slice(0, 10); // Lấy YYYY-MM-DD
         }
         return ''; // Trả về chuỗi rỗng nếu date là null
     };
@@ -103,6 +108,7 @@ function FlashSaleForm({ props, hideFunc }) {
     };
     const onFinish = (values) => {
         //values.date_sale = moment(values.date_sale).format('YYYY-MM-DD');
+        console.log('Received values of form: ', selectedDate);
         values.date_sale = formatDateToString(selectedDate);
 
         addFlashSale(values, products);

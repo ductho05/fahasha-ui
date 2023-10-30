@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { api } from '../../../../constants';
 import styles from './FlashSale.module.scss';
@@ -9,12 +10,13 @@ import AddOptionModal from '../../../components/AddOptionModal';
 import lottie from 'lottie-web';
 import { Divider, Form, Button, Radio, Skeleton, Space, Switch, Alert } from 'antd';
 import BarChartExample from '../../../components/charts/BarChar/BarChar';
-
+import CustomPopconfirm from '../../../components/CustomPopconfirm/CustomPopconfirm';
 import Marquee from 'react-fast-marquee';
 const cx = classNames.bind(styles);
 
 function FlashSale() {
     const container1 = useRef(null);
+    const navigate = useNavigate();
     lottie.loadAnimation({
         container: container1.current, // Thay container2.current bằng document.getElementById nếu bạn không sử dụng useRef.
         renderer: 'svg',
@@ -24,7 +26,7 @@ function FlashSale() {
     });
 
     const spaceSizeCol = [30, 210, 80, 80, 70, 60, 80, 80, 160];
-
+    const [isloadingdelete, setIsloadingdetele] = useState(null);
     const columns = [
         {
             field: 'rowNumber',
@@ -122,7 +124,12 @@ function FlashSale() {
             renderCell: (params) => {
                 const currentDate = new Date();
                 let current_point_sale = Math.floor(currentDate.getHours() / 3);
-                let toDay = currentDate.toISOString().slice(0, 10);
+
+                const year = currentDate.getUTCFullYear();
+                const month = (currentDate.getUTCMonth() + 1).toString().padStart(2, '0');
+                const day = currentDate.toString().slice(8, 10);
+                const utcTimeString = `${year}-${month}-${day}`;
+                let toDay = utcTimeString;
 
                 return (
                     <p
@@ -156,7 +163,11 @@ function FlashSale() {
                 const currentDate = new Date();
 
                 let current_point_sale = Math.floor(currentDate.getHours() / 3);
-                let toDay = currentDate.toISOString().slice(0, 10);
+                const year = currentDate.getUTCFullYear();
+                const month = (currentDate.getUTCMonth() + 1).toString().padStart(2, '0');
+                const day = currentDate.toString().slice(8, 10);
+                const utcTimeString = `${year}-${month}-${day}`;
+                let toDay = utcTimeString;
 
                 return (
                     <>
@@ -166,27 +177,35 @@ function FlashSale() {
                             style={{
                                 margin: '0 10px 0 0',
                             }}
+                            onClick={() => {
+                                navigate(`/admin/flashsale/${params.row._id}`);
+                            }}
                         >
                             Chi tiết
                         </Button>
-                        <Button
-                            danger
-                            disabled={
-                                params.row.date_sale == toDay && params.row.point_sale == current_point_sale
-                                    ? true
-                                    : params.row.date_sale > toDay ||
-                                      (params.row.date_sale == toDay && params.row.point_sale > current_point_sale)
-                                    ? false
-                                    : false
-                            }
-                            onClick={() => {
+
+                        <CustomPopconfirm
+                            title="Xóa flashsale?"
+                            description="Không hiển thị lại thông báo này"
+                            props={{
+                                disable:
+                                    params.row.date_sale == toDay && params.row.point_sale == current_point_sale
+                                        ? true
+                                        : params.row.date_sale > toDay ||
+                                          (params.row.date_sale == toDay && params.row.point_sale > current_point_sale)
+                                        ? false
+                                        : false,
+                                isloadingdelete: isloadingdelete,
+                            }}
+                            func={() => {
+                                setIsloadingdetele(true);
                                 fetch(`${api}/flashsales/delete/${params.row._id}`, {
                                     method: 'GET',
                                 })
                                     .then((response) => response.json())
                                     .then((result) => {
                                         if (result.status == 'OK') {
-                                            localStorage.setItem('isFlashsaleLoading', true);
+                                            //localStorage.setItem('isFlashsaleLoading', true);
                                             localStorage.setItem(
                                                 'temporary_data',
                                                 JSON.stringify({
@@ -202,12 +221,11 @@ function FlashSale() {
                                                 ),
                                             );
                                         }
+                                        setIsloadingdetele(false);
                                     })
                                     .catch((err) => console.log(err));
                             }}
-                        >
-                            Xóa
-                        </Button>
+                        />
                     </>
                 );
             },
@@ -224,8 +242,8 @@ function FlashSale() {
             var data = JSON.parse(localStorage.getItem('temporary_data')).flashsales;
             setRows(data);
             if (localStorage.getItem('isFlashsaleLoading')) {
-                localStorage.removeItem('isFlashsaleLoading');
-                fetch(`${api}/flashsales`)
+                //localStorage.removeItem('isFlashsaleLoading');
+                fetch(`${api}/flashsales?sort=reverse`)
                     .then((response) => response.json())
                     .then((result) => {
                         setRows(result.data);
@@ -236,11 +254,12 @@ function FlashSale() {
                                 flashsales: result.data,
                             }),
                         );
+                        localStorage.removeItem('isFlashsaleLoading');
                     })
                     .catch((err) => console.log(err));
             }
         } else {
-            fetch(`${api}/flashsales`)
+            fetch(`${api}/flashsales?sort=reverse`)
                 .then((response) => response.json())
                 .then((result) => {
                     setRows(result.data);
@@ -301,6 +320,7 @@ function FlashSale() {
                         isStatus={{
                             isToggle: isToggle,
                         }}
+                        pageSize={12}
                     />
                 </div>
                 <div className={cx('state')}>{rows && <BarChartExample data={rows} />}</div>

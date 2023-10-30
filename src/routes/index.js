@@ -1,27 +1,27 @@
-
-import Home from '../pages/Home/index'
-import ProductDetail from '../pages/ProductDetail/index'
-import TableCart from '../pages/Cart/TableCart'
-import Account from '../pages/Account'
-import SeeMoreProduct from '../pages/SeeMoreProduct'
-import CheckOut from '../pages/CheckOut'
-import SearchProduct from '../pages/SearchProduct'
-import RegisterLogin from '../pages/RegisterLoginPage'
-import OrderSuccess from '../pages/OrderSuccess'
-import OrderDetail from '../pages/OrderDetail'
-import Page404 from '../pages/Page404'
-import HomeAdmin from '../admin/pages/HomeAdmin/HomeAdmin'
-import Users from '../admin/pages/Users/Users'
-import UserDetail from '../admin/pages/UserDetail/UserDetail'
-import TermsServices from '../pages/TermsServices'
-import Review from '../admin/pages/Review/Review'
-import AutoFlashSale from '../admin/pages/UseFul/FlashSale/AutoFlashSale'
-import CostumFlashSale from '../admin/pages/UseFul/FlashSale/CostumFlashSale'
-import Order from '../admin/pages/Order'
-import Product from '../admin/pages/Product'
-import UpdateProduct from '../admin/pages/UpdateProduct'
+import Home from '../pages/Home/index';
+import ProductDetail from '../pages/ProductDetail/index';
+import TableCart from '../pages/Cart/TableCart';
+import Account from '../pages/Account';
+import SeeMoreProduct from '../pages/SeeMoreProduct';
+import CheckOut from '../pages/CheckOut';
+import SearchProduct from '../pages/SearchProduct';
+import RegisterLogin from '../pages/RegisterLoginPage';
+import OrderSuccess from '../pages/OrderSuccess';
+import OrderDetail from '../pages/OrderDetail';
+import Page404 from '../pages/Page404';
+import HomeAdmin from '../admin/pages/HomeAdmin/HomeAdmin';
+import Users from '../admin/pages/Users/Users';
+import UserDetail from '../admin/pages/UserDetail/UserDetail';
+import TermsServices from '../pages/TermsServices';
+import Review from '../admin/pages/Review/Review';
+import AutoFlashSale from '../admin/pages/UseFul/FlashSale/AutoFlashSale';
+import CostumFlashSale from '../admin/pages/UseFul/FlashSale/CostumFlashSale';
+import Order from '../admin/pages/Order';
+import Product from '../admin/pages/Product';
+import UpdateProduct from '../admin/pages/UpdateProduct';
 import FlashSale from '../admin/pages/UseFul/FlashSale';
 import Notifications from '../admin/pages/Notifications'
+import FlashSaleDetail from '../admin/pages/UseFul/FlashSale/FlashSaleDetail';
 
 // Public Routes
 const publicRoutes = [
@@ -51,7 +51,7 @@ const adminRoutes = [
     { path: '/admin/flashsale', component: FlashSale },
     { path: '/admin/flashsale/auto', component: AutoFlashSale },
     { path: '/admin/flashsale/custom', component: CostumFlashSale },
-
+    { path: '/admin/flashsale/:flashId', component: FlashSaleDetail },
     { path: '/admin/reviews', component: Review },
 
     { path: '/admin/orders', component: Order },

@@ -4,12 +4,13 @@ import styles from './SimpleItem.module.scss';
 import classNames from 'classnames/bind';
 import SizeContext from 'antd/es/config-provider/SizeContext';
 const { Meta } = Card;
-function SimpleItem({ props }) {
+function SimpleItem({ onClick, props }) {
     const { title, image, sold, isLoading } = props;
 
     const cx = classNames.bind(styles);
     return isLoading == false ? (
         <Card
+            onClick={onClick}
             hoverable
             bodyStyle={{
                 padding: '0px',

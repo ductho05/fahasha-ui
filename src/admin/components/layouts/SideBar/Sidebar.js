@@ -42,13 +42,13 @@ const tabList = [
                 id: 2,
                 icon: Inventory2OutlinedIcon,
                 name: 'Sản phẩm',
-                link: '/admin/products'
+                link: '/admin/products',
             },
             {
                 id: 3,
                 icon: ViewStreamOutlinedIcon,
                 name: 'Đơn hàng',
-                link: '/admin/orders'
+                link: '/admin/orders',
             },
             {
                 id: 4,

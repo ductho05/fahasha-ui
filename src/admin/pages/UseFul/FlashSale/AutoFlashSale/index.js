@@ -3,7 +3,7 @@ import classNames from 'classnames/bind';
 import { api } from '../../../../../constants';
 import SimpleItem from '../../../../components/SimpleItem';
 import styles from './AutoFlashSale.module.scss';
-
+import { useNavigate } from 'react-router-dom';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import { Divider, Form, Radio, Skeleton, Space, Switch, Alert } from 'antd';
 import Marquee from 'react-fast-marquee';
@@ -28,6 +28,7 @@ function shuffleArray(array) {
 }
 
 function AutoFlashSale() {
+    const navigate = useNavigate();
     const [suggestFlash, setSuggestFlash] = useState([]);
     const [isLoading, setIsLoading] = useState(false); // loading cho button
     const [isLoading2, setIsLoading2] = useState(false); // loading cho sản phẩm để hiển thị skeleton
@@ -108,8 +109,12 @@ function AutoFlashSale() {
             <div className={cx('content')}>
                 {suggestFlash.length
                     ? suggestFlash.map((item, index) => {
+                          console.log(item);
                           return (
                               <SimpleItem
+                                  onClick={() => {
+                                      navigate(`/admin/update-product/${item._id}`);
+                                  }}
                                   key={index}
                                   props={{
                                       image: item.images,
