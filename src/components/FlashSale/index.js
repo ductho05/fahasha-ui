@@ -106,7 +106,7 @@ function FlashSale() {
                                 fontSize: '2.5rem',
                                 color: '#ffe818',
                                 justifyContent: 'left',
-                                flex: '0.9',
+                                margin: '0 1rem 0 0',
                             }}
                         />
                     </div>

@@ -3,34 +3,26 @@ import React, { useState, useEffect, flashef } from 'react';
 import classNames from 'classnames/bind';
 import styles from './CountDownCustom.module.scss';
 import { Skeleton } from 'antd';
-
+function formatNumber(number) {
+    if (number < 10) {
+        // Nếu số nhỏ hơn 10, thêm số 0 phía trước và chuyển thành chuỗi
+        return '0' + number;
+    } else {
+        // Nếu số lớn hơn hoặc bằng 10, giữ nguyên số và chuyển thành chuỗi
+        return number.toString();
+    }
+}
 const App = ({ title, isLoading, props }) => {
     const cx = classNames.bind(styles);
     const [countdown, setCountdown] = useState(null);
-    // const dl = !deadline == undefined ? deadline : localStorage.getItem('date_flash');
     const deadline = localStorage.getItem('date_flash') ? localStorage.getItem('date_flash') : null;
 
     useEffect(() => {
-        //const date = new Date();
-        //date.setDate(date.getDate() + 10);
-        //date.setHours(deadline, 0, 0);
-
         let countDownDate = null;
-        // if (title == 'Đếm ngược đến giờ mở bán:') {
-        //     // Thiết lập thời gian kết thúc đếm ngược
-        //     console.log('localStorage.getItem', localStorage.getItem('date_flash'));
-        //     countDownDate = new Date(localStorage.getItem('date_flash')).getTime();
-        // } else {
-        //     // Thiết lập thời gian kết thúc đếm ngược
-        //     const date = new Date();
-        //     date.setHours(deadline, 0, 0);
-        //     countDownDate = date.getTime();
-        // }
+
         countDownDate = deadline
             ? new Date(deadline).getTime()
             : new Date().setHours((Math.floor(new Date().getHours() / 3) + 1) * 3, 0, 0);
-        //const countDownDate = date.getTime();
-        //console.log('countDownDate', countDownDate);
 
         // Cập nhật đồng hồ đếm ngược mỗi 1 giây
         const x = setInterval(() => {
@@ -47,7 +39,11 @@ const App = ({ title, isLoading, props }) => {
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
             // Hiển thị đồng hồ đếm ngược
-            setCountdown(days != 0 ? `${days}d` : '' + ` ${hours}h ${minutes}m ${seconds}s`);
+            setCountdown(
+                days != 0
+                    ? `${formatNumber(days)}d`
+                    : '' + ` ${formatNumber(hours)}h ${formatNumber(minutes)}m ${formatNumber(seconds)}s`,
+            );
 
             // Nếu đếm ngược kết thúc, dừng cập nhật
             if (distance < 0) {
@@ -73,7 +69,8 @@ const App = ({ title, isLoading, props }) => {
                                       fontSize: '2rem',
                                       color: '#d53c3c',
                                       justifyContent: 'center',
-                                      flex: '1',
+                                      width: '150px',
+                                      margin: '0 10px',
                                   }
                         }
                     >
@@ -107,7 +104,10 @@ const App = ({ title, isLoading, props }) => {
                                           padding: '0 1rem',
                                           borderRadius: '5px',
                                       }
-                                    : {}
+                                    : {
+                                          width: '220px',
+                                          margin: '0 10px',
+                                      }
                             }
                         >
                             {countdown}

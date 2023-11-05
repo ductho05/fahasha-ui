@@ -89,8 +89,6 @@ function FlashSaleDetail() {
     const navigate = useNavigate();
     const { flashId } = useParams();
     const [flash, setFlash] = useState({});
-    const [optionSelected, setOptionSelected] = useState(options[0]);
-    console.log('flash', optionSelected);
     const [showDialog, setShowDialog] = useState(false);
     const [data, setData] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -139,7 +137,7 @@ function FlashSaleDetail() {
                 autoplay: true,
                 animationData: require('../../../../../assets/json/notData.json'),
             });
-            console.log('Hoạt hình 3 đã tải hoàn tất.');
+
             setDone(true);
         }, 30000); // 10 giây (10000 milliseconds)
 
@@ -233,8 +231,6 @@ function FlashSaleDetail() {
         total: item?.flashid?.product?.price * item?.flashid?.current_sale * 0.01 * item.mount,
     }));
 
-    console.log('dataIncomes', data);
-
     const handleClickEdit = () => {
         localStorage.setItem('isFlashsaleLoading', true);
         setSelectedDate(new Date(flash.date_sale));
@@ -292,11 +288,10 @@ function FlashSaleDetail() {
                     setLocal(result.data);
                 }
             })
-            .catch((err) => console.error(err.message));
+            .catch((err) => console.error('Aádad', err.message));
     }, [showDialog]);
 
     const formatDateToString = (date) => {
-        console.log('date', date);
         if (date) {
             date = date.$d ? date.$d : date._d ? date._d : date;
             const year = date.getUTCFullYear();
@@ -319,9 +314,7 @@ function FlashSaleDetail() {
         // if (Object.keys(avatar).length > 0) {
         //     formData.append('images', avatar);
         // }
-        console.log('Data', values);
-        console.log('formData', formData.get('date_sale'));
-        console.log('flashId', flashId);
+
         fetch(`${api}/flashsales/update/${flashId}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
