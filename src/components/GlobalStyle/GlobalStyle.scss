@@ -1,7 +1,7 @@
 @import 'normalize.css';
-// @tailwind base;
-// @tailwind components;
-// @tailwind utilities;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
     --primary-color: #c92127;
@@ -40,4 +40,46 @@ button {
     text-decoration: none;
     outline: none;
     border: none;
+}
+
+.ant-picker-dropdown,
+.ant-select-dropdown {
+    z-index: 100000000;
+}
+
+.ant-btn-primary {
+    background-color: #1677ff;
+}
+
+.scroll-custom,
+.MuiPaper-root,
+.MuiPaper-elevation,
+.MuiPaper-rounded,
+.MuiPaper-elevation24,
+.MuiDialog-paper,
+.MuiDialog-paperScrollPaper,
+.MuiDialog-paperWidthSm,
+.css-1t1j96h-MuiPaper-root-MuiDialog-paper {
+    &::-webkit-scrollbar {
+        width: 5px;
+        height: 0;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: linear-gradient(
+            180deg,
+            rgba(var(--background-start-rgb), 0) 9%,
+            rgba(var(--background-end-rgb), 0.1)
+        );
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: linear-gradient(
+            180deg,
+            rgba(39, 102, 241, 0.5),
+            rgba(59, 161, 242, 0.5),
+            rgba(81, 216, 145, 0.5),
+            rgba(225, 244, 62, 0.5)
+        );
+    }
 }

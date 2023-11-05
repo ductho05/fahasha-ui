@@ -2,28 +2,24 @@ import React, { useState, useEffect } from 'react'
 import classNames from "classnames/bind"
 import styles from './Product.module.scss'
 import EnhancedTable from '../../components/Table/EnhancedTable';
-import { api } from '../../../constants';
+import { api, appPath } from '../../../constants';
 import { Rating } from "@mui/material"
 import LinearProgress from '@mui/material/LinearProgress';
 import numeral from 'numeral';
-import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import { toast, ToastContainer } from 'react-toastify'
 import "react-toastify/dist/ReactToastify.css";
 import { Delete, Update } from '../../components/Button/Button';
 import { Link } from 'react-router-dom';
 import { useForm } from "react-hook-form"
-import { Dialog, TextField } from "@mui/material"
+import { Dialog } from "@mui/material"
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DemoItem } from '@mui/x-date-pickers/internals/demo';
 import { CircularProgress, Backdrop } from "@mui/material";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import Button from "../../../components/Button";
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import Dropdown from 'react-multilevel-dropdown';
+import { Input, DatePicker, Form, Button, Skeleton, Popconfirm } from 'antd';
+import SendNotification from '../../../service/SendNotification';
 
 const cx = classNames.bind(styles)
 function Product() {
@@ -33,6 +29,7 @@ function Product() {
     const [rows, setRows] = React.useState([])
     const [avatar, setAvatar] = useState()
     const [loading, setLoading] = useState(false)
+    const [loadingProduct, setLoadingProduct] = useState(false)
     const [isAction, setIsAction] = useState(false)
     const [options, setOptions] = useState([])
     const [categoryName, setCategoryName] = useState({
@@ -127,26 +124,18 @@ function Product() {
                 }
 
                 return <div style={{ display: 'flex' }} onClick={handleOnCLick}>
-                    <p onClick={() => {
-                        confirmAlert({
-                            title: 'Xác nhận xóa?',
-                            message: 'Sản phẩm này sẽ bị xóa khỏi hệ thống!',
-                            buttons: [
-                                {
-                                    label: 'Đồng ý',
-                                    onClick: () => {
-                                        handleDelete()
-                                    }
-                                },
-                                {
-                                    label: 'Hủy',
-                                    onClick: () => { }
-                                }
-                            ]
-                        });
-                    }}>
-                        <Delete />
-                    </p>
+                    <Popconfirm
+                        title="Xác nhận?"
+                        description="Sản phẩm sẽ bị xóa khỏi hệ thống"
+                        onConfirm={handleDelete}
+                        onCancel={() => { }}
+                        okText="Đồng ý"
+                        cancelText="Hủy"
+                    >
+                        <p>
+                            <Delete />
+                        </p>
+                    </Popconfirm>
                     <Link to={`/admin/update-product/${params.row._id}`}>
                         <Update />
                     </Link>
@@ -155,26 +144,20 @@ function Product() {
         },
     ];
 
-    const {
-        register,
-        handleSubmit,
-        reset
-    } = useForm()
-
     React.useEffect(() => {
-        setLoading(true)
+        setLoadingProduct(true)
         fetch(`${api}/products`)
             .then(response => response.json())
             .then(result => {
                 if (result.status === "OK") {
-                    setLoading(false)
+                    setLoadingProduct(false)
                     setRows(result.data)
                 } else {
-                    setLoading(false)
+                    setLoadingProduct(false)
                 }
             })
             .catch(error => {
-                setLoading(false)
+                setLoadingProduct(false)
                 console.log(error.message)
             })
     }, [isAction])
@@ -190,7 +173,7 @@ function Product() {
             .catch(err => console.log(err.message))
     }, [])
 
-    const onSubmit = (data) => {
+    const onFinish = (data) => {
         const formData = new FormData()
         Object.keys(data).forEach(key => {
             formData.append(key, data[key])
@@ -215,6 +198,17 @@ function Product() {
 
                 if (result.status === "OK") {
                     toast.success("Thêm mới sản phẩm thành công")
+                    const filter = "all"
+                    const title = "Thông báo sản phẩm"
+                    const description = "TA Book Store vừa ra mắt sản phẩm mới. Xem ngay"
+                    const url = `${appPath}/product-detail/${result.data._id}`
+                    const image = result.data.images
+                    SendNotification(filter, {
+                        title,
+                        description,
+                        url,
+                        image
+                    })
                 } else {
                     toast.error(result.message)
                 }
@@ -231,6 +225,10 @@ function Product() {
 
     }
 
+    const onFinishFailed = (errorInfo) => {
+        console.log('Failed:', errorInfo);
+    };
+
     useEffect(() => {
         return () => {
             avatar && URL.revokeObjectURL(avatar.preview)
@@ -246,8 +244,11 @@ function Product() {
         }
     }
 
+    const changeDate = (date, dateString) => {
+        setPublished(dateString)
+    }
+
     const handleShowDialog = () => {
-        reset()
         if (avatar) {
             URL.revokeObjectURL(avatar.preview)
             setAvatar()
@@ -277,260 +278,162 @@ function Product() {
             <Dialog
                 open={showDialog}
             >
-                <form onSubmit={handleSubmit(onSubmit)} className={cx("dialog_add_user")}>
+                <div className={cx("dialog_add_user")}>
                     <p className={cx('btn_close')} onClick={() => setShowDialog(false)}>
                         <CloseOutlinedIcon className={cx('btn_icon')} />
                     </p>
-                    <h1 className={cx("dialog_title")}>Thêm mới sản phẩm</h1>
-                    <p className={cx('label')}>Tên sản phẩm</p>
-                    <TextField
-                        {...register('title')}
-                        fullWidth
-                        placeholder='Nhập tên sản phẩm'
-                        size='medium'
+                    <Form
+                        name="basic"
+                        labelCol={{
+                            span: 4,
+                        }}
+                        wrapperCol={{
+                            span: 20,
+                        }}
                         style={{
-                            outline: 'none',
+                            maxWidth: 600,
                         }}
-                        sx={{
-                            "& .MuiOutlinedInput-root": {
-                                border: '1px solid #1363DF',
-                                borderRadius: "4px",
-                                padding: "0",
-                                height: "40px",
-                            },
-                            "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-                                border: "none"
-                            },
-                            "& .MuiInputBase-input": {
-                                backgroundColor: 'transparent'
-                            }
-                        }}
-                        InputProps={{
-                            style: {
-                                color: "#333",
-                                fontSize: "14px",
-                                marginBottom: '16px',
-                                backgroundColor: "#fff"
-                            }
-                        }}
-                    />
-                    <p className={cx('label')}>Tác giả</p>
-                    <TextField
-                        {...register('author')}
-                        fullWidth
-                        placeholder='Nhập tên tác giả'
-                        size='medium'
-                        style={{
-                            outline: 'none',
-                        }}
-                        sx={{
-                            "& .MuiOutlinedInput-root": {
-                                border: '1px solid #1363DF',
-                                borderRadius: "4px",
-                                padding: "0",
-                                height: "40px",
-                            },
-                            "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-                                border: "none"
-                            },
-                            "& .MuiInputBase-input": {
-                                backgroundColor: 'transparent'
-                            }
-                        }}
-                        InputProps={{
-                            style: {
-                                color: "#333",
-                                fontSize: "14px",
-                                marginBottom: '16px',
-                                backgroundColor: "#fff"
-                            }
-                        }}
-                    />
-                    <p className={cx('label')}>Giá hiện tại</p>
-                    <TextField
-                        {...register('price')}
-                        fullWidth
-                        placeholder='Nhập giá hiện tại'
-                        size='medium'
-                        style={{
-                            outline: 'none',
-                        }}
-                        sx={{
-                            "& .MuiOutlinedInput-root": {
-                                border: '1px solid #1363DF',
-                                borderRadius: "4px",
-                                padding: "0",
-                                height: "40px",
-                            },
-                            "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-                                border: "none"
-                            },
-                            "& .MuiInputBase-input": {
-                                backgroundColor: 'transparent'
-                            }
-                        }}
-                        InputProps={{
-                            style: {
-                                color: "#333",
-                                fontSize: "14px",
-                                marginBottom: '16px',
-                                backgroundColor: "#fff"
-                            }
-                        }}
-                    />
-                    <p className={cx('label')}>Giá cũ</p>
-                    <TextField
-                        {...register('old_price')}
-                        fullWidth
-                        placeholder='Nhập giá cũ'
-                        size='medium'
-                        style={{
-                            outline: 'none',
-                        }}
-                        sx={{
-                            "& .MuiOutlinedInput-root": {
-                                border: '1px solid #1363DF',
-                                borderRadius: "4px",
-                                padding: "0",
-                                height: "40px",
-                            },
-                            "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-                                border: "none"
-                            },
-                            "& .MuiInputBase-input": {
-                                backgroundColor: 'transparent'
-                            }
-                        }}
-                        InputProps={{
-                            style: {
-                                color: "#333",
-                                fontSize: "14px",
-                                marginBottom: '16px',
-                                backgroundColor: "#fff"
-                            }
-                        }}
-                    />
-                    <p className={cx('label')}>Năm xuất bản</p>
-                    <LocalizationProvider fullWidth dateAdapter={AdapterDayjs}>
-                        <DemoItem>
-                            <DatePicker
-                                value={published}
-                                onChange={(e) => setPublished(e.format("YYYY-MM-DD"))}
-                                fullWidth
-                                sx={{
-                                    "& .MuiOutlinedInput-root": {
-                                        border: '1px solid #1363DF',
-                                        borderRadius: "4px",
-                                        padding: "0 20px 0 0",
-                                        height: "40px",
-                                        fontSize: "1.4rem"
-                                    },
-                                    "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-                                        border: "none"
-                                    },
-                                    "& .MuiInputBase-input": {
-                                        backgroundColor: 'transparent'
-                                    }
-                                }}
-                                InputProps={{
-                                    style: {
-                                        color: "#333",
-                                        fontSize: "14px",
-                                        marginBottom: '16px',
-                                        backgroundColor: "#fff"
-                                    }
-                                }}
-                                renderInput={(params) => <TextField {...params} />}
-                            />
-                        </DemoItem>
-                    </LocalizationProvider>
-                    <p className={cx('label')}></p>
-                    <p className={cx('label')}>Loại sản phẩm</p>
-                    <Dropdown
-                        position="top-right"
-                        title={categoryName.name}
-                        menuClassName={cx("dropmenu")}
-                        buttonClassName={cx("category")}
-                        buttonVariant="special-success"
-                        wrapperClassName={cx("submenu")}
+                        onFinish={onFinish}
+                        onFinishFailed={onFinishFailed}
+                        autoComplete="off"
                     >
-                        {
-                            options.map((option, index) => (
-                                <Dropdown.Item key={index}>
-                                    {option._id}
-                                    <Dropdown.Submenu
-                                        position="right-top"
-                                        className={cx("submenu")}
-                                    >
-                                        {
-                                            option.categories.map((category, index) => (
-                                                <Dropdown.Item key={index} onClick={() => setCategoryName({ name: category.name, value: category._id })}>
-                                                    {category.name}
-                                                </Dropdown.Item>
-                                            ))
-                                        }
-                                    </Dropdown.Submenu>
-                                </Dropdown.Item>
-                            ))
-                        }
-                    </Dropdown>
-                    <p className={cx('label')}></p>
-                    <p className={cx('label')}>Mô tả</p>
-                    <TextField
-                        {...register('description')}
-                        multiline
-                        maxRows={5}
-                        fullWidth
-                        placeholder='Mô tả sản phẩm...'
-                        size='medium'
-                        style={{
-                            outline: 'none',
-                        }}
-                        sx={{
-                            "& .MuiOutlinedInput-root": {
-                                border: '1px solid #1363DF',
-                                borderRadius: "4px",
-                                padding: "5px 5px 5px 10px",
-                                minHeight: "120px",
-                                maxHeight: "100vh"
-                            },
-                            "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-                                border: "none"
-                            },
-                            "& .MuiInputBase-input": {
-                                backgroundColor: 'transparent'
-                            }
-                        }}
-                        InputProps={{
-                            style: {
-                                color: "#333",
-                                fontSize: "14px",
-                                marginBottom: '16px',
-                                backgroundColor: "#fff"
-                            }
-                        }}
-                    />
-                    <p className={cx('label')}></p>
-                    <p className={cx('label')}>Hình ảnh</p>
-                    <div className={cx('avatar')}>
-                        <p className={cx('edit_avatar')}>
-                            <label for="image">
-                                <AccountCircleIcon className={cx('icon')} />
-                                Chọn
-                            </label>
-                            <input type="file" id='image' name='image' onChange={(e) => handleChooseImage(e)} />
-                        </p>
-                        {
-                            avatar && <img src={avatar.preview} />
-                        }
-                    </div>
+                        <Form.Item
+                            label="Tên"
+                            name="title"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Nội dung này không được để trống',
+                                },
+                            ]}
+                        >
+                            <Input placeholder='Nhập tên sản phẩm' />
+                        </Form.Item>
 
-                    <div className={cx('buttons')}>
-                        <p>
-                            <Button primary>Thêm</Button>
-                        </p>
-                    </div>
-                </form>
+                        <Form.Item
+                            label="Tác giả"
+                            name="author"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Nội dung này không được để trống',
+                                },
+                            ]}
+                        >
+                            <Input placeholder='Nhập tên tác giả' />
+                        </Form.Item>
+
+                        <Form.Item
+                            label="Giá hiện tại"
+                            name="price"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Nội dung này không được để trống',
+                                },
+                            ]}
+                        >
+                            <Input placeholder='Nhập giá hiện tại' />
+                        </Form.Item>
+
+                        <Form.Item
+                            label="Giá cũ"
+                            name="old_price"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Nội dung này không được để trống',
+                                },
+                            ]}
+                        >
+                            <Input placeholder='Nhập giá cũ' />
+                        </Form.Item>
+
+                        <p className={cx('label')}></p>
+                        <div className="flex items-center">
+                            <p className={cx('label')}>Loại sản phẩm</p>
+                            <div className="flex flex-[20] justify-start">
+                                <Dropdown
+                                    position="top-right"
+                                    title={categoryName.name}
+                                    menuClassName={cx("dropmenu")}
+                                    buttonClassName={cx("category")}
+                                    buttonVariant="special-success"
+                                    wrapperClassName={cx("submenu")}
+                                >
+                                    {
+                                        options.map((option, index) => (
+                                            <Dropdown.Item key={index}>
+                                                {option._id}
+                                                <Dropdown.Submenu
+                                                    position="right-top"
+                                                    className={cx("submenu")}
+                                                >
+                                                    {
+                                                        option.categories.map((category, index) => (
+                                                            <Dropdown.Item key={index} onClick={() => setCategoryName({ name: category.name, value: category._id })}>
+                                                                {category.name}
+                                                            </Dropdown.Item>
+                                                        ))
+                                                    }
+                                                </Dropdown.Submenu>
+                                            </Dropdown.Item>
+                                        ))
+                                    }
+                                </Dropdown>
+                            </div>
+                        </div>
+                        <p className={cx('label')}></p>
+                        <div className="flex items-center">
+                            <p className={cx('label')}>Năm xuất bản</p>
+                            <div className="flex flex-[20] justify-start">
+                                <DatePicker
+                                    onChange={changeDate}
+                                />
+                            </div>
+                        </div>
+                        <Form.Item
+                            label="Mô tả"
+                            name="desciption"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Nội dung này không được để trống',
+                                },
+                            ]}
+                        >
+                            <Input.TextArea
+                                placeholder='Mô tả sản phẩm...'
+                                rows={5}
+                            />
+                        </Form.Item>
+                        <div className='flex items-center mb-[20px]'>
+                            <p className={cx('label')}>Hình ảnh</p>
+                            <div className={cx('avatar')}>
+                                <p className={cx('edit_avatar')}>
+                                    <label for="image">
+                                        <AccountCircleIcon className={cx('icon')} />
+                                        Chọn
+                                    </label>
+                                    <input type="file" id='image' name='image' onChange={(e) => handleChooseImage(e)} />
+                                </p>
+                                {
+                                    avatar && <img src={avatar.preview} />
+                                }
+                            </div>
+                        </div>
+                        <Form.Item
+                            wrapperCol={{
+                                offset: 8,
+                                span: 16,
+                            }}
+                        >
+                            <Button type="primary" htmlType="submit">
+                                Thêm
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                </div>
             </Dialog>
             <Backdrop
                 sx={{ color: '#fff', zIndex: 10000 }}
@@ -546,17 +449,22 @@ function Product() {
                 </p>
             </div>
             {
-                loading &&
+                loadingProduct &&
                 <div>
                     <LinearProgress />
                 </div>
             }
             {
-                rows.length > 0 ? <div className={cx('table')}>
+                loadingProduct === false ? <div className={cx('table')}>
                     <EnhancedTable columns={columns} rows={rows} />
                 </div>
-                    : <div className={cx('nodata')}>
-                        <p className={cx('nodata_label')}>Dữ liệu trống!</p>
+                    : <div className="mt-[20px]">
+                        <Skeleton
+                            active
+                            paragraph={{
+                                rows: 8,
+                            }}
+                        />
                     </div>
             }
         </div>

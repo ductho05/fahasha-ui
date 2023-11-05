@@ -5,7 +5,10 @@ import numeral from 'numeral'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleLeft } from '@fortawesome/free-solid-svg-icons'
 import styles from './OrderDetail.module.scss'
-import { api } from '../../constants'
+import { api, appPath, cancelOrderImage, CHOXACNHAN, DAHUY } from '../../constants'
+import { Button, Popconfirm, message } from 'antd';
+import SendNotification from "../../service/SendNotification"
+import { useStore } from "../../stores/hooks"
 
 const cx = classNames.bind(styles)
 function OrderDetail() {
@@ -14,6 +17,7 @@ function OrderDetail() {
     const navigate = useNavigate()
     const [order, setOrder] = useState({})
     const [orderItems, setOrderItems] = useState([])
+    const [state, dispach] = useStore()
 
     useEffect(() => {
         document.title = 'Chi tiết đơn hàng'
@@ -48,6 +52,38 @@ function OrderDetail() {
         navigate(`/account/${1}`)
     }
 
+    const handleUpdate = () => {
+        fetch(`${api}/orders/update/${order._id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                _id: order._id,
+                status: DAHUY
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status === "OK") {
+                        const title = "Thông báo đơn hàng"
+                        const description = `${state.user.fullName} vừa hủy đơn hàng`
+                        const image = cancelOrderImage
+                        const url = `${appPath}/admin/orders`
+                        message.success("Đã hủy đơn hàng")
+                        SendNotification("admin", {
+                            title,
+                            description,
+                            image,
+                            url
+                        })
+                    } else {
+                        message.error("Lỗi hủy đơn hàng")
+                    }
+                })
+                .catch(err => message.error("Lỗi hủy đơn hàng"))
+        })
+    }
+
     return (
         <div className={cx('wrapper')}>
             <div className={cx('heading')}>
@@ -64,6 +100,22 @@ function OrderDetail() {
                     <p className={cx('name')}>{order.name}</p>
                     <p className={cx('phone')}>{order.phone}</p>
                     <p className={cx('address')}>{`${order.address}, ${order.wards}, ${order.districs}, ${order.city}, ${order.country}`}</p>
+                    {
+                        order.status === CHOXACNHAN &&
+                        <Popconfirm
+                            title="Xác nhận hủy"
+                            description="Đơn hàng sẽ bị hủy"
+                            onConfirm={handleUpdate}
+                            onCancel={() => { }}
+                            okText="Đồng ý"
+                            cancelText="Hủy"
+                        >
+                            <Button className="mt-[20px]" type="primary" danger>
+                                Hủy đơn hàng
+                            </Button>
+                        </Popconfirm>
+
+                    }
                 </div>
 
                 <div className={cx('right')}>

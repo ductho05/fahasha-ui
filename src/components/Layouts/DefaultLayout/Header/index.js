@@ -27,6 +27,7 @@ import { Input } from '@mui/material';
 import LoginWithFacebook from '../../../LoginWithFacebook';
 import { Skeleton } from '@mui/material';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { seeNotice } from '../../../../stores/actions';
 
 const cx = classNames.bind(styles);
 
@@ -49,6 +50,7 @@ function Header() {
     const [state, dispatch] = useStore();
     const [user, setUser] = useState({});
     const [notice, setNotice] = useState([]);
+    const [numNoticeNoAccess, setNumNoticeNoAccess] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const productQuality = 7;
 
@@ -56,7 +58,35 @@ function Header() {
         if (state.user) {
             setUser(state.user);
         }
+        fetch(`${api}/webpush/get`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id: state.user._id
+            })
+        })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === "OK") {
+                    setNotice(result.data)
+                }
+            })
+            .catch(err => {
+                console.error(err)
+            })
     }, [state]);
+
+    useEffect(() => {
+        const num = notice.reduce((acc, item) => {
+            if (item.isAccess === false) {
+                return acc + 1;
+            }
+
+            return acc
+        }, 0)
+
+        setNumNoticeNoAccess(num)
+    }, [notice])
     useEffect(() => {
         const handleScroll = () => {
             if (window.scrollY > 0) {
@@ -220,6 +250,23 @@ function Header() {
     const handlLoaded = () => {
         setIsLoading(false);
     };
+
+    const updateNotification = (id) => {
+        fetch(`${api}/webpush/update`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: id })
+        })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === "OK") {
+                    dispatch(seeNotice())
+                }
+            })
+            .catch(err => {
+                console.err(err)
+            })
+    }
 
     return (
         <>
@@ -405,7 +452,7 @@ function Header() {
                                                     <div
                                                         className={
                                                             products.length > 0 ||
-                                                            localstorage.get('historys').length <= 0
+                                                                localstorage.get('historys').length <= 0
                                                                 ? cx('hide')
                                                                 : cx('keywords_hot')
                                                         }
@@ -534,63 +581,34 @@ function Header() {
                                                         <Button onClick={handleRegister}>Đăng ký</Button>
                                                     </div>
 
-                                                    <ul className={notice.lenth > 0 ? cx('notice_list') : cx('hide')}>
-                                                        <li className={cx('notice_item')}>
-                                                            <div className={cx('notice_icon')}>
-                                                                <p className={cx('notice_no_read')}></p>
-                                                                <img src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/customer/ico_noti_other.svg" />
-                                                            </div>
-                                                            <div className={cx('notice_body')}>
-                                                                <h5 className={cx('notice_title')}>
-                                                                    Hè vui chơi không rơi kiến thức{' '}
-                                                                </h5>
-                                                                <p className={cx('notice_content')}>
-                                                                    Bút chấm đọc - học tiếng anh Tân Việt - Kho sách
-                                                                    bách khoa gieo mầm tri thức - và nhiều sản phẩm hấp
-                                                                    dẫn khác giảm đến 50%
-                                                                </p>
-                                                            </div>
-                                                        </li>
-                                                        <li className={cx('notice_item')}>
-                                                            <div className={cx('notice_icon')}>
-                                                                <p className={cx('notice_no_read')}></p>
-                                                                <img src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/customer/ico_noti_other.svg" />
-                                                            </div>
-                                                            <div className={cx('notice_body')}>
-                                                                <h5 className={cx('notice_title')}>
-                                                                    Hè vui chơi không rơi kiến thức{' '}
-                                                                </h5>
-                                                                <p className={cx('notice_content')}>
-                                                                    Bút chấm đọc - học tiếng anh Tân Việt - Kho sách
-                                                                    bách khoa gieo mầm tri thức - và nhiều sản phẩm hấp
-                                                                    dẫn khác giảm đến 50%
-                                                                </p>
-                                                            </div>
-                                                        </li>
-                                                        <li className={cx('notice_item')}>
-                                                            <div className={cx('notice_icon')}>
-                                                                <p className={cx('notice_no_read')}></p>
-                                                                <img src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/customer/ico_noti_other.svg" />
-                                                            </div>
-                                                            <div className={cx('notice_body')}>
-                                                                <h5 className={cx('notice_title')}>
-                                                                    Hè vui chơi không rơi kiến thức{' '}
-                                                                </h5>
-                                                                <p className={cx('notice_content')}>
-                                                                    Bút chấm đọc - học tiếng anh Tân Việt - Kho sách
-                                                                    bách khoa gieo mầm tri thức - và nhiều sản phẩm hấp
-                                                                    dẫn khác giảm đến 50%
-                                                                </p>
-                                                            </div>
-                                                        </li>
+                                                    <ul className={notice.length <= 0 || Object.keys(state.user) <= 0 ? cx('hide') : cx('notice_list')}>
+                                                        {
+                                                            notice.map((item, index) => (
+                                                                <Link
+                                                                    to={item.notification.url}
+                                                                    key={index}
+                                                                    className={cx('notice_item')}
+                                                                    onClick={() => updateNotification(item._id)}
+                                                                >
+                                                                    <div className={cx('notice_icon')}>
+                                                                        {item.isAccess === false && <p className={cx('notice_no_read')}></p>}
+                                                                        <img src={item.notification.image} />
+                                                                    </div>
+                                                                    <div className={cx('notice_body')}>
+                                                                        <h5 className={cx('notice_title')}>
+                                                                            {item.notification.title}
+                                                                        </h5>
+                                                                        <p className={cx('notice_content')}>
+                                                                            {item.notification.description}
+                                                                        </p>
+                                                                    </div>
+                                                                </Link>
+                                                            ))
+                                                        }
                                                     </ul>
 
                                                     <div
-                                                        className={
-                                                            notice.lenth > 0 || Object.keys(user).length == 0
-                                                                ? cx('hide')
-                                                                : cx('notice_empty')
-                                                        }
+                                                        className={notice.length >= 0 || Object.keys(state.user) ? cx('hide') : cx('notice_empty')}
                                                     >
                                                         <p>Bạn chưa có thông báo nào</p>
                                                     </div>
@@ -602,7 +620,7 @@ function Header() {
                                     <div className={cx('notification', 'hide-on-tablet-mobile')}>
                                         <img src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/ico_noti_gray.svg" />
                                         <label>Thông báo</label>
-                                        <p className={Object.keys(user).length > 0 ? cx('num_carts') : cx('hide')}>0</p>
+                                        <p className={Object.keys(user).length > 0 ? cx('num_carts') : cx('hide')}>{numNoticeNoAccess}</p>
                                     </div>
                                 </Tippy>
 

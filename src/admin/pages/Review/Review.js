@@ -5,7 +5,7 @@ import EnhancedTable from '../../components/Table/EnhancedTable';
 import { Rating } from '@mui/material';
 import { api } from '../../../constants';
 import LinearProgress from '@mui/material/LinearProgress';
-import { Backdrop } from "@mui/material"
+import { Skeleton } from 'antd';
 
 const cx = classNames.bind(styles);
 
@@ -66,10 +66,6 @@ function Review() {
 
     return (
         <div className={cx('wrapper')}>
-            <Backdrop
-                sx={{ color: '#fff', zIndex: 10000 }}
-                open={loading}
-            />
             <div className={cx('heading')}>
                 <h3>Quản lý đánh giá</h3>
             </div>
@@ -82,12 +78,17 @@ function Review() {
             }
 
             {
-                rows.length > 0 ?
-                    <div className={cx('table')}>
-                        <EnhancedTable columns={columns} rows={rows} actions={{}} />
+                loading === false
+                    ? <div className={cx('table')}>
+                        <EnhancedTable columns={columns} rows={rows} />
                     </div>
-                    : <div className={cx('nodata')}>
-                        <p className={cx('nodata_label')}>Dữ liệu trống!</p>
+                    : <div className="mt-[20px]">
+                        <Skeleton
+                            active
+                            paragraph={{
+                                rows: 8,
+                            }}
+                        />
                     </div>
             }
         </div>

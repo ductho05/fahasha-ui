@@ -75,6 +75,7 @@ const tabList = [
                 id: 7,
                 icon: NotificationsNoneOutlinedIcon,
                 name: 'Thông báo',
+                link: '/admin/notifications'
             },
             {
                 id: 8,

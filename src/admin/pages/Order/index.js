@@ -8,11 +8,11 @@ import { Backdrop } from '@mui/material';
 import { toast, ToastContainer } from 'react-toastify'
 import "react-toastify/dist/ReactToastify.css";
 import StatusOrder from '../../components/StatusOrder';
-import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import { Delete, View } from '../../components/Button/Button';
-import { Link } from 'react-router-dom';
 import numeral from 'numeral';
+import { Popconfirm, Skeleton } from 'antd';
+import SendNotification from '../../../service/SendNotification'
+import { appPath, orderImages } from '../../../constants';
 
 const tabList = [
     {
@@ -42,6 +42,7 @@ function Order() {
     const [rows, setRows] = React.useState([])
     const [currentIndex, setCurrentIndex] = React.useState(0)
     const [loading, setLoading] = React.useState(false)
+    const [loadingOrder, setLoadingOrder] = React.useState(false)
     const [isUpdate, setIsUpdate] = React.useState(false)
     const columns = [
         {
@@ -57,6 +58,7 @@ function Order() {
             headerName: 'Tài khoản',
             sortable: false,
             editable: true,
+            width: 160,
             renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value?.fullName : "Trống"}</p>
         },
         {
@@ -142,6 +144,24 @@ function Order() {
                                 if (result.status === 'OK') {
                                     setIsUpdate(prev => !prev)
                                     toast.success('Cập nhật thành công!')
+                                    let description = ""
+                                    if (result.data.status === DANGGIAO) {
+                                        description = "Đơn hàng của bạn đang trên đường giao. Hãy để ý điện thoại nhé!"
+                                    } else if (result.data.status === HOANTHANH) {
+                                        description = "Đơn hàng của bạn đã được giao thành công!"
+                                    }
+                                    const url = `${appPath}/account/order/detail/${result.data._id}`
+                                    const title = "Thông báo đơn hàng"
+                                    const user = result.data.user
+
+                                    SendNotification("personal", {
+                                        title,
+                                        description,
+                                        image: orderImages,
+                                        url,
+                                        user
+                                    })
+
                                 } else {
                                     toast.error(result.message)
                                 }
@@ -150,31 +170,24 @@ function Order() {
                                 toast.error(err.message)
                             })
                     } else {
-                        toast.error("Lỗi! Không tìm thấy trạng thái đơn hàng")
+                        toast.error("Không tìm thấy trạng thái đơn hàng")
                     }
                 }
 
                 return <div style={{ display: 'flex' }} onClick={handleOnCLick}>
-                    <p onClick={() => {
-                        confirmAlert({
-                            title: 'Xác nhận cập nhật?',
-                            message: 'Đơn hàng sẽ được cập nhật trạng thái!',
-                            buttons: [
-                                {
-                                    label: 'Đồng ý',
-                                    onClick: () => {
-                                        handleUpdate()
-                                    }
-                                },
-                                {
-                                    label: 'Hủy',
-                                    onClick: () => { }
-                                }
-                            ]
-                        });
-                    }}>
-                        <StatusOrder status={params.row.status} />
-                    </p>
+                    <Popconfirm
+                        title="Xác nhận?"
+                        description="Đơn hàng sẽ được cập nhật trạng thái"
+                        onConfirm={handleUpdate}
+                        onCancel={() => { }}
+                        okText="Đồng ý"
+                        cancelText="Hủy"
+                    >
+                        <p>
+                            <StatusOrder status={params.row.status} />
+                        </p>
+                    </Popconfirm>
+
                 </div>
             }
         },
@@ -185,7 +198,7 @@ function Order() {
     }
 
     React.useEffect(() => {
-        setLoading(true)
+        setLoadingOrder(true)
         setRows([])
         let query = `${api}/orders/filter`
         if (tabList[currentIndex].value) {
@@ -200,15 +213,15 @@ function Order() {
             .then(response => response.json())
             .then(result => {
                 if (result.status === "OK") {
-                    setLoading(false)
+                    setLoadingOrder(false)
                     setRows(result.data)
                 } else {
-                    setLoading(false)
+                    setLoadingOrder(false)
                     toast.error(result.message)
                 }
             })
             .catch(error => {
-                setLoading(false)
+                setLoadingOrder(false)
                 toast.error(error.message)
             })
     }, [currentIndex, isUpdate])
@@ -234,7 +247,7 @@ function Order() {
                 <h3>Quản lý đơn hàng</h3>
             </div>
             {
-                loading &&
+                loadingOrder &&
                 <div>
                     <LinearProgress />
                 </div>
@@ -253,12 +266,17 @@ function Order() {
                 }
             </ul>
             {
-                rows.length > 0
+                loadingOrder === false
                     ? <div className={cx('table')}>
                         <EnhancedTable columns={columns} rows={rows} />
                     </div>
-                    : <div className={cx('nodata')}>
-                        <p className={cx('nodata_label')}>Dữ liệu trống!</p>
+                    : <div className="mt-[20px]">
+                        <Skeleton
+                            active
+                            paragraph={{
+                                rows: 8,
+                            }}
+                        />
                     </div>
             }
         </div>

@@ -20,6 +20,7 @@ import Order from '../admin/pages/Order';
 import Product from '../admin/pages/Product';
 import UpdateProduct from '../admin/pages/UpdateProduct';
 import FlashSale from '../admin/pages/UseFul/FlashSale';
+import Notifications from '../admin/pages/Notifications'
 import FlashSaleDetail from '../admin/pages/UseFul/FlashSale/FlashSaleDetail';
 
 // Public Routes
@@ -56,7 +57,9 @@ const adminRoutes = [
     { path: '/admin/orders', component: Order },
     { path: '/admin/products', component: Product },
     { path: '/admin/update-product/:pid', component: UpdateProduct },
-];
+    { path: '/admin/notifications', component: Notifications },
+
+]
 
 const notFoundRoute = { path: '*', component: Page404 };
 

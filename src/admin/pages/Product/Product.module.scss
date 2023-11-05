@@ -54,8 +54,7 @@
     height: 35px;
     border-radius: 4px;
     color: rgb(0, 223, 162);
-    background-color: rgba(0, 223, 162, 0.2);
-    border: 1px solid rgb(0, 223, 162);
+    border: 1px solid #00dfa2;
     font-weight: 600;
     cursor: pointer;
     margin-right: 10px;
@@ -79,7 +78,7 @@
 
 // Dialog
 .dialog_add_user {
-    padding: 10px 20px;
+    padding: 40px 20px 10px 20px;
     width: 40vw;
 }
 
@@ -98,16 +97,19 @@
 }
 
 .label {
-    font-size: 1.6rem;
-    color: #333;
-    text-align: left;
-    font-weight: 500;
+    font-size: 1.4rem;
+    color: #000;
+    text-align: right;
+    font-weight: 400;
     margin-bottom: 10px;
+    flex: 4;
+    margin-right: 10px;
 }
 
 .avatar {
     display: flex;
     align-items: center;
+    flex: 20;
 
     img {
         width: 100px;
