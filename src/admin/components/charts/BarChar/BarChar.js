@@ -21,8 +21,10 @@ import {
     MinusCircleOutlined,
     SyncOutlined,
 } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 function BarChartExample({ data }) {
     const cx = classNames.bind(styles);
+    const navigate = useNavigate();
 
     const [isToggle, setIsToggle] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -68,6 +70,7 @@ function BarChartExample({ data }) {
     newData > 10 && newData.splice(10, newData.length - 10);
     const dataChart = newData.map((item) => {
         return {
+            id: item._id,
             name: item?.product.title,
             sold: item?.sold_sale,
             imageURL: item?.product.images,
@@ -195,6 +198,9 @@ function BarChartExample({ data }) {
                             fill="#8884d8"
                             style={{
                                 cursor: 'pointer',
+                            }}
+                            onClick={(data) => {
+                                navigate(`/admin/flashsale/${data.id}`);
                             }}
                         />
                     </BarChart>

@@ -10,6 +10,7 @@ const cx = classname.bind(styles);
 function Item(props) {
     const navigate = useNavigate();
     const { item, index } = props;
+    console.log('item', item);
     const restAPI = 'https://backoffice.nodemy.vn';
     function GetCoupon(price, priceSale) {
         var coupon = 100 - Math.floor((price / priceSale) * 100);
@@ -28,7 +29,7 @@ function Item(props) {
                     e.currentTarget.childNodes[0].style.transform = 'scale(1.0)';
                     e.currentTarget.childNodes[1].childNodes[0].style.color = '#000';
                 }}
-                onClick={() => navigate(`/detail/${item.attributes.slug}`)}
+                onClick={() => navigate(`/product-detail/${item.product?._id}`)}
                 className={cx('item-gift')}
             >
                 <LazyLoadImage
@@ -38,30 +39,24 @@ function Item(props) {
                         width: '98%',
                     }}
                     effect="blur"
-                    src={
-                        item.attributes.image?.data
-                            ? restAPI + item.attributes.image.data[0].attributes.url
-                            : 'https://backoffice.nodemy.vn/uploads/r5_3050_1ca8d2e294ca4a3c8c875ac518beb714_large_4c8a4d705f.webp'
-                    }
+                    src={item.product?.images}
                 />
                 <div className={cx('item-content')}>
-                    <div className={cx('item-content__title')}>{item.attributes.name}</div>
+                    <div className={cx('item-content__title')}>{item.product?.title}</div>
                     <div className={cx('item-content__price')}>
                         <div className={cx('price__new')}>
-                            {numeral(item.attributes.price).format('0,0')}
+                            {numeral(item.product?.old_price * (1 - item.current_sale / 100)).format('0,0')}
                             <span>đ</span>
                         </div>
                         <div className={cx('price__old')}>
-                            <div className={cx('price')}>{numeral(item.attributes.oldPrice).format('0,0') + 'đ'}</div>
-                            <div className={cx('sale')}>
-                                {GetCoupon(item.attributes.price, item.attributes.oldPrice)}
-                            </div>
+                            <div className={cx('price')}>{numeral(item.product?.old_price).format('0,0') + 'đ'}</div>
+                            <div className={cx('sale')}>{`-${item.current_sale}%`}</div>
                         </div>
                     </div>
                     <div style={{ position: 'relative' }}>
                         <Progress
-                            percent={(Math.floor(20 - item.attributes.quantityAvailable) * 100) / 20}
-                            format={(percent) => `${(percent * 20) / 100}/20`}
+                            percent={(Math.floor(item.num_sale - item.sold_sale) * 100) / 20}
+                            format={(percent) => `${(percent * item.num_sale) / 100}/${item.num_sale}`}
                             status="active"
                             showInfo={false}
                             strokeWidth={25}
@@ -89,7 +84,7 @@ function Item(props) {
                                 textAlign: 'center',
                             }}
                         >
-                            {`Đã bán ${20 - item.attributes.quantityAvailable}/20`}
+                            {`Đã bán ${item.sold_sale}/${item.num_sale}`}
                         </div>
                     </div>
                 </div>
