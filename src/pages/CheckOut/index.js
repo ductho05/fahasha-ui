@@ -6,7 +6,7 @@ import { faCircleXmark, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames/bind';
 import styles from './CheckOut.module.scss';
 import { useForm, useController } from 'react-hook-form';
-import { apiProvinces, api } from '../../constants';
+import { apiProvinces, api, orderImages, appPath } from '../../constants';
 import { Link, useNavigate, Redirect, useLocation } from 'react-router-dom';
 import numeral from 'numeral';
 import { apiMaps, API_KEY, locationShop } from '../../constants';
@@ -16,6 +16,7 @@ import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import Page404 from '../Page404';
+import SendNotification from '../../service/SendNotification';
 
 const cx = classNames.bind(styles);
 function CheckOut() {
@@ -136,12 +137,23 @@ function CheckOut() {
                         setShowProgress(false);
                         setOrder(order);
                     }
+                    const title = "Thông báo đơn hàng"
+                    const description = `${state.user.fullName} vừa đặt đơn hàng mới. Chuẩn bị hàng thôi!`
+                    const image = orderImages
+                    const url = `${appPath}/admin/orders`
+
+                    SendNotification("admin", {
+                        title,
+                        description,
+                        image,
+                        url
+                    })
                 } else {
                     setShowProgress(false);
                     navigate(`/order-success/err-E99`);
                 }
             })
-            .catch((err) => {});
+            .catch((err) => { });
     };
 
     // Chuyển hướng đến trang khác sau khi thanh toán bên VNpay

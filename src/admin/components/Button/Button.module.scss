@@ -7,6 +7,7 @@
     cursor: pointer;
     border-radius: 4px;
     margin-right: 16px;
+    border: 1px solid transparent;
 }
 
 .icon {
@@ -20,11 +21,11 @@
 }
 
 .delete {
-    background-color: var(--primary-color);
-    color: #fff;
+    border-color: var(--primary-color);
+    color: var(--primary-color);
 }
 
 .edit {
-    background-color: #73aafa;
-    color: #fff;
+    border-color: #73aafa;
+    color: #73aafa;
 }

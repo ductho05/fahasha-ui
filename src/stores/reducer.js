@@ -1,4 +1,4 @@
-import { REGISTER, LOGIN, LOGOUT, UPDATE, NOACTION } from './constants';
+import { REGISTER, LOGIN, LOGOUT, UPDATE, NOACTION, SEENOTICE } from './constants';
 import { api } from '../constants';
 import localstorge from './localstorge';
 
@@ -42,7 +42,7 @@ function Reducer(state, action) {
 
         case LOGIN:
             localstorge.set(action.payload.token);
-         
+
             return {
                 ...state,
                 user: action.payload.data,
@@ -71,6 +71,12 @@ function Reducer(state, action) {
             return {
                 ...state,
                 action: '',
+            };
+
+        case SEENOTICE:
+            return {
+                ...state,
+                action: SEENOTICE,
             };
         default:
             throw new Error(`Invalid action ${action.type}`);

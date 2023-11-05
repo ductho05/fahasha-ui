@@ -27,7 +27,7 @@ function App() {
     const Page404 = notFoundRoute.component;
     const [api, contextHolder] = notification.useNotification();
 
-    ServiceWorkerNotifi()
+    // ServiceWorkerNotifi()
 
     return (
         <BrowserRouter>

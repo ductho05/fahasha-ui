@@ -10,18 +10,20 @@ import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import styles from './RegisterLogin.module.scss';
 import Button from '../../Button';
 import { useStore } from '../../../stores/hooks';
-import { api } from '../../../constants';
+import { api, appPath, registerImages } from '../../../constants';
 import { register, login, noAction } from '../../../stores/actions';
 import { LOGIN, REGISTER } from '../../../stores/constants';
 import { Dialog, Backdrop, CircularProgress } from '@mui/material';
 
 // Firebase
-import { signInWithPopup, signInWithRedirect } from 'firebase/auth';
+import { signInWithPopup } from 'firebase/auth';
 import { auth, provider } from '../../../FirebaseConfig';
 import LoginWithFacebook from '../../LoginWithFacebook';
 
 import { WarningOutlined } from '@ant-design/icons';
 import { notification } from 'antd';
+import ServiceWorkerNotifi from '../../../service/ServiceWorkerNotifi';
+import SendNotification from '../../../service/SendNotification'
 
 const cx = classNames.bind(styles);
 function RegisterLogin(props) {
@@ -133,9 +135,9 @@ function RegisterLogin(props) {
             pattern:
                 indexActive === 1
                     ? {
-                          value: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/,
-                          message: 'Vui lòng nhập: trên 8 ký tự. Chứa 0-9, a-z, A-Z và 1 ký tự đặc biệt',
-                      }
+                        value: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/,
+                        message: 'Vui lòng nhập: trên 8 ký tự. Chứa 0-9, a-z, A-Z và 1 ký tự đặc biệt',
+                    }
                     : {},
         },
     });
@@ -176,6 +178,7 @@ function RegisterLogin(props) {
                         setShowDialog(true);
                     } else if (result.message == 'Login Succsess') {
                         dispatch(login(result));
+                        ServiceWorkerNotifi()
                     }
                 }
             })
@@ -225,6 +228,18 @@ function RegisterLogin(props) {
                     setShowProgress(false);
                     props.setShowForm(false);
                     dispatch(register(result));
+
+                    const title = "Thông báo tài khoản"
+                    const description = "Khách hàng vừa đăng ký tài khoản mới"
+                    const image = registerImages
+                    const url = `${appPath}/admin/user`
+
+                    SendNotification("admin", {
+                        title,
+                        description,
+                        image,
+                        url
+                    })
                 } else if (result.status == 'Falure' && result.message == 'User is already') {
                     setShowProgress(false);
                     setShowDialogRegister(true);
@@ -301,8 +316,8 @@ function RegisterLogin(props) {
     const handleLoginFacebook = (event) => {
         event.preventDefault();
         signInWithPopup(auth, provider)
-            .then((result) => {})
-            .catch((err) => {});
+            .then((result) => { })
+            .catch((err) => { });
     };
 
     return (

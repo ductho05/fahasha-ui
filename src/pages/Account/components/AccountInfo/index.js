@@ -15,8 +15,10 @@ import Backdrop from '@mui/material/Backdrop'
 import CircularProgress from '@mui/material/CircularProgress'
 import { toast, ToastContainer } from 'react-toastify'
 import "react-toastify/dist/ReactToastify.css";
+import { Skeleton } from 'antd';
 
 const cx = classnames.bind(styles)
+
 function AccountInfo() {
     const navigate = useNavigate()
     const [errors, setErrors] = useState({})
@@ -34,6 +36,7 @@ function AccountInfo() {
     const [showError, setShowError] = useState(false)
     const [showProgressUpdate, setShowProgressUpdate] = useState(false)
     const [checked, setChecked] = useState(false)
+    const [loading, setLoading] = useState(false)
 
     const handleChangeFullName = (e) => {
         setUser(prev => {
@@ -83,6 +86,7 @@ function AccountInfo() {
     }
 
     useEffect(() => {
+        setLoading(true)
         fetch(`${api}/users/profile`, {
             method: 'POST',
             headers: {
@@ -95,7 +99,9 @@ function AccountInfo() {
                 if (result.status == 'OK') {
                     setUser(result.data)
                 }
+                setLoading(false)
             })
+            .catch(() => setLoading(false))
     }, [showProgressUpdate])
 
     const handleIncorectPass = () => {
@@ -441,165 +447,186 @@ function AccountInfo() {
                     </div>
                 </div>
             </Dialog>
-            <div className={cx('heading')}>
-                <h3>Thông tin tài khoản</h3>
-                <div className={cx('avatar')}>
-                    <img src={avatar ? avatar.preview : user.images} />
-                    <p className={cx('edit_avatar')}>
-                        <label for="image">Sửa</label>
-                        <input type="file" id='image' name='image' onChange={(e) => handleChooseImage(e)} />
-                    </p>
-                </div>
-            </div>
-            <div className={cx('form')}>
-                <div className={cx('form_group')}>
-                    <label className={cx('label')}>Họ tên*</label>
-                    <div className={cx('form_input')}>
-                        <input
-                            value={user.fullName}
-                            type="text"
-                            placeholder='Nhập họ tên'
-                            spellCheck={false}
-                            onChange={(e) => handleChangeFullName(e)}
-                        />
-                    </div>
-                </div>
-
-                <div className={cx('form_group')}>
-                    <label className={cx('label')}>Số điện thoại</label>
-                    <div className={cx('form_input')}>
-                        <input
-                            value={user.phoneNumber}
-                            type="text"
-                            placeholder='Chưa có số điện thoại'
-                            spellCheck={false} disabled
-                        />
-                        <p className={cx('btn')}>{user.phoneNumber != '' ? 'Thay đổi' : 'Thêm mới'}</p>
-                    </div>
-                </div>
-
-                <div className={cx('form_group')}>
-                    <label className={cx('label')}>Email*</label>
-                    <div className={cx('form_input')}>
-                        <input
-                            value={user.email}
-                            type="text"
-                            placeholder='Chưa có email'
-                            spellCheck={false} disabled />
-                        <p onClick={handleChangeEmail} className={cx('btn')}>{user.email != '' ? 'Thay đổi' : 'Thêm mới'}</p>
-                    </div>
-                </div>
-
-                <div className={cx('form_group')}>
-                    <label className={cx('label')}>Giới tính*</label>
-                    <div className={cx('form_radio')}>
-                        <div className={cx('radio')}>
-                            <input
-                                id='radio'
-                                type="radio"
-                                checked={user.gender == 'male'}
-                                onChange={() => handleChangeGender('male')}
+            {
+                loading ?
+                    <>
+                        <div className={cx('heading')}>
+                            <Skeleton.Input active size={20} />
+                            <div className={cx('avatar')}>
+                                <Skeleton.Avatar active size={100} shape />
+                            </div>
+                        </div>
+                        <div className={cx('form')}>
+                            <Skeleton
+                                active
+                                paragraph={{
+                                    rows: 8
+                                }}
                             />
-                            <label for='radio'>Nam</label>
                         </div>
-
-                        <div className={cx('radio')}>
-                            <input
-                                id='radio_female'
-                                type="radio"
-                                checked={user.gender == 'female'}
-                                onChange={() => handleChangeGender('female')}
-                            />
-                            <label for='radio_female'>Nữ</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div className={cx('form_group')}>
-                    <label className={cx('label')}>Ngày sinh*</label>
-                    <div className={cx('form_input')}>
-                        <input
-                            value={user.birth}
-                            type="text"
-                            placeholder='ngày/tháng/năm'
-                            spellCheck={false}
-                            onChange={(e) => handleChangeBirth(e)}
-                        />
-                    </div>
-                </div>
-
-                <div className={cx('form_group')}>
-                    <label className={cx('label')}>Địa chỉ*</label>
-                    <div className={cx('form_input')}>
-                        <input
-                            value={user.address}
-                            type="text"
-                            placeholder='Nhập địa chỉ'
-                            spellCheck={false}
-                            onChange={(e) => handleChangeAddress(e)}
-                        />
-                    </div>
-                </div>
-
-                <div className={cx('form_checkbox')}>
-                    <input
-                        id='change'
-                        type="checkbox"
-                        value={checked}
-                        onChange={() => setChecked(!checked)}
-                    />
-                    <label className={cx('label_checkbox')} for="change" >Đổi mật khẩu</label>
-                    <div className={cx('change_password')}>
-                        <div className={cx('form_group')}>
-                            <label className={cx('label')}>Mật khẩu hiện tại*</label>
-                            <div className={cx('form_input')}>
-                                <input
-                                    value={currentPassword}
-                                    type="text"
-                                    placeholder='Mật khẩu hiện tại'
-                                    spellCheck={false}
-                                    onChange={(e) => handleChangeCurrentPassword(e)}
-                                />
+                    </>
+                    : <>
+                        <div className={cx('heading')}>
+                            <h3>Thông tin tài khoản</h3>
+                            <div className={cx('avatar')}>
+                                <img src={avatar ? avatar.preview : user.images} />
+                                <p className={cx('edit_avatar')}>
+                                    <label for="image">Sửa</label>
+                                    <input type="file" id='image' name='image' onChange={(e) => handleChooseImage(e)} />
+                                </p>
                             </div>
                         </div>
-
-                        <div className={cx('form_group')}>
-                            <label className={cx('label')}>Mật khẩu mới*</label>
-                            <div className={cx('form_input')}>
-                                <input
-                                    value={password}
-                                    type={toggleName ? "text" : "password"}
-                                    placeholder='Mật khẩu mới'
-                                    spellCheck={false}
-                                    onChange={(e) => handlePassword(e)}
-                                />
-                                <p onClick={handleToggle} className={cx('btn')}>{toggleName ? 'Ẩn' : 'Hiện'}</p>
+                        <div className={cx('form')}>
+                            <div className={cx('form_group')}>
+                                <label className={cx('label')}>Họ tên*</label>
+                                <div className={cx('form_input')}>
+                                    <input
+                                        value={user.fullName}
+                                        type="text"
+                                        placeholder='Nhập họ tên'
+                                        spellCheck={false}
+                                        onChange={(e) => handleChangeFullName(e)}
+                                    />
+                                </div>
                             </div>
-                        </div>
-                        <p className={cx('form_error')}>{errors?.password?.message}</p>
 
-                        <div className={cx('form_group')}>
-                            <label className={cx('label')}>Nhập lại mật khẩu mới*</label>
-                            <div className={cx('form_input')}>
-                                <input
-                                    value={confirmPassword}
-                                    type={toggleName ? "text" : "password"}
-                                    placeholder='Nhập lại mật khẩu mới'
-                                    spellCheck={false}
-                                    onChange={(e) => handleConfirm(e)}
-                                />
-                                <p onClick={handleToggle} className={cx('btn')}>{toggleName ? 'Ẩn' : 'Hiện'}</p>
+                            <div className={cx('form_group')}>
+                                <label className={cx('label')}>Số điện thoại</label>
+                                <div className={cx('form_input')}>
+                                    <input
+                                        value={user.phoneNumber}
+                                        type="text"
+                                        placeholder='Chưa có số điện thoại'
+                                        spellCheck={false} disabled
+                                    />
+                                    <p className={cx('btn')}>{user.phoneNumber != '' ? 'Thay đổi' : 'Thêm mới'}</p>
+                                </div>
                             </div>
+
+                            <div className={cx('form_group')}>
+                                <label className={cx('label')}>Email*</label>
+                                <div className={cx('form_input')}>
+                                    <input
+                                        value={user.email}
+                                        type="text"
+                                        placeholder='Chưa có email'
+                                        spellCheck={false} disabled />
+                                    <p onClick={handleChangeEmail} className={cx('btn')}>{user.email != '' ? 'Thay đổi' : 'Thêm mới'}</p>
+                                </div>
+                            </div>
+
+                            <div className={cx('form_group')}>
+                                <label className={cx('label')}>Giới tính*</label>
+                                <div className={cx('form_radio')}>
+                                    <div className={cx('radio')}>
+                                        <input
+                                            id='radio'
+                                            type="radio"
+                                            checked={user.gender == 'male'}
+                                            onChange={() => handleChangeGender('male')}
+                                        />
+                                        <label for='radio'>Nam</label>
+                                    </div>
+
+                                    <div className={cx('radio')}>
+                                        <input
+                                            id='radio_female'
+                                            type="radio"
+                                            checked={user.gender == 'female'}
+                                            onChange={() => handleChangeGender('female')}
+                                        />
+                                        <label for='radio_female'>Nữ</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className={cx('form_group')}>
+                                <label className={cx('label')}>Ngày sinh*</label>
+                                <div className={cx('form_input')}>
+                                    <input
+                                        value={user.birth}
+                                        type="text"
+                                        placeholder='ngày/tháng/năm'
+                                        spellCheck={false}
+                                        onChange={(e) => handleChangeBirth(e)}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className={cx('form_group')}>
+                                <label className={cx('label')}>Địa chỉ*</label>
+                                <div className={cx('form_input')}>
+                                    <input
+                                        value={user.address}
+                                        type="text"
+                                        placeholder='Nhập địa chỉ'
+                                        spellCheck={false}
+                                        onChange={(e) => handleChangeAddress(e)}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className={cx('form_checkbox')}>
+                                <input
+                                    id='change'
+                                    type="checkbox"
+                                    value={checked}
+                                    onChange={() => setChecked(!checked)}
+                                />
+                                <label className={cx('label_checkbox')} for="change" >Đổi mật khẩu</label>
+                                <div className={cx('change_password')}>
+                                    <div className={cx('form_group')}>
+                                        <label className={cx('label')}>Mật khẩu hiện tại*</label>
+                                        <div className={cx('form_input')}>
+                                            <input
+                                                value={currentPassword}
+                                                type="text"
+                                                placeholder='Mật khẩu hiện tại'
+                                                spellCheck={false}
+                                                onChange={(e) => handleChangeCurrentPassword(e)}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className={cx('form_group')}>
+                                        <label className={cx('label')}>Mật khẩu mới*</label>
+                                        <div className={cx('form_input')}>
+                                            <input
+                                                value={password}
+                                                type={toggleName ? "text" : "password"}
+                                                placeholder='Mật khẩu mới'
+                                                spellCheck={false}
+                                                onChange={(e) => handlePassword(e)}
+                                            />
+                                            <p onClick={handleToggle} className={cx('btn')}>{toggleName ? 'Ẩn' : 'Hiện'}</p>
+                                        </div>
+                                    </div>
+                                    <p className={cx('form_error')}>{errors?.password?.message}</p>
+
+                                    <div className={cx('form_group')}>
+                                        <label className={cx('label')}>Nhập lại mật khẩu mới*</label>
+                                        <div className={cx('form_input')}>
+                                            <input
+                                                value={confirmPassword}
+                                                type={toggleName ? "text" : "password"}
+                                                placeholder='Nhập lại mật khẩu mới'
+                                                spellCheck={false}
+                                                onChange={(e) => handleConfirm(e)}
+                                            />
+                                            <p onClick={handleToggle} className={cx('btn')}>{toggleName ? 'Ẩn' : 'Hiện'}</p>
+                                        </div>
+                                    </div>
+                                    <p className={cx('form_error')}>{errors?.confirmPassword?.message}</p>
+                                </div>
+                            </div>
+
+                            <p className={cx('btn_edit')}>
+                                <p onClick={handleUpdateUser}><Button primary>Lưu thay đổi</Button></p>
+                            </p>
+
                         </div>
-                        <p className={cx('form_error')}>{errors?.confirmPassword?.message}</p>
-                    </div>
-                </div>
-
-                <p className={cx('btn_edit')}>
-                    <p onClick={handleUpdateUser}><Button primary>Lưu thay đổi</Button></p>
-                </p>
-
-            </div>
+                    </>
+            }
         </div >
     )
 }

@@ -5,12 +5,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faStar } from '@fortawesome/free-solid-svg-icons'
 import Button from "../../Button"
 import { useStore } from "../../../stores/hooks"
-import { api } from "../../../constants"
+import { api, appPath } from "../../../constants"
 import { useNavigate } from 'react-router-dom'
 import { Backdrop, CircularProgress } from "@mui/material"
+import SendNotification from "../../../service/SendNotification"
+import { message } from 'antd';
 
 const cx = classNames.bind(styles)
-function EvaluateForm({ setShow, product, orderItem, setResult }) {
+function EvaluateForm({ setShow, product, orderItem }) {
 
     const navigate = useNavigate()
     const [rate, setRate] = useState(0)
@@ -58,22 +60,35 @@ function EvaluateForm({ setShow, product, orderItem, setResult }) {
                                 if (result.status == 'OK') {
                                     setShow(false)
                                     setShowProgress(false)
-                                    setResult(true)
+
                                 }
                             })
                     } else {
                         setShow(false)
                         setShowProgress(false)
-                        setResult(true)
+
                     }
+                    message.success("Đã đánh giá sản phẩm")
+
+                    const title = "Thông báo sản phẩm"
+                    const description = `${state.user.fullName} vừa đánh giá một sản phẩm. Xem ngay`
+                    const image = result.data.product.images
+                    const url = `${appPath}/product-detail/${result.data.product._id}/comments-detail`
+
+                    SendNotification("admin", {
+                        title,
+                        description,
+                        image,
+                        url
+                    })
                 } else {
                     setShow(false)
                     setShowProgress(false)
-                    setResult(false)
+                    message.error("Lỗi khi đánh giá sản phẩm")
                 }
             })
             .catch(err => {
-                console.log(err)
+                message.error("Lỗi khi đánh giá sản phẩm")
             })
     }
 

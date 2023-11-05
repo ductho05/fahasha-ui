@@ -11,19 +11,13 @@ import { toast, ToastContainer } from 'react-toastify'
 import "react-toastify/dist/ReactToastify.css";
 import { Link } from 'react-router-dom';
 import LinearProgress from '@mui/material/LinearProgress';
-import { Dialog, TextField, InputAdornment } from "@mui/material"
+import { Dialog } from "@mui/material"
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import DropMenu from "../../../components/DropMenu"
 import Button from "../../../components/Button"
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
-import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
-import { useForm } from "react-hook-form"
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DemoItem } from '@mui/x-date-pickers/internals/demo';
 import { CircularProgress, Backdrop } from "@mui/material"
+import { Input, Form, Skeleton, DatePicker, Popconfirm } from 'antd';
 
 const cx = classNames.bind(styles)
 
@@ -44,9 +38,8 @@ function Users() {
     const [rows, setRows] = useState([])
     const [avatar, setAvatar] = useState()
     const [showDialog, setShowDialog] = useState(false)
-    const [showPassword, setShowPassword] = useState(false)
     const [birth, setBirth] = useState()
-    const [loading, setLoading] = useState(false)
+    const [loadingUsers, setLoadingUsers] = useState(false)
     const [isAction, setIsAction] = useState(false)
     const [gender, setGender] = useState()
     const [isInsert, setIsInsert] = useState(false)
@@ -102,6 +95,7 @@ function Users() {
                 }
 
                 const handleDelete = () => {
+                    setIsInsert(true)
                     fetch(`${api}/users/delete/${params.value}`, {
                         method: 'DELETE'
                     })
@@ -113,33 +107,27 @@ function Users() {
                             } else {
                                 toast.error(result.message)
                             }
+                            setIsInsert(false)
                         })
                         .catch(err => {
                             toast.error(err.message)
+                            setIsInsert(false)
                         })
                 }
 
                 return <div style={{ display: 'flex' }} onClick={handleOnCLick}>
-                    <p onClick={() => {
-                        confirmAlert({
-                            title: 'Xác nhận xóa?',
-                            message: 'Tài khoản này sẽ bị xóa khỏi hệ thống!',
-                            buttons: [
-                                {
-                                    label: 'Đồng ý',
-                                    onClick: () => {
-                                        handleDelete()
-                                    }
-                                },
-                                {
-                                    label: 'Hủy',
-                                    onClick: () => { }
-                                }
-                            ]
-                        });
-                    }}>
-                        <Delete />
-                    </p>
+                    <Popconfirm
+                        title="Xác nhận?"
+                        description="Tài khoản sẽ bị xóa khỏi hệ thống"
+                        onConfirm={handleDelete}
+                        onCancel={() => { }}
+                        okText="Đồng ý"
+                        cancelText="Hủy"
+                    >
+                        <p>
+                            <Delete />
+                        </p>
+                    </Popconfirm>
                     <Link to={`/admin/user/${params.row._id}`}>
                         <View />
                     </Link>
@@ -148,23 +136,16 @@ function Users() {
         },
     ];
 
-    const {
-        register,
-        handleSubmit,
-        watch,
-        reset
-    } = useForm()
-
     useEffect(() => {
-        setLoading(true)
+        setLoadingUsers(true)
         fetch(`${api}/users`)
             .then(response => response.json())
             .then(result => {
-                setLoading(false)
+                setLoadingUsers(false)
                 setRows(result.data)
             })
             .catch(err => {
-                setLoading(false)
+                setLoadingUsers(false)
                 console.log(err)
             })
     }, [isAction])
@@ -188,7 +169,7 @@ function Users() {
         setGender(gender)
     }
 
-    const onSubmit = (data) => {
+    const onFinish = (data) => {
         const formData = new FormData()
         Object.keys(data).forEach(key => {
             formData.append(key, data[key])
@@ -205,7 +186,7 @@ function Users() {
         if (gender) {
             formData.append('gender', gender)
         }
-        setLoading(true)
+        setIsInsert(true)
         fetch(`${api}/users/insert`, {
             method: 'POST',
             body: formData
@@ -215,24 +196,30 @@ function Users() {
                 if (result.status === 'OK') {
                     setIsAction(prev => !prev)
                     setShowDialog(false)
-                    setLoading(false)
+                    setIsInsert(false)
                     toast.success("Thêm mới tài khoản thành công!")
                 } else {
                     setShowDialog(false)
-                    setLoading(false)
+                    setIsInsert(false)
                     toast.success(`Error! ${result.message}`)
                 }
             })
             .catch(err => {
                 setShowDialog(false)
-                setLoading(false)
+                setIsInsert(false)
                 toast.success(`Error! ${err.message}`)
             })
+    }
 
+    const onFinishFailed = (errorInfo) => {
+        console.log('Failed:', errorInfo);
+    };
+
+    const changeDate = (date, dateString) => {
+        setBirth(dateString)
     }
 
     const handleShowDialog = () => {
-        reset()
         if (avatar) {
             URL.revokeObjectURL(avatar.preview)
             setAvatar()
@@ -263,270 +250,170 @@ function Users() {
             <Dialog
                 open={showDialog}
             >
-                <form onSubmit={handleSubmit(onSubmit)} className={cx("dialog_add_user")}>
+                <div className={cx("dialog_add_user")}>
                     <p className={cx('btn_close')} onClick={() => setShowDialog(false)}>
                         <CloseOutlinedIcon className={cx('btn_icon')} />
                     </p>
-                    <h1 className={cx("dialog_title")}>Thêm mới tài khoản</h1>
-                    <p className={cx('label')}>Tên tài khoản</p>
-                    <TextField
-                        {...register('fullName')}
-                        fullWidth
-                        placeholder='Nhập tên tài khoản'
-                        size='medium'
+                    <Form
+                        name="basic"
+                        labelCol={{
+                            span: 5,
+                        }}
+                        wrapperCol={{
+                            span: 20,
+                        }}
                         style={{
-                            outline: 'none',
+                            maxWidth: 600,
                         }}
-                        sx={{
-                            "& .MuiOutlinedInput-root": {
-                                border: '1px solid #1363DF',
-                                borderRadius: "4px",
-                                padding: "0",
-                                height: "40px",
-                            },
-                            "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-                                border: "none"
-                            },
-                            "& .MuiInputBase-input": {
-                                backgroundColor: 'transparent'
-                            }
-                        }}
-                        InputProps={{
-                            style: {
-                                color: "#333",
-                                fontSize: "14px",
-                                marginBottom: '16px',
-                                backgroundColor: "#fff"
-                            }
-                        }}
-                    />
-                    <p className={cx('label')}>Email</p>
-                    <TextField
-                        {...register('email')}
-                        fullWidth
-                        placeholder='Nhập email'
-                        size='medium'
-                        style={{
-                            outline: 'none',
-                        }}
-                        sx={{
-                            "& .MuiOutlinedInput-root": {
-                                border: '1px solid #1363DF',
-                                borderRadius: "4px",
-                                padding: "0",
-                                height: "40px",
-                            },
-                            "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-                                border: "none"
-                            },
-                            "& .MuiInputBase-input": {
-                                backgroundColor: 'transparent'
-                            }
-                        }}
-                        InputProps={{
-                            style: {
-                                color: "#333",
-                                fontSize: "14px",
-                                marginBottom: '16px',
-                                backgroundColor: "#fff"
-                            }
-                        }}
-                    />
-                    <p className={cx('label')}>Số điện thoại</p>
-                    <TextField
-                        {...register('phoneNumber')}
-                        fullWidth
-                        placeholder='Nhập số điện thoại'
-                        size='medium'
-                        style={{
-                            outline: 'none',
-                        }}
-                        sx={{
-                            "& .MuiOutlinedInput-root": {
-                                border: '1px solid #1363DF',
-                                borderRadius: "4px",
-                                padding: "0",
-                                height: "40px",
-                            },
-                            "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-                                border: "none"
-                            },
-                            "& .MuiInputBase-input": {
-                                backgroundColor: 'transparent'
-                            }
-                        }}
-                        InputProps={{
-                            style: {
-                                color: "#333",
-                                fontSize: "14px",
-                                marginBottom: '16px',
-                                backgroundColor: "#fff"
-                            }
-                        }}
-                    />
-                    <p className={cx('label')}>Mật khẩu</p>
-                    <TextField
-                        {...register('password')}
-                        type={showPassword ? "text" : "password"}
-                        fullWidth
-                        placeholder='Nhập mật khẩu'
-                        size='medium'
-                        style={{
-                            outline: 'none',
-                        }}
-                        sx={{
+                        onFinish={onFinish}
+                        onFinishFailed={onFinishFailed}
+                        autoComplete="off"
+                    >
+                        <Form.Item
+                            label="Tên"
+                            name="fullName"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Nội dung này không được để trống',
+                                },
+                            ]}
+                        >
+                            <Input placeholder='Nhập tên tài khoản' />
+                        </Form.Item>
 
-                            "& .MuiOutlinedInput-root": {
-                                border: '1px solid #1363DF',
-                                borderRadius: "4px",
-                                padding: "0",
-                                height: "40px",
-                            },
-                            "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-                                border: "none"
-                            }
-                        }}
-                        InputProps={{
-                            style: {
-                                color: "#333",
-                                fontSize: "14px",
-                                marginBottom: '16px',
-                                backgroundColor: "#fff"
-                            },
-                            endAdornment: (
-                                <InputAdornment position="end" className={watch('password') === '' || !watch('password') ? cx('hidden') : cx('visible')}>
+                        <Form.Item
+                            label="Email"
+                            name="email"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Nội dung này không được để trống',
+                                },
+                                {
+                                    pattern: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
+                                    message: 'Email không đúng định dạng. Vui lòng nhập lại',
+                                }
+                            ]}
+                        >
+                            <Input placeholder='Nhập email' />
+                        </Form.Item>
+
+                        <Form.Item
+                            label="Số điện thoại"
+                            name="phoneNumber"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Nội dung này không được để trống',
+                                },
+                            ]}
+                        >
+                            <Input placeholder='Nhập số điện thoại' />
+                        </Form.Item>
+
+                        <Form.Item
+                            label="Mật khẩu"
+                            name="password"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Nội dung này không được để trống',
+                                },
+                                {
+                                    pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/,
+                                    message: "Vui lòng nhập: trên 8 ký tự. Chứa 0-9, a-z, A-Z và 1 ký tự đặc biệt"
+                                }
+                            ]}
+                        >
+                            <Input.Password placeholder='Nhập mật khẩu' />
+                        </Form.Item>
+
+                        <Form.Item
+                            label="Địa chỉ"
+                            name="address"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Nội dung này không được để trống',
+                                },
+                            ]}
+                        >
+                            <Input placeholder='Nhập địa chỉ' />
+                        </Form.Item>
+                        <div className="flex items-center mb-[20px]">
+                            <p className={cx('label')}>Ngày sinh: </p>
+                            <div className="flex flex-[20] justify-start ml-[6px]">
+                                <DatePicker
+                                    onChange={changeDate}
+                                />
+                            </div>
+                        </div>
+                        <div className="flex items-center mb-[20px]">
+                            <p className={cx('label')}>Giới tính: </p>
+                            <div className="flex flex-[20] justify-start ml-[6px]">
+                                <div className={cx('form_radio')}>
+                                    <div className={cx('radio')}>
+                                        <input
+                                            id='radio'
+                                            type="radio"
+                                            checked={gender == 'male'}
+                                            onChange={() => handleChangeGender('male')}
+                                        />
+                                        <label for='radio'>Nam</label>
+                                    </div>
+
+                                    <div className={cx('radio')}>
+                                        <input
+                                            id='radio_female'
+                                            type="radio"
+                                            checked={gender == 'female'}
+                                            onChange={() => handleChangeGender('female')}
+                                        />
+                                        <label for='radio_female'>Nữ</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex items-center mb-[20px]">
+                            <p className={cx('label')}>Chức vụ: </p>
+                            <div className="flex flex-[20] justify-start ml-[6px]">
+                                <DropMenu
+                                    options={options}
+                                    size="big"
+                                    optionSelected={role}
+                                    setOptionSelected={setRole}
+                                />
+                            </div>
+                        </div>
+                        <div className="flex items-center mb-[20px]">
+                            <p className={cx('label')}>Ảnh đại diện: </p>
+                            <div className="flex flex-[20] justify-start ml-[6px]">
+                                <div className={cx('avatar')}>
+                                    <p className={cx('edit_avatar')}>
+                                        <label for="image">
+                                            <AccountCircleIcon className={cx('icon')} />
+                                            Chọn
+                                        </label>
+                                        <input type="file" id='image' name='image' onChange={(e) => handleChooseImage(e)} />
+                                    </p>
                                     {
-                                        showPassword ? <VisibilityOutlinedIcon onClick={() => setShowPassword(prev => !prev)} className={cx("icon_password")} />
-                                            : <VisibilityOffOutlinedIcon onClick={() => setShowPassword(prev => !prev)} className={cx("icon_password")} />
+                                        avatar && <img src={avatar.preview} />
                                     }
-                                </InputAdornment>
-                            )
-                        }}
-                    />
-                    <p className={cx('label')}>Địa chỉ</p>
-                    <TextField
-                        {...register('address')}
-                        fullWidth
-                        placeholder='Nhập địa chỉ'
-                        size='medium'
-                        style={{
-                            outline: 'none',
-                        }}
-                        sx={{
-                            "& .MuiOutlinedInput-root": {
-                                border: '1px solid #1363DF',
-                                borderRadius: "4px",
-                                padding: "0",
-                                height: "40px",
-                            },
-                            "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-                                border: "none"
-                            },
-                            "& .MuiInputBase-input": {
-                                backgroundColor: 'transparent'
-                            }
-                        }}
-                        InputProps={{
-                            style: {
-                                color: "#333",
-                                fontSize: "14px",
-                                marginBottom: '16px',
-                                backgroundColor: "#fff"
-                            }
-                        }}
-                    />
-                    <p className={cx('label')}>Ngày sinh</p>
-                    <LocalizationProvider fullWidth dateAdapter={AdapterDayjs}>
-                        <DemoItem>
-                            <DatePicker
-                                value={birth}
-                                onChange={(e) => setBirth(e.format("MM-DD-YYYY"))}
-                                fullWidth
-                                style={{
-                                    outline: 'none',
-                                }}
-                                sx={{
-                                    "& .MuiOutlinedInput-root": {
-                                        border: '1px solid #1363DF',
-                                        borderRadius: "4px",
-                                        padding: "0 20px 0 0",
-                                        height: "40px",
-                                        fontSize: "1.4rem"
-                                    },
-                                    "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-                                        border: "none"
-                                    },
-                                    "& .MuiInputBase-input": {
-                                        backgroundColor: 'transparent'
-                                    }
-                                }}
-                                InputProps={{
-                                    style: {
-                                        color: "#333",
-                                        fontSize: "14px",
-                                        marginBottom: '16px',
-                                        backgroundColor: "#fff"
-                                    }
-                                }}
-                                renderInput={(params) => <TextField {...params} />}
-                            />
-                        </DemoItem>
-                    </LocalizationProvider>
-                    <p className={cx('label')}></p>
-                    <p className={cx('label')}>Giới tính</p>
-                    <div className={cx('form_radio')}>
-                        <div className={cx('radio')}>
-                            <input
-                                id='radio'
-                                type="radio"
-                                checked={gender == 'male'}
-                                onChange={() => handleChangeGender('male')}
-                            />
-                            <label for='radio'>Nam</label>
+                                </div>
+                            </div>
                         </div>
-
-                        <div className={cx('radio')}>
-                            <input
-                                id='radio_female'
-                                type="radio"
-                                checked={gender == 'female'}
-                                onChange={() => handleChangeGender('female')}
-                            />
-                            <label for='radio_female'>Nữ</label>
+                        <div className={cx('buttons')}>
+                            <p htmlType="submit">
+                                <Button primary>Thêm</Button>
+                            </p>
                         </div>
-                    </div>
-                    <p className={cx('label')}>Chức vụ</p>
-                    <DropMenu
-                        options={options}
-                        size="big"
-                        optionSelected={role}
-                        setOptionSelected={setRole}
-                    />
-                    <p className={cx('label')}></p>
-                    <p className={cx('label')}>Ảnh đại diện</p>
-                    <div className={cx('avatar')}>
-                        <p className={cx('edit_avatar')}>
-                            <label for="image">
-                                <AccountCircleIcon className={cx('icon')} />
-                                Chọn
-                            </label>
-                            <input type="file" id='image' name='image' onChange={(e) => handleChooseImage(e)} />
-                        </p>
-                        {
-                            avatar && <img src={avatar.preview} />
-                        }
-                    </div>
-
-                    <div className={cx('buttons')}>
-                        <p>
-                            <Button primary>Thêm</Button>
-                        </p>
-                    </div>
-                </form>
+                    </Form>
+                </div>
             </Dialog>
             <Backdrop
                 sx={{ color: '#fff', zIndex: 10000 }}
-                open={loading}
+                open={isInsert}
             >
                 {isInsert && <CircularProgress color="error" />}
             </Backdrop>
@@ -538,14 +425,24 @@ function Users() {
                 </p>
             </div>
             {
-                loading &&
+                loadingUsers &&
                 <div>
                     <LinearProgress />
                 </div>
             }
-            <div className={cx('table')}>
-                <EnhancedTable columns={columns} rows={rows} />
-            </div>
+            {
+                loadingUsers === false ? <div className={cx('table')}>
+                    <EnhancedTable columns={columns} rows={rows} />
+                </div>
+                    : <div className="mt-[20px]">
+                        <Skeleton
+                            active
+                            paragraph={{
+                                rows: 8,
+                            }}
+                        />
+                    </div>
+            }
         </div>
     )
 }

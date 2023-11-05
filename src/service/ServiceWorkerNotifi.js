@@ -1,39 +1,49 @@
 
 const checkPermission = () => {
     if (!('serviceWorker' in navigator)) {
-        throw new Error('No support for service worker')
+        console.log('No support for service worker');
     }
 
     if (!('Notification' in window)) {
-        throw new Error('No support for notification Api')
+        console.log('No support for notification API');
     }
-}
+};
 
 const registerSw = async () => {
     const registration = await navigator.serviceWorker.register('./sw.js')
-    return registration
-}
+    return registration;
+};
 
 const requestNoficationPermissions = async () => {
-    const permission = await Notification.requestPermission()
+    const permission = await Notification.requestPermission();
 
     if (permission !== "granted") {
-        throw new Error('Notification permission not allowed!')
+        console.log('Notification permission not allowed!');
     } else {
-        console.log('dax vo')
-        new Notification("hello world")
+        console.log('Permission granted');
     }
+};
+
+const sendData = () => {
+    const token = JSON.parse(localStorage.getItem('token'))
+    navigator.serviceWorker.ready.then((registration) => {
+        registration.active.postMessage({ action: 'send-token', data: token });
+    });
 }
 
 const main = async () => {
-    checkPermission()
-    registerSw()
-    requestNoficationPermissions()
-}
+    try {
+        checkPermission();
+        await requestNoficationPermissions();
+        await registerSw()
+        sendData()
+    } catch (error) {
+        console.log(error);
+    }
+};
 
-
-function ServiceWorkerNotifi() {
+async function ServiceWorkerNotifi() {
     main()
 }
 
-export default ServiceWorkerNotifi
+export default ServiceWorkerNotifi;
