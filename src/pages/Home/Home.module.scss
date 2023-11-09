@@ -1,5 +1,5 @@
 .wrapper {
-    background-color: var(--background-color);
+    background-color: #fff;
 }
 
 .page {
@@ -92,11 +92,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-}
-
-// Product Trending
-.trending_product {
-    margin-top: 16px;
 }
 
 .title {

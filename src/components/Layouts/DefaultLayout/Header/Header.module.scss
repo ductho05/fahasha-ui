@@ -4,9 +4,10 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: fixed;
+    top: 0px;
     width: 100%;
-    background-color: #fff;
-    z-index: 100000000000000000000;
+    z-index: 1;
 }
 
 .loading {
@@ -78,7 +79,7 @@
     position: relative;
     width: 586px;
     height: 40px;
-    border: 1px solid #cdcfd0;
+    border: 1px solid transparent;
     border-radius: var(--border-radius);
 
     input {
@@ -90,7 +91,7 @@
         padding: 0 28px 0 24px;
 
         &::placeholder {
-            color: #ccc;
+            color: #c92127;
         }
     }
 }
@@ -149,13 +150,13 @@
 
     .num_carts {
         position: absolute;
-        right: 7px;
-        top: -8px;
+        right: 10px;
+        top: -10px;
         display: flex;
         justify-content: center;
         align-items: center;
-        width: 18px;
-        height: 18px;
+        width: 20px;
+        height: 20px;
         border-radius: 50%;
         background-color: var(--primary-color);
         color: #fff;
@@ -873,6 +874,7 @@
         width: 50rem;
         height: 33px;
         border: none;
+        border: 1px solid #c92127;
 
         input {
             font-weight: 500;
@@ -881,6 +883,10 @@
             width: 100%;
             height: 100%;
             border-radius: 4px;
+
+            &::placeholder {
+                color: #c92127;
+            }
         }
     }
 
@@ -950,24 +956,6 @@
         }
     }
 
-    .cart {
-        background: url('https://cdn0.fahasa.com/skin/frontend/base/default/images/ico_shopping_cart_white.svg')
-            no-repeat center center;
-        background-size: contain;
-        height: 24px;
-        width: 24px;
-        margin: 0 5px;
-    }
-
-    .account {
-        background: url('https://cdn0.fahasa.com/skin/frontend/base/default/images/ico_thongtintk.svg') no-repeat center
-            center;
-        background-size: contain;
-        height: 24px;
-        width: 24px;
-        margin: 0 5px;
-    }
-
     .notification,
     .cart,
     .account {
@@ -979,8 +967,9 @@
 }
 
 .logo-tablet {
-    max-width: 130px;
-    max-height: 24px;
+    width: 130px;
+    height: 35px;
+    object-fit: contain;
     margin-top: 10px;
     animation: hideLogo 0.5s ease-in-out;
 }
@@ -1023,7 +1012,7 @@
         input {
             font-weight: 500;
             color: #333;
-            caret-color: #333;
+            caret-color: var(--primary-color);
             width: 100%;
             height: 100%;
             border-radius: 4px;

@@ -13,99 +13,17 @@ function Footer() {
     const navigate = useNavigate();
     return (
         <div className={cx('wrapper')}>
-            <div className={cx('heading', 'hide-on-mobide', 'hide-on-small-tablet')}>
-                <p className={cx('heading_icon')}>
-                    <FontAwesomeIcon icon={faEnvelope} />
-                </p>
-                <h5>ĐĂNG KÝ NHẬN BẢN TIN</h5>
-                <div className={cx('heading_input')}>
-                    <input placeholder="Nhập địa chỉ email của bạn" />
-                    <button>Đăng ký</button>
-                </div>
-            </div>
-            <div className={cx('content')}>
+            <div className={cx('content')} style={{
+                backgroundImage: "linear-gradient(to top, #accbee 0%, #e7f0fd 100%)"
+            }}>
                 <div className={cx('content_left')}>
                     <LazyLoadImage src={images.logo} />
                     <div className={cx('footer_address')}>
-                        <div className={cx('address_detail')}>
-                            <p>Lầu 5, 387-389 Hai Bà Trưng Quận 3 TP HCM</p>
-                            <p>Công Ty Cổ Phần Phát Hành Sách TP HCM - FAHASA</p>
-                            <p>60 - 62 Lê Lợi, Quận 1, TP. HCM, Việt Nam</p>
-                        </div>
-
                         <div className={cx('address_description')}>
-                            <p>
-                                Fahasa.com nhận đặt hàng trực tuyến và giao hàng tận nơi. KHÔNG hỗ trợ đặt mua và nhận
-                                hàng trực tiếp tại văn phòng cũng như tất cả Hệ Thống Fahasa trên toàn quốc.
+                            <p className='text-[14px] text-[#333] font-[500]'>
+                                TA Bookstore nhận đặt hàng trực tuyến và giao hàng tận nơi. KHÔNG hỗ trợ đặt mua và nhận
+                                hàng trực tiếp tại văn phòng cũng như tất cả Hệ Thống TA Bookstore trên toàn quốc.
                             </p>
-                        </div>
-                        <LazyLoadImage
-                            className={cx('congthuong_icon')}
-                            src="https://cdn0.fahasa.com/media/wysiwyg/Logo-NCC/logo-bo-cong-thuong-da-thong-bao1.png"
-                        />
-                        <ul className={cx('social_list')}>
-                            <li className={cx('social_item')}>
-                                <a href="#">
-                                    <LazyLoadImage
-                                        title="Facebook"
-                                        src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/footer/Facebook-on.png"
-                                    />
-                                </a>
-                            </li>
-
-                            <li className={cx('social_item')}>
-                                <a href="#">
-                                    <LazyLoadImage
-                                        title="Instagram"
-                                        src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images//footer/Insta-on.png"
-                                    />
-                                </a>
-                            </li>
-
-                            <li className={cx('social_item')}>
-                                <a href="#">
-                                    <LazyLoadImage
-                                        title="Youtube"
-                                        src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images//footer/Youtube-on.png"
-                                    />
-                                </a>
-                            </li>
-
-                            <li className={cx('social_item')}>
-                                <a href="#">
-                                    <LazyLoadImage
-                                        title="Tumblr"
-                                        src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images//footer/tumblr-on.png"
-                                    />
-                                </a>
-                            </li>
-
-                            <li className={cx('social_item')}>
-                                <a href="#">
-                                    <LazyLoadImage
-                                        title="Twitter"
-                                        src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images//footer/twitter-on.png"
-                                    />
-                                </a>
-                            </li>
-
-                            <li className={cx('social_item')}>
-                                <a href="#">
-                                    <LazyLoadImage
-                                        title="Pinterest"
-                                        src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images//footer/pinterest-on.png"
-                                    />
-                                </a>
-                            </li>
-                        </ul>
-
-                        <div className={cx('footer_download')}>
-                            <a href="#" className={cx('gg_play')}>
-                                <LazyLoadImage src="https://cdn0.fahasa.com/media/wysiwyg/Logo-NCC/android1.png" />
-                            </a>
-                            <a href="#" className={cx('app_store')}>
-                                <LazyLoadImage src="https://cdn0.fahasa.com/media/wysiwyg/Logo-NCC/appstore1.png" />
-                            </a>
                         </div>
                     </div>
                 </div>
@@ -113,8 +31,8 @@ function Footer() {
                 <div className={cx('content_right')}>
                     <div className={cx('grid')}>
                         <ul className={cx('row', 'footer_list')}>
-                            <li className={cx('col l-4 m-4 c-12', 'footer_item')}>
-                                <h3>DỊCH VỤ</h3>
+                            <li className={cx('col l-3 m-4 c-12', 'footer_item')}>
+                                <h3 className="font-[800]">DỊCH VỤ</h3>
                                 <ul className={cx('footer_list_child')}>
                                     <li className={cx('footer_item_child')}>Đăng nhập/Tạo mới tài khoản</li>
                                     <a href="/terms-of-service" className={cx('footer_item_child')}>
@@ -135,7 +53,7 @@ function Footer() {
                             </li>
 
                             <li className={cx('col l-4 m-4 c-12', 'footer_item')}>
-                                <h3>HỖ TRỢ</h3>
+                                <h3 className="font-[800]">HỖ TRỢ</h3>
                                 <ul className={cx('footer_list_child')}>
                                     <li className={cx('footer_item_child')}>Chính sách đổi - trả - hoàn tiền</li>
                                     <li className={cx('footer_item_child')}>Chính sách bảo hành - bồi hoàn</li>
@@ -146,7 +64,7 @@ function Footer() {
                             </li>
 
                             <li className={cx('col l-4 m-4 c-12', 'footer_item')}>
-                                <h3>TÀI KHOẢN CỦA TÔI</h3>
+                                <h3 className="font-[800]">TÀI KHOẢN CỦA TÔI</h3>
                                 <ul className={cx('footer_list_child')}>
                                     <li className={cx('footer_item_child')}>Điều khoản sử dụng</li>
                                     <li className={cx('footer_item_child')}>Thay đổi địa chỉ khách hàng</li>
@@ -158,7 +76,7 @@ function Footer() {
                     </div>
 
                     <div className={cx('grid', 'footer_contact')}>
-                        <h3>LIÊN HỆ</h3>
+                        <h3 className="font-[800]">LIÊN HỆ</h3>
                         <ul className={cx('row', 'contact_list')}>
                             <li className={cx('col l-4 m-4 c-12', 'contact_item')}>
                                 <p className={cx('contact_icon')}>
@@ -182,57 +100,7 @@ function Footer() {
                             </li>
                         </ul>
                     </div>
-
-                    <div className={cx('grid', 'service', 'hide-on-mobide', 'hide-on-small-tablet')}>
-                        <ul className={cx('row', 'service_list')}>
-                            <li className={cx('col l-2-4', 'service_item')}>
-                                <LazyLoadImage src="https://cdn0.fahasa.com/media/wysiwyg/Logo-NCC/vnpost1.png" />
-                            </li>
-
-                            <li className={cx('col l-2-4', 'service_item')}>
-                                <LazyLoadImage src="https://cdn0.fahasa.com/media/wysiwyg/Logo-NCC/ahamove_logo3.png" />
-                            </li>
-
-                            <li className={cx('col l-2-4', 'service_item')}>
-                                <LazyLoadImage src="https://cdn0.fahasa.com/media/wysiwyg/Logo-NCC/icon_giao_hang_nhanh1.png" />
-                            </li>
-
-                            <li className={cx('col l-2-4', 'service_item')}>
-                                <LazyLoadImage src="https://cdn0.fahasa.com/media/wysiwyg/Logo-NCC/icon_snappy1.png" />
-                            </li>
-
-                            <li className={cx('col l-2-4', 'service_item')}>
-                                <LazyLoadImage src="https://cdn0.fahasa.com/media/wysiwyg/Logo-NCC/Logo_ninjavan.png" />
-                            </li>
-
-                            <li className={cx('col l-2-4', 'service_item')}>
-                                <LazyLoadImage src="https://cdn0.fahasa.com/media//wysiwyg/Logo-NCC/vnpay_logo.png" />
-                            </li>
-
-                            <li className={cx('col l-2-4', 'service_item')}>
-                                <LazyLoadImage src="https://cdn0.fahasa.com/media//wysiwyg/Logo-NCC/ZaloPay-logo-130x83.png" />
-                            </li>
-
-                            <li className={cx('col l-2-4', 'service_item')}>
-                                <LazyLoadImage src="https://cdn0.fahasa.com/media//wysiwyg/Logo-NCC/momopay.png" />
-                            </li>
-
-                            <li className={cx('col l-2-4', 'service_item')}>
-                                <LazyLoadImage src="https://cdn0.fahasa.com/media//wysiwyg/Logo-NCC/shopeepay_logo.png" />
-                            </li>
-
-                            <li className={cx('col l-2-4', 'service_item')}>
-                                <LazyLoadImage src="https://cdn0.fahasa.com/media//wysiwyg/Logo-NCC/logo_moca_120.jpg" />
-                            </li>
-                        </ul>
-                    </div>
                 </div>
-            </div>
-
-            <div className={cx('footer_bot')}>
-                <p>Đây là website clone lại từ nguồn </p>
-                <a href="https://www.fahasa.com">FAHASHA</a>
-                <p> chỉ dùng với mục đích học tập và học hỏi, không dùng với mục đích kinh doanh</p>
             </div>
         </div>
     );

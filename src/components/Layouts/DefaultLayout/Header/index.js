@@ -28,6 +28,13 @@ import LoginWithFacebook from '../../../LoginWithFacebook';
 import { Skeleton } from '@mui/material';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { seeNotice } from '../../../../stores/actions';
+import WidgetsIcon from '@mui/icons-material/Widgets';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import {
+    BellOutlined,
+    ShoppingCartOutlined,
+    UserOutlined
+} from '@ant-design/icons';
 
 const cx = classNames.bind(styles);
 
@@ -291,23 +298,11 @@ function Header() {
                             ></RegisterLogin>
                         </Modal>
                     </div>
-                    <div className={cx('wrapper')}>
-                        <div className={isLoading ? cx('loading') : cx('banner', 'hide-on-tablet-mobile')}>
-                            {isLoading ? (
-                                <Skeleton
-                                    variant="rectangular"
-                                    animation="wave"
-                                    cx={{
-                                        height: '60px',
-                                        width: '100vw',
-                                    }}
-                                />
-                            ) : (
-                                <a href="#">
-                                    <img src={images.banner} alt="Banner" />
-                                </a>
-                            )}
-                        </div>
+                    <div
+                        style={{
+                            backgroundImage: "linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%)"
+                        }}
+                        className={cx('wrapper', "shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px]")}>
                         <div className={isHideBanner ? cx('hide') : cx('hide-on-desktop')}>
                             {isLoading ? (
                                 <Skeleton
@@ -322,16 +317,21 @@ function Header() {
                                 <Link to={'/'}>
                                     <img
                                         className={cx('logo-tablet')}
-                                        src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/fahasa-logo.png"
-                                        alt="Fahasa"
+                                        src={images.logo}
+                                        alt="TA Bookstore"
                                     />
                                 </Link>
                             )}
                         </div>
                         <div className={cx('content')}>
                             <Link to={'/'}>
-                                <p className={cx('home')}>FAHASHA</p>
-                                <img className={cx('logo', 'hide-on-tablet-mobile')} src={images.logo} alt="Fahasa" />
+                                <p className={cx('home')}>TA Bookstore</p>
+                                <img style={{
+                                    width: "180px",
+                                    height: "60px",
+                                    objectFit: "cover",
+                                    marginLeft: "40px"
+                                }} className={cx('logo', 'hide-on-tablet-mobile')} src={images.logo} alt="TA BOOK" />
                             </Link>
 
                             <div className={cx('tools')}>
@@ -408,10 +408,16 @@ function Header() {
                                 >
                                     <div onClick={handleShowMenuOnTablet} className={cx('menu_dropdown')}>
                                         <span className={cx('icon_menu')}>
-                                            <img src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/ico_menu.svg" />
+                                            <WidgetsIcon style={{
+                                                fontSize: "30px",
+                                                color: "#c92127"
+                                            }} />
                                         </span>
                                         <span className={cx('icon_seemore')}>
-                                            <img src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/icon_seemore_gray.svg" />
+                                            <ArrowDropDownIcon style={{
+                                                fontSize: "20px",
+                                                color: "#c92127"
+                                            }} />
                                         </span>
                                     </div>
                                 </Tippy>
@@ -513,8 +519,13 @@ function Header() {
                                         </div>
                                     )}
                                 >
-                                    <div className={cx('search')}>
+                                    <div
+                                        style={{
+                                            borderColor: "#c92127"
+                                        }}
+                                        className={cx('search')}>
                                         <input
+                                            className='bg-transparent'
                                             onChange={handleChangeValue}
                                             //value={keyTextSearch}
                                             onFocus={handleOnFocus}
@@ -555,7 +566,7 @@ function Header() {
                                             <PopperWrapper>
                                                 <div className={cx('noti_nologin_content')}>
                                                     <div className={cx('noti_nologin_heading')}>
-                                                        <img src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/ico_noti_black.svg" />
+                                                        <BellOutlined />
                                                         <h3>Thông báo</h3>
                                                         <p
                                                             className={
@@ -617,16 +628,28 @@ function Header() {
                                         </div>
                                     )}
                                 >
-                                    <div className={cx('notification', 'hide-on-tablet-mobile')}>
-                                        <img src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/ico_noti_gray.svg" />
-                                        <label>Thông báo</label>
+                                    <div
+                                        style={{
+                                            color: "#c92127"
+                                        }}
+                                        className={cx('notification', 'hide-on-tablet-mobile')}>
+                                        <BellOutlined className="text-[20px]" />
+                                        <label style={{
+                                            color: "#c92127",
+                                            fontSize: '1.4rem'
+                                        }}>Thông báo</label>
                                         <p className={Object.keys(user).length > 0 ? cx('num_carts') : cx('hide')}>{numNoticeNoAccess}</p>
                                     </div>
                                 </Tippy>
 
                                 <Link to="/cart" className={cx('cart')}>
-                                    <img src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/ico_cart_gray.svg" />
-                                    <label>Giỏ hàng</label>
+                                    <ShoppingCartOutlined className="text-[20px]" style={{
+                                        color: "#c92127"
+                                    }} />
+                                    <label style={{
+                                        color: "#c92127",
+                                        fontSize: '1.4rem'
+                                    }}>Giỏ hàng</label>
                                     <p className={Object.keys(user).length > 0 ? cx('num_carts') : cx('hide')}>
                                         {Object.keys(localstorage.get(`myCart_${state.user._id}`)).length
                                             ? localstorage.get(`myCart_${state.user._id}`).items.length
@@ -662,8 +685,13 @@ function Header() {
                                     hideOnClick={true}
                                 >
                                     <Link to={`/account/${0}`} className={cx('account')}>
-                                        <img src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/ico_account_gray.svg" />
-                                        <label>{Object.keys(user).length > 0 ? user.fullName : 'Tài khoản'}</label>
+                                        <UserOutlined className="text-[20px]" style={{
+                                            color: "#c92127"
+                                        }} />
+                                        <label style={{
+                                            color: "#c92127",
+                                            fontSize: '1.4rem'
+                                        }}>{Object.keys(user).length > 0 ? user.fullName : 'Tài khoản'}</label>
                                     </Link>
                                 </Tippy>
                             </div>

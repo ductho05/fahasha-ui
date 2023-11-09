@@ -3,7 +3,6 @@
     font-size: 1.4rem;
     text-transform: uppercase;
     background-color: #fff;
-    padding: 20px 10px;
     border-bottom: 1px solid #f2f2f2;
 }
 
@@ -96,6 +95,7 @@
     img {
         width: 80px;
         height: 80px;
+        object-fit: contain;
     }
 }
 

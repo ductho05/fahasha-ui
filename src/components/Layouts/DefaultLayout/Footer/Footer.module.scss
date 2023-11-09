@@ -4,7 +4,6 @@
     align-items: center;
     width: 100%;
     background-color: var(--background-color);
-    padding-top: 20px;
 }
 .heading {
     position: relative;
@@ -71,7 +70,7 @@
 .content {
     width: 100%;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     padding: 40px 0 25px;
     background-color: #fff;
 }

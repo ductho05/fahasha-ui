@@ -12,6 +12,7 @@ import { api, listPathHots, listPathCategory, listPathLearn, listJustWatched } f
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { Skeleton } from '@mui/material';
 import "react-loading-skeleton/dist/skeleton.css";
+import HomeHero from '../../components/HomeHero';
 
 // Fake api
 const listPoster = [
@@ -169,7 +170,7 @@ function Home() {
                 .catch((err) => console.log(err));
         });
 
-    
+
 
         listPathCategory.forEach((item) => {
             fetch(`${api}/products/category?${item.path}`, {
@@ -236,7 +237,7 @@ function Home() {
 
     return (
         <div className={cx('wrapper')}>
-            <div className={cx('heading')}>
+            {/* <div className={cx('heading')}>
                 <div className={cx('slider')}>
                     {
                         isLoading ? <Skeleton variant='rectangular' animation='wave' height={400} cx={{
@@ -286,40 +287,47 @@ function Home() {
 
             <div className={cx('hide-on-tablet-mobile')}>
                 <Categories categoryList={categories} />
-            </div>
+            </div> */}
 
-            <div className={cx('trending_product')}>
-                <div className={cx('title')}>
-                    {isLoading ? (
-                        <Skeleton animation="wave" variant='circular' width={24} height={24} />
-                    ) : (
+            <HomeHero />
+            <div className="p-[10px] md:p-[20px] lg:p-[40px]">
+                <div className={cx('hide-on-tablet-mobile', 'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px]')}>
+                    <Categories categoryList={categories} />
+                </div>
+
+                <div className={cx('trending_product', 'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden')}>
+                    <div className={cx('title')}>
+                        {isLoading ? (
+                            <Skeleton animation="wave" variant='circular' width={24} height={24} />
+                        ) : (
+                            <LazyLoadImage src="https://cdn0.fahasa.com/skin/frontend/base/default/images/ico_dealhot.png" />
+                        )}
+                        <h3 className='min-w-[170px]'>{isLoading ? <Skeleton variant='text' sx={{ fontSize: '1.4rem' }} animation="wave" /> : 'DANH MỤC NỔI BẬT'}</h3>
+                    </div>
+
+                    <ProductFrame isLoading={isLoading} productList={productsHots} Component={GridProduct} />
+                </div>
+
+                <div className={cx('textboook', 'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden')}>
+                    <ProductFrame isLoading={isLoading} productList={categoryBooks} Component={ProductSlider} />
+                </div>
+
+                <div className={cx('trending_product', 'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden')}>
+                    <div className={cx('title')}>
                         <LazyLoadImage src="https://cdn0.fahasa.com/skin/frontend/base/default/images/ico_dealhot.png" />
-                    )}
-                    <h3 className='min-w-[170px]'>{isLoading ? <Skeleton variant='text' sx={{ fontSize: '1.4rem' }} animation="wave" /> : 'DANH MỤC NỔI BẬT'}</h3>
+                        <h3>CÓ THỂ BẠN SẼ THÍCH</h3>
+                    </div>
+                    <ForYou limit={4} />
                 </div>
 
-                <ProductFrame isLoading={isLoading} productList={productsHots} Component={GridProduct} />
-            </div>
+                <div className={cx('trending_product', 'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden')}>
+                    <div className={cx('title')}>
+                        <LazyLoadImage src="https://cdn0.fahasa.com/skin/frontend/base/default/images/ico_dealhot.png" />
+                        <h3>DỤNG CỤ HỌC TẬP</h3>
+                    </div>
 
-            <div className={cx('textboook')}>
-                <ProductFrame isLoading={isLoading} productList={categoryBooks} Component={ProductSlider} />
-            </div>
-
-            <div className={cx('trending_product')}>
-                <div className={cx('title')}>
-                    <LazyLoadImage src="https://cdn0.fahasa.com/skin/frontend/base/default/images/ico_dealhot.png" />
-                    <h3>CÓ THỂ BẠN SẼ THÍCH</h3>
+                    <ProductFrame isLoading={isLoading} productList={learnBooks} Component={GridProduct}></ProductFrame>
                 </div>
-                <ForYou limit={4} />
-            </div>
-
-            <div className={cx('trending_product')}>
-                <div className={cx('title')}>
-                    <LazyLoadImage src="https://cdn0.fahasa.com/skin/frontend/base/default/images/ico_dealhot.png" />
-                    <h3>DỤNG CỤ HỌC TẬP</h3>
-                </div>
-
-                <ProductFrame isLoading={isLoading} productList={learnBooks} Component={GridProduct}></ProductFrame>
             </div>
         </div>
     );

@@ -7,6 +7,7 @@ import Paging from '../../components/Paging'
 import GridProduct from '../../components/GridProduct'
 import { optionsArange, optionsNumProduct, api } from '../../constants'
 import { Backdrop, CircularProgress } from '@mui/material'
+import GridProductLoading from '../../components/GridProductLoading'
 
 const cx = className.bind(styles)
 function SeeMoreProduct() {
@@ -80,10 +81,7 @@ function SeeMoreProduct() {
 
     return (
         <div className={cx('wrapper')}>
-            <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={showProgress}>
-                <CircularProgress color="inherit" />
-            </Backdrop>
-            <div className={cx('fillter')}>
+            <div className={cx('fillter', 'p-[20px] shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden')}>
                 <div className={cx('fillter_arange')}>
                     <p>Sắp xếp theo:</p>
                     <DropMenu
@@ -104,20 +102,25 @@ function SeeMoreProduct() {
                 </div>
             </div>
 
-            <div className={cx('product_list')}>
-                <GridProduct products={products} />
-            </div>
+            <div className='p-[20px] shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden'>
+                <div className={cx('product_list')}>
+                    {
+                        showProgress ? <GridProductLoading /> : <GridProduct products={products} />
+                    }
 
-            <div className={numPages > 1 || !showProgress ? cx('bottom') : cx('hidden')}>
-                <Paging
-                    numPages={numPages}
-                    pages={pages}
-                    listCurrentPage={listCurrentPage}
-                    currentPage={currentPage}
-                    setCurrentPage={setCurrentPage}
-                    setListCurrentPage={setListCurrentPage}
-                    fiveAndLast={fiveAndLast}
-                />
+                </div>
+
+                <div className={numPages > 1 || !showProgress ? cx('bottom') : cx('hidden')}>
+                    <Paging
+                        numPages={numPages}
+                        pages={pages}
+                        listCurrentPage={listCurrentPage}
+                        currentPage={currentPage}
+                        setCurrentPage={setCurrentPage}
+                        setListCurrentPage={setListCurrentPage}
+                        fiveAndLast={fiveAndLast}
+                    />
+                </div>
             </div>
         </div>
     )

@@ -2,7 +2,7 @@ import React from 'react'
 
 const TermsServices = () => {
     return (
-        <div className="bg-[#fff] p-[20px]">
+        <div className="bg-[#fff] p-[20px] shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden">
             <h1 className="text-[2.4rem] uppercase text-center text-[#333] font-bold mt-[20px]">Chính sách quyền riêng tư</h1>
             <p className="text=[1.6rem] text-[#333] font-bold mt-[20px]">Thu thập thông tin cá nhân: </p>
             <p className="text=[1.4rem] text-[#333] mt-[20px] leading-9">

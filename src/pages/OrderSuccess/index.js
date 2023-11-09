@@ -110,29 +110,27 @@ function OrderSuccess() {
     };
 
     return (
-        <div>
-            <Dialog open={true}>
-                <div className={cx('dialog')}>
-                    <div className={cx('heading')}>
-                        <FontAwesomeIcon
-                            icon={iconInfo.type}
-                            style={{
-                                height: '140px',
-                                color: iconInfo.color,
-                            }}
-                        />
-                    </div>
-                    <p className={cx('dialog_notice')}>{status_content}</p>
-                    <ul className={cx('btns')}>
-                        <li className={cx('btn', 'back_to_cart')} onClick={handleBackToCart}>
-                            Quay lại giỏ hàng
-                        </li>
-                        <li className={cx('btn', 'order_detail')} onClick={handleOption}>
-                            {option}
-                        </li>
-                    </ul>
+        <div className="p-[10px] md:p-[20px] lg:p-[40px]">
+            <div className={cx('dialog', 'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden')}>
+                <div className={cx('heading')}>
+                    <FontAwesomeIcon
+                        icon={iconInfo.type}
+                        style={{
+                            height: '140px',
+                            color: iconInfo.color,
+                        }}
+                    />
                 </div>
-            </Dialog>
+                <p className={cx('dialog_notice')}>{status_content}</p>
+                <ul className={cx('btns')}>
+                    <li className={cx('btn', 'back_to_cart')} onClick={handleBackToCart}>
+                        Quay lại giỏ hàng
+                    </li>
+                    <li className={cx('btn', 'order_detail')} onClick={handleOption}>
+                        {option}
+                    </li>
+                </ul>
+            </div>
         </div>
     );
 }

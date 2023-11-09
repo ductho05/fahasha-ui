@@ -30,7 +30,6 @@ const publicRoutes = [
     { path: '/product-detail/:productId/comments-detail', component: ProductDetail },
     { path: '/seemore-product/:categoryId', component: SeeMoreProduct },
     { path: '/search/:title', component: SearchProduct },
-    { path: '/login-register', component: RegisterLogin },
     { path: '/terms-of-service', component: TermsServices },
 ];
 
@@ -61,6 +60,11 @@ const adminRoutes = [
 
 ]
 
+// Auth routes
+const authRoutes = [
+    { path: '/login-register', component: RegisterLogin },
+]
+
 const notFoundRoute = { path: '*', component: Page404 };
 
-export { publicRoutes, privateRoutes, notFoundRoute, adminRoutes };
+export { publicRoutes, privateRoutes, notFoundRoute, adminRoutes, authRoutes };

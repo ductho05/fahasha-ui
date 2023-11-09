@@ -1,11 +1,11 @@
 .wrapper {
-    padding: 12px;
+    padding: 40px;
     background-color: #fff;
 }
 
 .fillter {
     display: flex;
-    padding: 10px 0 25px 0;
+    padding: 20px;
     border-bottom: 1px solid #cdcfd0;
 }
 
@@ -37,7 +37,18 @@
     display: none;
 }
 
+// On Tablet
+@media (min-width: 500px) and (max-width: 1023px) {
+    .wrapper {
+        padding: 20px;
+    }
+}
+
 @media (max-width: 500px) {
+    .wrapper {
+        padding: 10px;
+    }
+
     .fillter {
         display: flex;
         flex-direction: column;

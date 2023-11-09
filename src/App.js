@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { publicRoutes, privateRoutes, notFoundRoute, adminRoutes } from './routes/index';
+import { publicRoutes, privateRoutes, notFoundRoute, adminRoutes, authRoutes } from './routes/index';
 import DefaultLayout from './components/Layouts/DefaultLayout';
 import ScrollToTop from './components/ScrollToTop';
 import localstorge from './stores/localstorge';
@@ -86,6 +86,19 @@ function App() {
                             />
                         );
                     })}
+
+                    {
+                        authRoutes.map((route, index) => {
+                            const Page = route.component;
+                            return (
+                                <Route
+                                    key={index}
+                                    path={route.path}
+                                    element={<Page />}
+                                />
+                            );
+                        })
+                    }
 
                     <Route path={notFoundRoute.path} element={<Page404 />} />
                 </Routes>

@@ -362,7 +362,7 @@ function RegisterLogin(props) {
                     </div>
                 </Dialog>
             </div>
-            <div className={cx('form')}>
+            <div className={props.isAccountPage ? cx('form', 'form-account') : cx('form')}>
                 <ul className={indexActive === 2 ? cx('form_headings', 'hide') : cx('form_headings')}>
                     {tabNames.map((tabName, index) => {
                         return (
@@ -503,15 +503,6 @@ function RegisterLogin(props) {
                         <p className={props.isAccountPage ? cx('hide') : cx('visible')}>
                             <Button onClick={() => props.setShowForm(false)}>Bỏ qua</Button>
                         </p>
-                    </div>
-
-                    <div className={cx('form_policy')}>
-                        Bằng việc đăng ký, bạn đã đồng ý với Fahasa.com về
-                        <div className={cx('policy_list')}>
-                            <p className={cx('terms')}>Điều khoản dịch vụ</p>
-                            &nbsp;&nbsp;và&nbsp;&nbsp;
-                            <p className={cx('privacy')}>Chính sách bảo mật</p>
-                        </div>
                     </div>
                 </form>
                 <h3 className={indexActive === 2 ? cx('forgot_pass_heading') : cx('forgot_pass_heading', 'hide')}>
