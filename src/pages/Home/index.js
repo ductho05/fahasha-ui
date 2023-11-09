@@ -298,6 +298,8 @@ function Home() {
                     <Categories categoryList={categories} />
                 </div>
 
+                <FlashSale />
+
                 <div className={cx('trending_product', 'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden')}>
                     <div className={cx('title')}>
                         {isLoading ? (
