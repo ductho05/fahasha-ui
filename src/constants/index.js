@@ -1,13 +1,14 @@
 export const api = 'https://bookstore-api-0a2i.onrender.com/bookstore/api/v1';
-// export const api = 'http://127.0.0.1:3000/bookstore/api/v1';
+//export const api = 'http://127.0.0.1:3000/bookstore/api/v1';
 export const apiProvinces = 'https://provinces.open-api.vn/api/?depth=3';
 export const apiMaps = 'https://api.mapbox.com/';
 // export const appPath = 'http://localhost:8080'
-export const appPath = 'https://bookstore-ta.vercel.app'
+export const appPath = 'https://bookstore-ta.vercel.app';
 
-export const orderImages = "https://www.advotics.com/wp-content/uploads/2022/02/surat-jalan-01-1-4-1536x984.png"
-export const registerImages = "https://quicklaunch.io/wp-content/uploads/2019/10/user-registration.png"
-export const cancelOrderImage = "https://commercemarketplace.adobe.com/media/catalog/product/f/8/f80e_cancel-order-240x240_3.png"
+export const orderImages = 'https://www.advotics.com/wp-content/uploads/2022/02/surat-jalan-01-1-4-1536x984.png';
+export const registerImages = 'https://quicklaunch.io/wp-content/uploads/2019/10/user-registration.png';
+export const cancelOrderImage =
+    'https://commercemarketplace.adobe.com/media/catalog/product/f/8/f80e_cancel-order-240x240_3.png';
 
 export const listJustWatched = JSON.parse(localStorage.getItem('mycategory')) || [];
 
@@ -96,4 +97,4 @@ export const DANGGIAO = 'DANGGIAO';
 export const HOANTHANH = 'HOANTHANH';
 export const DAHUY = 'DAHUY';
 
-export const PUBLIC_KEY = "BChIP9bgEuPaXNXFpNSQaIVpF5DsKYSl9WoueBtNKA-FX1LOvuS6oxc-92DBgFMgcojDPfTzPvxmbzeFz27lJ68"
+export const PUBLIC_KEY = 'BChIP9bgEuPaXNXFpNSQaIVpF5DsKYSl9WoueBtNKA-FX1LOvuS6oxc-92DBgFMgcojDPfTzPvxmbzeFz27lJ68';

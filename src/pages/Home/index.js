@@ -11,6 +11,7 @@ import ProductSlider from '../../components/ProductSlider';
 import { api, listPathHots, listPathCategory, listPathLearn, listJustWatched } from '../../constants';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { Skeleton } from '@mui/material';
+import FlashSale from '../../components/FlashSale/index';
 import "react-loading-skeleton/dist/skeleton.css";
 import HomeHero from '../../components/HomeHero';
 
@@ -284,6 +285,8 @@ function Home() {
                     ))}
                 </ul>
             </div>
+
+            <FlashSale />
 
             <div className={cx('hide-on-tablet-mobile')}>
                 <Categories categoryList={categories} />

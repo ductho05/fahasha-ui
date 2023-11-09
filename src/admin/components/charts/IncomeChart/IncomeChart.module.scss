@@ -1,0 +1,9 @@
+.cursor {
+    position: absolute;
+    width: 2px; /* Độ rộng của con trỏ */
+    background: red; /* Màu sắc của con trỏ */
+    height: 100%; /* Chiều cao của con trỏ */
+    top: 0;
+    left: 0; /* Vị trí ban đầu ẩn con trỏ */
+    display: none; /* Ẩn con trỏ ban đầu */
+}

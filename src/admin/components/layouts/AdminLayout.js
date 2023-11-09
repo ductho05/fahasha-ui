@@ -13,22 +13,22 @@ function AdminLayout({ children }) {
     const [isLoaded, setIsLoaded] = useState(
         localStorage.getItem('temporary_data')
             ? {
-                products: true,
-                flashsales: true,
-            }
+                  products: true,
+                  flashsales: true,
+              }
             : {
-                products: false,
-                flashsales: false,
-            },
+                  products: false,
+                  flashsales: false,
+              },
     );
     const [percent, setPercent] = useState(0);
     const [data, setData] = useState(
         localStorage.getItem('temporary_data')
             ? JSON.parse(localStorage.getItem('temporary_data'))
             : {
-                products: [],
-                flashsales: [],
-            },
+                  products: [],
+                  flashsales: [],
+              },
     );
 
     // useEffect(() => {
