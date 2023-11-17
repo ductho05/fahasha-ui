@@ -2,7 +2,7 @@ import React from 'react'
 import classNames from "classnames/bind"
 import styles from './Order.module.scss'
 import EnhancedTable from '../../components/Table/EnhancedTable';
-import { api, CHOXACNHAN, DANGGIAO, HOANTHANH } from '../../../constants';
+import { api, CHOXACNHAN, DAHUY, DANGGIAO, HOANTHANH } from '../../../constants';
 import LinearProgress from '@mui/material/LinearProgress';
 import { Backdrop } from '@mui/material';
 import { toast, ToastContainer } from 'react-toastify'
@@ -175,18 +175,22 @@ function Order() {
                 }
 
                 return <div style={{ display: 'flex' }} onClick={handleOnCLick}>
-                    <Popconfirm
-                        title="Xác nhận?"
-                        description="Đơn hàng sẽ được cập nhật trạng thái"
-                        onConfirm={handleUpdate}
-                        onCancel={() => { }}
-                        okText="Đồng ý"
-                        cancelText="Hủy"
-                    >
-                        <p>
-                            <StatusOrder status={params.row.status} />
-                        </p>
-                    </Popconfirm>
+                    {
+                        params.row.status === HOANTHANH || params.row.status === DAHUY
+                            ? <StatusOrder status={params.row.status} />
+                            : <Popconfirm
+                                title="Xác nhận?"
+                                description="Đơn hàng sẽ được cập nhật trạng thái"
+                                onConfirm={handleUpdate}
+                                onCancel={() => { }}
+                                okText="Đồng ý"
+                                cancelText="Hủy"
+                            >
+                                <p>
+                                    <StatusOrder status={params.row.status} />
+                                </p>
+                            </Popconfirm>
+                    }
 
                 </div>
             }

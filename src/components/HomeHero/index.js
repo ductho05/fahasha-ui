@@ -1,20 +1,29 @@
 import React from 'react'
 import { Carousel } from 'antd';
-import BG5 from '../../assets/images/SlideBg/BG5.jpg'
-import BG8 from '../../assets/images/SlideBg/BG8.jpg'
+import SLIDE1 from '../../assets/images/SlideBg/SLIDE1.png'
+import SLIDE2 from '../../assets/images/SlideBg/SLIDE2.jpg'
+import SLIDE3 from '../../assets/images/SlideBg/SLIDE3.jpg'
+import SLIDE4 from '../../assets/images/SlideBg/SLIDE4.jpg'
+
 const contentStyle = {
     height: 'max-content',
     width: '100vw',
-    objectFit: 'cover'
+    objectFit: 'contain'
 };
 function HomeHero() {
     return (
         <Carousel autoplay>
             <div>
-                <img src={BG5} style={contentStyle} />
+                <img src={SLIDE1} style={contentStyle} />
             </div>
             <div>
-                <img src={BG8} style={contentStyle} />
+                <img src={SLIDE2} style={contentStyle} />
+            </div>
+            <div>
+                <img src={SLIDE3} style={contentStyle} />
+            </div>
+            <div>
+                <img src={SLIDE4} style={contentStyle} />
             </div>
         </Carousel>
     )

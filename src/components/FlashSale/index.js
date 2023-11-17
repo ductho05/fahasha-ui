@@ -20,11 +20,9 @@ function GetCoupon(price, priceSale) {
 
 function GetListGift(gifts) {
     //const { gifts } = props;
-    console.log('gifts1', gifts);
     var listGift = [];
     var listGiftTemp = [];
     gifts.map((item, index) => {
-        console.log('item', index, item);
         if (index % 4 === 0 && index !== 0) {
             listGift.push(listGiftTemp);
             listGiftTemp = [];

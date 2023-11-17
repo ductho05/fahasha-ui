@@ -24,6 +24,7 @@ import { WarningOutlined } from '@ant-design/icons';
 import { notification } from 'antd';
 import ServiceWorkerNotifi from '../../../service/ServiceWorkerNotifi';
 import SendNotification from '../../../service/SendNotification'
+import { socket } from '../../../service/SocketIo';
 
 const cx = classNames.bind(styles);
 function RegisterLogin(props) {
@@ -179,6 +180,7 @@ function RegisterLogin(props) {
                     } else if (result.message == 'Login Succsess') {
                         dispatch(login(result));
                         ServiceWorkerNotifi()
+                        state.socket.emit('save-socket', (result.data._id))
                     }
                 }
             })
@@ -240,6 +242,8 @@ function RegisterLogin(props) {
                         image,
                         url
                     })
+                    ServiceWorkerNotifi()
+                    state.socket.emit('save-socket', (result.data._id))
                 } else if (result.status == 'Falure' && result.message == 'User is already') {
                     setShowProgress(false);
                     setShowDialogRegister(true);

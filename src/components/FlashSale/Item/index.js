@@ -10,7 +10,6 @@ const cx = classname.bind(styles);
 function Item(props) {
     const navigate = useNavigate();
     const { item, index } = props;
-    console.log('item', item);
     const restAPI = 'https://backoffice.nodemy.vn';
     function GetCoupon(price, priceSale) {
         var coupon = 100 - Math.floor((price / priceSale) * 100);
