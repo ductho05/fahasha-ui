@@ -17,6 +17,7 @@
     justify-content: center;
     align-items: center;
     width: 100%;
+    z-index: 1;
 }
 
 .gift-current__text {
@@ -64,7 +65,7 @@
     background-color: rgba(255, 242, 123, 0.941);
     border-radius: 4px;
     padding: 1% 0;
-     height: 436.45px;
+    height: 436.45px;
     //height: 100%;
     position: relative;
 }
