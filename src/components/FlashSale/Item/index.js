@@ -170,8 +170,8 @@ function Item({ item, index, type, filter }) {
                                     {filter !== undefined && filter == false
                                         ? item.hide_price
                                         : numeral(item.product?.old_price * (1 - item.current_sale / 100)).format(
-                                              '0,0',
-                                          )}
+                                            '0,0',
+                                        )}
                                     <span>đ</span>
                                 </div>
                                 <div className={cx('price__old')}>

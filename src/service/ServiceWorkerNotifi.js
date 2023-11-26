@@ -24,10 +24,37 @@ const requestNoficationPermissions = async () => {
     }
 };
 
-const sendData = () => {
+const sendData = async () => {
     const token = JSON.parse(localStorage.getItem('token'))
     navigator.serviceWorker.ready.then((registration) => {
         registration.active.postMessage({ action: 'send-token', data: token });
+    });
+}
+
+const checkSubscription = async () => {
+    navigator.serviceWorker.ready.then((serviceWorkerRegistration) => {
+        serviceWorkerRegistration.pushManager
+            .getSubscription()
+            .then(async (subscription) => {
+                const token = JSON.parse(localStorage.getItem('token'))
+                await fetch('https://bookstore-api-0a2i.onrender.com/bookstore/api/v1/webpush/subscription', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        token,
+                        subscription
+                    })
+                })
+                    .then(response => response.json())
+                    .then(result => {
+                        console.log(result)
+                    })
+            })
+            .catch((err) => {
+                console.error(`Error during getSubscription(): ${err}`);
+            });
     });
 }
 
@@ -36,7 +63,8 @@ const main = async () => {
         checkPermission();
         await requestNoficationPermissions();
         await registerSw()
-        sendData()
+        await sendData()
+        await checkSubscription()
     } catch (error) {
         console.log(error);
     }

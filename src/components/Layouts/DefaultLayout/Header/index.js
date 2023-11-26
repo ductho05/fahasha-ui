@@ -59,7 +59,15 @@ function Header() {
     const [notice, setNotice] = useState([]);
     const [numNoticeNoAccess, setNumNoticeNoAccess] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
+    const [toNotice, setToNotice] = useState(false)
     const productQuality = 7;
+
+    useEffect(() => {
+        state.socket.on('response-notification', () => {
+            console.log('Đã nhận thông báo')
+            setToNotice(prev => !prev)
+        })
+    }, [])
 
     useEffect(() => {
         if (state.user) {
@@ -81,7 +89,7 @@ function Header() {
             .catch(err => {
                 console.error(err)
             })
-    }, [state]);
+    }, [state, toNotice]);
 
     useEffect(() => {
         const num = notice.reduce((acc, item) => {
@@ -300,9 +308,10 @@ function Header() {
                     </div>
                     <div
                         style={{
-                            backgroundImage: "linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%)"
+                            backgroundColor: "#fff",
+                            borderBottom: `${isHideBanner ? "" : "1px solid #7A7E7F"}`
                         }}
-                        className={cx('wrapper', "shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px]")}>
+                        className={cx('wrapper', `${isHideBanner && "shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] fixed left-0 top-[-1px]"}`)}>
                         <div className={isHideBanner ? cx('hide') : cx('hide-on-desktop')}>
                             {isLoading ? (
                                 <Skeleton
@@ -410,13 +419,13 @@ function Header() {
                                         <span className={cx('icon_menu')}>
                                             <WidgetsIcon style={{
                                                 fontSize: "30px",
-                                                color: "#c92127"
+                                                color: "#7A7E7F"
                                             }} />
                                         </span>
                                         <span className={cx('icon_seemore')}>
                                             <ArrowDropDownIcon style={{
                                                 fontSize: "20px",
-                                                color: "#c92127"
+                                                color: "#7A7E7F"
                                             }} />
                                         </span>
                                     </div>
@@ -521,7 +530,7 @@ function Header() {
                                 >
                                     <div
                                         style={{
-                                            borderColor: "#c92127"
+                                            borderColor: "#7A7E7F"
                                         }}
                                         className={cx('search')}>
                                         <input
@@ -630,12 +639,12 @@ function Header() {
                                 >
                                     <div
                                         style={{
-                                            color: "#c92127"
+                                            color: "#7A7E7F"
                                         }}
                                         className={cx('notification', 'hide-on-tablet-mobile')}>
                                         <BellOutlined className="text-[20px]" />
                                         <label style={{
-                                            color: "#c92127",
+                                            color: "#7A7E7F",
                                             fontSize: '1.4rem'
                                         }}>Thông báo</label>
                                         <p className={Object.keys(user).length > 0 ? cx('num_carts') : cx('hide')}>{numNoticeNoAccess}</p>
@@ -644,10 +653,10 @@ function Header() {
 
                                 <Link to="/cart" className={cx('cart')}>
                                     <ShoppingCartOutlined className="text-[20px]" style={{
-                                        color: "#c92127"
+                                        color: "#7A7E7F"
                                     }} />
                                     <label style={{
-                                        color: "#c92127",
+                                        color: "#7A7E7F",
                                         fontSize: '1.4rem'
                                     }}>Giỏ hàng</label>
                                     <p className={Object.keys(user).length > 0 ? cx('num_carts') : cx('hide')}>
@@ -686,10 +695,10 @@ function Header() {
                                 >
                                     <Link to={`/account/${0}`} className={cx('account')}>
                                         <UserOutlined className="text-[20px]" style={{
-                                            color: "#c92127"
+                                            color: "#7A7E7F"
                                         }} />
                                         <label style={{
-                                            color: "#c92127",
+                                            color: "#7A7E7F",
                                             fontSize: '1.4rem'
                                         }}>{Object.keys(user).length > 0 ? user.fullName : 'Tài khoản'}</label>
                                     </Link>

@@ -1,9 +1,11 @@
 import { REGISTER, LOGIN, LOGOUT, UPDATE, NOACTION, SEENOTICE } from './constants';
 import { api } from '../constants';
 import localstorge from './localstorge';
+import { socket } from '../service/SocketIo';
 
 var user = {};
 var token = localstorge.get();
+var sk = socket
 if (token) {
     await fetch(`${api}/users/profile`, {
         method: 'POST',
@@ -27,6 +29,7 @@ const initialState = {
     token: token,
     action: '',
     isLoggedIn: localstorge.get().length > 0,
+    socket: sk
 };
 
 function Reducer(state, action) {

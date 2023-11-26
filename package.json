@@ -63,6 +63,7 @@
         "recharts": "^2.7.2",
         "remark-gfm": "^4.0.0",
         "sass": "^1.63.5",
+        "socket.io-client": "^4.7.2",
         "victory": "^36.6.11",
         "web-vitals": "^2.1.4"
     },

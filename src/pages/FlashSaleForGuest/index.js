@@ -353,7 +353,7 @@ function FlashSaleForGuest() {
                         <OfflineBoltIcon
                             fontSize="large"
                             style={{
-                                zIndex: '1000',
+                                zIndex: '0',
                                 marginRight: '0.5rem',
                             }}
                         />
@@ -422,7 +422,7 @@ function FlashSaleForGuest() {
                             position: 'absolute',
                             maxWidth: '100%',
                             height: '40vh',
-                            zIndex: '900',
+                            zIndex: '0',
                             top: '0',
                             left: '30vw',
                         }}
@@ -442,7 +442,7 @@ function FlashSaleForGuest() {
                         ref={container2}
                         style={{
                             flex: '1',
-                            zIndex: '800',
+                            zIndex: '0',
                         }}
                     ></div>
                     <div
@@ -473,7 +473,7 @@ function FlashSaleForGuest() {
                 <div
                     className={cx('wrapper_menu')}
                     style={{
-                        zIndex: '1000',
+                        zIndex: '0',
                     }}
                 >
                     <div className={cx('wrapper_menu__time')}>
@@ -615,7 +615,7 @@ function FlashSaleForGuest() {
                                                             index >= (pageNum - 1) * perPage &&
                                                             index < pageNum * perPage && (
                                                                 <Item
-                                                                    filter = {item.point_sale == Math.floor(currentHourInVietnam / 3) && item.date_sale == formatDateToString(
+                                                                    filter={item.point_sale == Math.floor(currentHourInVietnam / 3) && item.date_sale == formatDateToString(
                                                                         new Date(),
                                                                     ) ? true : false}
                                                                     key={index}
@@ -726,21 +726,21 @@ function FlashSaleForGuest() {
                                                         valueOptionCategory == '',
                                                 ).length / perPage,
                                             ) != pageNum && (
-                                                <RightOutlined
-                                                    style={{
-                                                        color: '#0066ff',
-                                                    }}
-                                                    onClick={() => {
-                                                        // tự động scroll lên đầu trang
-                                                        window.scrollTo({
-                                                            top: valueTop,
+                                                    <RightOutlined
+                                                        style={{
+                                                            color: '#0066ff',
+                                                        }}
+                                                        onClick={() => {
+                                                            // tự động scroll lên đầu trang
+                                                            window.scrollTo({
+                                                                top: valueTop,
 
-                                                            behavior: 'smooth',
-                                                        });
-                                                        setPageNum(pageNum + 1);
-                                                    }}
-                                                />
-                                            )}
+                                                                behavior: 'smooth',
+                                                            });
+                                                            setPageNum(pageNum + 1);
+                                                        }}
+                                                    />
+                                                )}
                                         </span>{' '}
                                     </>
                                 )}
