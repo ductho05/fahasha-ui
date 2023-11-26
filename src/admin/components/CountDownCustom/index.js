@@ -27,6 +27,7 @@ const App = ({ title, isLoading, props, reload }) => {
     const [countdown, setCountdown] = useState(null);
     const deadline = localStorage.getItem('date_flash') ? localStorage.getItem('date_flash') : null;
 
+    console.log('deadline', deadline);
     useEffect(() => {
         let countDownDate = null;
 
@@ -47,6 +48,8 @@ const App = ({ title, isLoading, props, reload }) => {
             const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            console.log('days', days);
 
             // Hiển thị đồng hồ đếm ngược
             setCountdown(

@@ -87,7 +87,7 @@ function FlashSale() {
             if (gifts.length === 0) {
                 setIsShow(true);
             }
-        }, 100000);
+        }, 15000);
     }, []);
 
     return (
