@@ -50,7 +50,7 @@ function FlashSale() {
             animationData: require('../../assets/json/sale_tag.json'),
         });
     }, []);
-
+    console.log('gifts', gifts);
     useEffect(() => {
         axios
             .get(`${api}/flashsales?sort=reverse&filter=expired&num=${numFlash}`)
@@ -87,7 +87,7 @@ function FlashSale() {
             if (gifts.length === 0) {
                 setIsShow(true);
             }
-        }, 10000);
+        }, 100000);
     }, []);
 
     return (

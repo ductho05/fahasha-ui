@@ -168,7 +168,7 @@ function FlashSaleForGuest() {
     const [productsHots, setProductsHots] = useState([]);
     const [categoryBooks, setCategoryBooks] = useState([]);
     const [data, setData] = useState([]);
-    const [isLoading, setIsLoading] = useState(true); // load lai cục flashsale khi thay đổi thời gian
+    const [isLoading, setIsLoading] = useState(false); // load lai cục flashsale khi thay đổi thời gian
     const [load_animation, setLoad_animation] = useState(true); // load animation
     const navigate = useNavigate();
     const [perPage, setPerPage] = useState(24);
@@ -194,6 +194,8 @@ function FlashSaleForGuest() {
     const reloadFlashSale = () => {
         setIsLoading(!isLoading);
     };
+
+    console.log(isLoading, valueOptionDate, valueOptionTimePoint);
 
     useEffect(() => {
         fetch(`${api}/categories?filter=simple`)
@@ -393,7 +395,7 @@ function FlashSaleForGuest() {
                 <div style={{ flex: '1' }}></div>
             </div>
             <div className={cx('wrapper_body')}>
-                {/* <div className={cx('wrapper_image')}>
+                <div className={cx('wrapper_image')}>
                     <div
                         style={{
                             position: 'absolute',
@@ -457,7 +459,7 @@ function FlashSaleForGuest() {
                             - Sách ngoại ngữ -<br /> - Mại dô mại dô... -
                         </div>
                     </div>
-                </div> */}
+                </div>
                 <div
                     className={cx('wrapper_menu')}
                     style={{
@@ -555,7 +557,6 @@ function FlashSaleForGuest() {
                                     maxHeight: '55vh',
                                     display: 'flex',
                                     flexDirection: 'column-reverse',
-                                   
                                 }}
                                 // sửa lại style của content
 
