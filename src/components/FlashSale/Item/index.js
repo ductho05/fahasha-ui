@@ -19,10 +19,17 @@ const numeral = require('numeral');
 
 const cx = classname.bind(styles);
 
-function Item({ item, index, type }) {
+function Item({ item, index, type, filter }) {
     const navigate = useNavigate();
     const [state, dispatch] = useStore();
     const [showNolginDialog, setShowNolginDialog] = useState(false);
+
+    const changeNumSale = (num) => {
+        let hiddenPriceString = '';
+        hiddenPriceString += num.toString()[0];
+        hiddenPriceString += 'X';
+        return hiddenPriceString;
+    };
 
     function checkCart(pops) {
         const { cart, item } = pops;
@@ -160,24 +167,34 @@ function Item({ item, index, type }) {
                         <div className={cx('item-content__info')}>
                             <div className={cx('item-content__price')}>
                                 <div className={cx('price__new')}>
-                                    {numeral(item.product?.old_price * (1 - item.current_sale / 100)).format('0,0')}
+                                    {filter !== undefined && filter == false
+                                        ? item.hide_price
+                                        : numeral(item.product?.old_price * (1 - item.current_sale / 100)).format(
+                                              '0,0',
+                                          )}
                                     <span>đ</span>
                                 </div>
                                 <div className={cx('price__old')}>
                                     <div className={cx('price')}>
                                         {numeral(item.product?.old_price).format('0,0') + 'đ'}
                                     </div>
-                                    <div className={cx('sale')}>{`-${item.current_sale}%`}</div>
+                                    <div className={cx('sale')}>
+                                        {filter !== undefined && filter == false
+                                            ? `-${changeNumSale(item.current_sale)}%`
+                                            : `-${item.current_sale}%`}
+                                    </div>
                                 </div>
                             </div>
-                            <div
-                                className={cx('item-content__gettocart')}
-                                onClick={() => {
-                                    handleAddToCart(item.product?._id);
-                                }}
-                            >
-                                <ShoppingCartOutlined style={{ fontSize: '2rem', color: 'green' }} />
-                            </div>
+                            {filter !== undefined && filter == true && (
+                                <div
+                                    className={cx('item-content__gettocart')}
+                                    onClick={() => {
+                                        handleAddToCart(item.product?._id);
+                                    }}
+                                >
+                                    <ShoppingCartOutlined style={{ fontSize: '2rem', color: 'green' }} />
+                                </div>
+                            )}
                         </div>
                         <div style={{ position: 'relative' }}>
                             <Progress

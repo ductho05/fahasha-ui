@@ -14,6 +14,16 @@ function formatNumber(number) {
 }
 const App = ({ title, isLoading, props, reload }) => {
     const cx = classNames.bind(styles);
+    const moment = require('moment-timezone');
+
+    // Đặt múi giờ cho Việt Nam
+    const vietnamTimeZone = 'Asia/Ho_Chi_Minh';
+
+    // Lấy thời gian hiện tại ở Việt Nam
+    const currentTimeInVietnam = moment().tz(vietnamTimeZone);
+
+    // Lấy số giờ hiện tại
+    const currentHourInVietnam = currentTimeInVietnam.get('hours');
     const [countdown, setCountdown] = useState(null);
     const deadline = localStorage.getItem('date_flash') ? localStorage.getItem('date_flash') : null;
 
@@ -22,7 +32,7 @@ const App = ({ title, isLoading, props, reload }) => {
 
         countDownDate = deadline
             ? new Date(deadline).getTime()
-            : new Date().setHours((Math.floor(new Date().getHours() / 3) + 1) * 3, 0, 0);
+            : new Date().setHours((Math.floor(currentHourInVietnam / 3) + 1) * 3, 0, 0);
         // new Date().setHours(17, new Date().getMinutes() + 1, 0);
         // Cập nhật đồng hồ đếm ngược mỗi 1 giây
         const x = setInterval(() => {

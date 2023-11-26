@@ -87,7 +87,16 @@ const options = [
 function FlashSaleDetail() {
     const cx = classNames.bind(styles);
     const navigate = useNavigate();
+    const moment = require('moment-timezone');
 
+    // Đặt múi giờ cho Việt Nam
+    const vietnamTimeZone = 'Asia/Ho_Chi_Minh';
+
+    // Lấy thời gian hiện tại ở Việt Nam
+    const currentTimeInVietnam = moment().tz(vietnamTimeZone);
+
+    // Lấy số giờ hiện tại
+    const currentHourInVietnam = currentTimeInVietnam.get('hours');
     const { flashId } = useParams();
     const [flash, setFlash] = useState({});
     const [showDialog, setShowDialog] = useState(false);
@@ -252,7 +261,7 @@ function FlashSaleDetail() {
         flash.date_sale ==
             `${new Date().getUTCFullYear()}-${(new Date().getUTCMonth() + 1).toString().padStart(2, '0')}-${new Date()
                 .toString()
-                .slice(8, 10)}` && flash.point_sale == Math.floor(new Date().getHours() / 3)
+                .slice(8, 10)}` && flash.point_sale == Math.floor(currentHourInVietnam / 3)
             ? localStorage.setItem(
                   'date_flash',
                   `${flash.date_sale.slice(5, 7)} ${flash.date_sale.slice(8, 10)}, ${flash.date_sale.slice(0, 4)} ${
@@ -576,7 +585,7 @@ function FlashSaleDetail() {
                                     `${new Date().getUTCFullYear()}-${(new Date().getUTCMonth() + 1)
                                         .toString()
                                         .padStart(2, '0')}-${new Date().toString().slice(8, 10)}` &&
-                                flash.point_sale == Math.floor(new Date().getHours() / 3) ? (
+                                flash.point_sale == Math.floor(currentHourInVietnam / 3) ? (
                                     <CountDownCustom title={'Thời gian còn lại:'} isLoading={isLoading} />
                                 ) : (
                                     <CountDownCustom title={'Đếm ngược đến giờ mở bán:'} isLoading={isLoading} />

@@ -17,6 +17,19 @@ const cx = classNames.bind(styles);
 function FlashSale() {
     const container1 = useRef(null);
     const navigate = useNavigate();
+
+    const moment = require('moment-timezone');
+
+    // Đặt múi giờ cho Việt Nam
+    const vietnamTimeZone = 'Asia/Ho_Chi_Minh';
+
+    // Lấy thời gian hiện tại ở Việt Nam
+    const currentTimeInVietnam = moment().tz(vietnamTimeZone);
+
+    // Lấy số giờ hiện tại
+    const currentHourInVietnam = currentTimeInVietnam.get('hours');
+
+
     lottie.loadAnimation({
         container: container1.current, // Thay container2.current bằng document.getElementById nếu bạn không sử dụng useRef.
         renderer: 'svg',
@@ -133,8 +146,7 @@ function FlashSale() {
             width: spaceSizeCol[8],
             renderCell: (params) => {
                 const currentDate = new Date();
-                let current_point_sale = Math.floor(currentDate.getHours() / 3);
-
+                let current_point_sale = Math.floor(currentHourInVietnam / 3);
                 const year = currentDate.getUTCFullYear();
                 const month = (currentDate.getUTCMonth() + 1).toString().padStart(2, '0');
                 const day = currentDate.toString().slice(8, 10);
@@ -172,7 +184,7 @@ function FlashSale() {
             renderCell: (params) => {
                 const currentDate = new Date();
 
-                let current_point_sale = Math.floor(currentDate.getHours() / 3);
+                let current_point_sale = Math.floor(currentHourInVietnam / 3);
                 const year = currentDate.getUTCFullYear();
                 const month = (currentDate.getUTCMonth() + 1).toString().padStart(2, '0');
                 const day = currentDate.toString().slice(8, 10);

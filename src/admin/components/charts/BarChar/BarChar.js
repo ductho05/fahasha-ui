@@ -22,6 +22,17 @@ import {
     SyncOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+
+const moment = require('moment-timezone');
+
+    // Đặt múi giờ cho Việt Nam
+    const vietnamTimeZone = 'Asia/Ho_Chi_Minh';
+
+    // Lấy thời gian hiện tại ở Việt Nam
+    const currentTimeInVietnam = moment().tz(vietnamTimeZone);
+
+    // Lấy số giờ hiện tại
+    const currentHourInVietnam = currentTimeInVietnam.get('hours');
 function BarChartExample({ data }) {
     const cx = classNames.bind(styles);
     const navigate = useNavigate();
@@ -29,6 +40,9 @@ function BarChartExample({ data }) {
     const [isToggle, setIsToggle] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [rows, setRows] = useState([]);
+
+    
+
     // lấy ngày hôm nay
     const getTimeData = () => {
         const currentDate = new Date();
@@ -36,7 +50,7 @@ function BarChartExample({ data }) {
         const month = (currentDate.getUTCMonth() + 1).toString().padStart(2, '0');
         const day = currentDate.toString().slice(8, 10);
         const utcTimeString = `${year}-${month}-${day}`;
-        let current_point_sale = Math.floor(currentDate.getHours() / 3);
+        let current_point_sale = Math.floor(currentHourInVietnam / 3);
         let toDay = utcTimeString;
 
         return { current_point_sale, toDay };

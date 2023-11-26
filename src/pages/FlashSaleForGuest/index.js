@@ -164,6 +164,16 @@ function formatDateToString(date) {
 
 const cx = classNames.bind(styles);
 function FlashSaleForGuest() {
+    const moment = require('moment-timezone');
+
+    // Đặt múi giờ cho Việt Nam
+    const vietnamTimeZone = 'Asia/Ho_Chi_Minh';
+
+    // Lấy thời gian hiện tại ở Việt Nam
+    const currentTimeInVietnam = moment().tz(vietnamTimeZone);
+
+    // Lấy số giờ hiện tại
+    const currentHourInVietnam = currentTimeInVietnam.get('hours');
     var category = JSON.parse(localStorage.getItem('mycategory')) || [];
     const [productsHots, setProductsHots] = useState([]);
     const [categoryBooks, setCategoryBooks] = useState([]);
@@ -173,7 +183,7 @@ function FlashSaleForGuest() {
     const navigate = useNavigate();
     const [perPage, setPerPage] = useState(24);
     const [pageNum, setPageNum] = useState(1);
-    const [valueOptionTimePoint, setValueOptionTimePoint] = useState(Math.floor(new Date().getHours() / 3));
+    const [valueOptionTimePoint, setValueOptionTimePoint] = useState(Math.floor(currentHourInVietnam / 3));
     const [valueOptionCategory, setValueOptionCategory] = useState('');
     const [valueOptionDate, setValueOptionDate] = useState(formatDateToString(new Date()));
     const [isLastPage, setIsLastPage] = useState(false);
@@ -238,7 +248,7 @@ function FlashSaleForGuest() {
 
     const getTimePont = () => {
         const timepoints = [];
-        let timepoint = Math.floor(new Date().getHours() / 3);
+        let timepoint = Math.floor(currentHourInVietnam / 3);
         let datesale = formatDateToString(new Date());
         let i = 0;
         while (i < 5) {
@@ -605,6 +615,9 @@ function FlashSaleForGuest() {
                                                             index >= (pageNum - 1) * perPage &&
                                                             index < pageNum * perPage && (
                                                                 <Item
+                                                                    filter = {item.point_sale == Math.floor(currentHourInVietnam / 3) && item.date_sale == formatDateToString(
+                                                                        new Date(),
+                                                                    ) ? true : false}
                                                                     key={index}
                                                                     item={item}
                                                                     index={index}

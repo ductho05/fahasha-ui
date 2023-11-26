@@ -26,6 +26,8 @@ import {
 import { api } from '../../../constants';
 import { set } from 'react-hook-form';
 
+
+
 function FlashSaleForm({ props, hideFunc }) {
     const [showProgress, setShowProgress] = useState(false);
     const [title, setTitle] = useState('');
@@ -34,6 +36,17 @@ function FlashSaleForm({ props, hideFunc }) {
     const [show, setShow] = useState(false);
     const [valuepoint, setValuepoint] = useState(null);
     const formRef = useRef(null);
+
+    const moment = require('moment-timezone');
+
+    // Đặt múi giờ cho Việt Nam
+    const vietnamTimeZone = 'Asia/Ho_Chi_Minh';
+
+    // Lấy thời gian hiện tại ở Việt Nam
+    const currentTimeInVietnam = moment().tz(vietnamTimeZone);
+
+    // Lấy số giờ hiện tại
+    const currentHourInVietnam = currentTimeInVietnam.get('hours');
     const formItemLayout = {
         labelCol: {
             span: 6,
@@ -81,7 +94,7 @@ function FlashSaleForm({ props, hideFunc }) {
         //console.log(values);
         setShowProgress(true);
         // kiểm tra pointsale ở thời điểm hiên tại
-        const current_point = Math.floor(new Date().getHours() / 3);
+        const current_point = Math.floor(currentHourInVietnam / 3);
         // kiểm tra date_sale có phải là ngày hiện tại hay không
         // in ra ngày hiện tại theo định dạng yyyy-mm-dd
         const current_date = formatDateToString(new Date());
@@ -214,7 +227,7 @@ function FlashSaleForm({ props, hideFunc }) {
     const handleAutoSetting = (values) => {
         var gioHienTai = new Date();
         setShow(false);
-        setValuepoint(Math.floor(gioHienTai.getHours() / 3));
+        setValuepoint(Math.floor(currentHourInVietnam / 3));
         formRef.current.setFieldsValue({
             num_sale: 100,
             is_loop: false,
