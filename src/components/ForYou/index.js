@@ -65,10 +65,10 @@ function ForYou({ limit }) {
                 src={restAPI + item.image?.item[0].attributes.url}
               /> */}
                 <img
-                    height="200px"
                     style={{
-                        backgroundColor: 'red',
-                        width: '98%',
+                        width: '200px',
+                        height: '200px',
+                        objectFit: 'contain'
                     }}
                     src={item.images}
                 />
@@ -97,8 +97,8 @@ function ForYou({ limit }) {
                                 opacity: '0.8',
                             }}
                             strokeColor={{
-                                '0%': 'pink',
-                                '100%': 'black',
+                                '0%': '#f6d365',
+                                '100%': '#fda085'
                             }}
                             trailColor="#dddddd"
                         />
@@ -163,7 +163,7 @@ function ForYou({ limit }) {
                 <div className={cx('foryou-current__content')}>
                     {GetListforyou().map((item, index) => {
                         return (
-                            <div key={index} className={cx('content')}>
+                            <div key={index} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
                                 {item.map((item, index) => {
                                     return <Itemforyou key={index} item={item} />;
                                 })}

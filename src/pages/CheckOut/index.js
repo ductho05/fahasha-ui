@@ -483,7 +483,7 @@ function CheckOut() {
             <Backdrop sx={{ color: '#fff', zIndex: 10000 }} open={showProgress}>
                 <CircularProgress color="error" />
             </Backdrop>
-            <form onSubmit={handleSubmit(submit)}>
+            <form onSubmit={handleSubmit(submit)} className="shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden">
                 <div className={cx('shipping_address')}>
                     <h3 className={cx('heading')}>Địa chỉ giao hàng</h3>
                     <div className={cx('form_group')}>
@@ -761,7 +761,7 @@ function CheckOut() {
                 </div>
             </form>
 
-            <div className={cx('payment_method')}>
+            <div className={cx('payment_method', "shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden")}>
                 <h3 className={cx('heading')}>Kiểm tra lại đơn hàng</h3>
                 {listCheckouts.map((item, index) => (
                     <li key={index} className={cx('product_item')}>

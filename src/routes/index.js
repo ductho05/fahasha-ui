@@ -32,7 +32,6 @@ const publicRoutes = [
     { path: '/seemore-product/:categoryId', component: SeeMoreProduct },
     { path: '/flashsale', component: FlashSaleForGuest},
     { path: '/search/:title', component: SearchProduct },
-    { path: '/login-register', component: RegisterLogin },
     { path: '/terms-of-service', component: TermsServices },
 ];
 
@@ -63,6 +62,11 @@ const adminRoutes = [
     { path: '/admin/notifications', component: Notifications },
 ];
 
+// Auth routes
+const authRoutes = [
+    { path: '/login-register', component: RegisterLogin },
+]
+
 const notFoundRoute = { path: '*', component: Page404 };
 
-export { publicRoutes, privateRoutes, notFoundRoute, adminRoutes };
+export { publicRoutes, privateRoutes, notFoundRoute, adminRoutes, authRoutes };

@@ -45,6 +45,7 @@
         "react-icons": "^4.11.0",
         "react-lazy-load-image-component": "^1.6.0",
         "react-loading-skeleton": "^3.3.1",
+        "react-lottie": "^1.2.3",
         "react-markdown": "^9.0.0",
         "react-multi-carousel": "^2.8.4",
         "react-multilevel-dropdown": "^4.0.0",

@@ -29,10 +29,6 @@ body {
     line-height: 1.5rem;
 }
 
-body::-webkit-scrollbar {
-    display: none;
-}
-
 a,
 input,
 [tab-index],
@@ -59,7 +55,8 @@ button {
 .MuiDialog-paper,
 .MuiDialog-paperScrollPaper,
 .MuiDialog-paperWidthSm,
-.css-1t1j96h-MuiPaper-root-MuiDialog-paper {
+.css-1t1j96h-MuiPaper-root-MuiDialog-paper,
+body {
     &::-webkit-scrollbar {
         width: 5px;
         height: 0;

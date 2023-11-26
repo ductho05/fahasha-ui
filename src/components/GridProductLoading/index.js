@@ -1,14 +1,17 @@
+import React from 'react'
 import ProductItem from '../ProductItem'
 
-function GridProduct({ isLoading, products }) {
+function GridProductLoading() {
+
+    const tempArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     return (
         <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
             {
-                products.map(product => (
+                tempArray?.map(() => (
                     <div>
                         {
-                            isLoading ? <ProductItem.Loading /> : < ProductItem product={product} />
+                            <ProductItem.Loading />
                         }
                     </div>
                 ))
@@ -18,4 +21,4 @@ function GridProduct({ isLoading, products }) {
     )
 }
 
-export default GridProduct
+export default GridProductLoading

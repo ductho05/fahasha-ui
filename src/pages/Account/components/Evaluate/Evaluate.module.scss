@@ -1,8 +1,9 @@
 .product_list,
 .list {
     list-style: none;
-    max-height: 65vh;
+    max-height: 100vh;
     overflow-y: scroll;
+    padding-bottom: 100px;
     &::-webkit-scrollbar {
         width: 5px;
         height: 0;

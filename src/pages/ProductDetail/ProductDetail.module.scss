@@ -1,7 +1,11 @@
+.wrapper {
+    padding: 40px;
+}
+
 .product_detail {
     display: flex;
     background-color: #fff;
-    padding: 16px;
+    padding: 30px 16px;
     border-radius: var(--border-radius);
 }
 
@@ -17,8 +21,9 @@
     height: 388px;
 
     img {
-        width: 388px;
-        height: 388px;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
     }
 }
 
@@ -778,6 +783,10 @@
 
 // On Tablet
 @media (min-width: 500px) and (max-width: 1023px) {
+    .wrapper {
+        padding: 20px;
+    }
+
     .btn_on_mobile {
         width: 80%;
         left: 10%;
@@ -810,7 +819,7 @@
     }
 
     .wrapper {
-        padding: 0;
+        padding: 10px;
     }
 
     .product_detail {

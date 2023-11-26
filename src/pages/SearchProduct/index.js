@@ -7,6 +7,7 @@ import Paging from '../../components/Paging'
 import GridProduct from '../../components/GridProduct'
 import { optionsArange, api } from '../../constants'
 import { Backdrop, CircularProgress } from '@mui/material'
+import GridProductLoading from '../../components/GridProductLoading'
 
 const cx = className.bind(styles)
 function SearchProduct() {
@@ -64,27 +65,28 @@ function SearchProduct() {
     }, [optionSelectedFilter])
     return (
         <div className={cx('wrapper')}>
-            <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={loading}>
-                <CircularProgress color="inherit" />
-            </Backdrop>
-            <div className={cx('result')}>
-                <h3>Kết quả tìm kiếm với:</h3>
-                <p>{`${title}(${products.length} kết quả)`}</p>
-            </div>
-            <div className={cx('fillter')}>
-                <div className={cx('fillter_arange')}>
-                    <p>Sắp xếp theo:</p>
-                    <DropMenu
-                        options={optionsArange}
-                        size='big'
-                        optionSelected={optionSelectedFilter}
-                        setOptionSelected={setOptionSelectedFilter}
-                    />
+            <div className="p-[20px] shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden">
+                <div className={cx('result')}>
+                    <h3>Kết quả tìm kiếm với:</h3>
+                    <p>{`${title}(${products.length} kết quả)`}</p>
+                </div>
+                <div className={cx('fillter')}>
+                    <div className={cx('fillter_arange')}>
+                        <p>Sắp xếp theo:</p>
+                        <DropMenu
+                            options={optionsArange}
+                            size='big'
+                            optionSelected={optionSelectedFilter}
+                            setOptionSelected={setOptionSelectedFilter}
+                        />
+                    </div>
                 </div>
             </div>
 
-            <div className={cx('product_list')}>
-                <GridProduct products={products} />
+            <div className={cx('product_list', 'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden')}>
+                {
+                    loading ? <GridProductLoading /> : <GridProduct products={products} />
+                }
             </div>
         </div>
     )

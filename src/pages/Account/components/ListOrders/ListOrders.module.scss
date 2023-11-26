@@ -23,8 +23,9 @@
 }
 .order_list {
     list-style: none;
-    max-height: 60vh;
+    max-height: 80vh;
     overflow-y: scroll;
+    padding-bottom: 100px;
 
     &::-webkit-scrollbar {
         width: 5px;

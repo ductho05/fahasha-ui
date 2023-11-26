@@ -24,6 +24,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useStore } from '../../stores/hooks';
 import EvaluateForm from '../../components/Forms/EvaluateForm';
 import LikeDislike from '../../components/LikeDislike';
+import Skeleton from '@mui/material/Skeleton';
 
 const cx = classNames.bind(styles);
 
@@ -354,29 +355,25 @@ function ProductDetail() {
                         ></RegisterLogin>
                     </Modal>
                 </div>
-                <div className={cx('visible')}>
-                    <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={loading}>
-                        <CircularProgress color="inherit" />
-                    </Backdrop>
-                </div>
-                <div className={cx('product_detail')}>
-                    <div className={cx('product_left')}>
-                        <div className={cx('product_thumnail')}>
-                            <img src={product.images} />
+                {
+                    loading ? <Loading /> : <div className={cx('product_detail', 'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden')}>
+                        <div className={cx('product_left')}>
+                            <div className={cx('product_thumnail')}>
+                                <img src={product.images} />
+                            </div>
+                            <div className={cx('product_btn', 'hide_on_tablet_mobile')}>
+                                <Button onClick={handleAddToCart} leftIcon={<FontAwesomeIcon icon={faCartShopping} />}>
+                                    Thêm vào giỏ hàng
+                                </Button>
+                                <Button onClick={handleBuyNow} primary>
+                                    Mua ngay
+                                </Button>
+                            </div>
                         </div>
-                        <div className={cx('product_btn', 'hide_on_tablet_mobile')}>
-                            <Button onClick={handleAddToCart} leftIcon={<FontAwesomeIcon icon={faCartShopping} />}>
-                                Thêm vào giỏ hàng
-                            </Button>
-                            <Button onClick={handleBuyNow} primary>
-                                Mua ngay
-                            </Button>
-                        </div>
-                    </div>
 
-                    <div className={cx('product_right')}>
-                        <p className={cx('product_name')}>{product.title}</p>
-                        {/* <div className={cx('manu_brand', 'hide_on_mobile')}>
+                        <div className={cx('product_right')}>
+                            <p className={cx('product_name')}>{product.title}</p>
+                            {/* <div className={cx('manu_brand', 'hide_on_mobile')}>
                             <p className={cx('manufacturer_name')}>
                                 Nhà cung cấp:
                                 <a href="#">Kokuyo</a>
@@ -391,71 +388,73 @@ function ProductDetail() {
                             Xuất xứ:
                             <span>Thương Hiệu Nhật</span>
                         </p> */}
-                        <div className={cx('rate')}>
-                            {rates.map((rate, index) => (
-                                <span
-                                    key={index}
-                                    className={rate <= product.rate ? cx('star_active', 'rate_star') : cx('rate_star')}
-                                >
-                                    <FontAwesomeIcon icon={faStar} />
-                                </span>
-                            ))}
-                            <p className={cx('rate_number')}>({evaluate.total} đánh giá)</p>
-                            <p className={cx('btn_share', 'hide_on_pc')}>
-                                <FontAwesomeIcon icon={faShareNodes} />
-                            </p>
-                        </div>
-
-                        <div className={cx('mid_content')}>
-                            <div className={cx('price')}>
-                                <p className={cx('current_price')}>{numeral(product.price).format('0,0[.]00 VNĐ')} đ</p>
-                                <p className={product.price === product.old_price ? cx('hidden') : cx('old_price')}>
-                                    {numeral(product.old_price).format('0,0[.]00 VNĐ')} đ
-                                </p>
-                                <p className={product.price === product.old_price ? cx('hidden') : cx('discount')}>
-                                    -{(100 - (product.price / product.old_price) * 100).toFixed(1)}%
+                            <div className={cx('rate')}>
+                                {rates.map((rate, index) => (
+                                    <span
+                                        key={index}
+                                        className={rate <= product.rate ? cx('star_active', 'rate_star') : cx('rate_star')}
+                                    >
+                                        <FontAwesomeIcon icon={faStar} />
+                                    </span>
+                                ))}
+                                <p className={cx('rate_number')}>({evaluate.total} đánh giá)</p>
+                                <p className={cx('btn_share', 'hide_on_pc')}>
+                                    <FontAwesomeIcon icon={faShareNodes} />
                                 </p>
                             </div>
-                            <p className={cx('btn_share', 'hide_on_tablet_mobile')}>
-                                <FontAwesomeIcon icon={faShareNodes} />
-                            </p>
-                        </div>
-                        <div className={cx('shipping')}>
-                            <p className={cx('hide_on_tablet_mobile')}>Thời gian giao hàng</p>
-                            <p>Giao hàng đến</p>
-                            <a href="#">Thay đổi</a>
-                        </div>
-                        <div className={cx('policy_lie')}>
-                            <p className={cx('hide_on_tablet_mobile')}>Chính sách đổi trả</p>
-                            <p>Đổi trả sản phẩm trong 30 ngày</p>
-                            <a href="#">Xem thêm</a>
-                        </div>
-                        <div className={cx('quantity', 'hide_on_tablet_mobile')}>
-                            <p className={cx('label')}>Số lượng:</p>
-                            <div className={cx('quantity_btn')}>
-                                <p onClick={handleMinus} className={cx('btn_minus')}>
-                                    <FontAwesomeIcon icon={faMinus} />
+
+                            <div className={cx('mid_content')}>
+                                <div className={cx('price')}>
+                                    <p className={cx('current_price')}>{numeral(product.price).format('0,0[.]00 VNĐ')} đ</p>
+                                    <p className={product.price === product.old_price ? cx('hidden') : cx('old_price')}>
+                                        {numeral(product.old_price).format('0,0[.]00 VNĐ')} đ
+                                    </p>
+                                    <p className={product.price === product.old_price ? cx('hidden') : cx('discount')}>
+                                        -{(100 - (product.price / product.old_price) * 100).toFixed(1)}%
+                                    </p>
+                                </div>
+                                <p className={cx('btn_share', 'hide_on_tablet_mobile')}>
+                                    <FontAwesomeIcon icon={faShareNodes} />
                                 </p>
-                                <input type="number" value={currentQuantity} className={cx('quantity_num')} />
-                                <p onClick={handlePlus} className={cx('btn_plus')}>
-                                    <FontAwesomeIcon icon={faPlus} />
-                                </p>
+                            </div>
+                            <div className={cx('shipping')}>
+                                <p className={cx('hide_on_tablet_mobile')}>Thời gian giao hàng</p>
+                                <p>Giao hàng đến</p>
+                                <a href="#">Thay đổi</a>
+                            </div>
+                            <div className={cx('policy_lie')}>
+                                <p className={cx('hide_on_tablet_mobile')}>Chính sách đổi trả</p>
+                                <p>Đổi trả sản phẩm trong 30 ngày</p>
+                                <a href="#">Xem thêm</a>
+                            </div>
+                            <div className={cx('quantity', 'hide_on_tablet_mobile')}>
+                                <p className={cx('label')}>Số lượng:</p>
+                                <div className={cx('quantity_btn')}>
+                                    <p onClick={handleMinus} className={cx('btn_minus')}>
+                                        <FontAwesomeIcon icon={faMinus} />
+                                    </p>
+                                    <input type="number" value={currentQuantity} className={cx('quantity_num')} />
+                                    <p onClick={handlePlus} className={cx('btn_plus')}>
+                                        <FontAwesomeIcon icon={faPlus} />
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                }
 
-                <div className={cx('introduction')}>
+
+                <div className={cx('introduction', 'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden')}>
                     <h3>Fahasa giới thiệu</h3>
                     <ProductFrame productList={productNews} Component={ProductSlider}></ProductFrame>
                 </div>
 
-                <div className={cx('introduction')}>
+                <div className={cx('introduction', 'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden')}>
                     <h3>Sách liên quan</h3>
                     <ProductFrame productList={productRelated} Component={ProductSlider}></ProductFrame>
                 </div>
 
-                <div className={cx('infomation')}>
+                <div className={cx('infomation', 'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden')}>
                     <h3>Thông tin sản phẩm</h3>
                     <div className={cx('product_info')}>
                         <table className={cx('table_info')}>
@@ -501,7 +500,7 @@ function ProductDetail() {
                     </div>
                 </div>
 
-                <div className={cx('rating_product')}>
+                <div className={cx('rating_product', 'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden')}>
                     <h3>Đánh giá sản phẩm</h3>
                     <div className={cx('rating_body')}>
                         <div className={cx('list_rate')}>
@@ -628,6 +627,129 @@ function ProductDetail() {
             </ul>
         </>
     );
+}
+
+function Loading() {
+    return (
+        <div className={cx('wrapper')}>
+            <div className={cx('product_detail', 'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden')}>
+                <div className={cx('product_left')}>
+                    <div className={cx('product_thumnail')}>
+                        <Skeleton variant="rectangular" width={300} height={300} />
+                    </div>
+                    <div className={cx('product_btn', 'hide_on_tablet_mobile')}>
+                        <Skeleton variant="rectangular" width={300} height={300} />
+                        <Skeleton variant="rectangular" width={200} height={44} />
+                    </div>
+                </div>
+
+                <div className={cx('product_right')}>
+                    <p className={cx('product_name')}>
+                        <Skeleton variant="text" sx={{ fontSize: '2.2rem' }} />
+                    </p>
+                    <div className={cx('rate')}>
+                        <Skeleton variant="text" sx={{ fontSize: '1.3rem' }} />
+                    </div>
+
+                    <div className={cx('mid_content')}>
+                        <div className={cx('price')}>
+                            <Skeleton variant="text" sx={{ fontSize: '2.2rem' }} />
+                        </div>
+                    </div>
+                    <div className={cx('shipping')}>
+                        <Skeleton variant="text" sx={{ fontSize: '1.3rem' }} />
+                    </div>
+                    <div className={cx('policy_lie')}>
+                        <Skeleton variant="text" sx={{ fontSize: '1.3rem' }} />
+                    </div>
+                    <div className={cx('quantity', 'hide_on_tablet_mobile')}>
+                        <p className={cx('label')}>
+                            <Skeleton variant="text" sx={{ fontSize: '1.3rem' }} />
+                        </p>
+                        <div className={cx('quantity_btn')}>
+                            <Skeleton variant="rectangular" width={100} height={44} />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className={cx('infomation', 'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden')}>
+                <h3>
+                    <Skeleton variant="text" sx={{ fontSize: '2rem' }} />
+                </h3>
+                <div className={cx('product_info')}>
+                    <table className={cx('table_info')}>
+                        <colgroup>
+                            <col></col>
+                        </colgroup>
+                        <tbody>
+                            <tr>
+                                <th><Skeleton variant="text" sx={{ fontSize: '1.3rem' }} /></th>
+                                <th><Skeleton variant="text" sx={{ fontSize: '1.3rem' }} /></th>
+                            </tr>
+
+                            <tr>
+                                <th><Skeleton variant="text" sx={{ fontSize: '1.3rem' }} /></th>
+                                <th><Skeleton variant="text" sx={{ fontSize: '1.3rem' }} /></th>
+                            </tr>
+
+                            <tr>
+                                <th><Skeleton variant="text" sx={{ fontSize: '1.3rem' }} /></th>
+                                <th><Skeleton variant="text" sx={{ fontSize: '1.3rem' }} /></th>
+                            </tr>
+
+                            <tr>
+                                <th><Skeleton variant="text" sx={{ fontSize: '1.3rem' }} /></th>
+                                <th><Skeleton variant="text" sx={{ fontSize: '1.3rem' }} /></th>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>
+                        <th><Skeleton variant="text" sx={{ fontSize: '1.3rem' }} /></th>
+                    </p>
+                    <span>
+                        <th><Skeleton variant="text" sx={{ fontSize: '1.3rem' }} /></th>
+                    </span>
+                </div>
+
+                <div className={cx('description')}>
+                    <h5>
+                        <Skeleton variant="text" sx={{ fontSize: '2rem' }} />
+                    </h5>
+                </div>
+            </div>
+
+            <div className={cx('rating_product', 'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden')}>
+                <h3>
+                    <Skeleton variant="text" sx={{ fontSize: '2rem' }} />
+                </h3>
+                <div className={cx('rating_body')}>
+                    <div className={cx('list_rate')}>
+                        <h3 className={cx('current_rate')}>
+                            <Skeleton variant="text" sx={{ fontSize: '1.3rem' }} />
+                        </h3>
+                        <div className={cx('rate')}>
+                            <Skeleton variant="text" sx={{ fontSize: '1.3rem' }} />
+                        </div>
+                        <p className={cx('rate_number')}>
+                            <Skeleton variant="text" sx={{ fontSize: '1.3rem' }} />
+                        </p>
+                    </div>
+
+                    <div className={cx('rate_percent')}>
+                        {[1, 2, 3, 4, 5].map((rate, index) => (
+                            <div key={index} className={cx('rate_percent_item')}>
+                                <p><Skeleton variant="text" sx={{ fontSize: '1.6rem' }} /></p>
+                                <div className={cx('review_rating')}>
+                                    <Skeleton variant="text" sx={{ fontSize: '1.6rem' }} />
+                                </div>
+                                <p><Skeleton variant="text" sx={{ fontSize: '1.6rem' }} /></p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
 }
 
 export default ProductDetail;

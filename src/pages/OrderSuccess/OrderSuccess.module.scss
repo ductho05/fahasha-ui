@@ -26,14 +26,15 @@
 .btns {
     display: flex;
     list-style: none;
-    justify-content: space-between;
+    justify-content: center;
 }
 
 .btn {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 50%;
+    text-align: center;
+    width: 30%;
     height: 60px;
     color: #fff;
     cursor: pointer;
