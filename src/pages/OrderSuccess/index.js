@@ -62,7 +62,11 @@ function OrderSuccess() {
             content:
                 'Giao dịch không thành công do: KH nhập sai mật khẩu thanh toán quá số lần quy định. Xin quý khách vui lòng thực hiện lại giao dịch',
         },
-        { code: 'E99', content: 'Hệ thống đã xảy ra lỗi trong quá trình lưu đơn hàng, tiền sẽ được hoàn trả lại trong 7 ngày làm việc. Quý khách vui lòng thử thanh toán lại sau!' },
+        {
+            code: 'E99',
+            content:
+                'Hệ thống đã xảy ra lỗi trong quá trình lưu đơn hàng, tiền sẽ được hoàn trả lại trong 7 ngày làm việc. Quý khách vui lòng thử thanh toán lại sau!',
+        },
     ];
     localStorage.removeItem('item_order_checkout');
     localStorage.removeItem(statusVNPayCheckout);
@@ -73,8 +77,86 @@ function OrderSuccess() {
         ? JSON.parse(localStorage.getItem('curent_checkoutid'))
         : {};
 
+        // const addUserFlashSale = (data) => {
+        //     setShowProgress(true);
+        //     fetch(`${api}/orders/insert`, {
+        //         method: 'POST',
+        //         headers: { 'Content-Type': 'application/json' },
+        //         body: JSON.stringify(data),
+        //     })
+        //         .then((response) => response.json())
+        //         .then((result) => {
+        //             if (result.status == 'OK') {
+        //                 const order = result.data;
+        //                 let item_order_checkout = [];
+        //                 if (type == 'vnp') {
+        //                     item_order_checkout = localStorage.getItem('item_order_checkout')
+        //                         ? JSON.parse(localStorage.getItem('item_order_checkout'))
+        //                         : [];
+        //                 } else if (type == 'cash') {
+        //                     item_order_checkout = listCheckouts;
+        //                 }
+        //                 const orderItems = item_order_checkout.map((item) => {
+        //                     return {
+        //                         quantity: item.quantity,
+        //                         price: item.product.price * item.quantity,
+        //                         order: result.data._id,
+        //                         product: item.product._id,
+        //                     };
+        //                 });
+        //                 if (item_order_checkout.length) {
+        //                     orderItems.forEach((orderItem) => {
+        //                         fetch(`${api}/orderitems/insert`, {
+        //                             method: 'POST',
+        //                             headers: { 'Content-Type': 'application/json' },
+        //                             body: JSON.stringify(orderItem),
+        //                         })
+        //                             .then((response) => response.json())
+        //                             .then((result) => {
+        //                                 if (result.status == 'OK') {
+        //                                     const carts = localStorage.getItem(namecart)
+        //                                         ? JSON.parse(localStorage.getItem(namecart))
+        //                                         : [];
+        //                                     const newCarts = {
+        //                                         id: state.user._id,
+        //                                         items: carts.items.filter((cart) => cart.id !== orderItem.product),
+        //                                     };
+        //                                     localstorage.set(namecart, newCarts);
+        //                                     setShowProgress(false);
+        //                                     setOrder(order);
+        //                                 }
+        //                             })
+        //                             .catch((err) => {
+        //                                 console.log(err);
+        //                             });
+        //                     });
+        //                 } else {
+        //                     setShowProgress(false);
+        //                     setOrder(order);
+        //                 }
+        //                 const title = "Thông báo đơn hàng"
+        //                 const description = `${state.user.fullName} vừa đặt đơn hàng mới. Chuẩn bị hàng thôi!`
+        //                 const image = orderImages
+        //                 const url = `${appPath}/admin/orders`
+    
+        //                 SendNotification("admin", {
+        //                     title,
+        //                     description,
+        //                     image,
+        //                     url
+        //                 })
+        //             } else {
+        //                 setShowProgress(false);
+        //                 navigate(`/order-success/err-E99`);
+        //             }
+        //         })
+        //         .catch((err) => { });
+        // };
+    
+
     useEffect(() => {
         if (curent_checkoutid === orderId) {
+            //addUserFlashSale();
             setStatus_content('Thanh toán đơn hàng thành công!');
             document.title = 'Thanh toán thành công';
             setOption('Chi tiết đơn hàng');

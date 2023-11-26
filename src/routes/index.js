@@ -20,7 +20,8 @@ import Order from '../admin/pages/Order';
 import Product from '../admin/pages/Product';
 import UpdateProduct from '../admin/pages/UpdateProduct';
 import FlashSale from '../admin/pages/UseFul/FlashSale';
-import Notifications from '../admin/pages/Notifications'
+import FlashSaleForGuest from '../pages/FlashSaleForGuest';
+import Notifications from '../admin/pages/Notifications';
 import FlashSaleDetail from '../admin/pages/UseFul/FlashSale/FlashSaleDetail';
 
 // Public Routes
@@ -29,6 +30,7 @@ const publicRoutes = [
     { path: '/product-detail/:productId', component: ProductDetail },
     { path: '/product-detail/:productId/comments-detail', component: ProductDetail },
     { path: '/seemore-product/:categoryId', component: SeeMoreProduct },
+    { path: '/flashsale', component: FlashSaleForGuest},
     { path: '/search/:title', component: SearchProduct },
     { path: '/login-register', component: RegisterLogin },
     { path: '/terms-of-service', component: TermsServices },
@@ -53,13 +55,13 @@ const adminRoutes = [
     { path: '/admin/flashsale/custom', component: CostumFlashSale },
     { path: '/admin/flashsale/:flashId', component: FlashSaleDetail },
     { path: '/admin/reviews', component: Review },
+    { path: '/admin/reviews/:reviewId', component: Review },
 
     { path: '/admin/orders', component: Order },
     { path: '/admin/products', component: Product },
     { path: '/admin/update-product/:pid', component: UpdateProduct },
     { path: '/admin/notifications', component: Notifications },
-
-]
+];
 
 const notFoundRoute = { path: '*', component: Page404 };
 

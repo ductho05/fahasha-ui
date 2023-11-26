@@ -7,7 +7,7 @@ const App = ({ title, description, props, func }) => {
     const [open, setOpen] = useState(false);
     const { disable, isloadingdelete } = props;
     const [isCheckBox, setIsCheckBox] = useState(false);
-    console.log(isCheckBox);
+    //console.log(isCheckBox);
     const handleCancel = () => {
         setOpen(false);
     };

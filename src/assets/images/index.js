@@ -7,6 +7,7 @@ const images = {
     page404: require('../images/page404.png'),
     autoflashsale: require('../images/auto_flashsale.png'),
     customflashsale: require('../images/custom_flashsale.png'),
-}
+    fire_sale: require('../images/fire.png'),
+};
 
-export default images
+export default images;

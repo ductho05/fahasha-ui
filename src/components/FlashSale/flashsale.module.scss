@@ -20,18 +20,27 @@
 }
 
 .gift-current__text {
-    font-size: 2.8rem;
     font-family: 'Roboto', sans-serif;
     color: #ffe818;
     font-weight: bold;
-    flex: 1;
+    position: relative;
     text-align: left;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+
+    span {
+        font-size: 4.4rem;
+        font-family: 'Roboto', sans-serif;
+        color: #ffe818;
+        font-weight: bold;
+        margin: 0 7% 0 7%;
+    }
 }
 
 .gift-current__time {
-    flex: 4;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     text-align: left;
 }
 
@@ -55,7 +64,9 @@
     background-color: rgba(255, 242, 123, 0.941);
     border-radius: 4px;
     padding: 1% 0;
-    height: 100%;
+     height: 436.45px;
+    //height: 100%;
+    position: relative;
 }
 
 .content {
@@ -63,18 +74,7 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
-}
-
-.item-gift {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: #fff;
-    border-radius: 4px;
-    margin: 1%;
-    padding: 2%;
-    width: 25%;
+    margin: 0.5% 1%;
 }
 
 .item-content {
@@ -151,4 +151,49 @@
 
 .zoom-in:hover {
     transform: scale(1.1);
+}
+
+.gift-current__extra-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 242, 123, 0.941);
+    border-radius: 4px;
+    padding: 1% 0;
+    height: 100%;
+    position: relative;
+    cursor: pointer;
+
+    // hover
+    &:hover {
+        background-color: rgba(252, 228, 15, 0.941);
+        transition: all 0.5s ease-in-out;
+    }
+}
+
+.gift-current__tag {
+    position: absolute;
+    top: -90px;
+    left: 105px;
+    width: 300px;
+    height: auto;
+    z-index: 998;
+}
+
+.text-3d {
+    font-size: 50px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: center;
+    color: #fff;
+    text-shadow: 5px 0px 0 rgb(102, 91, 10); //-6px 6px 0 #ff5600, -8px 8px 0 #ff4400, -10px 10px 0 #ff3300, -12px 12px 0 #ff2200;
+}
+
+.gift-current__progress {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    position: relative;
 }

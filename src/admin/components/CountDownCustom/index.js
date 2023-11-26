@@ -12,7 +12,7 @@ function formatNumber(number) {
         return number.toString();
     }
 }
-const App = ({ title, isLoading, props }) => {
+const App = ({ title, isLoading, props, reload }) => {
     const cx = classNames.bind(styles);
     const [countdown, setCountdown] = useState(null);
     const deadline = localStorage.getItem('date_flash') ? localStorage.getItem('date_flash') : null;
@@ -23,7 +23,7 @@ const App = ({ title, isLoading, props }) => {
         countDownDate = deadline
             ? new Date(deadline).getTime()
             : new Date().setHours((Math.floor(new Date().getHours() / 3) + 1) * 3, 0, 0);
-
+        // new Date().setHours(17, new Date().getMinutes() + 1, 0);
         // Cập nhật đồng hồ đếm ngược mỗi 1 giây
         const x = setInterval(() => {
             // Lấy thời gian hiện tại
@@ -40,14 +40,14 @@ const App = ({ title, isLoading, props }) => {
 
             // Hiển thị đồng hồ đếm ngược
             setCountdown(
-                days != 0
-                    ? `${formatNumber(days)}d`
-                    : '' + ` ${formatNumber(hours)}h ${formatNumber(minutes)}m ${formatNumber(seconds)}s`,
+                (days != 0 ? `${formatNumber(days)}d` : '') +
+                    ` ${formatNumber(hours)}h ${formatNumber(minutes)}m ${formatNumber(seconds)}s`,
             );
 
             // Nếu đếm ngược kết thúc, dừng cập nhật
             if (distance < 0) {
                 clearInterval(x);
+                reload && reload();
                 isLoading = !isLoading;
                 setCountdown('ĐÃ KẾT THÚC');
             }
@@ -84,7 +84,7 @@ const App = ({ title, isLoading, props }) => {
                 <p
                     style={
                         countdown == 'ĐÃ KẾT THÚC'
-                            ? { color: 'darkgreen' }
+                            ? { color: 'darkgreen', margin: 'auto' }
                             : {
                                   color: '#ff0000',
                                   justifyContent: props ? 'left' : 'center',
@@ -105,7 +105,7 @@ const App = ({ title, isLoading, props }) => {
                                           borderRadius: '5px',
                                       }
                                     : {
-                                          width: '220px',
+                                          width: '250px',
                                           margin: '0 10px',
                                       }
                             }
@@ -113,7 +113,11 @@ const App = ({ title, isLoading, props }) => {
                             {countdown}
                         </div>
                     ) : (
-                        <Skeleton.Input style={{ width: 100, height: 47 }} active={true} size="default" />
+                        <Skeleton.Input
+                            style={{ width: 100, height: 47, margin: !props ? '0 50px' : '0 10px' }}
+                            active={true}
+                            size="default"
+                        />
                     )}
                 </p>
             </div>

@@ -25,7 +25,7 @@ function FlashSale() {
         animationData: require('../../../../assets/json/customAddFlashSale.json'),
     });
 
-    const spaceSizeCol = [30, 210, 80, 80, 70, 60, 80, 80, 160];
+    const spaceSizeCol = [30, 150, 80, 80, 70, 60, 80, 30, 80, 160];
     const [isloadingdelete, setIsloadingdetele] = useState(null);
     const columns = [
         {
@@ -117,10 +117,20 @@ function FlashSale() {
             },
         },
         {
+            field: 'is_loop',
+            headerName: 'Lặp',
+            editable: false,
+            sortable: true,
+            width: spaceSizeCol[7],
+            renderCell: (params) => {
+                return <p>{params.value === true ? 'Có' : 'Không'}</p>;
+            },
+        },
+        {
             headerName: 'Trạng thái',
             sortable: false,
             editable: false,
-            width: spaceSizeCol[7],
+            width: spaceSizeCol[8],
             renderCell: (params) => {
                 const currentDate = new Date();
                 let current_point_sale = Math.floor(currentDate.getHours() / 3);
@@ -158,7 +168,7 @@ function FlashSale() {
             sortable: true,
             editable: false,
             headerAlign: 'marginLeft',
-            width: spaceSizeCol[8],
+            width: spaceSizeCol[9],
             renderCell: (params) => {
                 const currentDate = new Date();
 

@@ -51,13 +51,13 @@ function BarChartExample({ data }) {
             .then((result) => {
                 setRows(result.data);
                 setIsLoading(false);
-                console.log('A', result.data);
+                //console.log('A', result.data);
             })
             .catch((err) => console.log(err));
     }, [isToggle]);
 
     const getDatePointSale = (values) => {
-        console.log(values);
+        //console.log(values);
         setIsToggle(!isToggle);
         setDate(values.date_sale);
         setPointSale(values.point_sale);

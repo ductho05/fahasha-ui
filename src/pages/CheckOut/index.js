@@ -34,6 +34,8 @@ function CheckOut() {
     const [isSubmit, setIsSubmit] = useState(false);
     const [order, setOrder] = useState();
     const [state, dispatch] = useStore();
+
+    const [productFlash, setProductFlash] = useState([]);
     const [showProgress, setShowProgress] = useState(false);
     const location = useLocation();
     const namecart = `myCart_${state.user._id}`;
@@ -50,15 +52,54 @@ function CheckOut() {
         navigate('/cart');
     }
 
+    const addUserFlash = () => {
+        fetch(`${api}/flashusers/add`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(productFlash),
+        })
+            .then((response) => response.json())
+            .then((result) => {
+                console.log('result', result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     useEffect(() => {
         if (order) {
+            addUserFlash();
             localstorage.set('curent_checkoutid', order._id);
             navigate(`/order-success/${order._id}`);
         }
     }, [order]);
 
+    console.log('productFlash', productFlash);
+
     useEffect(() => {
         mycheckout.map((item) => {
+            // check product flash sale
+            fetch(`${api}/flashsales?productId=${item.id}&filter=expired`)
+                .then((response) => response.json())
+                .then((products) => {
+                    if (products.data.length == 1) {
+                        setProductFlash((prev) => {
+                            return [
+                                ...prev,
+                                {
+                                    userid: state.user._id,
+                                    flashid: products.data[0]._id,
+                                    mount: item.count,
+                                },
+                            ];
+                        });
+                    } else {
+                        console.log('Xuat hien 2 cai');
+                    }
+                })
+                .catch((err) => console.log(err));
+
             fetch(`${api}/products/id/${item.id}`)
                 .then((response) => response.json())
                 .then((products) => {
@@ -137,23 +178,23 @@ function CheckOut() {
                         setShowProgress(false);
                         setOrder(order);
                     }
-                    const title = "Thông báo đơn hàng"
-                    const description = `${state.user.fullName} vừa đặt đơn hàng mới. Chuẩn bị hàng thôi!`
-                    const image = orderImages
-                    const url = `${appPath}/admin/orders`
+                    const title = 'Thông báo đơn hàng';
+                    const description = `${state.user.fullName} vừa đặt đơn hàng mới. Chuẩn bị hàng thôi!`;
+                    const image = orderImages;
+                    const url = `${appPath}/admin/orders`;
 
-                    SendNotification("admin", {
+                    SendNotification('admin', {
                         title,
                         description,
                         image,
-                        url
-                    })
+                        url,
+                    });
                 } else {
                     setShowProgress(false);
                     navigate(`/order-success/err-E99`);
                 }
             })
-            .catch((err) => { });
+            .catch((err) => {});
     };
 
     // Chuyển hướng đến trang khác sau khi thanh toán bên VNpay
@@ -431,7 +472,6 @@ function CheckOut() {
             listCheckouts.reduce((total, curr) => total + curr.quantity * curr.product.price, 0) + shippingCost,
         );
         setValue('shippingCost', shippingCost);
-
     }, [isSubmit]);
 
     useEffect(() => {

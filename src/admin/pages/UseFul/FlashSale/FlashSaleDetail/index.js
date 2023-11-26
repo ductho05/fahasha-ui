@@ -4,9 +4,9 @@ import { api } from '../../../../../constants';
 import SimpleItem from '../../../../components/SimpleItem';
 import styles from './FlashSaleDetail.module.scss';
 import { useParams, useNavigate } from 'react-router-dom';
+import moment from 'moment';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import CountDownCustom from '../../../../components/CountDownCustom';
-import moment from 'moment';
 import EnhancedTable from '../../../../components/Table/EnhancedTable';
 import lottie from 'lottie-web';
 import {
@@ -40,7 +40,7 @@ import IncomeChart from '../../../../components/charts/IncomeChart/IncomeChart';
 import DropMenu from '../../../../../components/DropMenu/index';
 //import OrdersLatesTable from '../../components/OrdersLatesTable/OrdersLatesTable';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
-import { useForm, useController } from 'react-hook-form';
+import { useForm, useController, set } from 'react-hook-form';
 import 'react-toastify/dist/ReactToastify.css';
 
 function getRandomElementsWithBias(arr, num) {
@@ -87,6 +87,7 @@ const options = [
 function FlashSaleDetail() {
     const cx = classNames.bind(styles);
     const navigate = useNavigate();
+
     const { flashId } = useParams();
     const [flash, setFlash] = useState({});
     const [showDialog, setShowDialog] = useState(false);
@@ -96,11 +97,14 @@ function FlashSaleDetail() {
     const [valueId, setValueId] = useState(null);
     const [height, setHight] = useState('9px');
     const [done, setDone] = useState(false); // Trạng thái tải xong animation 3
+    const [show, setShow] = useState(false);
+    const [valuepoint, setValuepoint] = useState(null);
 
     const container1 = useRef();
     const container2 = useRef();
     const container3 = useRef();
     const infoDivRef = useRef(null);
+    const formRef = useRef(null);
 
     useEffect(() => {
         if (infoDivRef.current) {
@@ -239,6 +243,8 @@ function FlashSaleDetail() {
 
     const handleCloseEdit = () => {
         setShowDialog(false);
+        handleAutoSetting();
+        // load lại form
     };
 
     const setLocal = (flash) => {
@@ -259,6 +265,19 @@ function FlashSaleDetail() {
                       flash?.point_sale * 3
                   }:00:00`,
               );
+    };
+
+    const handleAutoSetting = () => {
+        console.log('flash', formRef.current);
+        setShow(flash.is_loop);
+        setValuepoint(flash.point_sale);
+        formRef.current.setFieldsValue({
+            num_sale: flash.num_sale,
+            is_loop: flash.is_loop,
+            current_sale: flash.current_sale,
+            date_sale: moment(new Date(flash.date_sale)),
+            point_sale: flash.point_sale,
+        });
     };
 
     useEffect(() => {
@@ -285,6 +304,7 @@ function FlashSaleDetail() {
             .then((result) => {
                 if (result.status === 'OK') {
                     setFlash(result.data);
+                    handleAutoSetting();
                     setLocal(result.data);
                 }
             })
@@ -307,6 +327,7 @@ function FlashSaleDetail() {
     const onFinish = (values) => {
         //values.date_sale = moment(values.date_sale).format('YYYY-MM-DD');
         values.date_sale = formatDateToString(selectedDate);
+        values.is_loop = show;
         const formData = new FormData();
         Object.keys(values).forEach((key) => {
             formData.append(key, values[key]);
@@ -315,6 +336,7 @@ function FlashSaleDetail() {
         //     formData.append('images', avatar);
         // }
 
+        console.log('values1', values);
         fetch(`${api}/flashsales/update/${flashId}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -384,6 +406,8 @@ function FlashSaleDetail() {
                         </div>
                         <div className={cx('right')}>
                             <Form
+                                // load lại form khi đóng
+                                ref={formRef}
                                 name="validate_other"
                                 {...formItemLayout}
                                 onFinish={onFinish}
@@ -392,6 +416,7 @@ function FlashSaleDetail() {
                                     date_sale: moment(new Date(flash.date_sale)),
                                     current_sale: flash.current_sale,
                                     num_sale: flash.num_sale,
+                                    is_loop: flash.is_loop,
                                 }}
                                 style={{
                                     margin: '20px 0 0 0',
@@ -409,7 +434,12 @@ function FlashSaleDetail() {
                                         },
                                     ]}
                                 >
-                                    <Select placeholder="Hãy chọn 1 khung giờ">
+                                    <Select
+                                        placeholder="Hãy chọn 1 khung giờ"
+                                        onChange={(value) => {
+                                            setValuepoint(value);
+                                        }}
+                                    >
                                         {Array.from({ length: 8 }).map((_, i) => (
                                             <Option key={i} value={i}>{`${i * 3}h - ${(i + 1) * 3}h`}</Option>
                                         ))}
@@ -429,7 +459,43 @@ function FlashSaleDetail() {
                                     <DatePicker selected={selectedDate} onChange={handleDateChange} />
                                 </Form.Item>
 
-                                <Form.Item name="current_sale" label="Giảm giá">
+                                <Form.Item
+                                    name="is_loop"
+                                    label="Lặp lại"
+                                    wrapperCol={{
+                                        span: 16,
+                                        offset: 0.5,
+                                    }}
+                                >
+                                    <Space>
+                                        <Switch
+                                            style={{
+                                                backgroundColor: show ? '#1890ff' : '#ccc',
+                                            }}
+                                            checked={show}
+                                            onChange={() => setShow(!show)}
+                                        />
+                                        <span style={{ color: show ? '#1890ff' : '#ccc' }}>
+                                            {show &&
+                                                (valuepoint > -1
+                                                    ? `Giảm giá từ ${`${valuepoint * 3}h - ${
+                                                          (valuepoint + 1) * 3
+                                                      }h`} hàng ngày`
+                                                    : `Giảm giá tất cả khung giờ hàng ngày`)}
+                                        </span>
+                                    </Space>
+                                </Form.Item>
+
+                                <Form.Item
+                                    name="current_sale"
+                                    label="Giảm giá"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: 'Chọn mức giảm giá!',
+                                        },
+                                    ]}
+                                >
                                     <Slider
                                         marks={{
                                             0: '0%',
@@ -480,7 +546,6 @@ function FlashSaleDetail() {
                                 {/* <Form.Item name="switch" label="Nhiều ngày" valuePropName="checked">
             <Switch />
         </Form.Item> */}
-
                                 <Form.Item
                                     wrapperCol={{
                                         span: 12,
@@ -518,27 +583,40 @@ function FlashSaleDetail() {
                                 )
                             }
                             style={{
+                                backgroundColor: '#f5f5f5',
+                                border: '1px solid #e7e7e7',
                                 margin: '0 0 0 0',
                                 minHeight: '80px',
                                 borderRadius: '6px',
                             }}
                         />
-                        <p
-                            style={{
-                                fontSize: '2rem',
-                                color: '#6c757d',
-                                height: '4  0px',
-                                margin: '3% 0',
-                            }}
-                            className={cx('btnEdit')}
-                            onClick={handleClickEdit}
-                        >
-                            Chỉnh sửa
-                        </p>
+                        {flash.product ? (
+                            <p
+                                style={{
+                                    fontSize: '2rem',
+                                    color: '#6c757d',
+                                    height: '40px',
+                                    margin: '2% 0',
+                                }}
+                                className={cx('btnEdit')}
+                                onClick={handleClickEdit}
+                            >
+                                Chỉnh sửa
+                            </p>
+                        ) : (
+                            <Skeleton.Input
+                                style={{
+                                    height: '40px',
+                                    width: '100%',
+                                    margin: '2% 0',
+                                }}
+                                active={true}
+                            />
+                        )}
                         {flash.product ? (
                             <div className={cx('top_content')}>
                                 <div className={cx('avatar')}>
-                                    <Image src={flash.product?.images} alt="Avatar" />
+                                    <Image height={150} src={flash.product?.images} alt="Avatar" />
                                 </div>
 
                                 <div className={cx('info')}>
@@ -561,6 +639,9 @@ function FlashSaleDetail() {
                         {flash.product ? (
                             <div className={cx('description')}>
                                 <div className={cx('body_description')}>
+                                    <p className={cx('info_other')}>
+                                        <span style={{ fontSize: '1.5rem' }}>{flash?.product?._id}</span>
+                                    </p>
                                     <p className={cx('info_other')}>Tác giả: {flash.product?.author}</p>
                                     <p className={cx('info_other')}>Thể loại: {flash?.product?.categoryId?.name}</p>
                                     <p className={cx('info_other')}>
@@ -571,8 +652,8 @@ function FlashSaleDetail() {
                                         })}
                                     </p>
                                     <p className={cx('info_other')}>
-                                        Giá trước khi sale:{' '}
-                                        {flash?.product?.price.toLocaleString('vi-VN', {
+                                        Giá giảm trước:{' '}
+                                        {flash?.product?.containprice.toLocaleString('vi-VN', {
                                             style: 'currency',
                                             currency: 'VND',
                                         })}
@@ -583,12 +664,13 @@ function FlashSaleDetail() {
                                 <div className={cx('body_description')}>
                                     <p className={cx('info_other')}>Ngày Sale: {flash.date_sale}</p>
                                     <p className={cx('info_other')}>
-                                        Khung giờ: {`${flash?.point_sale * 3}h - ${(flash?.point_sale + 1) * 3}h`}
+                                        Khung giờ: {`${flash?.point_sale * 3}h - ${(flash?.point_sale + 1) * 3}h`}{' '}
+                                        {flash.is_loop && '(hàng ngày)'}
                                     </p>
                                     <p className={cx('info_other')}>Sales Off: {flash?.current_sale}%</p>
                                     <p className={cx('info_other')}>Số lượng: {flash?.num_sale} sản phẩm</p>
                                     <p className={cx('info_other')}>
-                                        Giá hiện tại:{' '}
+                                        Giá FlashSale:{' '}
                                         {(
                                             (flash?.product?.old_price * (100 - flash.current_sale)) /
                                             100

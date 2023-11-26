@@ -3,6 +3,7 @@ import { Card, Skeleton } from 'antd';
 import styles from './SimpleItem.module.scss';
 import classNames from 'classnames/bind';
 import SizeContext from 'antd/es/config-provider/SizeContext';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 const { Meta } = Card;
 function SimpleItem({ onClick, props }) {
     const { title, image, sold, isLoading } = props;
@@ -25,7 +26,7 @@ function SimpleItem({ onClick, props }) {
                 width: '150px',
                 height: '220px',
             }}
-            cover={<img alt="example" src={image} style={{ maxHeight: '130px', width: 'auto' }} />}
+            cover={<LazyLoadImage effect="blur" alt="example" src={image} style={{ height: '130px', width: 'auto' }} />}
         >
             <div className={cx('text-container')}>{`[Đã bán: ${sold}] ${title}`}</div>
             <div className={cx('text-container')}></div>

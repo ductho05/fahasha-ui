@@ -109,7 +109,6 @@ function AutoFlashSale() {
             <div className={cx('content')}>
                 {suggestFlash.length
                     ? suggestFlash.map((item, index) => {
-                          console.log(item);
                           return (
                               <SimpleItem
                                   onClick={() => {

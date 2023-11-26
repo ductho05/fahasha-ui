@@ -89,6 +89,21 @@ export const optionsNumProduct = [
         value: 40,
     },
 ];
+
+export const cateList = [
+    {
+        title: '10 sản phẩm',
+        value: 10,
+    },
+    {
+        title: '20 sản phẩm',
+        value: 20,
+    },
+    {
+        title: '40 sản phẩm',
+        value: 40,
+    },
+];
 export const locationShop = [106.762681, 10.854211];
 export const API_KEY = 'pk.eyJ1IjoiZHVjdGhvIiwiYSI6ImNsanlmem5kaDA0OTIzZnFnMGpmMzhlZ2sifQ.Tm8Tc--X7kKEwGD3p7N1gw';
 // List status order
