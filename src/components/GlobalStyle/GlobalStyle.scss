@@ -80,3 +80,11 @@ body {
         );
     }
 }
+
+.slick-dots li button {
+    background-color: #666 !important;
+}
+
+.slick-active {
+    background-color: #c92127 !important;
+}
