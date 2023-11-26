@@ -13,7 +13,7 @@ const FlashSaleModal = ({ props, handelLoading, func, isStatus, style }) => {
     const [hideForm, setHideForm] = useState(false);
     const [stateResult, setStateResult] = useState({});
     const navigate = useNavigate();
-
+    //console.log('props', props);
     const showModal = () => {
         setHideForm(false);
         setOpen(true);
@@ -32,7 +32,14 @@ const FlashSaleModal = ({ props, handelLoading, func, isStatus, style }) => {
 
     return (
         <>
-            <p className={props ? cx('btn_add_new') : cx('btn_no_loaded')} onClick={props && showModal}>
+            <p
+                className={props?.products.length > 0 ? cx('btn_add_new') : cx('btn_no_loaded')}
+                onClick={() => {
+                    if (props?.products.length > 0) {
+                        showModal();
+                    }
+                }}
+            >
                 <ArrowForwardIcon className={cx('btn_icon_set')} />
             </p>
 

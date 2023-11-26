@@ -82,11 +82,11 @@ const AddOptionModal = ({ handelLoading, func, isStatus }) => {
 
         // Sử dụng sự kiện 'data_ready' để theo dõi khi hoạt hình đã tải hoàn tất.
         animation1.addEventListener('data_ready', () => {
-            console.log('Hoạt hình 1 đã tải hoàn tất.');
+            //console.log('Hoạt hình 1 đã tải hoàn tất.');
         });
 
         animation2.addEventListener('data_ready', () => {
-            console.log('Hoạt hình 2 đã tải hoàn tất.');
+            //console.log('Hoạt hình 2 đã tải hoàn tất.');
         });
 
         // Trả về một hàm xử lý để huỷ bỏ sự kiện khi component bị unmounted.

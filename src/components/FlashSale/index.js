@@ -4,26 +4,22 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { api } from '../../constants';
 import 'animate.css';
 import Item from './Item';
 import OfflineBoltIcon from '@mui/icons-material/OfflineBolt';
 import { Carousel, Progress, Skeleton } from 'antd';
+import { LeftSquareFilled, RightSquareFilled } from '@ant-design/icons';
 import CountDownCustom from '../../admin/components/CountDownCustom';
+import lottie from 'lottie-web';
 const cx = classname.bind(styles);
 
-function GetCoupon(price, priceSale) {
-    var coupon = 100 - Math.floor((price / priceSale) * 100);
-    return coupon < 0 ? `+${Math.abs(coupon)}%` : `-${Math.abs(coupon)}%`;
-}
-
 function GetListGift(gifts) {
-    //const { gifts } = props;
     var listGift = [];
     var listGiftTemp = [];
     gifts.map((item, index) => {
-        if (index % 4 === 0 && index !== 0) {
+        if (index % 5 === 0 && index !== 0) {
             listGift.push(listGiftTemp);
             listGiftTemp = [];
         }
@@ -33,92 +29,161 @@ function GetListGift(gifts) {
     return listGift;
 }
 
-// function RestTime(props) {
-//     const [countdown, setCountdown] = useState(null);
-//     useEffect(() => {
-//         // Thiết lập thời gian kết thúc đếm ngược
-//         const countDownDate = new Date('NOV 1, 2024 16:37:25').getTime();
-
-//         // Cập nhật đồng hồ đếm ngược mỗi 1 giây
-//         const x = setInterval(() => {
-//             // Lấy thời gian hiện tại
-//             const now = new Date().getTime();
-
-//             // Tính thời gian còn lại giữa thời gian hiện tại và thời gian kết thúc đếm ngược
-//             const distance = countDownDate - now;
-
-//             // Tính toán thời gian cho giờ, phút và giây
-//             const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-//             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-//             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-//             // Hiển thị đồng hồ đếm ngược
-//             setCountdown(`${hours}h ${minutes}m ${seconds}s`);
-
-//             // Nếu đếm ngược kết thúc, dừng cập nhật
-//             if (distance < 0) {
-//                 clearInterval(x);
-//                 setCountdown('Đếm ngược đã kết thúc');
-//             }
-//         }, 1000);
-
-//         // Clear interval khi component unmount
-//         return () => clearInterval(x);
-//     }, []);
-//     return (
-//         <>
-//             <div className={cx('gift-current__time')}>
-//                 <p className={cx('gift-current__time__title')}>Kết thúc sau</p>
-//                 {countdown ? <p className={cx('gift-current__time__title')}>{countdown}</p> : <Skeleton.Input active />}
-//             </div>
-//         </>
-//     );
-// }
 function FlashSale() {
     var [gifts, setGifts] = useState([]);
     const navigate = useNavigate();
+    const container = useRef(null);
+    const numFlash = 25;
+    const [isLoading, setIsLoading] = useState(false);
+    const [isShow, setIsShow] = useState(false); // show khi chờ 10s không có data
+    // hàm load lại cục flashsale
+    const reloadFlashSale = () => {
+        setIsLoading(!isLoading);
+    };
 
     useEffect(() => {
+        lottie.loadAnimation({
+            container: container.current,
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            animationData: require('../../assets/json/sale_tag.json'),
+        });
+    }, []);
+    console.log('gifts', gifts);
+    useEffect(() => {
         axios
-            .get(`${api}/flashsales?sort=reverse`)
+            .get(`${api}/flashsales?sort=reverse&filter=expired&num=${numFlash}`)
             .then((res) => {
                 setGifts(res.data.data);
             })
             .catch((err) => {
                 console.log(err);
             });
+    }, [isLoading]);
+
+    const settings = {
+        infinite: true,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        autoplay: true,
+        dots: false,
+        speed: 1000,
+        autoplaySpeed: 6000,
+    };
+    const carouselRef = useRef();
+
+    const handleNextSlide = () => {
+        carouselRef.current.next();
+    };
+
+    const handlePrevSlide = () => {
+        carouselRef.current.prev();
+    };
+
+    // sau 10 giây nếu không có sản phẩm nào thì hiện thông báo
+    useEffect(() => {
+        setTimeout(() => {
+            if (gifts.length === 0) {
+                setIsShow(true);
+            }
+        }, 100000);
     }, []);
 
     return (
         <>
             <div className={cx('gift-current')}>
                 <div className={cx('gift-current__title')}>
-                    <h2 className={cx('gift-current__text')}>
+                    <h2
+                        className={cx('gift-current__text')}
+                        style={{
+                            flex: '2',
+                        }}
+                    >
                         <OfflineBoltIcon fontSize="large" />
-                        <span> FLASH SALE</span>
-                    </h2>
-                    <div className={cx('gift-current__time')}>
-                        <CountDownCustom
-                            title={'Kết thúc sau'}
-                            props={{
-                                fontSize: '2.5rem',
-                                color: '#ffe818',
-                                justifyContent: 'left',
-                                margin: '0 1rem 0 0',
+                        <span className={cx('text-3d')}> FLASH </span>
+                        <OfflineBoltIcon
+                            fontSize="large"
+                            style={{
+                                zIndex: '1000',
+                                marginRight: '0.5rem',
                             }}
                         />
+                        <div className={cx('gift-current__tag')} ref={container}></div>
+                    </h2>
+
+                    <span
+                        style={{
+                            height: '100%',
+                            width: '1.5px',
+                            backgroundColor: '#ffe818',
+                            fontSize: '1.5rem',
+                            fontWeight: 'bold',
+                            margin: '0 2rem 0 2rem',
+                            // flex: '1',
+                        }}
+                    ></span>
+
+                    <div
+                        className={cx('gift-current__time')}
+                        style={{
+                            flex: '3',
+                        }}
+                    >
+                        {!isShow ? (
+                            <CountDownCustom
+                                title={'Kết thúc sau'}
+                                reload={reloadFlashSale}
+                                isLoading={isLoading}
+                                props={{
+                                    fontSize: '3rem',
+                                    color: '#ffe818',
+                                    justifyContent: 'left',
+                                    margin: '0 1rem 0 0',
+                                }}
+                            />
+                        ) : (
+                            <CountDownCustom
+                                title={'Chờ cập nhật'}
+                                reload={reloadFlashSale}
+                                isLoading={isLoading}
+                                props={{
+                                    fontSize: '3rem',
+                                    color: '#ffe818',
+                                    justifyContent: 'left',
+                                    margin: '0 1rem 0 0',
+                                }}
+                            />
+                        )}
                     </div>
-                    {/* <div className={cx('gift-current__progress')}>
-                        <Progress
+
+                    <div
+                        className={cx('gift-current__progress')}
+                        style={{
+                            flex: '3',
+                        }}
+                    >
+                        {/* <Progress
                             strokeColor={{
                                 '0%': '#108ee9',
                                 '100%': '#87d068',
                             }}
                             percent={100}
                             status="active"
-                            style={{ width: '50%' }}
-                        />
-                    </div> */}
+                            style={{ width: '80%' }}
+                        /> */}
+                    </div>
+                    <div
+                        className={cx('gift-current__extra-info')}
+                        style={{
+                            flex: '2',
+                        }}
+                        onClick={() => {
+                            navigate('/flashsale');
+                        }}
+                    >
+                        Xem thêm
+                    </div>
                 </div>
                 <span
                     style={{
@@ -130,37 +195,124 @@ function FlashSale() {
                         margin: '2rem 0 0 0',
                     }}
                 ></span>
-
                 <div className={cx('gift-current__content')}>
+                    {' '}
+                    {gifts.length !== 0 ? (
+                        <>
+                            {
+                                <button
+                                    className="custom-prev-button"
+                                    onClick={handlePrevSlide}
+                                    style={{
+                                        position: 'absolute',
+                                        top: '50%',
+                                        left: '0%',
+                                        transform: 'translate(-50%, -50%)',
+                                        zIndex: '1000',
+                                        backgroundColor: 'transparent',
+                                        border: 'none',
+                                        outline: 'none',
+                                        cursor: 'pointer',
+                                        color: 'white',
+
+                                        fontWeight: 'bold',
+                                    }}
+                                >
+                                    <LeftSquareFilled style={{ fontSize: '35px', color: '#fff' }} />
+                                </button>
+                            }
+                            {
+                                <button
+                                    className="custom-next-button"
+                                    onClick={handleNextSlide}
+                                    style={{
+                                        position: 'absolute',
+                                        top: '50%',
+                                        right: '0%',
+                                        transform: 'translate(50%, -50%)',
+                                        zIndex: '1000',
+                                        backgroundColor: 'transparent',
+                                        border: 'none',
+                                        outline: 'none',
+                                        cursor: 'pointer',
+                                        color: 'white',
+
+                                        fontWeight: 'bold',
+                                    }}
+                                >
+                                    <RightSquareFilled style={{ fontSize: '35px', color: '#fff' }} />
+                                </button>
+                            }
+                        </>
+                    ) : null}
                     {gifts.length === 0 ? (
-                        <div className={cx('content')}>
-                            {[1, 2, 3, 4].map((item, index) => {
-                                return (
-                                    <div className={cx('item-gift')}>
-                                        <Skeleton.Image style={{ width: '100' }} active={true} />
-                                        <Skeleton
-                                            style={{ width: '100%', margin: '20% 0 0 0' }}
-                                            size="2rem"
-                                            active={true}
-                                        />
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    ) : (
-                        <Carousel autoplay>
-                            {GetListGift(gifts).map((item, index) => {
-                                return (
-                                    <div key={index}>
-                                        <div className={cx('content')}>
-                                            {item.map((item, index) => {
-                                                return <Item item={item} index={index} />;
-                                            })}
+                        !isShow ? (
+                            <div className={cx('content')}>
+                                {[1, 2, 3, 4, 5].map((item, index) => {
+                                    return (
+                                        <div
+                                            style={{
+                                                height: '400px',
+                                                width: '100%',
+                                                backgroundColor: '#fff',
+                                                borderRadius: '3px',
+                                                padding: '1%',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                margin: '0 0.2%',
+                                                justifyContent: 'center',
+                                                alignItems: 'center',
+                                            }}
+                                        >
+                                            <Skeleton.Image style={{ width: '200px', height: '200px' }} active={true} />
+
+                                            <Skeleton
+                                                style={{ width: '100%', margin: '10% 0 0 0' }}
+                                                size="1rem"
+                                                // 5 dòng chữ
+                                                line={5}
+                                                active={true}
+                                            />
                                         </div>
-                                    </div>
-                                );
-                            })}
-                        </Carousel>
+                                    );
+                                })}
+                            </div>
+                        ) : (
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    backgroundColor: '#fff',
+                                    height: '400px',
+                                    margin: '0.5% 1%',
+                                    color: '#000',
+                                    fontWeight: 'bold',
+                                    fontSize: '2.5rem',
+                                }}
+                            >
+                                Chương trình FlashSale đang được cập nhật, vui lòng đợi trong giây lát...
+                            </div>
+                        )
+                    ) : (
+                        <div>
+                            <Carousel
+                                {...settings}
+                                ref={carouselRef} //beforeChange={handleCarouselChange}
+                            >
+                                {GetListGift(gifts).map((item, index) => {
+                                    return (
+                                        <div key={index}>
+                                            <div className={cx('content')}>
+                                                {item.map((item, index) => {
+                                                    return <Item key={index} item={item} index={index} />;
+                                                })}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </Carousel>
+                        </div>
                     )}
                 </div>
             </div>

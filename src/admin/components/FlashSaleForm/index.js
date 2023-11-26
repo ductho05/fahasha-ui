@@ -24,13 +24,29 @@ import {
     Upload,
 } from 'antd';
 import { api } from '../../../constants';
+import { set } from 'react-hook-form';
+
+
 
 function FlashSaleForm({ props, hideFunc }) {
     const [showProgress, setShowProgress] = useState(false);
-
+    const [title, setTitle] = useState('');
     const { Option } = Select;
     const cx = classNames.bind(styles);
+    const [show, setShow] = useState(false);
+    const [valuepoint, setValuepoint] = useState(null);
     const formRef = useRef(null);
+
+    const moment = require('moment-timezone');
+
+    // Đặt múi giờ cho Việt Nam
+    const vietnamTimeZone = 'Asia/Ho_Chi_Minh';
+
+    // Lấy thời gian hiện tại ở Việt Nam
+    const currentTimeInVietnam = moment().tz(vietnamTimeZone);
+
+    // Lấy số giờ hiện tại
+    const currentHourInVietnam = currentTimeInVietnam.get('hours');
     const formItemLayout = {
         labelCol: {
             span: 6,
@@ -68,56 +84,153 @@ function FlashSaleForm({ props, hideFunc }) {
         localStorage.setItem('temporary_data', JSON.stringify({ ...JSON.parse(data), flashsales: newFlashsales }));
     };
 
+    const checktooffprogress = (i) => {
+        i == true && setShowProgress(false);
+    };
+
     const addFlashSale = (values, products) => {
+        let loop = 0,
+            small_loop = 0;
+        //console.log(values);
         setShowProgress(true);
-        products.map((item, index) => {
-            const data = { ...values, product: item };
-            fetch(`${api}/flashsales/add`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-            })
-                .then((response) => response.json())
-                .then((result) => {
-                    if (result.status == 'OK') {
-                        //addFlashsaleToLocal(result.data);
-                        localStorage.setItem('isFlashsaleLoading', true);
-                        setShowProgress(false);
-                        hideFunc({
-                            status: 'success',
-                            title: 'Thiết đặt thành công',
-                            subTitle:
-                                'Vui lòng nhấn [Tiếp tục] để tiếp tục thiết đặt hoặc nhấn [Quản lý] để đến trang quản lý Sales Off!',
+        // kiểm tra pointsale ở thời điểm hiên tại
+        const current_point = Math.floor(currentHourInVietnam / 3);
+        // kiểm tra date_sale có phải là ngày hiện tại hay không
+        // in ra ngày hiện tại theo định dạng yyyy-mm-dd
+        const current_date = formatDateToString(new Date());
+        //console.log(current_date);
+        const time_points = [0, 1, 2, 3, 4, 5, 6, 7];
+        // lấy ra các point sale lớn hơn hoặc bằng point sale hiện tại
+        const time_points_filter =
+            values.point_sale == -1
+                ? time_points.filter(
+                      (point) =>
+                          (current_date == values.date_sale && point >= current_point) ||
+                          current_date < values.date_sale,
+                  )
+                : [values.point_sale];
+
+        // lấy ra các point sale nhỏ hơn point sale hiện tại
+        const small_time_points_filter = time_points.filter((point) => point < current_point);
+        //console.log(small_time_points_filter);
+        products.map((item) => {
+            values.point_sale == -1 &&
+                values.is_loop == true &&
+                small_time_points_filter.map((point) => {
+                    const data = {
+                        current_sale: values.current_sale,
+                        num_sale: values.num_sale,
+                        // ngày + 1
+                        date_sale: formatDateToString(new Date(new Date(values.date_sale).getTime() + 86400000)),
+                        is_loop: values.is_loop,
+                        product: item,
+                        point_sale: point,
+                    };
+
+                    //console.log('data1', data);
+                    fetch(`${api}/flashsales/add`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data),
+                    })
+                        .then((response) => response.json())
+                        .then((result) => {
+                            if (result.status == 'OK') {
+                                //addFlashsaleToLocal(result.data);
+                                localStorage.setItem('isFlashsaleLoading', true);
+                                //console.log(result.status);
+                                //setShowProgress(false);
+                                checktooffprogress(small_time_points_filter.length * products.length - 1 == small_loop);
+                                small_time_points_filter.length * products.length - 1 == small_loop++ &&
+                                    hideFunc({
+                                        status: 'success',
+                                        title: 'Thiết đặt thành công',
+                                        subTitle:
+                                            'Vui lòng nhấn [Tiếp tục] để tiếp tục thiết đặt hoặc nhấn [Quản lý] để đến trang quản lý Sales Off!',
+                                    });
+                            } else {
+                                setShowProgress(false);
+                                hideFunc({
+                                    status: 'error',
+                                    title: 'Thiết đặt không thành công',
+                                    subTitle: result.message
+                                        ? result.message
+                                        : 'Đã có lỗi xãy ra trong quá trình thiết đặt, vui lòng kiểm tra kết nối mạng!',
+                                });
+                            }
+                        })
+                        .catch((err) => {
+                            setShowProgress(false);
+                            console.log(err);
                         });
-                    } else {
-                        setShowProgress(false);
-                        hideFunc({
-                            status: 'error',
-                            title: 'Thiết đặt không thành công',
-                            subTitle: result.message
-                                ? result.message
-                                : 'Đã có lỗi xãy ra trong quá trình thiết đặt, vui lòng kiểm tra kết nối mạng!',
-                        });
-                    }
-                })
-                .catch((err) => {
-                    setShowProgress(false);
-                    console.log(err);
                 });
+
+            time_points_filter.map((point, index) => {
+                const data = {
+                    current_sale: values.current_sale,
+                    num_sale: values.num_sale,
+                    date_sale: values.date_sale,
+                    is_loop: values.is_loop,
+                    product: item,
+                    point_sale: point,
+                };
+
+                fetch(`${api}/flashsales/add`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                })
+                    .then((response) => response.json())
+                    .then((result) => {
+                        if (result.status == 'OK') {
+                            //addFlashsaleToLocal(result.data);
+                            localStorage.setItem('isFlashsaleLoading', true);
+                            //console.log(result.status);
+                            //setShowProgress(false);
+                            checktooffprogress(time_points_filter.length * products.length - 1 == loop);
+
+                            time_points_filter.length * products.length - 1 == loop++ &&
+                                hideFunc({
+                                    status: 'success',
+                                    title: 'Thiết đặt thành công',
+                                    subTitle:
+                                        result.message == 'Update product quantity successfully'
+                                            ? `Hệ thống phát hiện ID này đã tồn tại trong khung giờ này, hệ thống đã tự động cập nhật số lượng và mức giá cho flashsale này
+                                            Vui lòng nhấn [Tiếp tục] để tiếp tục thiết đặt hoặc nhấn [Quản lý] để đến trang quản lý Sales Off`
+                                            : 'Vui lòng nhấn [Tiếp tục] để tiếp tục thiết đặt hoặc nhấn [Quản lý] để đến trang quản lý Sales Off!',
+                                });
+                        } else {
+                            //checktooffprogress(time_points_filter.length * products.length - 1 == loop++);
+                            setShowProgress(false);
+                            hideFunc({
+                                status: 'error',
+                                title: 'Thiết đặt không thành công',
+                                subTitle: result.message
+                                    ? result.message
+                                    : 'Đã có lỗi xãy ra trong quá trình thiết đặt, vui lòng kiểm tra kết nối mạng!',
+                            });
+                        }
+                    })
+                    .catch((err) => {
+                        setShowProgress(false);
+                        console.log(err);
+                    });
+            });
         });
     };
     const onFinish = (values) => {
-        //values.date_sale = moment(values.date_sale).format('YYYY-MM-DD');
-        console.log('Received values of form: ', selectedDate);
         values.date_sale = formatDateToString(selectedDate);
-
+        values.is_loop = show;
         addFlashSale(values, products);
     };
 
     const handleAutoSetting = (values) => {
         var gioHienTai = new Date();
+        setShow(false);
+        setValuepoint(Math.floor(currentHourInVietnam / 3));
         formRef.current.setFieldsValue({
             num_sale: 100,
+            is_loop: false,
             current_sale: 40,
             date_sale: moment(gioHienTai),
             point_sale: Math.floor(gioHienTai.getHours() / 3),
@@ -134,14 +247,8 @@ function FlashSaleForm({ props, hideFunc }) {
                 name="validate_other"
                 {...formItemLayout}
                 onFinish={onFinish}
-                // initialValues={{
-                //     point_sale: 0,
-                //     // date_sale: moment('2023-12-11'),
-                //     current_sale: 20,
-                //     num_sale: autoInput,
-                // }}
                 style={{
-                    margin: '20px 0 0 0',
+                    margin: '20px 0 0 10px',
                     maxWidth: 600,
                 }}
                 ref={formRef}
@@ -157,12 +264,19 @@ function FlashSaleForm({ props, hideFunc }) {
                         },
                     ]}
                 >
-                    <Select placeholder="Hãy chọn 1 khung giờ">
+                    <Select
+                        placeholder="Hãy chọn 1 khung giờ"
+                        onChange={(value) => {
+                            setValuepoint(value);
+                        }}
+                    >
+                        <Option key={-1} value={-1}>{`Cả ngày`}</Option>
                         {Array.from({ length: 8 }).map((_, i) => (
                             <Option key={i} value={i}>{`${i * 3}h - ${(i + 1) * 3}h`}</Option>
                         ))}
                     </Select>
                 </Form.Item>
+
                 <Form.Item
                     name="date_sale"
                     label="Ngày"
@@ -177,7 +291,41 @@ function FlashSaleForm({ props, hideFunc }) {
                     <DatePicker selected={selectedDate} onChange={handleDateChange} />
                 </Form.Item>
 
-                <Form.Item name="current_sale" label="Giảm giá">
+                <Form.Item
+                    name="is_loop"
+                    label="Lặp lại"
+                    wrapperCol={{
+                        span: 16,
+                        offset: 0.5,
+                    }}
+                >
+                    <Space>
+                        <Switch
+                            style={{
+                                backgroundColor: show ? '#1890ff' : '#ccc',
+                            }}
+                            checked={show}
+                            onChange={() => setShow(!show)}
+                        />
+                        <span style={{ color: show ? '#1890ff' : '#ccc' }}>
+                            {show &&
+                                (valuepoint > -1
+                                    ? `Giảm giá từ ${`${valuepoint * 3}h - ${(valuepoint + 1) * 3}h`} hàng ngày`
+                                    : `Giảm giá tất cả khung giờ hàng ngày`)}
+                        </span>
+                    </Space>
+                </Form.Item>
+
+                <Form.Item
+                    name="current_sale"
+                    label="Giảm giá"
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Chọn mức giảm giá!',
+                        },
+                    ]}
+                >
                     <Slider
                         marks={{
                             0: '0%',
@@ -202,12 +350,10 @@ function FlashSaleForm({ props, hideFunc }) {
                             {
                                 type: 'number',
                                 min: 1,
-
                                 message: 'Số lượng sản phẩm phải là số nguyên dương.',
                             },
                             {
                                 type: 'number',
-
                                 max: 200,
                                 message: 'Số lượng Flashsale tối đa trong 1 khung giờ là 200.',
                             },
@@ -215,19 +361,10 @@ function FlashSaleForm({ props, hideFunc }) {
                     >
                         <InputNumber />
                     </Form.Item>
-                    <span
-                        className="ant-form-text"
-                        style={{
-                            marginLeft: 8,
-                        }}
-                    >
+                    <span className="ant-form-text" style={{ marginLeft: 8 }}>
                         sản phẩm
                     </span>
                 </Form.Item>
-
-                {/* <Form.Item name="switch" label="Nhiều ngày" valuePropName="checked">
-            <Switch />
-        </Form.Item> */}
 
                 <Form.Item
                     wrapperCol={{
@@ -239,12 +376,7 @@ function FlashSaleForm({ props, hideFunc }) {
                     }}
                 >
                     <Space>
-                        <Button
-                            // htmlType="reset"
-                            onClick={handleAutoSetting}
-                        >
-                            Tự động
-                        </Button>
+                        <Button onClick={handleAutoSetting}>Tự động</Button>
                         <Button type="primary" htmlType="submit" disabled={!products.length}>
                             Áp dụng
                         </Button>

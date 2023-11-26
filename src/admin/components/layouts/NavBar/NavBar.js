@@ -28,7 +28,7 @@ function NavBar() {
                 if (result.status == "OK") {
                     setNotices(result.data)
                 }
-                console.log(result)
+                //console.log(result)
             })
             .catch(err => console.error(err))
     }, [state])

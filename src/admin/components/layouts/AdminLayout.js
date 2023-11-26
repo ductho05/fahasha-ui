@@ -52,7 +52,7 @@ function AdminLayout({ children }) {
     window.addEventListener('storage', handleStorageChange);
 
     function handleStorageChange(e) {
-        console.log('LocalStorage has changed:', e);
+        //console.log('LocalStorage has changed:', e);
     }
 
     // useEffect(() => {
@@ -106,7 +106,7 @@ function AdminLayout({ children }) {
         }
     }, [isLoaded]);
 
-    console.log('AA', !(isLoaded.flashsales && isLoaded.products) && !localStorage.getItem('temporary_data'));
+    //console.log('AA', !(isLoaded.flashsales && isLoaded.products) && !localStorage.getItem('temporary_data'));
 
     return (
         <>

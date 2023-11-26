@@ -9,6 +9,7 @@ const images = {
     customflashsale: require('../images/custom_flashsale.png'),
     bg_LOGIN: require('../images/backgrounds/BG_LOGIN.png'),
     logo2: require('../images/logos/TA.png'),
-}
+    fire_sale: require('../images/fire.png'),
+};
 
-export default images
+export default images;
