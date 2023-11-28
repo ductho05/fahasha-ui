@@ -25,6 +25,7 @@ export const listPathHots = [
         path: '/bestseller/10',
     },
 ];
+
 export const listPathCategory = [
     {
         title: 'Lịch sử thế giới',

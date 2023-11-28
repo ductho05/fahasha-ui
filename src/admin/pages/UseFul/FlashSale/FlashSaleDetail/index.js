@@ -164,6 +164,7 @@ function FlashSaleDetail() {
             clearTimeout(timeout); // Huỷ bỏ đợi nếu component unmounted trước khi hiển thị animation 3
         };
     }, []);
+    console.log('flash123', Math.floor(currentHourInVietnam / 3));
     const colunmsUser = [
         {
             field: 'rowNumber',
@@ -313,8 +314,8 @@ function FlashSaleDetail() {
             .then((result) => {
                 if (result.status === 'OK') {
                     setFlash(result.data);
-                    handleAutoSetting();
                     setLocal(result.data);
+                    handleAutoSetting();
                 }
             })
             .catch((err) => console.error('Aádad', err.message));

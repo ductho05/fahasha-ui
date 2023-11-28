@@ -12,7 +12,7 @@ function ProductFrame({ isLoading, productList, Component }) {
         return item.title ? (acc += 1) : acc;
     }, 0);
 
-    const categoryId = productList.length > 0 ? productList[0].products[0].categoryId?._id : 0;
+    const categoryId = productList.length > 0 ? productList[0].products[0]?.categoryId?._id : 0;
     const [currentTab, setCurrentTab] = useState(0);
     let handleTab = (index) => {
         setCurrentTab(index);
