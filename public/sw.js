@@ -18,7 +18,7 @@ const urlBase64ToUint8Array = base64String => {
 }
 
 const saveSubscription = async (subscription, token) => {
-    const response = await fetch('https://bookstore-api-0a2i.onrender.com/bookstore/api/v1/webpush/subscription', {
+    const response = await fetch('https://bookstore-ta.onrender.com/bookstore/api/v1/webpush/subscription', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
