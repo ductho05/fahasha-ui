@@ -49,7 +49,7 @@ const checkSubscription = async () => {
                 })
                     .then(response => response.json())
                     .then(result => {
-                        console.log(result)
+                        
                     })
             })
             .catch((err) => {
