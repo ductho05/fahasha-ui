@@ -61,7 +61,7 @@ function DefaultLayout(props) {
     setInterval(() => {
         if (isLogin()) {
             let token = localstorge.get();
-            fetch(`${api}/users/profile`, {
+            fetch(`${api}/users/get/profile`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

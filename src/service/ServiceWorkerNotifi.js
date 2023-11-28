@@ -37,7 +37,7 @@ const checkSubscription = async () => {
             .getSubscription()
             .then(async (subscription) => {
                 const token = JSON.parse(localStorage.getItem('token'))
-                await fetch('https://bookstore-api-0a2i.onrender.com/bookstore/api/v1/webpush/subscription', {
+                await fetch('https://bookstore-ta.onrender.com/bookstore/api/v1/webpush/subscription', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
