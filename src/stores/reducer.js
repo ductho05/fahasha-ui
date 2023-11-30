@@ -7,7 +7,7 @@ var user = {};
 var token = localstorge.get();
 var sk = socket
 if (token) {
-    await fetch(`${api}/users/profile`, {
+    await fetch(`${api}/users/get/profile`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

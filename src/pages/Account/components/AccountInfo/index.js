@@ -87,7 +87,7 @@ function AccountInfo() {
 
     useEffect(() => {
         setLoading(true)
-        fetch(`${api}/users/profile`, {
+        fetch(`${api}/users/get/profile`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
