@@ -33,7 +33,7 @@ const moment = require('moment-timezone');
 
     // Lấy số giờ hiện tại
     const currentHourInVietnam = currentTimeInVietnam.get('hours');
-function BarChartExample({ data }) {
+    function BarChartExample({ data }) {
     const cx = classNames.bind(styles);
     const navigate = useNavigate();
 

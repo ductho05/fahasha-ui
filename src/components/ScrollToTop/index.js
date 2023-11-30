@@ -13,7 +13,7 @@ export default function ScrollToTop() {
         // Kiểm tra xem URL có chứa từ "admin" hay không
         if (!currentPath.includes('admin')) {
             // Nếu không có, xóa dữ liệu trong Local Storage
-            localStorage.removeItem('temporary_data');
+            //localStorage.removeItem('temporary_data');
         }
         if (!currentPath.includes('admin/flashsale')) localStorage.removeItem('isCheckboxDeleteFS');
     }, [location.pathname]);

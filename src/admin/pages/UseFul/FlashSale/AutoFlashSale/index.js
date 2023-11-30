@@ -8,7 +8,7 @@ import AutorenewIcon from '@mui/icons-material/Autorenew';
 import { Divider, Form, Radio, Skeleton, Space, Switch, Alert } from 'antd';
 import Marquee from 'react-fast-marquee';
 import FlashSaleModal from '../../../../components/FlashSaleModal';
-
+import { useData } from '../../../../../stores/DataContext';
 const cx = classNames.bind(styles);
 
 function getRandomElementsWithBias(arr, num) {
@@ -32,21 +32,24 @@ function AutoFlashSale() {
     const [suggestFlash, setSuggestFlash] = useState([]);
     const [isLoading, setIsLoading] = useState(false); // loading cho button
     const [isLoading2, setIsLoading2] = useState(false); // loading cho sản phẩm để hiển thị skeleton
-
+    const { data, setData } = useData();
     useEffect(() => {
-        if (localStorage.getItem('temporary_data')) {
-            var data = JSON.parse(localStorage.getItem('temporary_data')).products;
+        if (Object.keys(data).length !== 0) {
+            //var data1 = data.products;
             setIsLoading2(true);
+            var data2 = [...data.products]; // Tạo bản sao của mảng
+
+            data2.sort((a, b) => b.quantity - a.quantity);
             setTimeout(() => {
-                setSuggestFlash(getRandomElementsWithBias(data.slice(0, 200), 14));
+                setSuggestFlash(getRandomElementsWithBias(data2.slice(0, 500), 14));
                 setIsLoading2(false);
-            }, 500); // 1000 milliseconds tương đương với 1 giây
+            }, 200); // 1000 milliseconds tương đương với 1 giây
         } else {
             setIsLoading2(true);
-            fetch(`${api}/products?filter=sold&sort=asc`)
+            fetch(`${api}/products?filter=quantity&sort=desc`)
                 .then((response) => response.json())
                 .then((flashsales) => {
-                    setSuggestFlash(getRandomElementsWithBias(flashsales.data.slice(0, 200), 14));
+                    setSuggestFlash(getRandomElementsWithBias(flashsales.data.slice(0, 500), 14));
                     setIsLoading2(false);
                 })
                 .catch((err) => console.log(err));
@@ -118,7 +121,7 @@ function AutoFlashSale() {
                                   props={{
                                       image: item.images,
                                       title: item.title,
-                                      sold: item.sold,
+                                      sold: item.quantity,
                                       isLoading: isLoading2,
                                   }}
                               />

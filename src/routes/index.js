@@ -23,6 +23,7 @@ import FlashSale from '../admin/pages/UseFul/FlashSale';
 import FlashSaleForGuest from '../pages/FlashSaleForGuest';
 import Notifications from '../admin/pages/Notifications';
 import FlashSaleDetail from '../admin/pages/UseFul/FlashSale/FlashSaleDetail';
+import Statistics from '../admin/pages/Statistics';
 
 // Public Routes
 const publicRoutes = [
@@ -30,7 +31,7 @@ const publicRoutes = [
     { path: '/product-detail/:productId', component: ProductDetail },
     { path: '/product-detail/:productId/comments-detail', component: ProductDetail },
     { path: '/seemore-product/:categoryId', component: SeeMoreProduct },
-    { path: '/flashsale', component: FlashSaleForGuest},
+    { path: '/flashsale', component: FlashSaleForGuest },
     { path: '/search/:title', component: SearchProduct },
     { path: '/terms-of-service', component: TermsServices },
 ];
@@ -55,7 +56,7 @@ const adminRoutes = [
     { path: '/admin/flashsale/:flashId', component: FlashSaleDetail },
     { path: '/admin/reviews', component: Review },
     { path: '/admin/reviews/:reviewId', component: Review },
-
+    { path: '/admin/statistics', component: Statistics },
     { path: '/admin/orders', component: Order },
     { path: '/admin/products', component: Product },
     { path: '/admin/update-product/:pid', component: UpdateProduct },
@@ -63,9 +64,7 @@ const adminRoutes = [
 ];
 
 // Auth routes
-const authRoutes = [
-    { path: '/login-register', component: RegisterLogin },
-]
+const authRoutes = [{ path: '/login-register', component: RegisterLogin }];
 
 const notFoundRoute = { path: '*', component: Page404 };
 

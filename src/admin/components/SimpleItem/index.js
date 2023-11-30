@@ -28,7 +28,7 @@ function SimpleItem({ onClick, props }) {
             }}
             cover={<LazyLoadImage effect="blur" alt="example" src={image} style={{ height: '130px', width: 'auto' }} />}
         >
-            <div className={cx('text-container')}>{`[Đã bán: ${sold}] ${title}`}</div>
+            <div className={cx('text-container')}>{`[Tồn kho: ${sold}] ${title}`}</div>
             <div className={cx('text-container')}></div>
         </Card>
     ) : (

@@ -7,11 +7,14 @@ import { api } from '../../../constants';
 import { Progress } from 'antd';
 import { Scrollbar } from 'react-scrollbars-custom';
 import lottie from 'lottie-web';
+import { useData } from '../../../stores/DataContext';
 const cx = classNames.bind(styles);
 function AdminLayout({ children }) {
     const container = useRef(null);
+    const { data, setData } = useData();
+
     const [isLoaded, setIsLoaded] = useState(
-        localStorage.getItem('temporary_data')
+        Object.keys(data).length !== 0
             ? {
                   products: true,
                   flashsales: true,
@@ -22,14 +25,16 @@ function AdminLayout({ children }) {
               },
     );
     const [percent, setPercent] = useState(0);
-    const [data, setData] = useState(
-        localStorage.getItem('temporary_data')
-            ? JSON.parse(localStorage.getItem('temporary_data'))
+    const [data2, setData2] = useState(
+        Object.keys(data).length !== 0
+            ? data
             : {
                   products: [],
                   flashsales: [],
               },
     );
+
+    console.log('data', data, data2);
 
     // useEffect(() => {
     //     // Hàm này sẽ được gọi khi component được mount và mỗi khi localStorage thay đổi.
@@ -49,11 +54,11 @@ function AdminLayout({ children }) {
     //     };
     // });
 
-    window.addEventListener('storage', handleStorageChange);
+    // window.addEventListener('storage', handleStorageChange);
 
-    function handleStorageChange(e) {
-        //console.log('LocalStorage has changed:', e);
-    }
+    // function handleStorageChange(e) {
+    //     //console.log('LocalStorage has changed:', e);
+    // }
 
     // useEffect(() => {
     //     setIsLoaded((prev) => ({ ...prev, flashsales: false }));
@@ -61,7 +66,7 @@ function AdminLayout({ children }) {
     //         fetch(`${api}/flashsales`)
     //             .then((response) => response.json())
     //             .then((result) => {
-    //                 setData((prev) => ({ ...prev, flashsales: result.data }));
+    //                 setData2((prev) => ({ ...prev, flashsales: result.data }));
     //                 setIsLoaded((prev) => ({ ...prev, flashsales: true }));
     //             })
     //             .catch((err) => console.log(err));
@@ -76,14 +81,14 @@ function AdminLayout({ children }) {
             autoplay: true,
             animationData: require('../../../assets/json/loadAdminPage.json'),
         });
-        if (!localStorage.getItem('temporary_data')) {
+        if (Object.keys(data).length === 0) {
             setIsLoaded([false, false]);
             fetch(`${api}/products?filter=sold&sort=asc`)
                 .then((response) => {
                     return response.json();
                 })
                 .then((flashsales) => {
-                    setData((prev) => ({ ...prev, products: flashsales.data }));
+                    setData2((prev) => ({ ...prev, products: flashsales.data }));
                     setIsLoaded((prev) => ({ ...prev, products: true }));
                 })
                 .catch((err) => console.log(err));
@@ -91,7 +96,7 @@ function AdminLayout({ children }) {
             fetch(`${api}/flashsales?sort=reverse`)
                 .then((response) => response.json())
                 .then((result) => {
-                    setData((prev) => ({ ...prev, flashsales: result.data }));
+                    setData2((prev) => ({ ...prev, flashsales: result.data }));
                     setIsLoaded((prev) => ({ ...prev, flashsales: true }));
                 })
                 .catch((err) => console.log(err));
@@ -101,8 +106,9 @@ function AdminLayout({ children }) {
     }, []);
 
     useEffect(() => {
-        if (isLoaded.flashsales && isLoaded.products && !localStorage.getItem('temporary_data')) {
-            localStorage.setItem('temporary_data', JSON.stringify(data));
+        if (isLoaded.flashsales && isLoaded.products && Object.keys(data).length === 0) {
+            //localStorage.setItem('temporary_data', JSON.stringify(data));
+            setData(data2);
         }
     }, [isLoaded]);
 
@@ -110,12 +116,12 @@ function AdminLayout({ children }) {
 
     return (
         <>
-            {!(isLoaded.flashsales && isLoaded.products) && !localStorage.getItem('temporary_data') && (
+            {!(isLoaded.flashsales && isLoaded.products) && Object.keys(data).length === 0 && (
                 <div className={cx('wrapper-loading')}>
                     <div className={cx('animation-loading')} ref={container}></div>
                 </div>
             )}
-            {!(!(isLoaded.flashsales && isLoaded.products) && !localStorage.getItem('temporary_data')) && (
+            {!(!(isLoaded.flashsales && isLoaded.products) && Object.keys(data).length === 0) && (
                 <div className={cx('wrapper')}>
                     <div className={cx('navbar')}>
                         <SideBar />

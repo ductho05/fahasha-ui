@@ -11,7 +11,7 @@ import Item from './Item';
 import OfflineBoltIcon from '@mui/icons-material/OfflineBolt';
 import { Carousel, Progress, Skeleton } from 'antd';
 import { LeftSquareFilled, RightSquareFilled } from '@ant-design/icons';
-import CountDownCustom from '../../admin/components/CountDownCustom';
+import CountDownCustom from '../../components/CountDownCustom';
 import lottie from 'lottie-web';
 const cx = classname.bind(styles);
 
@@ -50,11 +50,14 @@ function FlashSale() {
             animationData: require('../../assets/json/sale_tag.json'),
         });
     }, []);
-    console.log('gifts', gifts);
+
     useEffect(() => {
         axios
             .get(`${api}/flashsales?sort=reverse&filter=expired&num=${numFlash}`)
             .then((res) => {
+                setInterval(() => {
+                    res.data.data.length === 0 && setIsShow(true);
+                }, 15000);
                 setGifts(res.data.data);
             })
             .catch((err) => {
@@ -82,13 +85,12 @@ function FlashSale() {
     };
 
     // sau 10 giây nếu không có sản phẩm nào thì hiện thông báo
-    useEffect(() => {
-        setTimeout(() => {
-            if (gifts.length === 0) {
-                setIsShow(true);
-            }
-        }, 15000);
-    }, []);
+    // useEffect(() => {
+    //     setInterval((togle) => {
+    //         console.log('togle', togle);
+    //         togle == false && setIsShow(true);
+    //     }, 15000);
+    // }, []);
 
     return (
         <>
@@ -206,7 +208,7 @@ function FlashSale() {
                                     style={{
                                         position: 'absolute',
                                         top: '50%',
-                                        left: '0%',
+                                        left: '-0.2%',
                                         transform: 'translate(-50%, -50%)',
                                         zIndex: '1000',
                                         backgroundColor: 'transparent',
@@ -218,7 +220,7 @@ function FlashSale() {
                                         fontWeight: 'bold',
                                     }}
                                 >
-                                    <LeftSquareFilled style={{ fontSize: '35px', color: '#fff' }} />
+                                    <LeftSquareFilled style={{ fontSize: '30px', color: '#fff' }} />
                                 </button>
                             }
                             {
@@ -228,7 +230,7 @@ function FlashSale() {
                                     style={{
                                         position: 'absolute',
                                         top: '50%',
-                                        right: '0%',
+                                        right: '-0.2%',
                                         transform: 'translate(50%, -50%)',
                                         zIndex: '1000',
                                         backgroundColor: 'transparent',
@@ -240,7 +242,7 @@ function FlashSale() {
                                         fontWeight: 'bold',
                                     }}
                                 >
-                                    <RightSquareFilled style={{ fontSize: '35px', color: '#fff' }} />
+                                    <RightSquareFilled style={{ fontSize: '30px', color: '#fff' }} />
                                 </button>
                             }
                         </>

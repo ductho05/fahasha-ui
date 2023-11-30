@@ -25,8 +25,7 @@ import {
 } from 'antd';
 import { api } from '../../../constants';
 import { set } from 'react-hook-form';
-
-
+import { useData } from '../../../stores/DataContext';
 
 function FlashSaleForm({ props, hideFunc }) {
     const [showProgress, setShowProgress] = useState(false);
@@ -36,7 +35,7 @@ function FlashSaleForm({ props, hideFunc }) {
     const [show, setShow] = useState(false);
     const [valuepoint, setValuepoint] = useState(null);
     const formRef = useRef(null);
-
+    const { data, setData } = useData();
     const moment = require('moment-timezone');
 
     // Đặt múi giờ cho Việt Nam
@@ -77,12 +76,12 @@ function FlashSaleForm({ props, hideFunc }) {
     };
 
     // // ham them product vao flashsale de luu vao localstorage
-    const addFlashsaleToLocal = (product) => {
-        const data = localStorage.getItem('temporary_data');
-        const { flashsales } = JSON.parse(data);
-        const newFlashsales = [...flashsales, product];
-        localStorage.setItem('temporary_data', JSON.stringify({ ...JSON.parse(data), flashsales: newFlashsales }));
-    };
+    // const addFlashsaleToLocal = (product) => {
+    //     const data = localStorage.getItem('temporary_data');
+    //     const { flashsales } = JSON.parse(data);
+    //     const newFlashsales = [...flashsales, product];
+    //     localStorage.setItem('temporary_data', JSON.stringify({ ...JSON.parse(data), flashsales: newFlashsales }));
+    // };
 
     const checktooffprogress = (i) => {
         i == true && setShowProgress(false);
