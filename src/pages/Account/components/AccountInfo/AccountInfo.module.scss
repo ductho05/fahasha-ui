@@ -283,6 +283,7 @@ input[type='checkbox']:checked ~ .change_password {
 .disable {
     pointer-events: none;
     background-color: #f2f2f2;
+    border-radius: 4px;
 
     input {
         background-color: #f2f2f2;

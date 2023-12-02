@@ -9,6 +9,7 @@ import { Dialog } from '@mui/material';
 import EvaluateForm from '../../../../components/Forms/EvaluateForm';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from 'antd';
+import { authInstance } from '../../../../utils/axiosConfig'
 
 const cx = classNames.bind(styles);
 function Evaluate() {
@@ -26,14 +27,10 @@ function Evaluate() {
 
     useEffect(() => {
         setLoading(true)
-        fetch(`${api}/evaluates?user=${state.user._id}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-        })
-            .then((response) => response.json())
+        authInstance.post(`${api}/evaluates`)
             .then((result) => {
-                if (result.status == 'OK') {
-                    setEvaluates(result.data);
+                if (result.data.status == 'OK') {
+                    setEvaluates(result.data.data);
                 }
                 setLoading(false)
             })
@@ -42,14 +39,10 @@ function Evaluate() {
 
     useEffect(() => {
         setLoading(true)
-        fetch(`${api}/orderitems/order/filter?user=${state.user._id}&status_order=HOANTHANH&status=CHUADANHGIA`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-        })
-            .then((response) => response.json())
+        authInstance.post(`${api}/orderitems/order/filter?status_order=HOANTHANH&status=CHUADANHGIA`)
             .then((result) => {
-                if (result.status == 'OK') {
-                    setProductNotRates(result.data);
+                if (result.data.status == 'OK') {
+                    setProductNotRates(result.data.data);
                 }
                 setLoading(false)
             })
@@ -99,8 +92,8 @@ function Evaluate() {
                     <>
                         <ul className={currentTab == 0 ? cx('list') : cx('hide')}>
                             {evalutes.map((evalute, index) => (
-                                <li key={index} className={cx('item')}>
-                                    <p className={cx('days')}>{new Date(evalute.createdAt).toLocaleDateString()}</p>
+                                <li key={index} className={cx('item', "items-center")}>
+                                    <p className={cx('days')}>{evalute.createdAt}</p>
                                     <p className={cx('name')}>{evalute.product.title}</p>
                                     <div className={cx('rate')}>
                                         {rates.map((rate, index) => (

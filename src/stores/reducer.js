@@ -1,23 +1,16 @@
 import { REGISTER, LOGIN, LOGOUT, UPDATE, NOACTION, SEENOTICE } from './constants';
-import { api } from '../constants';
 import localstorge from './localstorge';
 import { socket } from '../service/SocketIo';
+import { authInstance } from '../utils/axiosConfig';
 
 var user = {};
 var token = localstorge.get();
 var sk = socket
 if (token) {
-    await fetch(`${api}/users/get/profile`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token: token }),
-    })
-        .then((response) => response.json())
+    await authInstance.get("/users/get/profile")
         .then((result) => {
-            if (result.status === 'OK') {
-                user = { ...result.data };
+            if (result.data.status === 'OK') {
+                user = { ...result.data.data };
             }
         })
         .catch((err) => {
@@ -65,8 +58,7 @@ function Reducer(state, action) {
         case UPDATE:
             return {
                 ...state,
-                user: {},
-                token: '',
+                user: action.payload.data,
                 action: UPDATE,
             };
 

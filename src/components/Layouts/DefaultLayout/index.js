@@ -16,6 +16,7 @@ import { LOGOUT, LOGIN, REGISTER } from '../../../stores/constants';
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { authInstance } from '../../../utils/axiosConfig';
 
 const cx = classNames.bind(styles);
 function DefaultLayout(props) {
@@ -26,57 +27,21 @@ function DefaultLayout(props) {
     const [state, dispatch] = useStore();
     const [isInteractive, setIsInteractive] = useState(false);
 
-    const handleUserInteraction = () => {
-        setIsInteractive(true);
-    };
-
-    const handleUserInactivity = () => {
-        setIsInteractive(false);
-    };
-
-    useEffect(() => {
-        clearInterval(5000);
-
-        setInterval(() => {
-            setIsInteractive(false);
-        }, 5000);
-
-        window.addEventListener('mousemove', handleUserInteraction);
-        window.addEventListener('scroll', handleUserInteraction);
-        window.addEventListener('keydown', handleUserInteraction);
-
-        window.addEventListener('blur', handleUserInactivity);
-
-        return () => {
-            window.removeEventListener('mousemove', handleUserInteraction);
-            window.removeEventListener('scroll', handleUserInteraction);
-            window.removeEventListener('keydown', handleUserInteraction);
-            window.removeEventListener('blur', handleUserInactivity);
-        };
-    }, []);
-
     useEffect(() => {
         props.setIsLogin(localstorage.get().length > 0);
     }, [state]);
     setInterval(() => {
         if (isLogin()) {
-            let token = localstorge.get();
-            fetch(`${api}/users/get/profile`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ token: token }),
-            })
-                .then((response) => response.json())
+
+            authInstance.get("/users/get/profile")
                 .then((result) => {
-                    if (result.message == 'jwt expired') {
+                    if (result.data.message == 'Jwt expired') {
                         setExpired(true);
                     } else {
                         setExpired(false);
                     }
                 })
-                .catch(() => {
+                .catch((err) => {
                     setExpired(false);
                 });
         }
