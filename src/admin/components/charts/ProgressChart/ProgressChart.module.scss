@@ -31,8 +31,8 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            align-items: center;
-            flex: 6;
+            align-items: self-start;
+            flex: 8;
             .total_value {
                 font-size: 3rem;
                 color: #333;
@@ -55,11 +55,24 @@
         color: #999;
     }
 
-    .total {
-        font-size: 3rem;
-        color: #333;
-        line-height: 1.5;
-        margin: 20px 0;
+    .content_content {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+
+        .total {
+            font-size: 2.8rem;
+            color: #333333;
+            line-height: 1.5;
+            padding: 0 10px 0 0;
+            flex: 3;
+        }
+
+        .statistic {
+            flex: 7;
+            padding: 0 0 0 10px;
+        }
     }
 
     .last_revenue {
@@ -94,7 +107,9 @@
         color: #9f0d7f;
     }
 }
-
+.visible {
+    display: block;
+}
 .total_revenue {
     font-size: 2rem;
     color: #333;

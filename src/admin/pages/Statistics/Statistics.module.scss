@@ -30,6 +30,13 @@
     .right {
         flex: 4;
 
+        .income {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 5% 0 0 0;
+        }
+
         .heading {
             display: flex;
             justify-content: space-between;
@@ -37,9 +44,10 @@
         }
 
         .income_title {
-            font-size: 1.4rem;
+            font-size: 2rem;
             color: #333;
             font-weight: 400;
+            margin: 0 0 0 7%;
         }
 
         .filter {
@@ -65,4 +73,21 @@
     -moz-box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
     padding: 10px 10px 20px 10px;
     border-radius: 8px;
+}
+
+.filter {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .content {
+        padding: 10px 0;
+        font-size: 1.4rem;
+        color: #999;
+    }
+
+    .total_custom {
+        margin: 5% 0;
+    }
 }

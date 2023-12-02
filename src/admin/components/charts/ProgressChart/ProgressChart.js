@@ -5,10 +5,16 @@ import 'react-circular-progressbar/dist/styles.css';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { api } from '../../../../constants';
-import { Modal, Button, Form, Input, Select, Radio, Checkbox, Typography } from 'antd';
+import { Modal, Popover, Button, Form, Statistic, message, Input, Select, Radio, Checkbox, Typography } from 'antd';
+import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
+import { set } from 'react-hook-form';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
+
 const { Option } = Select;
 const { Text } = Typography;
 const cx = classNames.bind(styles);
+
 function ProgressChart() {
     const [doanhThu, setDoanhThu] = useState(0);
     const [doanhThuHomQua, setDoanhThuHomQua] = useState(0);
@@ -18,6 +24,11 @@ function ProgressChart() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isRun, setIsRun] = useState(false);
     const [kpi, setKPI] = useState('');
+    const [systemKpi, setSystemKpi] = useState('');
+    const [isStatus, setIsStatus] = useState(false);
+    const [doanhthukpi, setDoanhthukpi] = useState(0);
+
+    const [load_animation, setLoad_animation] = useState(false);
 
     const addCommasToNumber = (number) => {
         // Chuyển đổi số thành chuỗi
@@ -44,6 +55,60 @@ function ProgressChart() {
         return formattedNumber;
     };
 
+    const content = (
+        <div>
+            {systemKpi.kpi ? (
+                <>
+                    <p>Đạt được: {addCommasToNumber(doanhthukpi)} đ</p>
+                    <p>Mục tiêu: {addCommasToNumber(parseInt(systemKpi?.kpi))} đ</p>
+                    <p>Ngày bắt đầu: {systemKpi.start}</p>
+                    <p>Ngày kết thúc: {systemKpi.end}</p>
+                </>
+            ) : (
+                <p>Click vào để khởi động chiến dịch KPI doanh thu</p>
+            )}
+        </div>
+    );
+
+    console.log('isStatus', isStatus);
+    useEffect(() => {
+        axios // lấy kpi có status = true
+            .get(`${api}/systems`)
+            .then((res) => {
+                const systems = res.data.data;
+                console.log('systems', systems);
+                if (systems) {
+                    // tính doanh thu từ start đến hôm nay
+                    const today = new Date();
+                    axios
+                        .get(`${api}/orders`)
+                        .then((res) => {
+                            const orders = res.data.data;
+                            const ordersToday = orders.filter((order) => {
+                                return (
+                                    formatDateToString(new Date(order.date)) <= formatDateToString(today) &&
+                                    formatDateToString(new Date(order.date)) >= systems.start
+                                );
+                            });
+                            const totalToday = ordersToday.reduce((total, order) => {
+                                return total + order.price;
+                            }, 0);
+                            console.log('totalToday1213', totalToday);
+                            setDoanhthukpi(totalToday);
+                        })
+                        .catch((err) => {
+                            console.log('sfasd', err);
+                        });
+                    setIsStatus(true);
+                    setSystemKpi(systems);
+                    console.log('Có nha');
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }, [isModalOpen]);
+
     const handleKPIChange = (e) => {
         // Loại bỏ dấu phẩy hiện tại (nếu có) và chỉ giữ lại số
         const inputValue = e.target.value.replace(/,/g, '');
@@ -68,12 +133,35 @@ function ProgressChart() {
     const [form] = Form.useForm();
 
     const onFinish = (values) => {
+        setLoad_animation(true);
         values = {
             ...values,
             kpi: values.kpi.replace(/,/g, ''),
             isRun,
         };
-        console.log('Success:', values);
+        fetch(`${api}/systems/insert`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(values),
+        })
+            .then((res) => res.json())
+            .then((res) => {
+                console.log(res);
+                setLoad_animation(false);
+                setIsModalOpen(false);
+                if (res.status === 'OK') {
+                    info('success', 'Cài đặt KPI thành công!');
+                } else if (res.status === 'ERROR') {
+                    info('warning', 'Mã kích hoạt không đúng, vui lòng kiểm tra lại!');
+                } else {
+                    info('error', 'Cài đặt KPI thất bại! Lỗi: ' + res.message);
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     };
     const onReset = () => {
         form.resetFields();
@@ -107,16 +195,16 @@ function ProgressChart() {
                     // in ra
                     console.log('yesterday', formatDateToString(yesterday));
                 });
-
-                const today = new Date();
-                const yesterday = new Date(today);
+                const yesterday = new Date(new Date());
                 yesterday.setDate(yesterday.getDate() - 1);
-                const lastWeek = new Date(today);
+                const lastWeek = new Date(new Date());
                 lastWeek.setDate(lastWeek.getDate() - 7);
-                const lastMonth = new Date(today);
+                const lastMonth = new Date(new Date());
                 lastMonth.setDate(lastMonth.getDate() - 30);
+
+                console.log('yesterday13213', yesterday, lastWeek, lastMonth);
                 const ordersToday = orders.filter((order) => {
-                    return formatDateToString(new Date(order.date)) === formatDateToString(today);
+                    return formatDateToString(new Date(order.date)) === formatDateToString(new Date());
                 });
                 const ordersYesterday = orders.filter((order) => {
                     return formatDateToString(new Date(order.date)) === formatDateToString(yesterday);
@@ -127,9 +215,12 @@ function ProgressChart() {
                     const date = new Date();
                     const day = date.getDay();
                     const diff = date.getDate() - day + (day == 0 ? -6 : 1) - 7;
-                    const mondaylast = new Date(date.setDate(diff));
-                    const sundaylast = new Date(date.setDate(diff + 6));
-                    console.log('mondaylast', mondaylast, sundaylast);
+                    const mondaylast = new Date(new Date().setDate(diff));
+                    // giá trị chủ nhật tuần trước
+                    const sundaylast = new Date(new Date().setDate(diff + 6));
+                    // lấy giá trị thứ 2 tuần sau
+                    const mondaynext = new Date(new Date().setDate(diff + 14));
+                    console.log('mondaylast123', mondaylast, sundaylast, mondaynext);
                     // in ra những đơn hàng trong tuần trước
                     return (
                         formatDateToString(new Date(order.date)) >= formatDateToString(mondaylast) &&
@@ -141,7 +232,7 @@ function ProgressChart() {
                     const date = new Date();
                     const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
                     const lastDay = new Date(date.getFullYear(), date.getMonth(), 0);
-                    console.log('firstDay', formatDateToString(firstDay), formatDateToString(lastDay));
+                    console.log('firstDay2323', formatDateToString(firstDay), formatDateToString(lastDay));
                     // in ra những đơn hàng trong tháng trước
                     return (
                         formatDateToString(new Date(order.date)) >= formatDateToString(firstDay) &&
@@ -186,16 +277,33 @@ function ProgressChart() {
             });
     }, []);
 
+    const info = (type, content) => {
+        messageApi.open({
+            type: type,
+            content: content,
+        });
+    };
+
+    const [messageApi, contextHolder] = message.useMessage();
+
     return (
         <>
+            {contextHolder}
             {/* <h1 className={cx('total_revenue')}>Doanh thu</h1> */}
+            <div className={cx('visible')}>
+                <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={load_animation}>
+                    <CircularProgress color="inherit" />
+                </Backdrop>
+            </div>
+
             <Modal
+                title="Cài đặt KPI doanh thu"
+                visible={isModalOpen}
                 onCancel={() => {
                     setIsModalOpen(false);
                 }}
-                title="Cài đặt KPI"
-                open={isModalOpen} // ẩn  nút ok và cancel
                 footer={null}
+                width={600}
             >
                 <Form
                     {...layout}
@@ -206,7 +314,16 @@ function ProgressChart() {
                         maxWidth: 600,
                     }}
                 >
-                    <Form.Item label="Chọn loại" name="type">
+                    <Form.Item
+                        label="Chọn loại"
+                        name="type"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Chọn loại để tiếp tục',
+                            },
+                        ]}
+                    >
                         <Radio.Group>
                             <Radio.Button value="week">Tuần</Radio.Button>
                             <Radio.Button value="month">Tháng</Radio.Button>
@@ -222,7 +339,16 @@ function ProgressChart() {
                             }}
                         />
                     </Form.Item>
-                    <Form.Item label="KPI" name="kpi">
+                    <Form.Item
+                        label="KPI"
+                        name="kpi"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Nhập Kpi để tiếp tục',
+                            },
+                        ]}
+                    >
                         <div
                             style={{
                                 display: 'flex',
@@ -231,7 +357,7 @@ function ProgressChart() {
                                 alignItems: 'center',
                             }}
                         >
-                            <Input value={kpi} onChange={handleKPIChange} />
+                            <Input value={kpi} onChange={handleKPIChange} placeholder="Nhập KPI mục tiêu" />
                             <Text
                                 type="secondary"
                                 style={{
@@ -240,6 +366,30 @@ function ProgressChart() {
                             >
                                 đ
                             </Text>
+                        </div>
+                    </Form.Item>
+                    <Form.Item
+                        label="Mã kích hoạt"
+                        name="key"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Nhập mã kích hoạt để tiếp tục',
+                            },
+                        ]}
+                    >
+                        <div
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                            }}
+                        >
+                            <Input
+                                // gợi ý chữ kích hoạt
+                                placeholder="Nhập mã kích hoạt"
+                            />
                         </div>
                     </Form.Item>
 
@@ -263,6 +413,7 @@ function ProgressChart() {
                             ) : null
                         }
                     </Form.Item>
+
                     <Form.Item {...tailLayout}>
                         <Button type="primary" htmlType="submit">
                             Áp dụng
@@ -281,34 +432,83 @@ function ProgressChart() {
             </Modal>
             <div className={cx('body')}>
                 <div className={cx('top')}>
-                    <div
+                    {' '}
+                    <Popover
+                        content={content}
+                        title={systemKpi.kpi ? 'KPI - Đang chạy' : 'KPI - Đã dừng'}
+                        trigger="hover"
                         className={cx('kpi')}
-                        onClick={() => {
-                            setIsModalOpen(true);
-                        }}
                     >
-                        <CircularProgressbar
-                            value={66}
-                            text="66 %"
-                            strokeWidth={6}
-                            styles={{
-                                path: {
-                                    stroke: `#f88`,
-                                    transition: 'stroke-dashoffset 0.5s ease 0s',
-                                },
-                                trail: {
-                                    stroke: '#d6d6d6',
-                                },
-                                text: {
-                                    fill: '#f88',
-                                    fontSize: '1.8rem',
-                                },
-                                background: {
-                                    fill: '#3e98c7',
-                                },
+                        <div
+                            onClick={() => {
+                                isStatus == false && setIsModalOpen(true);
+                                isStatus == true &&
+                                    info(
+                                        'warning',
+                                        'Không thể thay đổi KPI khi đã khởi động, vui lòng liên hệ bộ phận IT!',
+                                    );
                             }}
-                        />
-                    </div>
+                        >
+                            <CircularProgressbar
+                                value={
+                                    doanhthukpi < systemKpi.kpi
+                                        ? (doanhthukpi / systemKpi.kpi) * 100
+                                        : doanhthukpi == systemKpi.kpi
+                                        ? 100
+                                        : ((doanhthukpi % systemKpi.kpi) / systemKpi.kpi) * 100
+                                }
+                                text={
+                                    systemKpi.kpi
+                                        ? doanhthukpi < systemKpi.kpi
+                                            ? ((doanhthukpi / systemKpi.kpi) * 100).toFixed(0) + '%'
+                                            : doanhthukpi == systemKpi.kpi
+                                            ? '100%'
+                                            : '+' + ((doanhthukpi / systemKpi.kpi) * 100 - 100).toFixed(0) + '%'
+                                        : 'chưa thiết lập'
+                                }
+                                strokeWidth={6}
+                                styles={{
+                                    path: {
+                                        stroke: systemKpi.kpi
+                                            ? doanhthukpi < systemKpi.kpi
+                                                ? '#f88'
+                                                : doanhthukpi == systemKpi.kpi
+                                                ? '#4EEE94'
+                                                : '#0000EE'
+                                            : 'gray',
+                                        transition: 'stroke-dashoffset 0.5s ease 0s',
+                                    },
+                                    trail: {
+                                        stroke: systemKpi.kpi
+                                            ? doanhthukpi < systemKpi.kpi
+                                                ? '#DDDDDD'
+                                                : doanhthukpi == systemKpi.kpi
+                                                ? '#4EEE94'
+                                                : 'green'
+                                            : 'gray',
+                                    },
+                                    text: {
+                                        fill: systemKpi.kpi
+                                            ? doanhthukpi < systemKpi.kpi
+                                                ? '#f88'
+                                                : doanhthukpi == systemKpi.kpi
+                                                ? '#4EEE94'
+                                                : '#0000EE'
+                                            : 'gray',
+                                        fontSize: systemKpi.kpi ? '1.8rem' : '1.2rem',
+                                    },
+                                    background: {
+                                        fill:
+                                            doanhthukpi < systemKpi.kpi
+                                                ? 'gray'
+                                                : doanhthukpi == systemKpi.kpi
+                                                ? '#4EEE94'
+                                                : 'black', //parseInt(doanhthukpi / systemKpi.kpi) < 1 ? '#f88' : '#4EEE94',
+                                    },
+                                }}
+                            />
+                        </div>
+                    </Popover>
                     <div className={cx('total_')}>
                         <p className={cx('total_title')}>Tổng doanh thu</p>
                         <p className={cx('total_value')}>
@@ -320,12 +520,33 @@ function ProgressChart() {
                     </div>
                 </div>
                 <p className={cx('content')}>Doanh thu bán được trong hôm nay</p>
-                <p className={cx('total')}>
-                    {doanhThuNgay.toLocaleString('vi-VN', {
-                        style: 'currency',
-                        currency: 'VND',
-                    })}
-                </p>
+                <div className={cx('content_content')}>
+                    <p className={cx('total')}>
+                        {doanhThuNgay.toLocaleString('vi-VN', {
+                            style: 'currency',
+                            currency: 'VND',
+                        })}
+                    </p>
+                    <div className={cx('statistic')}>
+                        {
+                            <Statistic
+                                title={doanhThuHomQua <= doanhThuNgay ? 'Tăng' : 'Giảm'}
+                                value={
+                                    doanhThuHomQua == 0
+                                        ? 0
+                                        : (Math.abs(doanhThuHomQua - doanhThuNgay) / doanhThuHomQua) * 100
+                                }
+                                precision={2}
+                                valueStyle={{
+                                    color: doanhThuHomQua <= doanhThuNgay ? '#3f8600' : '#cf1322',
+                                    fontSize: '2rem',
+                                }}
+                                prefix={doanhThuHomQua <= doanhThuNgay ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
+                                suffix="%"
+                            />
+                        }
+                    </div>
+                </div>
                 <p className={cx('content')}>Doanh thu so với thời điểm trước</p>
                 <div className={cx('last_revenue')}>
                     <div className={cx('last_item')}>
