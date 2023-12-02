@@ -16,6 +16,8 @@ import CircularProgress from '@mui/material/CircularProgress'
 import { toast, ToastContainer } from 'react-toastify'
 import "react-toastify/dist/ReactToastify.css";
 import { Skeleton } from 'antd';
+import { authInstance } from '../../../../utils/axiosConfig'
+import { update } from '../../../../stores/actions';
 
 const cx = classnames.bind(styles)
 
@@ -37,6 +39,11 @@ function AccountInfo() {
     const [showProgressUpdate, setShowProgressUpdate] = useState(false)
     const [checked, setChecked] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [isChanged, setIsChanged] = useState(false)
+
+    useEffect(() => {
+        setIsChanged(user !== state.user)
+    }, [user])
 
     const handleChangeFullName = (e) => {
         setUser(prev => {
@@ -87,22 +94,10 @@ function AccountInfo() {
 
     useEffect(() => {
         setLoading(true)
-        fetch(`${api}/users/get/profile`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ token: localstorge.get() })
-        })
-            .then(response => response.json())
-            .then(result => {
-                if (result.status == 'OK') {
-                    setUser(result.data)
-                }
-                setLoading(false)
-            })
-            .catch(() => setLoading(false))
-    }, [showProgressUpdate])
+        setUser(state.user)
+        setLoading(false)
+
+    }, [state])
 
     const handleIncorectPass = () => {
         setShowError(false)
@@ -221,26 +216,22 @@ function AccountInfo() {
             }
 
             setShowProgressUpdate(true)
-            await fetch(`${api}/users/update/${user._id}`, {
-                method: 'PUT',
-                body: formData
-            })
-                .then(response => response.json())
+            await authInstance.put(`/users/update/${user._id}`, formData)
                 .then(result => {
-                    if (result.status == 'OK') {
-                        setShowProgressUpdate(false)
+
+                    if (result.data.status == 'OK') {
+                        dispatch(update(result.data))
                         toast.success('Lưu thông tin tài khoản thành công')
-                        setChecked(false)
                     } else {
-                        setShowProgressUpdate(false)
                         toast.error('Thất bại! Vui lòng liên hệ Admin')
-                        setChecked(false)
                     }
+                    setChecked(false)
+                    setShowProgressUpdate(false)
                 })
                 .catch(err => {
                     setShowProgressUpdate(false)
                     toast.error('Lỗi! Vui lòng liên hệ Admin')
-                    console.log(err?.message)
+                    console.log(err)
                 })
         }
     }
@@ -621,7 +612,9 @@ function AccountInfo() {
                             </div>
 
                             <p className={cx('btn_edit')}>
-                                <p onClick={handleUpdateUser}><Button primary>Lưu thay đổi</Button></p>
+                                <p onClick={handleUpdateUser} className={!isChanged && cx('disable')}>
+                                    <Button primary disabled={!isChanged}>Lưu thay đổi</Button>
+                                </p>
                             </p>
 
                         </div>

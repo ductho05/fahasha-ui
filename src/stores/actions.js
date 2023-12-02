@@ -1,4 +1,4 @@
-import { REGISTER, LOGIN, LOGOUT, NOACTION, SEENOTICE } from './constants';
+import { REGISTER, LOGIN, LOGOUT, NOACTION, SEENOTICE, UPDATE } from './constants';
 
 export const register = (payload) => {
     return {
@@ -23,7 +23,7 @@ export const logout = (payload) => {
 
 export const update = (payload) => {
     return {
-        type: LOGOUT,
+        type: UPDATE,
         payload,
     };
 };

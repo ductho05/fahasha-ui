@@ -6,6 +6,7 @@ import { useStore } from '../../../../stores/hooks';
 import { Link } from 'react-router-dom';
 import { seeNotice } from '../../../../stores/actions';
 import { Skeleton } from 'antd';
+import { authInstance } from '../../../../utils/axiosConfig'
 
 const cx = classNames.bind(styles)
 function Notifition() {
@@ -16,17 +17,10 @@ function Notifition() {
 
     React.useEffect(() => {
         setLoading(true)
-        fetch(`${api}/webpush/get`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                id: state.user._id
-            })
-        })
-            .then(response => response.json())
+        authInstance.post(`${api}/webpush/get`)
             .then(result => {
-                if (result.status === "OK") {
-                    setNotices(result.data)
+                if (result.data.status === "OK") {
+                    setNotices(result.data.data)
                 }
                 setLoading(false)
             })

@@ -172,13 +172,14 @@ function RegisterLogin(props) {
         })
             .then((response) => response.json())
             .then((result) => {
+
                 if (result.status == 'OK') {
                     setShowProgress(false);
                     props.setShowForm(false);
-                    if (result.message == 'Email Or Password Not Matched') {
+                    if (result.message == 'Password incorrect') {
                         setShowDialog(true);
-                    } else if (result.message == 'Login Succsess') {
-                        dispatch(login(result));
+                    } else if (result.message == 'Login successfully') {
+                        dispatch(login(result))
                         ServiceWorkerNotifi()
                         state.socket.emit('save-socket', (result.data._id))
                     }

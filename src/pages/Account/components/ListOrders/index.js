@@ -3,9 +3,10 @@ import classNames from "classnames/bind"
 import numeral from "numeral"
 import { useNavigate } from 'react-router-dom'
 import styles from './ListOrders.module.scss'
-import { api, CHOXACNHAN, DANGGIAO, HOANTHANH, DAHUY } from "../../../../constants"
+import { api } from "../../../../constants"
 import { useStore } from '../../../../stores/hooks'
 import { Skeleton } from 'antd';
+import { authInstance } from '../../../../utils/axiosConfig'
 
 const cx = classNames.bind(styles)
 const tabList = [
@@ -41,14 +42,10 @@ function ListOrders() {
     useEffect(() => {
         if (tabList[currentIndex].value == 'TATCA') {
             setLoading(true)
-            fetch(`${api}/orders?user=${state.user._id}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            })
-                .then(response => response.json())
+            authInstance.post(`${api}/orders/user`)
                 .then(result => {
-                    if (result.status == 'OK') {
-                        setListOrders(result.data)
+                    if (result.data.status == 'OK') {
+                        setListOrders(result.data.data)
                     }
                     setLoading(false)
                 })
@@ -58,14 +55,10 @@ function ListOrders() {
                 })
         } else {
             setLoading(true)
-            fetch(`${api}/orders/filter?status=${tabList[currentIndex].value}&user=${state.user._id}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            })
-                .then(response => response.json())
+            authInstance.post(`${api}/orders/filter?status=${tabList[currentIndex].value}`)
                 .then(result => {
-                    if (result.status == 'OK') {
-                        setListOrders(result.data)
+                    if (result.data.status == 'OK') {
+                        setListOrders(result.data.data)
                     }
                     setLoading(false)
                 })
@@ -131,7 +124,7 @@ function ListOrders() {
                         </ul>
 
                         <div className={listOrders.length <= 0 ? cx('listorders_empty') : cx('hide')}>
-                            <p>Danh sách đơn hàng trống</p>
+                            <p className="text-center">Danh sách đơn hàng trống</p>
                         </div>
                     </>
             }

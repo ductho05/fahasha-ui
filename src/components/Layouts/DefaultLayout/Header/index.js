@@ -71,6 +71,7 @@ function Header() {
 
     useEffect(() => {
         if (state.user) {
+
             setUser(state.user);
         }
         fetch(`${api}/webpush/get`, {
@@ -628,7 +629,7 @@ function Header() {
                                                     </ul>
 
                                                     <div
-                                                        className={notice.length >= 0 || Object.keys(state.user) ? cx('hide') : cx('notice_empty')}
+                                                        className={notice.length > 0 ? cx('hide') : cx('notice_empty')}
                                                     >
                                                         <p>Bạn chưa có thông báo nào</p>
                                                     </div>
