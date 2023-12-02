@@ -12,14 +12,14 @@ import { Divider, Form, Button, Radio, Skeleton, Space, Switch, Alert } from 'an
 import BarChartExample from '../../../components/charts/BarChar/BarChar';
 import CustomPopconfirm from '../../../components/CustomPopconfirm/CustomPopconfirm';
 import Marquee from 'react-fast-marquee';
-const cx = classNames.bind(styles);
+import { useData } from '../../../../stores/DataContext';
 
 function FlashSale() {
     const container1 = useRef(null);
     const navigate = useNavigate();
-
+    const cx = classNames.bind(styles);
+    const { data, setData } = useData();
     const moment = require('moment-timezone');
-
     // Đặt múi giờ cho Việt Nam
     const vietnamTimeZone = 'Asia/Ho_Chi_Minh';
 
@@ -28,7 +28,6 @@ function FlashSale() {
 
     // Lấy số giờ hiện tại
     const currentHourInVietnam = currentTimeInVietnam.get('hours');
-
 
     lottie.loadAnimation({
         container: container1.current, // Thay container2.current bằng document.getElementById nếu bạn không sử dụng useRef.
@@ -228,17 +227,14 @@ function FlashSale() {
                                     .then((result) => {
                                         if (result.status == 'OK') {
                                             //localStorage.setItem('isFlashsaleLoading', true);
-                                            localStorage.setItem(
-                                                'temporary_data',
-                                                JSON.stringify({
-                                                    ...JSON.parse(localStorage.getItem('temporary_data')),
-                                                    flashsales: JSON.parse(
-                                                        localStorage.getItem('temporary_data'),
-                                                    ).flashsales.filter((item) => item._id != params.row._id),
-                                                }),
-                                            );
+                                            setData({
+                                                ...JSON.parse(data),
+                                                flashsales: JSON.parse(data).flashsales.filter(
+                                                    (item) => item._id != params.row._id,
+                                                ),
+                                            });
                                             setRows(
-                                                JSON.parse(localStorage.getItem('temporary_data')).flashsales.filter(
+                                                JSON.parse(data).flashsales.filter(
                                                     (item) => item._id != params.row._id,
                                                 ),
                                             );
@@ -260,22 +256,19 @@ function FlashSale() {
 
     const [rows, setRows] = useState([]);
     useEffect(() => {
-        if (localStorage.getItem('temporary_data')) {
-            var data = JSON.parse(localStorage.getItem('temporary_data')).flashsales;
-            setRows(data);
+        if (Object.keys(data).length !== 0) {
+            var data1 = data.flashsales;
+            setRows(data1);
             if (localStorage.getItem('isFlashsaleLoading')) {
                 //localStorage.removeItem('isFlashsaleLoading');
                 fetch(`${api}/flashsales?sort=reverse`)
                     .then((response) => response.json())
                     .then((result) => {
                         setRows(result.data);
-                        localStorage.setItem(
-                            'temporary_data',
-                            JSON.stringify({
-                                ...JSON.parse(localStorage.getItem('temporary_data')),
-                                flashsales: result.data,
-                            }),
-                        );
+                        setData({
+                            ...JSON.parse(data),
+                            flashsales: result.data,
+                        });
                         localStorage.removeItem('isFlashsaleLoading');
                     })
                     .catch((err) => console.log(err));

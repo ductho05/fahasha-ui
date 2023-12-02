@@ -29,6 +29,7 @@
         "customize-cra": "^1.0.0",
         "firebase": "^10.1.0",
         "formik": "^2.4.2",
+        "localforage": "^1.10.0",
         "lottie-web": "^5.12.2",
         "material-ui-popup-state": "^5.0.9",
         "moment": "^2.29.4",

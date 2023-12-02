@@ -8,7 +8,7 @@ import images from '../../assets/images';
 
 const cx = classNames.bind(styles);
 function Page404() {
-    localStorage.removeItem('temporary_data');
+    //localStorage.removeItem('temporary_data');
 
     const navigate = useNavigate();
 

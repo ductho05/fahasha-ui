@@ -1,0 +1,29 @@
+.gift_current__time {
+    text-align: center;
+    @media (max-width: 768px) {
+        font-size: 16px;
+    }
+    display: flex;
+    flex-direction: row;
+}
+
+.gift_current__time__title {
+    // căn giữa chữ
+    display: flex;
+    align-items: center;
+
+    @media (max-width: 768px) {
+        font-size: 14px;
+    }
+}
+
+.gift_current__time__content {
+    font-weight: 600;
+    font-size: 3rem;
+    display: flex;
+    align-items: center;
+
+    @media (max-width: 768px) {
+        font-size: 14px;
+    }
+}

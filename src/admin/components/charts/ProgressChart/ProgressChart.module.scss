@@ -4,6 +4,51 @@
     justify-content: center;
     align-items: center;
 
+    .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-direction: row;
+        .kpi {
+            flex: 5;
+            height: 120px;
+            padding: 10px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            cursor: pointer;
+            .title {
+                font-size: 1.4rem;
+                color: #999;
+                line-height: 1.5;
+                text-align: center;
+                font-weight: 600;
+            }
+        }
+        .total_ {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            flex: 6;
+            .total_value {
+                font-size: 3rem;
+                color: #333;
+                line-height: 1.5;
+                margin: 2% 0;
+            }
+            .total_title {
+                font-size: 1.8rem;
+                color: #999;
+                line-height: 1.5;
+                text-align: center;
+                font-weight: 600;
+            }
+        }
+    }
+
     .content {
         padding: 10px 0;
         font-size: 1.4rem;
@@ -51,14 +96,8 @@
 }
 
 .total_revenue {
-    font-size: 1.4rem;
+    font-size: 2rem;
     color: #333;
     font-weight: 500;
     line-height: 1.5;
-}
-
-.sell-today {
-    width: 120px;
-    height: 120px;
-    padding: 10px;
 }

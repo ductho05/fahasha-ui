@@ -120,17 +120,17 @@ function Evaluate() {
                                 <>
                                     <li key={index} className={cx('product_item')}>
                                         <div className={cx('thumbnail')}>
-                                            <img src={item.product.images} />
+                                            <img src={item.product?.images} />
                                         </div>
                                         <div className={cx('product_body')}>
-                                            <p className={cx('product_name')}>{item.product.title}</p>
-                                            <p className={cx('author')}>Tác giả: {item.product.author}</p>
+                                            <p className={cx('product_name')}>{item.product?.title}</p>
+                                            <p className={cx('author')}>Tác giả: {item.product?.author}</p>
                                         </div>
-                                        <p onClick={() => handleEval(item.product._id, item)} className={cx('btn_eval')}>
+                                        <p onClick={() => handleEval(item.product?._id, item)} className={cx('btn_eval')}>
                                             Viết đánh giá
                                         </p>
                                     </li>
-                                    <p onClick={() => handleEval(item.product._id, item)} className={cx('btn_eval_mobile')}>
+                                    <p onClick={() => handleEval(item.product?._id, item)} className={cx('btn_eval_mobile')}>
                                         Viết đánh giá
                                     </p>
                                 </>

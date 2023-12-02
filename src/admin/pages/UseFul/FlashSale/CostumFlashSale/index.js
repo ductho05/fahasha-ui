@@ -9,9 +9,11 @@ import AutorenewIcon from '@mui/icons-material/Autorenew';
 import FlashSaleModal from '../../../../components/FlashSaleModal';
 import { Divider, Form, Radio, Skeleton, Space, Switch, Alert } from 'antd';
 import Marquee from 'react-fast-marquee';
+import { useData } from '../../../../../stores/DataContext';
 const cx = classNames.bind(styles);
 
 function CostumFlashSale() {
+    const { data, setData } = useData();
     const getCategoryName = (categoryId) => {
         // categoryId là đối tượng danh mục
         // Thực hiện logic để lấy tên danh mục từ categoryId
@@ -112,9 +114,9 @@ function CostumFlashSale() {
 
     const [rows, setRows] = useState([]);
     useEffect(() => {
-        if (localStorage.getItem('temporary_data')) {
-            var data = JSON.parse(localStorage.getItem('temporary_data')).products;
-            setRows(data);
+        if (Object.keys(data).length !== 0) {
+            var data1 = data.products;
+            setRows(data1);
         } else {
             fetch(`${api}/products`)
                 .then((response) => response.json())

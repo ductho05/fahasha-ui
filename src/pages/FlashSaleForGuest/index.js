@@ -3,7 +3,7 @@ import classNames from 'classnames/bind';
 import styles from './FlashSaleForGuest.module.scss';
 import Slides from '../../components/Slides';
 import axios from 'axios';
-import CountDownCustom from '../../admin/components/CountDownCustom';
+import CountDownCustom from '../../components/CountDownCustom';
 import OfflineBoltIcon from '@mui/icons-material/OfflineBolt';
 import Categories from '../../components/Categories';
 import ForYou from '../../components/ForYou';
@@ -190,7 +190,7 @@ function FlashSaleForGuest() {
     const [isfirstget, setIsFirstGet] = useState(true);
     const valueTop = 530;
 
-    const container = useRef(null);
+    //const container = useRef(null);
     const container2 = useRef(null);
     const container3 = useRef(null);
     const container4 = useRef(null);
@@ -279,13 +279,13 @@ function FlashSaleForGuest() {
     // };
 
     useEffect(() => {
-        lottie.loadAnimation({
-            container: container.current,
-            renderer: 'svg',
-            loop: true,
-            autoplay: true,
-            animationData: require('../../assets/json/sale_tag.json'),
-        });
+        // lottie.loadAnimation({
+        //     container: container.current,
+        //     renderer: 'svg',
+        //     loop: true,
+        //     autoplay: true,
+        //     animationData: require('../../assets/json/sale_tag.json'),
+        // });
         lottie.loadAnimation({
             container: container2.current,
             renderer: 'svg',
@@ -324,7 +324,7 @@ function FlashSaleForGuest() {
                 </Backdrop>
             </div>
             <div className={cx('wrapper_header')}>
-                <div style={{ flex: '1' }}></div>
+                <div style={{ flex: '0.5' }}></div>
                 <span
                     style={{
                         height: '1px',
@@ -345,19 +345,25 @@ function FlashSaleForGuest() {
                     <h2
                         className={cx('gift-current__text')}
                         style={{
-                            flex: '2',
+                            flex: '3',
                         }}
                     >
                         <OfflineBoltIcon fontSize="large" />
-                        <span className={cx('text-3d')}> FLASH </span>
+                        <span className={cx('text-3d')}> FLASH SALE</span>
                         <OfflineBoltIcon
                             fontSize="large"
                             style={{
-                                zIndex: '0',
+                                zIndex: '5',
                                 marginRight: '0.5rem',
                             }}
                         />
-                        <div className={cx('gift-current__tag')} ref={container}></div>
+                        {/* <div
+                            className={cx('gift-current__tag')}
+                            styles={{
+                                zIndex: '4',
+                            }}
+                            ref={container}
+                        ></div> */}
                     </h2>
 
                     <span
@@ -402,7 +408,7 @@ function FlashSaleForGuest() {
                         flex: '1',
                     }}
                 ></span>
-                <div style={{ flex: '1' }}></div>
+                <div style={{ flex: '0.5' }}></div>
             </div>
             <div className={cx('wrapper_body')}>
                 <div className={cx('wrapper_image')}>
@@ -410,7 +416,7 @@ function FlashSaleForGuest() {
                         style={{
                             position: 'absolute',
                             width: '100%',
-                            height: '60vh',
+                            height: '40vh',
                             top: '-10vh',
                             left: '0',
                         }}
@@ -421,9 +427,8 @@ function FlashSaleForGuest() {
                         style={{
                             position: 'absolute',
                             maxWidth: '100%',
-                            height: '40vh',
-                            zIndex: '0',
-                            top: '0',
+                            height: '30vh',
+                            top: '0vh',
                             left: '30vw',
                         }}
                         ref={container3}
@@ -442,7 +447,6 @@ function FlashSaleForGuest() {
                         ref={container2}
                         style={{
                             flex: '1',
-                            zIndex: '0',
                         }}
                     ></div>
                     <div
@@ -470,12 +474,7 @@ function FlashSaleForGuest() {
                         </div>
                     </div>
                 </div>
-                <div
-                    className={cx('wrapper_menu')}
-                    style={{
-                        zIndex: '0',
-                    }}
-                >
+                <div className={cx('wrapper_menu')} style={{}}>
                     <div className={cx('wrapper_menu__time')}>
                         {getTimePont().map((item, index) => (
                             <div
@@ -615,9 +614,13 @@ function FlashSaleForGuest() {
                                                             index >= (pageNum - 1) * perPage &&
                                                             index < pageNum * perPage && (
                                                                 <Item
-                                                                    filter={item.point_sale == Math.floor(currentHourInVietnam / 3) && item.date_sale == formatDateToString(
-                                                                        new Date(),
-                                                                    ) ? true : false}
+                                                                    filter={
+                                                                        item.point_sale ==
+                                                                            Math.floor(currentHourInVietnam / 3) &&
+                                                                        item.date_sale == formatDateToString(new Date())
+                                                                            ? true
+                                                                            : false
+                                                                    }
                                                                     key={index}
                                                                     item={item}
                                                                     index={index}
@@ -726,21 +729,20 @@ function FlashSaleForGuest() {
                                                         valueOptionCategory == '',
                                                 ).length / perPage,
                                             ) != pageNum && (
-                                                    <RightOutlined
-                                                        style={{
-                                                            color: '#0066ff',
-                                                        }}
-                                                        onClick={() => {
-                                                            // tự động scroll lên đầu trang
-                                                            window.scrollTo({
-                                                                top: valueTop,
-
-                                                                behavior: 'smooth',
-                                                            });
-                                                            setPageNum(pageNum + 1);
-                                                        }}
-                                                    />
-                                                )}
+                                                <RightOutlined
+                                                    style={{
+                                                        color: '#0066ff',
+                                                    }}
+                                                    onClick={() => {
+                                                        // tự động scroll lên đầu trang
+                                                        window.scrollTo({
+                                                            top: valueTop,
+                                                            behavior: 'smooth',
+                                                        });
+                                                        setPageNum(pageNum + 1);
+                                                    }}
+                                                />
+                                            )}
                                         </span>{' '}
                                     </>
                                 )}
