@@ -9,65 +9,56 @@ import DropMenu from '../../../components/DropMenu';
 import OrdersLatesTable from '../../components/OrdersLatesTable/OrdersLatesTable';
 import { api } from '../../../constants';
 import axios from 'axios';
-import { DatePicker, Space } from 'antd';
+import { DatePicker, Space, Image, Button, Typography, message } from 'antd';
+import { authInstance } from '../../../utils/axiosConfig';
 import dayjs from 'dayjs';
 import { set } from 'react-hook-form';
 const moment = require('moment-timezone');
 const cx = classNames.bind(styles);
-
+const { Text, Link } = Typography;
 // fetch data
-const dataWidgets = [
-    {
-        title: 'Người dùng',
-        type: 'users',
-        value: 250,
-        percent: 0.05,
-    },
-    {
-        title: 'Đơn hàng',
-        type: 'orders',
-        value: 1000,
-        percent: -0.03,
-    },
-    {
-        title: 'Thu nhập',
-        type: 'earnings',
-        value: 10000000,
-        percent: 0.12,
-    },
-    {
-        title: 'Đánh giá',
-        type: 'reviews',
-        value: 20,
-        percent: -0.01,
-    },
-];
 
 const options = [
     {
         title: '6 giờ gần nhất',
-        value: 'createdAt',
-        type: 'desc',
+        value: 1,
     },
     {
         title: '6 ngày gần nhất',
-        value: 'createdAt',
-        type: 'desc',
+        value: 2,
     },
+
     {
         title: '6 tuần gần nhất',
-        value: 'createdAt',
-        type: 'desc',
+        value: 3,
     },
     {
         title: '6 tháng gần nhất',
-        value: 'createdAt',
-        type: 'desc',
+        value: 4,
     },
     {
         title: '6 năm gần nhất',
-        value: 'createdAt',
-        type: 'desc',
+        value: 5,
+    },
+];
+
+// phần thưởng
+const dataWidgets = [
+    {
+        top: '1',
+        phanthuong: 'mã giảm giá 500K cho đơn hàng bất kỳ',
+    },
+    {
+        top: '2',
+        phanthuong: 'mã giảm giá 300K cho đơn hàng bất kỳ',
+    },
+    {
+        top: '3',
+        phanthuong: 'mã giảm giá 200K cho đơn hàng bất kỳ',
+    },
+    {
+        top: '4 - 10',
+        phanthuong: 'mã giảm giá 100K cho đơn hàng bất kỳ',
     },
 ];
 
@@ -141,9 +132,11 @@ function Statistics() {
     const [end, setEnd] = useState(formatDateToString(new Date()));
     const num = 5;
     const [dataIncomes, setDataIncomes] = useState([]);
+    const [top_usert, setTopUser] = useState([]);
     console.log('totalToday1213', dataIncomes);
     console.log('optionSelected1212', 'a');
 
+    console.log('userordersThisMonth', top_usert);
     const addCommasToNumber = (number) => {
         // Chuyển đổi số thành chuỗi
         const numberString = number.toString();
@@ -169,15 +162,65 @@ function Statistics() {
         return formattedNumber;
     };
 
+    const info = (type, content) => {
+        messageApi.open({
+            type: type,
+            content: content,
+        });
+    };
+
+    const [messageApi, contextHolder] = message.useMessage();
+
     useEffect(() => {
-        axios.get(`${api}/orders`).then((res) => {
+        authInstance.get(`/orders`).then((res) => {
             const today = new Date();
             const orders = res.data.data;
+            console.log('ord1212ers', orders);
+            console.log('star2121t', start, end);
+
+            // lấy ra những đơn hàng trong tháng này
+            const ordersThisMonth = orders.filter((order) => {
+                return (
+                    formatDateToString(new Date(order.date)) <= formatDateToString(today) &&
+                    formatDateToString(new Date(order.date)) >=
+                        formatDateToString(new Date(today.getFullYear(), today.getMonth(), 1))
+                );
+            });
+
+            console.log('ordersThisMonth', ordersThisMonth);
+            // lấy ra doanh thu của từng người trong tháng
+            const userOrdersThisMonth = [];
+            const user = [];
+            // {
+            //     avatar: 'A',
+            //     name: 'phan van duc anh',
+            //     value: 250,
+            // },
+            ordersThisMonth.forEach((element) => {
+                if (userOrdersThisMonth.includes(element.user.id)) {
+                    user[userOrdersThisMonth.indexOf(element.user.id)].value += element.price;
+                } else {
+                    userOrdersThisMonth.push(element.user.id);
+                    user.push({
+                        avatar: element.user.images,
+                        name: element.user.fullName,
+                        value: element.price,
+                    });
+                }
+            });
+            // sắp xếp theo thứ tự giảm dần
+            user.sort((a, b) => {
+                return b.value - a.value;
+            });
+            setTopUser(user);
+
             const ordersToday = orders.filter((order) => {
                 return (
                     formatDateToString(new Date(order.date)) <= end && formatDateToString(new Date(order.date)) >= start
                 );
             });
+
+            console.log('ordersToda1212y', ordersToday);
             const totalToday = ordersToday.reduce((total, order) => {
                 return total + order.price;
             }, 0);
@@ -394,11 +437,12 @@ function Statistics() {
     }, [end, start, optionSelected.title]);
     return (
         <div className={cx('wrapper')}>
-            <div className={cx('widgits')}>
+            {contextHolder}
+            {/* <div className={cx('widgits')}>
                 {dataWidgets.map((widget, index) => (
                     <Widget key={index} widget={widget} />
                 ))}
-            </div>
+            </div> */}
             <div className={cx('chart')}>
                 <div className={cx('left')}>
                     <ProgressChart />
@@ -439,7 +483,7 @@ function Statistics() {
                         />
                     </div>
                     <div className={cx('income')}>
-                        <LineChart width={700} height={400} data={dataIncomes} animation={{ duration: 1000 }}>
+                        <LineChart width={700} height={350} data={dataIncomes} animation={{ duration: 1000 }}>
                             <Line type="monotone" dataKey="value" stroke="#8884d8" />
                             <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
                             <Tooltip // sửa lại nội dung tooltip
@@ -451,31 +495,7 @@ function Statistics() {
                                 }}
                             />
 
-                            <XAxis
-                                dataKey="date"
-                                // tickFormatter={(value, index) => {
-                                //     if (optionSelected.title == '6 ngày gần nhất') {
-                                //         return value.slice(8, 10) + '/' + value.slice(5, 7);
-                                //     }
-                                //     else if (optionSelected.title == '6 tuần gần nhất') {
-                                //         return  value
-                                //     //         value.slice(8, 10) +
-                                //     //         '/' +
-                                //     //         value.slice(5, 7) +
-                                //     //         '-' +
-                                //     //         value.slice(20, 22) +
-                                //     //         '/' +
-                                //     //         value.slice(17, 19)
-                                //     //     );
-                                //     }
-                                //     else if (optionSelected.title == '6 tháng gần nhất') {
-                                //         return value;
-                                //     } else if (optionSelected.title == '6 năm gần nhất') {
-                                //         return value;
-                                //     }
-                                // }}
-                                tick={{ fontSize: 15, fontFamily: 'Arial', textAnchor: 'middle' }}
-                            />
+                            <XAxis dataKey="date" tick={{ fontSize: 15, fontFamily: 'Arial', textAnchor: 'middle' }} />
                             <YAxis
                                 tick={{
                                     fontSize: 15,
@@ -489,8 +509,79 @@ function Statistics() {
                 </div>
             </div>
 
-            <div className={cx('table')}>
-                <OrdersLatesTable rows={[]} />
+            <div className={cx('bottom')}>
+                <div className={cx('left')}>
+                    <h3 className={cx('title')}>KHÁCH HÀNG THÂN THIẾT THÁNG {new Date().getMonth() + 1}</h3>
+                    <div className={cx('content_user')}>
+                        {top_usert.map((user, index) => (
+                            <div className={cx('user')} key={index}>
+                                <div className={cx('index')}>
+                                    <div
+                                        className={cx('frame')}
+                                        style={{
+                                            backgroundColor:
+                                                index == 0
+                                                    ? '#f44336'
+                                                    : index == 1
+                                                    ? '#ff9800'
+                                                    : index == 2
+                                                    ? '#ffc107'
+                                                    : '#4caf50',
+                                        }}
+                                    >
+                                        {index + 1}
+                                    </div>
+                                </div>
+                                <div className={cx('avatar')}>
+                                    <div className={cx('img')}>
+                                        <Image
+                                            src={user.avatar}
+                                            preview={false}
+                                            style={{
+                                                margin: 'auto',
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                <div className={cx('name')}>{user.name}</div>
+                                <div className={cx('value')}>{addCommasToNumber(Math.ceil(user.value / 1000))}K</div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+                <div className={cx('right')}>
+                    <h3 className={cx('title')}>TRI ÂN KHÁCH HÀNG</h3>
+                    <div className={cx('content_user')}>
+                        <div className={cx('header')}>
+                            Trao quà cho top người dùng trên hệ thống vào cuối tháng {new Date().getMonth() + 1}
+                        </div>
+                        <div className={cx('body')}>
+                            {dataWidgets.map((widget, index) => (
+                                <div className={cx('phanthuong')} key={index}>
+                                    <div className={cx('index')}>
+                                        <li
+                                            style={{
+                                                color:
+                                                    index == 0
+                                                        ? '#f44336'
+                                                        : index == 1
+                                                        ? '#ff9800'
+                                                        : index == 2
+                                                        ? '#ffc107'
+                                                        : '#4caf50',
+                                            }}
+                                        >
+                                            Top {widget.top}: {widget.phanthuong}
+                                        </li>
+                                    </div>
+                                    <div className={cx('btn_trao')}>
+                                        <div className={cx('btn')}>Trao quà</div>
+                                    </div>{' '}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );

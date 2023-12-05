@@ -10,6 +10,7 @@ import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import { set } from 'react-hook-form';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+import { authInstance, postData } from '../../../../utils/axiosConfig';
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -72,16 +73,16 @@ function ProgressChart() {
 
     console.log('isStatus', isStatus);
     useEffect(() => {
-        axios // lấy kpi có status = true
-            .get(`${api}/systems`)
+        authInstance // lấy kpi có status = true
+            .get(`/systems`)
             .then((res) => {
                 const systems = res.data.data;
-                console.log('systems', systems);
+                console.log('systems123', systems);
                 if (systems) {
                     // tính doanh thu từ start đến hôm nay
                     const today = new Date();
-                    axios
-                        .get(`${api}/orders`)
+                    authInstance
+                        .get(`/orders`)
                         .then((res) => {
                             const orders = res.data.data;
                             const ordersToday = orders.filter((order) => {
@@ -93,7 +94,7 @@ function ProgressChart() {
                             const totalToday = ordersToday.reduce((total, order) => {
                                 return total + order.price;
                             }, 0);
-                            console.log('totalToday1213', totalToday);
+                            console.log('totalToday1213', totalToday, orders);
                             setDoanhthukpi(totalToday);
                         })
                         .catch((err) => {
@@ -139,24 +140,36 @@ function ProgressChart() {
             kpi: values.kpi.replace(/,/g, ''),
             isRun,
         };
-        fetch(`${api}/systems/insert`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(values),
-        })
-            .then((res) => res.json())
+        console.log('Success:', values);
+        // axios
+        //     .post(
+        //         `http://127.0.0.1:3000/bookstore/api/v1/systems/insert`,
+        //         {
+        //             body: JSON.stringify(values),
+        //         },
+        //         { headers: { Authorization: `Bearer ${JSON.parse(localStorage.getItem('token'))}` } },
+        //     )
+        authInstance
+            .post(
+                `/systems/insert`,
+                values, // Không cần JSON.stringify ở đây
+                // {
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //         Authorization: `Bearer ${JSON.parse(localStorage.getItem('token'))}`,
+                //     },
+                // },
+            )
             .then((res) => {
-                console.log(res);
+                console.log('ASSSSSSSSSSSS', res);
                 setLoad_animation(false);
                 setIsModalOpen(false);
-                if (res.status === 'OK') {
+                if (res.data.status === 'OK') {
                     info('success', 'Cài đặt KPI thành công!');
-                } else if (res.status === 'ERROR') {
+                } else if (res.data.status === 'ERROR') {
                     info('warning', 'Mã kích hoạt không đúng, vui lòng kiểm tra lại!');
                 } else {
-                    info('error', 'Cài đặt KPI thất bại! Lỗi: ' + res.message);
+                    info('error', 'Cài đặt KPI thất bại! Lỗi: ' + res.data.message);
                 }
             })
             .catch((err) => {
@@ -181,8 +194,8 @@ function ProgressChart() {
         return ''; // Trả về chuỗi rỗng nếu date là null
     };
     useEffect(() => {
-        axios
-            .get(`${api}/orders`)
+        authInstance
+            .get(`/orders`)
             .then((res) => {
                 const orders = res.data.data;
                 //console.log('orders', orders[7].createdAt);

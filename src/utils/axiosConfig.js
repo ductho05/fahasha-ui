@@ -1,10 +1,9 @@
-import axios from "axios"
-import { api } from "../constants"
+import axios from 'axios';
+import { api } from '../constants';
 
-const token = JSON.parse(localStorage.getItem("token"))
+const token = JSON.parse(localStorage.getItem('token'));
 
 export const authInstance = axios.create({
     baseURL: api,
-    headers: { 'Authorization': `Bearer ${token}` }
-})
-
+    headers: { Authorization: `Bearer ${token}` },
+});
