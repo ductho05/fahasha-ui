@@ -44,12 +44,10 @@ const App = ({ title, isLoading, props, reload }) => {
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            console.log('days', days);
-
             // Hiển thị đồng hồ đếm ngược
             setCountdown(
                 (days != 0 ? `${formatNumber(days)}d` : '') +
-                    ` ${formatNumber(hours)}h ${formatNumber(minutes)}m ${formatNumber(seconds)}s`,
+                ` ${formatNumber(hours)}h ${formatNumber(minutes)}m ${formatNumber(seconds)}s`,
             );
 
             // Nếu đếm ngược kết thúc, dừng cập nhật
@@ -74,12 +72,12 @@ const App = ({ title, isLoading, props, reload }) => {
                             props
                                 ? props
                                 : {
-                                      fontSize: '2rem',
-                                      color: '#d53c3c',
-                                      justifyContent: 'center',
-                                      width: '150px',
-                                      margin: '0 10px',
-                                  }
+                                    fontSize: '2rem',
+                                    color: '#d53c3c',
+                                    justifyContent: 'center',
+                                    width: '150px',
+                                    margin: '0 10px',
+                                }
                         }
                     >
                         {countdown ? (
@@ -94,9 +92,9 @@ const App = ({ title, isLoading, props, reload }) => {
                         countdown == 'ĐÃ KẾT THÚC'
                             ? { color: 'darkgreen', margin: 'auto' }
                             : {
-                                  color: '#ff0000',
-                                  justifyContent: props ? 'left' : 'center',
-                              }
+                                color: '#ff0000',
+                                justifyContent: props ? 'left' : 'center',
+                            }
                     }
                     className={cx('gift_current__time__content')}
                 >
@@ -105,17 +103,17 @@ const App = ({ title, isLoading, props, reload }) => {
                             style={
                                 props
                                     ? {
-                                          backgroundColor: 'white',
-                                          height: '47px',
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          padding: '0 1rem',
-                                          borderRadius: '5px',
-                                      }
+                                        backgroundColor: 'white',
+                                        height: '47px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        padding: '0 1rem',
+                                        borderRadius: '5px',
+                                    }
                                     : {
-                                          width: '250px',
-                                          margin: '0 10px',
-                                      }
+                                        width: '250px',
+                                        margin: '0 10px',
+                                    }
                             }
                         >
                             {countdown}

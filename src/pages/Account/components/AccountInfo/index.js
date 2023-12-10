@@ -16,12 +16,15 @@ import CircularProgress from '@mui/material/CircularProgress'
 import { toast, ToastContainer } from 'react-toastify'
 import "react-toastify/dist/ReactToastify.css";
 import { Skeleton } from 'antd';
-import { authInstance } from '../../../../utils/axiosConfig'
+import { getAuthInstance } from '../../../../utils/axiosConfig'
 import { update } from '../../../../stores/actions';
 
 const cx = classnames.bind(styles)
 
 function AccountInfo() {
+
+    const authInstance = getAuthInstance()
+
     const navigate = useNavigate()
     const [errors, setErrors] = useState({})
     const [currentPassword, setCurrentPassword] = useState('')
@@ -42,8 +45,8 @@ function AccountInfo() {
     const [isChanged, setIsChanged] = useState(false)
 
     useEffect(() => {
-        setIsChanged(user !== state.user)
-    }, [user])
+        setIsChanged(user !== state.user || avatar)
+    }, [user, avatar])
 
     const handleChangeFullName = (e) => {
         setUser(prev => {

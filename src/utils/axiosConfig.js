@@ -1,10 +1,15 @@
 import axios from "axios"
+import React from "react"
 import { api } from "../constants"
+import { useStore } from "../stores/hooks"
 
-const token = JSON.parse(localStorage.getItem("token"))
+export const getAuthInstance = () => {
 
-export const authInstance = axios.create({
-    baseURL: api,
-    headers: { 'Authorization': `Bearer ${token}` }
-})
+    return axios.create({
+        baseURL: api,
+        headers: {
+            'Authorization': `Bearer ${JSON.parse(localStorage.getItem("token"))}`
+        }
+    })
+}
 

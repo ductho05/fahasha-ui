@@ -1,8 +1,11 @@
 import React from 'react'
 import { api } from '../../../../constants';
 import EnhancedTable from '../../../components/Table/EnhancedTable';
+import { getAuthInstance } from "../../../../utils/axiosConfig"
 
 function NotificationList() {
+
+    const authInstance = getAuthInstance()
 
     const [notices, setNotices] = React.useState([])
 
@@ -34,11 +37,11 @@ function NotificationList() {
     ];
 
     React.useEffect(() => {
-        fetch(`${api}/webpush/get-all`)
-            .then(response => response.json())
+        authInstance.get(`/webpush/get-all`)
             .then(result => {
-                if (result.status === "OK") {
-                    setNotices(result.data)
+                console.log(result)
+                if (result.data.status === "OK") {
+                    setNotices(result.data.data)
                 }
             })
             .catch(err => {

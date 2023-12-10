@@ -4,7 +4,7 @@ import CustomPagination from './Components/CustomPagonation';
 import { useState, useEffect, useRef } from 'react';
 
 function moveElementToFront(arr, idToMove) {
-    const index = arr.findIndex((element) => element._id === idToMove);
+    const index = arr?.findIndex((element) => element._id === idToMove);
     if (index !== -1) {
         const elementToMove = arr.splice(index, 1)[0]; // Loại bỏ phần tử từ vị trí cũ
         arr.unshift(elementToMove); // Thêm phần tử vào đầu mảng

@@ -26,8 +26,12 @@ import {
 import { api } from '../../../constants';
 import { set } from 'react-hook-form';
 import { useData } from '../../../stores/DataContext';
+import { getAuthInstance } from "../../../utils/axiosConfig"
 
 function FlashSaleForm({ props, hideFunc }) {
+
+    const authInstance = getAuthInstance()
+
     const [showProgress, setShowProgress] = useState(false);
     const [title, setTitle] = useState('');
     const { Option } = Select;
@@ -103,10 +107,10 @@ function FlashSaleForm({ props, hideFunc }) {
         const time_points_filter =
             values.point_sale == -1
                 ? time_points.filter(
-                      (point) =>
-                          (current_date == values.date_sale && point >= current_point) ||
-                          current_date < values.date_sale,
-                  )
+                    (point) =>
+                        (current_date == values.date_sale && point >= current_point) ||
+                        current_date < values.date_sale,
+                )
                 : [values.point_sale];
 
         // lấy ra các point sale nhỏ hơn point sale hiện tại
@@ -127,14 +131,9 @@ function FlashSaleForm({ props, hideFunc }) {
                     };
 
                     //console.log('data1', data);
-                    fetch(`${api}/flashsales/add`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(data),
-                    })
-                        .then((response) => response.json())
+                    authInstance.post(`/flashsales/add`, data)
                         .then((result) => {
-                            if (result.status == 'OK') {
+                            if (result.data.status == 'OK') {
                                 //addFlashsaleToLocal(result.data);
                                 localStorage.setItem('isFlashsaleLoading', true);
                                 //console.log(result.status);
@@ -174,14 +173,9 @@ function FlashSaleForm({ props, hideFunc }) {
                     point_sale: point,
                 };
 
-                fetch(`${api}/flashsales/add`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data),
-                })
-                    .then((response) => response.json())
+                authInstance.post(`/flashsales/add`, data)
                     .then((result) => {
-                        if (result.status == 'OK') {
+                        if (result.data.status == 'OK') {
                             //addFlashsaleToLocal(result.data);
                             localStorage.setItem('isFlashsaleLoading', true);
                             //console.log(result.status);

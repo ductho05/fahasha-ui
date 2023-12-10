@@ -25,6 +25,7 @@ import { useStore } from '../../stores/hooks';
 import EvaluateForm from '../../components/Forms/EvaluateForm';
 import LikeDislike from '../../components/LikeDislike';
 import Skeleton from '@mui/material/Skeleton';
+import { CheckCircleFilled, CheckCircleOutlined, StopFilled } from '@ant-design/icons';
 
 const cx = classNames.bind(styles);
 
@@ -398,6 +399,7 @@ function ProductDetail() {
                                     </span>
                                 ))}
                                 <p className={cx('rate_number')}>({evaluate.total} đánh giá)</p>
+                                <p className={cx('rate_number', "px-[10px] border-l border-solid border-[#444]")}>Đã bán {product.sold}</p>
                                 <p className={cx('btn_share', 'hide_on_pc')}>
                                     <FontAwesomeIcon icon={faShareNodes} />
                                 </p>
@@ -418,14 +420,10 @@ function ProductDetail() {
                                 </p>
                             </div>
                             <div className={cx('shipping')}>
-                                <p className={cx('hide_on_tablet_mobile')}>Thời gian giao hàng</p>
-                                <p>Giao hàng đến</p>
-                                <a href="#">Thay đổi</a>
+
                             </div>
                             <div className={cx('policy_lie')}>
-                                <p className={cx('hide_on_tablet_mobile')}>Chính sách đổi trả</p>
-                                <p>Đổi trả sản phẩm trong 30 ngày</p>
-                                <a href="#">Xem thêm</a>
+
                             </div>
                             <div className={cx('quantity', 'hide_on_tablet_mobile')}>
                                 <p className={cx('label')}>Số lượng:</p>
@@ -438,6 +436,19 @@ function ProductDetail() {
                                         <FontAwesomeIcon icon={faPlus} />
                                     </p>
                                 </div>
+                            </div>
+                            <div className="flex items-center mt-[20px]">
+                                <div className={`flex items-center p-[10px] rounded-[6px] ${product.sold == product.quantity ? "bg-[#f2f4f5] text-[#7a7e7f]" : "bg-[rgba(201,33,39,0.06)] text-[#c92127]"}`}>
+                                    {
+                                        product.sold == product.quantity ? <StopFilled /> : <CheckCircleFilled />
+                                    }
+                                    <p className="font-[600] ml-[10px]">
+                                        {
+                                            product.sold == product.quantity ? "Hết hàng" : "Còn hàng"
+                                        }
+                                    </p>
+                                </div>
+                                <p className="text-[14px] ml-[10px] text-[#7a7e7f] font-[500]">{product.quantity - product.sold} sản phẩm có sẵn</p>
                             </div>
                         </div>
                     </div>
@@ -536,7 +547,7 @@ function ProductDetail() {
                                             }
                                         ></div>
                                     </div>
-                                    <p>{evaluate.total ? (evaluate.rate[index] / evaluate.total) * 100 : 0} %</p>
+                                    <p>{evaluate.total ? (Math.floor((evaluate.rate[index] / evaluate.total) * 100)) : 0} %</p>
                                 </div>
                             ))}
                         </div>
@@ -572,7 +583,7 @@ function ProductDetail() {
                                                         : comments[index].user.username}
                                                 </p>
                                                 <p className={cx('comments_day')}>
-                                                    {new Date(comments[index].updatedAt).toLocaleDateString()}
+                                                    {comments[index].createdAt}
                                                 </p>
                                             </div>
                                         </div>
@@ -667,6 +678,14 @@ function Loading() {
                             <Skeleton variant="text" sx={{ fontSize: '1.3rem' }} />
                         </p>
                         <div className={cx('quantity_btn')}>
+                            <Skeleton variant="rectangular" width={100} height={44} />
+                        </div>
+                    </div>
+                    <div className="flex items-center mt-[20px]">
+                        <div className={`flex items-center p-[10px] rounded-[6px]`}>
+                            <Skeleton variant="rectangular" width={100} height={44} />
+                        </div>
+                        <div className={`flex items-center p-[10px] rounded-[6px]`}>
                             <Skeleton variant="rectangular" width={100} height={44} />
                         </div>
                     </div>

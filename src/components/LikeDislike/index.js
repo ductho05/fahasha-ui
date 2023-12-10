@@ -7,10 +7,13 @@ import { Dialog } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { getAuthInstance } from '../../utils/axiosConfig';
 
 const cx = classNames.bind(styles);
 
 const LikeDislike = ({ user, comment }) => {
+
+    const authInstance = getAuthInstance()
 
     const navigate = useNavigate();
     const [like, setLike] = useState(false)
@@ -43,19 +46,9 @@ const LikeDislike = ({ user, comment }) => {
         if (Object.keys(user).length <= 0) {
             setShowDialog(true)
         } else {
-            fetch(`http://127.0.0.1:3000/bookstore/api/v1/evaluates/like?commentId=${currentComment._id}&userId=${user._id}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    commentId: currentComment._id,
-                    userId: user._id
-                })
-            })
-                .then(response => response.json())
+            authInstance.post(`/evaluates/like?id=${currentComment._id}`)
                 .then(result => {
-                    setCurrentComments(result.data)
+                    setCurrentComments(result.data.data)
                     setLike(prev => !prev)
                 })
                 .catch(err => console.error(err));

@@ -1,21 +1,18 @@
-import { api } from "../constants"
 import { useStore } from "../stores/hooks"
+import { getAuthInstance } from "../utils/axiosConfig"
 
 function SendNotification(filter, notification) {
 
+    const authInstance = getAuthInstance()
+
     const [state, dispatch] = useStore()
 
-    fetch(`${api}/webpush/send`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            filter,
-            notification
-        })
+    authInstance.post(`/webpush/send`, {
+        filter,
+        notification
     })
-        .then(response => response.json())
         .then(result => {
-            if (result.status === "OK") {
+            if (result.data.status === "OK") {
                 state.socket.emit("send-notification")
             }
         })

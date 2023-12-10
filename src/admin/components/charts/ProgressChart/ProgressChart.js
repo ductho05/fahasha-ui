@@ -6,10 +6,16 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { api } from '../../../../constants';
 import { Modal, Button, Form, Input, Select, Radio, Checkbox, Typography } from 'antd';
+import { getAuthInstance } from "../../../../utils/axiosConfig"
+
 const { Option } = Select;
 const { Text } = Typography;
 const cx = classNames.bind(styles);
+
 function ProgressChart() {
+
+    const authInstance = getAuthInstance()
+
     const [doanhThu, setDoanhThu] = useState(0);
     const [doanhThuHomQua, setDoanhThuHomQua] = useState(0);
     const [doanhThuNgay, setDoanhThuNgay] = useState(0);
@@ -93,8 +99,8 @@ function ProgressChart() {
         return ''; // Trả về chuỗi rỗng nếu date là null
     };
     useEffect(() => {
-        axios
-            .get(`${api}/orders`)
+        authInstance
+            .get(`/orders`)
             .then((res) => {
                 const orders = res.data.data;
                 //console.log('orders', orders[7].createdAt);

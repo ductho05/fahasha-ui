@@ -17,9 +17,15 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import Page404 from '../Page404';
 import SendNotification from '../../service/SendNotification';
+import { getAuthInstance } from '../../utils/axiosConfig';
+import localstorge from '../../stores/localstorge';
+import axios from 'axios';
 
 const cx = classNames.bind(styles);
 function CheckOut() {
+
+    const authInstance = getAuthInstance()
+
     const navigate = useNavigate();
     const [listCheckouts, setListCheckouts] = useState([]);
     const [isChecked, setIsChecked] = useState(false);
@@ -53,14 +59,11 @@ function CheckOut() {
     }
 
     const addUserFlash = () => {
-        fetch(`${api}/flashusers/add`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(productFlash),
+        authInstance.post(`/flashusers/add`, {
+            ...productFlash
         })
-            .then((response) => response.json())
             .then((result) => {
-                console.log('result', result);
+
             })
             .catch((err) => {
                 console.log(err);
@@ -74,8 +77,6 @@ function CheckOut() {
             navigate(`/order-success/${order._id}`);
         }
     }, [order]);
-
-    console.log('productFlash', productFlash);
 
     useEffect(() => {
         mycheckout.map((item) => {
@@ -121,17 +122,15 @@ function CheckOut() {
         });
     }, []);
 
-    const addCheckout = (data, type) => {
+    const addCheckout = async (data, type) => {
+
         setShowProgress(true);
-        fetch(`${api}/orders/insert`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
+        await authInstance.post(`/orders/insert`, {
+            ...data
         })
-            .then((response) => response.json())
             .then((result) => {
-                if (result.status == 'OK') {
-                    const order = result.data;
+                if (result.data.status == 'OK') {
+                    const order = result.data.data;
                     let item_order_checkout = [];
                     if (type == 'vnp') {
                         item_order_checkout = localStorage.getItem('item_order_checkout')
@@ -144,20 +143,17 @@ function CheckOut() {
                         return {
                             quantity: item.quantity,
                             price: item.product.price * item.quantity,
-                            order: result.data._id,
+                            order: result.data.data._id,
                             product: item.product._id,
                         };
                     });
                     if (item_order_checkout.length) {
                         orderItems.forEach((orderItem) => {
-                            fetch(`${api}/orderitems/insert`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(orderItem),
+                            authInstance.post(`/orderitems/insert`, {
+                                ...orderItem
                             })
-                                .then((response) => response.json())
                                 .then((result) => {
-                                    if (result.status == 'OK') {
+                                    if (result.data.status == 'OK') {
                                         const carts = localStorage.getItem(namecart)
                                             ? JSON.parse(localStorage.getItem(namecart))
                                             : [];
@@ -168,6 +164,13 @@ function CheckOut() {
                                         localstorage.set(namecart, newCarts);
                                         setShowProgress(false);
                                         setOrder(order);
+
+                                        authInstance.put(`/products/update-sold/${orderItem.product}`, {
+                                            sold: orderItem.quantity
+                                        })
+                                            .catch(err => {
+                                                console.error(err)
+                                            })
                                     }
                                 })
                                 .catch((err) => {
@@ -183,18 +186,38 @@ function CheckOut() {
                     const image = orderImages;
                     const url = `${appPath}/admin/orders`;
 
-                    SendNotification('admin', {
-                        title,
-                        description,
-                        image,
-                        url,
-                    });
+                    axios.post(`${api}/webpush/send`, {
+                        filter: "admin",
+                        notification: {
+                            title,
+                            description,
+                            image,
+                            url,
+                        }
+                    },
+                        {
+                            headers: {
+                                'Authorization': `Bearer ${localstorge.get()}`
+                            }
+                        }
+                    )
+                        .then(result => {
+                            if (result.data.status === "OK") {
+
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err)
+                        })
                 } else {
                     setShowProgress(false);
                     navigate(`/order-success/err-E99`);
                 }
             })
-            .catch((err) => {});
+            .catch((err) => {
+                console.log(err);
+                setShowProgress(false)
+            });
     };
 
     // Chuyển hướng đến trang khác sau khi thanh toán bên VNpay

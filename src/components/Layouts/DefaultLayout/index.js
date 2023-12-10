@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { authInstance } from '../../../utils/axiosConfig';
+import axios from 'axios';
 
 const cx = classNames.bind(styles);
 function DefaultLayout(props) {
@@ -31,27 +32,24 @@ function DefaultLayout(props) {
         props.setIsLogin(localstorage.get().length > 0);
     }, [state]);
     setInterval(() => {
+
         if (isLogin()) {
 
-            authInstance.get("/users/get/profile")
-                .then((result) => {
-                    if (result.data.message == 'Jwt expired') {
-                        setExpired(true);
-                    } else {
-                        setExpired(false);
-                    }
-                })
-                .catch((err) => {
-                    setExpired(false);
-                });
+            axios.get(`${api}/users/get/profile`, {
+                headers: {
+                    'Authorization': `Bearer ${localstorge.get()}`
+                }
+            }).then(result => {
+
+                if (result.data.message == "Jwt expired") {
+                    setExpired(true)
+                }
+            }).catch(() => {
+                setExpired(true)
+            })
+
         }
     }, 6000);
-
-    useEffect(() => {
-        if (expired && isInteractive === false) {
-            dispatch(logout({}));
-        }
-    }, [expired, isInteractive]);
 
     const handlePass = () => {
         dispatch(logout({}));
@@ -65,6 +63,7 @@ function DefaultLayout(props) {
             dispatch(noAction());
             setExpired(false);
         } else if (state.action == LOGIN) {
+            console.log("Login thanh cong")
             navigate('/');
             toast.success('Đăng nhập thành công');
             dispatch(noAction());
@@ -83,7 +82,7 @@ function DefaultLayout(props) {
             <div className={cx('container')}>
                 <ToastContainer
                     position="top-right"
-                    autoClose={5000}
+                    autoClose={2000}
                     hideProgressBar={false}
                     newestOnTop={false}
                     closeOnClick

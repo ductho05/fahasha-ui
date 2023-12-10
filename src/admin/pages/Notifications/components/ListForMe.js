@@ -3,24 +3,20 @@ import { api } from '../../../../constants';
 import { useStore } from '../../../../stores/hooks';
 import { Link } from 'react-router-dom';
 import { seeNotice } from '../../../../stores/actions';
+import { getAuthInstance } from "../../../../utils/axiosConfig"
 
 function ListForMe() {
+
+    const authInstance = getAuthInstance()
 
     const [notices, setNotices] = React.useState([])
     const [state, dispatch] = useStore();
 
     React.useEffect(() => {
-        fetch(`${api}/webpush/get`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                id: state.user._id
-            })
-        })
-            .then(response => response.json())
+        authInstance.post(`/webpush/get`)
             .then(result => {
-                if (result.status === "OK") {
-                    setNotices(result.data)
+                if (result.data.status === "OK") {
+                    setNotices(result.data.data)
                 }
             })
             .catch(err => {
@@ -29,14 +25,9 @@ function ListForMe() {
     }, [state])
 
     const updateNotification = (id) => {
-        fetch(`${api}/webpush/update`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: id })
-        })
-            .then(response => response.json())
+        authInstance.put(`/webpush`, { id: id })
             .then(result => {
-                if (result.status === "OK") {
+                if (result.data.status === "OK") {
                     dispatch(seeNotice())
                 }
             })

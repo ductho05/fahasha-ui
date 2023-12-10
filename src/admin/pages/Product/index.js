@@ -18,11 +18,14 @@ import { CircularProgress, Backdrop } from "@mui/material";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import Dropdown from 'react-multilevel-dropdown';
-import { Input, DatePicker, Form, Button, Skeleton, Popconfirm } from 'antd';
+import { Input, DatePicker, Form, Button, Skeleton, Popconfirm, Select } from 'antd';
 import SendNotification from '../../../service/SendNotification';
+import { getAuthInstance } from '../../../utils/axiosConfig';
 
 const cx = classNames.bind(styles)
 function Product() {
+
+    const authInstance = getAuthInstance()
 
     const [showDialog, setShowDialog] = useState(false)
     const [published, setPublished] = useState()
@@ -32,6 +35,7 @@ function Product() {
     const [loadingProduct, setLoadingProduct] = useState(false)
     const [isAction, setIsAction] = useState(false)
     const [options, setOptions] = useState([])
+    const [success, setSuccess] = useState(false)
     const [categoryName, setCategoryName] = useState({
         name: "--Chọn loại sản phẩm--",
         value: ""
@@ -103,15 +107,13 @@ function Product() {
                 const handleDelete = () => {
                     setLoading(true)
                     setIsAction(true)
-                    fetch(`${api}/products/delete/${params.value}`, {
-                        method: 'GET'
-                    })
-                        .then(response => response.json())
+                    authInstance.get(`${api}/products/delete/${params.value}`)
                         .then(result => {
-                            if (result.status === 'OK') {
+                            if (result.data.status === 'OK') {
                                 toast.success('Xóa thành công!')
+                                setSuccess(prev => !prev)
                             } else {
-                                toast.error(result.message)
+                                toast.error(result.data.message)
                             }
                             setLoading(false)
                             setIsAction(false)
@@ -119,7 +121,7 @@ function Product() {
                         .catch(err => {
                             setLoading(false)
                             setIsAction(false)
-                            toast.error(err.message)
+                            toast.error(err?.response?.data?.message)
                         })
                 }
 
@@ -160,27 +162,30 @@ function Product() {
                 setLoadingProduct(false)
                 console.log(error.message)
             })
-    }, [isAction])
+    }, [success])
 
     useEffect(() => {
-        fetch(`${api}/categories`)
+        fetch(`${api}/categories?filter=simple`)
             .then(response => response.json())
             .then(result => {
                 if (result.status == "OK") {
-                    setOptions(result.data)
+                    const newList = result.data.map(category => {
+                        return {
+                            label: category.name,
+                            value: category._id
+                        }
+                    })
+                    setOptions(newList)
                 }
             })
             .catch(err => console.log(err.message))
     }, [])
 
-    const onFinish = (data) => {
+    const onFinish = async (data) => {
         const formData = new FormData()
         Object.keys(data).forEach(key => {
             formData.append(key, data[key])
         })
-        if (categoryName.value !== "") {
-            formData.append("categoryId", categoryName.value)
-        }
         if (avatar) {
             formData.append("images", avatar)
         }
@@ -189,28 +194,30 @@ function Product() {
         }
         setLoading(true)
         setIsAction(true)
-        fetch(`${api}/products/add`, {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.json())
-            .then(result => {
+        await authInstance.post(`/products/add`, formData)
+            .then(async result => {
 
-                if (result.status === "OK") {
+                if (result.data.status === "OK") {
+                    setSuccess(prev => !prev)
                     toast.success("Thêm mới sản phẩm thành công")
-                    const filter = "all"
                     const title = "Thông báo sản phẩm"
                     const description = "TA Book Store vừa ra mắt sản phẩm mới. Xem ngay"
-                    const url = `${appPath}/product-detail/${result.data._id}`
-                    const image = result.data.images
-                    SendNotification(filter, {
-                        title,
-                        description,
-                        url,
-                        image
+                    const url = `${appPath}/product-detail/${result.data.data._id}`
+                    const image = result.data.data.images
+                    await authInstance.post("/webpush/send", {
+                        filter: "all",
+                        notification: {
+                            title,
+                            description,
+                            image: image,
+                            url
+                        }
                     })
+                        .catch((err) => {
+                            console.error(err)
+                        })
                 } else {
-                    toast.error(result.message)
+                    toast.error(result.data.message)
                 }
                 setIsAction(false)
                 setLoading(false)
@@ -220,7 +227,7 @@ function Product() {
                 setIsAction(false)
                 setLoading(false)
                 setShowDialog(false)
-                toast.error(err.message)
+                toast.error(err?.response?.data?.message)
             })
 
     }
@@ -261,6 +268,9 @@ function Product() {
         setShowDialog(true)
     }
 
+    const filterOption = (input, option) =>
+        (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
+
     return (
         <div className={cx('wrapper')}>
             <ToastContainer
@@ -285,10 +295,10 @@ function Product() {
                     <Form
                         name="basic"
                         labelCol={{
-                            span: 4,
+                            span: 6,
                         }}
                         wrapperCol={{
-                            span: 20,
+                            span: 18,
                         }}
                         style={{
                             maxWidth: 600,
@@ -349,49 +359,47 @@ function Product() {
                             <Input placeholder='Nhập giá cũ' />
                         </Form.Item>
 
+                        <Form.Item
+                            label="Loại sản phẩm"
+                            name="categoryId"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Nội dung này không được để trống!',
+                                },
+                            ]}
+                        >
+                            <Select
+                                showSearch
+                                placeholder="Chọn loại sản phẩm"
+                                optionFilterProp="children"
+                                filterOption={filterOption}
+                                options={options}
+                            />
+                        </Form.Item>
+                        <Form.Item
+                            label="Số lượng nhập"
+                            name="quantity"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Nội dung này không được để trống!',
+                                },
+                            ]}
+                        >
+                            <Input type="number" />
+                        </Form.Item>
                         <p className={cx('label')}></p>
                         <div className="flex items-center">
-                            <p className={cx('label')}>Loại sản phẩm</p>
-                            <div className="flex flex-[20] justify-start">
-                                <Dropdown
-                                    position="top-right"
-                                    title={categoryName.name}
-                                    menuClassName={cx("dropmenu")}
-                                    buttonClassName={cx("category")}
-                                    buttonVariant="special-success"
-                                    wrapperClassName={cx("submenu")}
-                                >
-                                    {
-                                        options.map((option, index) => (
-                                            <Dropdown.Item key={index}>
-                                                {option._id}
-                                                <Dropdown.Submenu
-                                                    position="right-top"
-                                                    className={cx("submenu")}
-                                                >
-                                                    {
-                                                        option.categories.map((category, index) => (
-                                                            <Dropdown.Item key={index} onClick={() => setCategoryName({ name: category.name, value: category._id })}>
-                                                                {category.name}
-                                                            </Dropdown.Item>
-                                                        ))
-                                                    }
-                                                </Dropdown.Submenu>
-                                            </Dropdown.Item>
-                                        ))
-                                    }
-                                </Dropdown>
-                            </div>
-                        </div>
-                        <p className={cx('label')}></p>
-                        <div className="flex items-center">
-                            <p className={cx('label')}>Năm xuất bản</p>
-                            <div className="flex flex-[20] justify-start">
+                            <p className='text-red-600 text-right'>*</p>
+                            <p className={cx('label')}>Năm xuất bản:</p>
+                            <div className="flex flex-[18] justify-start">
                                 <DatePicker
                                     onChange={changeDate}
                                 />
                             </div>
                         </div>
+                        <p className={cx('label')}></p>
                         <Form.Item
                             label="Mô tả"
                             name="desciption"
@@ -408,7 +416,8 @@ function Product() {
                             />
                         </Form.Item>
                         <div className='flex items-center mb-[20px]'>
-                            <p className={cx('label')}>Hình ảnh</p>
+                            <p className='text-red-600 text-right'>*</p>
+                            <p className={cx('label')}>Hình ảnh:</p>
                             <div className={cx('avatar')}>
                                 <p className={cx('edit_avatar')}>
                                     <label for="image">

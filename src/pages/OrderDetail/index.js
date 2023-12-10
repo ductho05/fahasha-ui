@@ -11,9 +11,14 @@ import SendNotification from "../../service/SendNotification"
 import { useStore } from "../../stores/hooks"
 import Skeleton from '@mui/material/Skeleton';
 import { Backdrop, CircularProgress } from '@mui/material'
+import { getAuthInstance } from '../../utils/axiosConfig'
+import axios from 'axios'
+import localstorge from '../../stores/localstorge'
 
 const cx = classNames.bind(styles)
 function OrderDetail() {
+
+    const authInstance = getAuthInstance()
 
     const { orderId } = useParams()
     const navigate = useNavigate()
@@ -30,11 +35,10 @@ function OrderDetail() {
 
     useEffect(() => {
         setLoading(true)
-        fetch(`${api}/orders/id/${orderId}`)
-            .then(response => response.json())
+        authInstance.get(`/orders/id/${orderId}`)
             .then(result => {
-                if (result.status == 'OK') {
-                    setOrder(result.data)
+                if (result.data.status == 'OK') {
+                    setOrder(result.data.data)
                 }
                 setLoading(false)
             })
@@ -43,14 +47,10 @@ function OrderDetail() {
 
     useEffect(() => {
         setLoading(true)
-        fetch(`${api}/orderitems/order?id=${orderId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        })
-            .then(response => response.json())
+        authInstance.get(`/orderitems/order?id=${orderId}`)
             .then(result => {
-                if (result.status == 'OK') {
-                    setOrderItems(result.data)
+                if (result.data.status == 'OK') {
+                    setOrderItems(result.data.data)
                 }
                 setLoading(false)
             })
@@ -63,30 +63,40 @@ function OrderDetail() {
 
     const handleUpdate = () => {
         setLoadingUpdate(true)
-        fetch(`${api}/orders/update/${order._id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                _id: order._id,
-                status: DAHUY
-            })
+        authInstance.put(`/orders/update/${order._id}`, {
+            status: DAHUY
         })
-            .then(response => response.json())
             .then(result => {
-                if (result.status === "OK") {
+                if (result.data.status === "OK") {
                     const title = "Thông báo đơn hàng"
                     const description = `${state.user.fullName} vừa hủy đơn hàng`
                     const image = cancelOrderImage
                     const url = `${appPath}/admin/orders`
                     message.success("Đã hủy đơn hàng")
-                    SendNotification("admin", {
-                        title,
-                        description,
-                        image,
-                        url
-                    })
+
+                    axios.post(`${api}/webpush/send`, {
+                        filter: "admin",
+                        notification: {
+                            title,
+                            description,
+                            image,
+                            url,
+                        }
+                    },
+                        {
+                            headers: {
+                                'Authorization': `Bearer ${localstorge.get()}`
+                            }
+                        }
+                    )
+                        .then(result => {
+                            if (result.data.status === "OK") {
+
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err)
+                        })
                     setUpdateSuccess(prev => !prev)
                 } else {
                     message.error("Lỗi hủy đơn hàng")
@@ -94,6 +104,7 @@ function OrderDetail() {
                 setLoadingUpdate(false)
             })
             .catch(err => {
+                console.error(err)
                 message.error("Lỗi hủy đơn hàng")
                 setLoadingUpdate(false)
             })

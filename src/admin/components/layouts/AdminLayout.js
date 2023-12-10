@@ -8,6 +8,7 @@ import { Progress } from 'antd';
 import { Scrollbar } from 'react-scrollbars-custom';
 import lottie from 'lottie-web';
 import { useData } from '../../../stores/DataContext';
+import SideBarLaptop from './SideBarLaptop';
 const cx = classNames.bind(styles);
 function AdminLayout({ children }) {
     const container = useRef(null);
@@ -16,25 +17,23 @@ function AdminLayout({ children }) {
     const [isLoaded, setIsLoaded] = useState(
         Object.keys(data).length !== 0
             ? {
-                  products: true,
-                  flashsales: true,
-              }
+                products: true,
+                flashsales: true,
+            }
             : {
-                  products: false,
-                  flashsales: false,
-              },
+                products: false,
+                flashsales: false,
+            },
     );
     const [percent, setPercent] = useState(0);
     const [data2, setData2] = useState(
         Object.keys(data).length !== 0
             ? data
             : {
-                  products: [],
-                  flashsales: [],
-              },
+                products: [],
+                flashsales: [],
+            },
     );
-
-    console.log('data', data, data2);
 
     // useEffect(() => {
     //     // Hàm này sẽ được gọi khi component được mount và mỗi khi localStorage thay đổi.
@@ -126,6 +125,7 @@ function AdminLayout({ children }) {
                     <div className={cx('navbar')}>
                         <SideBar />
                     </div>
+                    <SideBarLaptop />
                     <Scrollbar style={{ width: 250, height: '100vh' }} className={cx('container')}>
                         <NavBar />
                         {children}
