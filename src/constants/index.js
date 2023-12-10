@@ -8,7 +8,8 @@ export const appPath = 'https://bookstore-ta.vercel.app';
 
 export const orderImages = 'https://www.advotics.com/wp-content/uploads/2022/02/surat-jalan-01-1-4-1536x984.png';
 export const registerImages = 'https://quicklaunch.io/wp-content/uploads/2019/10/user-registration.png';
-export const cancelOrderImage = 'https://commercemarketplace.adobe.com/media/catalog/product/f/8/f80e_cancel-order-240x240_3.png';
+export const cancelOrderImage =
+    'https://commercemarketplace.adobe.com/media/catalog/product/f/8/f80e_cancel-order-240x240_3.png';
 
 export const listJustWatched = JSON.parse(localStorage.getItem('mycategory')) || [];
 
