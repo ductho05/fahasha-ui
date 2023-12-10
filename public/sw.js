@@ -25,7 +25,7 @@ const saveSubscription = async (subscription, token) => {
             'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-            subscription
+            ...subscription
         })
     })
 
