@@ -10,9 +10,7 @@ import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import { set } from 'react-hook-form';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
-import { authInstance, postData } from '../../../../utils/axiosConfig';
-
-import { getAuthInstance } from "../../../../utils/axiosConfig"
+import { getAuthInstance, postData } from '../../../../utils/axiosConfig';
 
 const { Option } = Select;
 const { Text } = Typography;

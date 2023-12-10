@@ -10,7 +10,7 @@ import OrdersLatesTable from '../../components/OrdersLatesTable/OrdersLatesTable
 import { api } from '../../../constants';
 import axios from 'axios';
 import { DatePicker, Space, Image, Button, Typography, message } from 'antd';
-import { authInstance } from '../../../utils/axiosConfig';
+import { getAuthInstance } from '../../../utils/axiosConfig';
 import dayjs from 'dayjs';
 import { set } from 'react-hook-form';
 const moment = require('moment-timezone');
@@ -123,6 +123,9 @@ const formatDateToString = (date) => {
     return ''; // Trả về chuỗi rỗng nếu date là null
 };
 function Statistics() {
+
+    const authInstance = getAuthInstance();
+
     const [optionSelected, setOptionSelected] = useState(options[0]);
     const { RangePicker } = DatePicker;
     const dateFormat = 'YYYY/MM/DD';
@@ -183,7 +186,7 @@ function Statistics() {
                 return (
                     formatDateToString(new Date(order.date)) <= formatDateToString(today) &&
                     formatDateToString(new Date(order.date)) >=
-                        formatDateToString(new Date(today.getFullYear(), today.getMonth(), 1))
+                    formatDateToString(new Date(today.getFullYear(), today.getMonth(), 1))
                 );
             });
 
@@ -523,10 +526,10 @@ function Statistics() {
                                                 index == 0
                                                     ? '#f44336'
                                                     : index == 1
-                                                    ? '#ff9800'
-                                                    : index == 2
-                                                    ? '#ffc107'
-                                                    : '#4caf50',
+                                                        ? '#ff9800'
+                                                        : index == 2
+                                                            ? '#ffc107'
+                                                            : '#4caf50',
                                         }}
                                     >
                                         {index + 1}
@@ -565,10 +568,10 @@ function Statistics() {
                                                     index == 0
                                                         ? '#f44336'
                                                         : index == 1
-                                                        ? '#ff9800'
-                                                        : index == 2
-                                                        ? '#ffc107'
-                                                        : '#4caf50',
+                                                            ? '#ff9800'
+                                                            : index == 2
+                                                                ? '#ffc107'
+                                                                : '#4caf50',
                                             }}
                                         >
                                             Top {widget.top}: {widget.phanthuong}
