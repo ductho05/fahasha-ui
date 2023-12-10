@@ -44,7 +44,7 @@ const checkSubscription = async () => {
                         'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({
-                        ...subscription
+                        subscription
                     })
                 })
                     .then(response => response.json())
