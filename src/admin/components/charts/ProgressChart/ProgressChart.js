@@ -10,13 +10,16 @@ import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import { set } from 'react-hook-form';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
-import { authInstance, postData } from '../../../../utils/axiosConfig';
+import { getAuthInstance, postData } from '../../../../utils/axiosConfig';
 
 const { Option } = Select;
 const { Text } = Typography;
 const cx = classNames.bind(styles);
 
 function ProgressChart() {
+
+    const authInstance = getAuthInstance()
+
     const [doanhThu, setDoanhThu] = useState(0);
     const [doanhThuHomQua, setDoanhThuHomQua] = useState(0);
     const [doanhThuNgay, setDoanhThuNgay] = useState(0);
@@ -467,16 +470,16 @@ function ProgressChart() {
                                     doanhthukpi < systemKpi.kpi
                                         ? (doanhthukpi / systemKpi.kpi) * 100
                                         : doanhthukpi == systemKpi.kpi
-                                        ? 100
-                                        : ((doanhthukpi % systemKpi.kpi) / systemKpi.kpi) * 100
+                                            ? 100
+                                            : ((doanhthukpi % systemKpi.kpi) / systemKpi.kpi) * 100
                                 }
                                 text={
                                     systemKpi.kpi
                                         ? doanhthukpi < systemKpi.kpi
                                             ? ((doanhthukpi / systemKpi.kpi) * 100).toFixed(0) + '%'
                                             : doanhthukpi == systemKpi.kpi
-                                            ? '100%'
-                                            : '+' + ((doanhthukpi / systemKpi.kpi) * 100 - 100).toFixed(0) + '%'
+                                                ? '100%'
+                                                : '+' + ((doanhthukpi / systemKpi.kpi) * 100 - 100).toFixed(0) + '%'
                                         : 'chưa thiết lập'
                                 }
                                 strokeWidth={6}
@@ -487,8 +490,8 @@ function ProgressChart() {
                                             ? doanhthukpi < systemKpi.kpi
                                                 ? '#f88'
                                                 : doanhthukpi == systemKpi.kpi
-                                                ? '#4EEE94'
-                                                : '#0000EE'
+                                                    ? '#4EEE94'
+                                                    : '#0000EE'
                                             : 'gray',
                                         transition: 'stroke-dashoffset 0.5s ease 0s',
                                     },
@@ -497,8 +500,8 @@ function ProgressChart() {
                                             ? doanhthukpi < systemKpi.kpi
                                                 ? '#DDDDDD'
                                                 : doanhthukpi == systemKpi.kpi
-                                                ? '#4EEE94'
-                                                : 'green'
+                                                    ? '#4EEE94'
+                                                    : 'green'
                                             : 'gray',
                                     },
                                     text: {
@@ -506,8 +509,8 @@ function ProgressChart() {
                                             ? doanhthukpi < systemKpi.kpi
                                                 ? '#f88'
                                                 : doanhthukpi == systemKpi.kpi
-                                                ? '#4EEE94'
-                                                : '#0000EE'
+                                                    ? '#4EEE94'
+                                                    : '#0000EE'
                                             : 'gray',
                                         fontSize: systemKpi.kpi ? '1.8rem' : '1.2rem',
                                     },
@@ -516,8 +519,8 @@ function ProgressChart() {
                                             doanhthukpi < systemKpi.kpi
                                                 ? 'gray'
                                                 : doanhthukpi == systemKpi.kpi
-                                                ? '#4EEE94'
-                                                : 'black', //parseInt(doanhthukpi / systemKpi.kpi) < 1 ? '#f88' : '#4EEE94',
+                                                    ? '#4EEE94'
+                                                    : 'black', //parseInt(doanhthukpi / systemKpi.kpi) < 1 ? '#f88' : '#4EEE94',
                                     },
                                 }}
                             />

@@ -6,10 +6,12 @@ import { useStore } from '../../../../stores/hooks';
 import { Link } from 'react-router-dom';
 import { seeNotice } from '../../../../stores/actions';
 import { Skeleton } from 'antd';
-import { authInstance } from '../../../../utils/axiosConfig'
+import { getAuthInstance } from '../../../../utils/axiosConfig'
 
 const cx = classNames.bind(styles)
 function Notifition() {
+
+    const authInstance = getAuthInstance()
 
     const [notices, setNotices] = React.useState([])
     const [state, dispatch] = useStore();
@@ -17,7 +19,7 @@ function Notifition() {
 
     React.useEffect(() => {
         setLoading(true)
-        authInstance.post(`${api}/webpush/get`)
+        authInstance.post(`/webpush/get`)
             .then(result => {
                 if (result.data.status === "OK") {
                     setNotices(result.data.data)
@@ -31,19 +33,14 @@ function Notifition() {
     }, [state])
 
     const updateNotification = (id) => {
-        fetch(`${api}/webpush/update`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: id })
-        })
-            .then(response => response.json())
+        authInstance.put(`/webpush`, { id: id })
             .then(result => {
-                if (result.status === "OK") {
+                if (result.data.status === "OK") {
                     dispatch(seeNotice())
                 }
             })
             .catch(err => {
-                console.err(err)
+                console.error(err)
             })
     }
 

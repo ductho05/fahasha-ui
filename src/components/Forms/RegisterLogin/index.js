@@ -25,6 +25,7 @@ import { notification } from 'antd';
 import ServiceWorkerNotifi from '../../../service/ServiceWorkerNotifi';
 import SendNotification from '../../../service/SendNotification'
 import { socket } from '../../../service/SocketIo';
+import { toast } from 'react-toastify';
 
 const cx = classNames.bind(styles);
 function RegisterLogin(props) {
@@ -103,6 +104,10 @@ function RegisterLogin(props) {
         });
     };
 
+    // useEffect(() => {
+    //     setValue()
+    // }, [showDialogRegister])
+
     // Validate Form
     const {
         control,
@@ -160,10 +165,10 @@ function RegisterLogin(props) {
     }, [otp]);
 
     // Login
-    const handleLogin = () => {
+    const handleLogin = async () => {
         const dataLogin = watch();
         setShowProgress(true);
-        fetch(`${api}/users/login`, {
+        await fetch(`${api}/users/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -174,24 +179,22 @@ function RegisterLogin(props) {
             .then((result) => {
 
                 if (result.status == 'OK') {
-                    setShowProgress(false);
-                    props.setShowForm(false);
-                    if (result.message == 'Password incorrect') {
-                        setShowDialog(true);
-                    } else if (result.message == 'Login successfully') {
-                        dispatch(login(result))
-                        ServiceWorkerNotifi()
-                        state.socket.emit('save-socket', (result.data._id))
-                    }
+                    dispatch(login(result))
+                    ServiceWorkerNotifi()
+                    state.socket.emit('save-socket', (result.data._id))
+                } else {
+                    setShowDialog(true)
                 }
+                setShowProgress(false);
+                props.setShowForm(false);
             })
-            .catch((error) => console.log(error));
+            .catch((error) => console.log(error))
     };
 
     // Handle Send OTP
     const handleSendOTP = (email) => {
         setShowProgress(true);
-        fetch(`${api}/users/sendotp`, {
+        fetch(`${api}/users/verify`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -227,6 +230,7 @@ function RegisterLogin(props) {
         })
             .then((response) => response.json())
             .then((result) => {
+
                 if (result.status == 'OK') {
                     setShowProgress(false);
                     props.setShowForm(false);
@@ -245,7 +249,7 @@ function RegisterLogin(props) {
                     })
                     ServiceWorkerNotifi()
                     state.socket.emit('save-socket', (result.data._id))
-                } else if (result.status == 'Falure' && result.message == 'User is already') {
+                } else if (result.status == 'Failure' && result.message == 'Account is exists') {
                     setShowProgress(false);
                     setShowDialogRegister(true);
                 } else {
@@ -261,9 +265,11 @@ function RegisterLogin(props) {
     useEffect(() => {
         if (state.action == REGISTER) {
             navigate(`/account/${0}`);
+            toast.success('Đăng ký tài khoản thành công')
             dispatch(noAction());
         } else if (state.action == LOGIN) {
             navigate('/');
+            toast.success('Đăng nhập thành công')
             dispatch(noAction());
         }
     }, [state]);

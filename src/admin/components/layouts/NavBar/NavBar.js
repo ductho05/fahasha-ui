@@ -7,6 +7,12 @@ import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import { useStore } from '../../../../stores/hooks'
 import { api } from '../../../../constants'
+import { Link } from "react-router-dom";
+import { Dialog } from '@mui/material';
+import RegisterLogin from '../../../../components/Forms/RegisterLogin';
+import { logout } from '../../../../stores/actions';
+import Button from "../../../../components/Button";
+import axios from "axios";
 
 const cx = classNames.bind(styles)
 function NavBar() {
@@ -14,24 +20,43 @@ function NavBar() {
     const [state, dispatch] = useStore()
     const [numNewNotice, setNumNewNotice] = React.useState(0)
     const [notices, setNotices] = React.useState([])
+    const [expired, setExpired] = React.useState(false);
+    const [indexForm, setIndexForm] = React.useState(0);
+    const [isShowForm, setIsShowForm] = React.useState(false);
+
+    const authInstance = state.authInstance
 
     React.useEffect(() => {
-        fetch(`${api}/webpush/get`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ id: state.user._id })
-        })
-            .then(response => response.json())
+        authInstance.post(`/webpush/get`)
             .then(result => {
-                if (result.status == "OK") {
-                    setNotices(result.data)
+                if (result.data.status == "OK") {
+                    setNotices(result.data.data)
                 }
                 //console.log(result)
             })
             .catch(err => console.error(err))
     }, [state])
+
+    setInterval(() => {
+
+        if (state.isLoggedIn) {
+
+            authInstance.get(`/users/get/profile`).then(result => {
+
+                if (result.data.message == "Jwt expired") {
+                    setExpired(true)
+                }
+            }).catch(() => {
+                setExpired(true)
+            })
+
+        }
+    }, 6000);
+
+    const handlePass = () => {
+        dispatch(logout({}));
+        setExpired(false);
+    };
 
     React.useEffect(() => {
         const num = notices.reduce((acc, item) => {
@@ -43,6 +68,20 @@ function NavBar() {
 
     return (
         <div className={cx('wrapper')}>
+            <Dialog open={expired}>
+                <div className={cx('dialog_end_session_login')}>
+                    <h1 className={cx('notice')}>Đã hết phiên đăng nhập. Vui lòng đăng nhập lại</h1>
+                    <RegisterLogin
+                        setShowForm={setIsShowForm}
+                        indexForm={indexForm}
+                        setForm={setIndexForm}
+                        isAccountPage={true}
+                    />
+                    <p onClick={handlePass} className={cx('btn_pass')}>
+                        <Button>Bỏ qua</Button>
+                    </p>
+                </div>
+            </Dialog>
             <div className={cx('search')}>
                 <input type="text" placeholder="Tìm kiếm..." spellCheck={false} />
                 <p className={cx('search_btn')}>
@@ -53,10 +92,10 @@ function NavBar() {
                 <li className={cx('item')}>
                     <DarkModeOutlinedIcon className={cx('icon')} />
                 </li>
-                <li className={cx('item')}>
+                <Link to="/admin/notifications" className={cx('item')}>
                     <NotificationsOutlinedIcon className={cx('icon')} />
                     <p className={cx('message_text')}>{numNewNotice}</p>
-                </li>
+                </Link>
                 <li className={cx('item')}>
                     <MessageOutlinedIcon className={cx('icon')} />
                     <p className={cx('message_text')}>2</p>

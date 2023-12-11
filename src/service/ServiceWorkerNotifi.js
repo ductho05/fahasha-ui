@@ -37,19 +37,19 @@ const checkSubscription = async () => {
             .getSubscription()
             .then(async (subscription) => {
                 const token = JSON.parse(localStorage.getItem('token'))
-                await fetch('https://bookstore-ta.onrender.com/bookstore/api/v1/webpush/subscription', {
+                await fetch('https://bookstore-ta-v3.onrender.com/bookstore/api/v1/webpush/subscription', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({
-                        token,
                         subscription
                     })
                 })
                     .then(response => response.json())
                     .then(result => {
-                        
+
                     })
             })
             .catch((err) => {

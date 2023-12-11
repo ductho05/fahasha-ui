@@ -6,7 +6,7 @@ import styles from './ListOrders.module.scss'
 import { api } from "../../../../constants"
 import { useStore } from '../../../../stores/hooks'
 import { Skeleton } from 'antd';
-import { authInstance } from '../../../../utils/axiosConfig'
+import { getAuthInstance } from '../../../../utils/axiosConfig'
 
 const cx = classNames.bind(styles)
 const tabList = [
@@ -38,6 +38,8 @@ function ListOrders() {
     const [listOrders, setListOrders] = useState([])
     const [state, dispatch] = useStore()
     const [loading, setLoading] = useState(false)
+
+    const authInstance = state.authInstance
 
     useEffect(() => {
         if (tabList[currentIndex].value == 'TATCA') {

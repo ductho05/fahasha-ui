@@ -18,6 +18,7 @@ import Button from "../../../components/Button"
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { CircularProgress, Backdrop } from "@mui/material"
 import { Input, Form, Skeleton, DatePicker, Popconfirm } from 'antd';
+import { getAuthInstance } from "../../../utils/axiosConfig"
 
 const cx = classNames.bind(styles)
 
@@ -35,6 +36,9 @@ const options = [
 ]
 
 function Users() {
+
+    const authInstance = getAuthInstance()
+
     const [rows, setRows] = useState([])
     const [avatar, setAvatar] = useState()
     const [showDialog, setShowDialog] = useState(false)
@@ -96,12 +100,9 @@ function Users() {
 
                 const handleDelete = () => {
                     setIsInsert(true)
-                    fetch(`${api}/users/delete/${params.value}`, {
-                        method: 'DELETE'
-                    })
-                        .then(response => response.json())
+                    authInstance.delete(`/users/delete/${params.value}`)
                         .then(result => {
-                            if (result.status === 'OK') {
+                            if (result.data.status === 'OK') {
                                 setIsAction(prev => !prev)
                                 toast.success('Xóa thành công!')
                             } else {
@@ -128,7 +129,7 @@ function Users() {
                             <Delete />
                         </p>
                     </Popconfirm>
-                    <Link to={`/admin/user/${params.row._id}`}>
+                    <Link to={`/admin/user/${params.value}`}>
                         <View />
                     </Link>
                 </div>
@@ -138,11 +139,10 @@ function Users() {
 
     useEffect(() => {
         setLoadingUsers(true)
-        fetch(`${api}/users`)
-            .then(response => response.json())
+        authInstance.get(`/users`)
             .then(result => {
                 setLoadingUsers(false)
-                setRows(result.data)
+                setRows(result.data.data)
             })
             .catch(err => {
                 setLoadingUsers(false)
@@ -187,27 +187,21 @@ function Users() {
             formData.append('gender', gender)
         }
         setIsInsert(true)
-        fetch(`${api}/users/insert`, {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.json())
+        authInstance.post(`/users/insert`, formData)
             .then(result => {
-                if (result.status === 'OK') {
+                if (result.data.status === 'OK') {
                     setIsAction(prev => !prev)
-                    setShowDialog(false)
-                    setIsInsert(false)
                     toast.success("Thêm mới tài khoản thành công!")
                 } else {
-                    setShowDialog(false)
-                    setIsInsert(false)
-                    toast.success(`Error! ${result.message}`)
+                    toast.error(`${result.data.message}`)
                 }
+                setShowDialog(false)
+                setIsInsert(false)
             })
             .catch(err => {
                 setShowDialog(false)
                 setIsInsert(false)
-                toast.success(`Error! ${err.message}`)
+                toast.error(`${err?.response?.data?.message}`)
             })
     }
 
@@ -340,6 +334,19 @@ function Users() {
                             ]}
                         >
                             <Input placeholder='Nhập địa chỉ' />
+                        </Form.Item>
+
+                        <Form.Item
+                            label="Tỉnh/Thành phố"
+                            name="city"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Nội dung này không được để trống',
+                                },
+                            ]}
+                        >
+                            <Input placeholder='Nhập tỉnh/thành phố' />
                         </Form.Item>
                         <div className="flex items-center mb-[20px]">
                             <p className={cx('label')}>Ngày sinh: </p>

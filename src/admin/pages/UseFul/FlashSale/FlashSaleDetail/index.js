@@ -42,8 +42,10 @@ import DropMenu from '../../../../../components/DropMenu/index';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { useForm, useController, set } from 'react-hook-form';
 import 'react-toastify/dist/ReactToastify.css';
+import { getAuthInstance } from "../../../../../utils/axiosConfig"
 
 function getRandomElementsWithBias(arr, num) {
+
     const originalIndices = Array.from(arr.keys());
     const shuffledIndices = shuffleArray(originalIndices);
     const selectedIndices = shuffledIndices.slice(0, num);
@@ -85,6 +87,9 @@ const options = [
 ];
 
 function FlashSaleDetail() {
+
+    const authInstance = getAuthInstance()
+
     const cx = classNames.bind(styles);
     const navigate = useNavigate();
     const moment = require('moment-timezone');
@@ -264,17 +269,15 @@ function FlashSaleDetail() {
                 .toString()
                 .slice(8, 10)}` && flash.point_sale == Math.floor(currentHourInVietnam / 3)
             ? localStorage.setItem(
-                  'date_flash',
-                  `${flash.date_sale.slice(5, 7)} ${flash.date_sale.slice(8, 10)}, ${flash.date_sale.slice(0, 4)} ${
-                      (flash.point_sale + 1) * 3
-                  }:00:00`,
-              )
+                'date_flash',
+                `${flash.date_sale.slice(5, 7)} ${flash.date_sale.slice(8, 10)}, ${flash.date_sale.slice(0, 4)} ${(flash.point_sale + 1) * 3
+                }:00:00`,
+            )
             : localStorage.setItem(
-                  'date_flash',
-                  `${flash?.date_sale.slice(5, 7)} ${flash?.date_sale.slice(8, 10)}, ${flash?.date_sale.slice(0, 4)} ${
-                      flash?.point_sale * 3
-                  }:00:00`,
-              );
+                'date_flash',
+                `${flash?.date_sale.slice(5, 7)} ${flash?.date_sale.slice(8, 10)}, ${flash?.date_sale.slice(0, 4)} ${flash?.point_sale * 3
+                }:00:00`,
+            );
     };
 
     const handleAutoSetting = () => {
@@ -346,15 +349,9 @@ function FlashSaleDetail() {
         //     formData.append('images', avatar);
         // }
 
-        console.log('values1', values);
-        fetch(`${api}/flashsales/update/${flashId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(values),
-        })
-            .then((response) => response.json())
+        authInstance.post(`/flashsales/update/${flashId}`, values)
             .then((result) => {
-                if (result.status === 'OK') {
+                if (result.data.status === 'OK') {
                     setShowDialog(false);
                     toast.success('Thay đổi thông tin Flash Sale thành công!');
                 } else {
@@ -488,9 +485,8 @@ function FlashSaleDetail() {
                                         <span style={{ color: show ? '#1890ff' : '#ccc' }}>
                                             {show &&
                                                 (valuepoint > -1
-                                                    ? `Giảm giá từ ${`${valuepoint * 3}h - ${
-                                                          (valuepoint + 1) * 3
-                                                      }h`} hàng ngày`
+                                                    ? `Giảm giá từ ${`${valuepoint * 3}h - ${(valuepoint + 1) * 3
+                                                    }h`} hàng ngày`
                                                     : `Giảm giá tất cả khung giờ hàng ngày`)}
                                         </span>
                                     </Space>
@@ -586,7 +582,7 @@ function FlashSaleDetail() {
                                     `${new Date().getUTCFullYear()}-${(new Date().getUTCMonth() + 1)
                                         .toString()
                                         .padStart(2, '0')}-${new Date().toString().slice(8, 10)}` &&
-                                flash.point_sale == Math.floor(currentHourInVietnam / 3) ? (
+                                    flash.point_sale == Math.floor(currentHourInVietnam / 3) ? (
                                     <CountDownCustom title={'Thời gian còn lại:'} isLoading={isLoading} />
                                 ) : (
                                     <CountDownCustom title={'Đếm ngược đến giờ mở bán:'} isLoading={isLoading} />

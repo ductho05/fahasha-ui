@@ -4,7 +4,7 @@ import styles from './UserDetail.module.scss';
 import IncomeChart from '../../components/charts/IncomeChart/IncomeChart';
 import DropMenu from '../../../components/DropMenu';
 import OrdersLatesTable from '../../components/OrdersLatesTable/OrdersLatesTable';
-import { Dialog } from '@mui/material';
+import { Backdrop, CircularProgress, Dialog } from '@mui/material';
 import Button from '../../../components/Button';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { useForm, useController } from 'react-hook-form';
@@ -12,6 +12,7 @@ import { useParams } from 'react-router-dom';
 import { api } from '../../../constants';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { getAuthInstance } from '../../../utils/axiosConfig';
 
 const cx = classNames.bind(styles);
 const dataIncomes = [
@@ -65,20 +66,25 @@ const options = [
 ];
 
 function UserDetail() {
+
+    const authInstance = getAuthInstance()
+
     const { userId } = useParams();
     const [user, setUser] = useState({});
     const [optionSelected, setOptionSelected] = useState(options[0]);
     const [showDialog, setShowDialog] = useState(false);
     const [avatar, setAvatar] = useState({});
     const [orders, setOrders] = useState([]);
+    const [ischanged, setIsChanged] = useState(false)
+    const [loading, setLoading] = useState(false)
 
     const handleClickEdit = () => {
         setShowDialog(true);
         setValue('fullName', user.fullName);
         setValue('email', user.email);
-        setValue('phone', user.phone);
+        setValue('phoneNumber', user.phoneNumber);
         setValue('address', user.address);
-    };
+    }
 
     const handleCloseEdit = () => {
         clearErrors();
@@ -87,28 +93,20 @@ function UserDetail() {
     };
 
     useEffect(() => {
-        fetch(`${api}/users/${userId}`)
-            .then((response) => response.json())
+        authInstance.get(`/users/${userId}`)
             .then((result) => {
-                if (result.status === 'OK') {
-                    setUser(result.data);
+                if (result.data.status === 'OK') {
+                    setUser(result.data.data);
                 }
             })
             .catch((err) => console.error(err.message));
-    }, [showDialog]);
+    }, [user]);
 
     useEffect(() => {
-        fetch('http://127.0.0.1:3000/bookstore/api/v1/orders/user', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ user: userId }),
-        })
-            .then((response) => response.json())
+        authInstance.post(`/orders/filter?page=1&limit=5&status=HOANTHANH&user=${userId}`)
             .then((result) => {
-                if (result.status === 'OK') {
-                    setOrders(result.data);
+                if (result.data.status === 'OK') {
+                    setOrders(result.data.data);
                 }
             })
             .catch((err) => console.error(err.message));
@@ -134,6 +132,7 @@ function UserDetail() {
         formState: { errors },
         handleSubmit,
         setValue,
+        watch,
     } = useForm({
         mode: 'onBlur',
     });
@@ -164,6 +163,18 @@ function UserDetail() {
         control,
     });
 
+
+    useEffect(() => {
+
+        if (watch("fullName") != user.fullName || watch("email") != user.email ||
+            watch("phoneNumber") != user.phoneNumber || watch("address") != user.address || Object.keys(avatar).length > 0) {
+            setIsChanged(true)
+        } else {
+            setIsChanged(false)
+        }
+
+    }, [watch(), avatar])
+
     const handleSave = (data) => {
         const formData = new FormData();
         Object.keys(data).forEach((key) => {
@@ -172,24 +183,24 @@ function UserDetail() {
         if (Object.keys(avatar).length > 0) {
             formData.append('images', avatar);
         }
-        console.log(formData.get('email'));
-        fetch(`${api}/users/update/${userId}`, {
-            method: 'PUT',
-            body: formData,
-        })
-            .then((response) => response.json())
+
+        setLoading(true)
+        authInstance.put(`/users/update/${userId}`, formData)
             .then((result) => {
-                if (result.status === 'OK') {
-                    setShowDialog(false);
-                    toast.success('Thay đổi thông tin tài khoản thành công!');
+                if (result.data.status === 'OK') {
+                    setUser(result.data.data)
+                    toast.success('Cập nhật thành công!');
                 } else {
-                    setShowDialog(false);
                     toast.error('Thất bại! Có lỗi xảy ra');
                 }
+                setShowDialog(false);
+                setLoading(false)
             })
             .catch((err) => {
                 setShowDialog(false);
+                setLoading(false)
                 toast.error(err.message);
+                console.error(err)
             });
     };
 
@@ -207,12 +218,18 @@ function UserDetail() {
                 pauseOnHover
                 theme="light"
             />
+            <Backdrop
+                sx={{ color: '#fff', zIndex: 10000 }}
+                open={loading}
+            >
+                <CircularProgress color="error" />
+            </Backdrop>
             <Dialog open={showDialog}>
                 <div className={cx('dialog')}>
                     <p className={cx('btn_close')} onClick={handleCloseEdit}>
                         <CloseOutlinedIcon className={cx('btn_icon')} />
                     </p>
-                    <h3 className={cx('dialog_title')}>Chỉnh sửa thông tin tài khoản</h3>
+                    <h3 className={cx('dialog_title', "font-[500]")}>Chỉnh sửa thông tin tài khoản</h3>
                     <form onSubmit={handleSubmit(handleSave)} className={cx('dialog_content')}>
                         <div className={cx('left')}>
                             <div className={cx('images')}>
@@ -229,8 +246,8 @@ function UserDetail() {
                                     errors.fullName
                                         ? cx('form_group', 'error')
                                         : errors.fullName
-                                        ? cx('form_group', 'error')
-                                        : cx('form_group')
+                                            ? cx('form_group', 'error')
+                                            : cx('form_group')
                                 }
                             >
                                 <p className={cx('label')}>Tên</p>
@@ -277,7 +294,7 @@ function UserDetail() {
                             </div>
 
                             <p className={cx('btn_edit')}>
-                                <Button primary>Lưu thay đổi</Button>
+                                <Button disabled={!ischanged} primary>Lưu thay đổi</Button>
                             </p>
                         </div>
                     </form>

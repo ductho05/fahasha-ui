@@ -13,6 +13,7 @@ import numeral from 'numeral';
 import { Popconfirm, Skeleton } from 'antd';
 import SendNotification from '../../../service/SendNotification'
 import { appPath, orderImages } from '../../../constants';
+import { getAuthInstance } from '../../../utils/axiosConfig';
 
 const tabList = [
     {
@@ -39,6 +40,8 @@ const tabList = [
 const cx = classNames.bind(styles)
 function Order() {
 
+    const authInstance = getAuthInstance()
+
     const [rows, setRows] = React.useState([])
     const [currentIndex, setCurrentIndex] = React.useState(0)
     const [loading, setLoading] = React.useState(false)
@@ -64,7 +67,7 @@ function Order() {
         {
             field: 'address',
             headerName: 'Địa chỉ',
-            width: 160,
+            width: 300,
             sortable: false,
             renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : "Trống"}</p>
         },
@@ -121,7 +124,7 @@ function Order() {
                     e.stopPropagation();
                 }
 
-                const handleUpdate = () => {
+                const handleUpdate = async () => {
                     let updateStatus = null
                     if (params.row.status === CHOXACNHAN) {
                         updateStatus = DANGGIAO
@@ -129,45 +132,42 @@ function Order() {
                         updateStatus = HOANTHANH
                     }
                     if (updateStatus) {
-                        fetch(`${api}/orders/update/${params.row._id}`, {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                "_id": params.row._id,
-                                "status": updateStatus
-                            })
-                        })
-                            .then(response => response.json())
-                            .then(result => {
-                                if (result.status === 'OK') {
+                        authInstance.put(`/orders/update/${params.row._id}`,
+                            { "status": updateStatus }
+                        )
+                            .then(async result => {
+                                console.log(result)
+                                if (result.data.status === 'OK') {
                                     setIsUpdate(prev => !prev)
                                     toast.success('Cập nhật thành công!')
-                                    let description = ""
+                                    let description = "Đơn hàng của bạn đang trên đường giao. Hãy để ý điện thoại nhé!"
                                     if (result.data.status === DANGGIAO) {
-                                        description = "Đơn hàng của bạn đang trên đường giao. Hãy để ý điện thoại nhé!"
-                                    } else if (result.data.status === HOANTHANH) {
                                         description = "Đơn hàng của bạn đã được giao thành công!"
                                     }
                                     const url = `${appPath}/account/order/detail/${result.data._id}`
                                     const title = "Thông báo đơn hàng"
-                                    const user = result.data.user
+                                    const user = result.data.data.user
 
-                                    SendNotification("personal", {
-                                        title,
-                                        description,
-                                        image: orderImages,
-                                        url,
-                                        user
+                                    await authInstance.post(`/webpush/send`, {
+                                        filter: "personal",
+                                        notification: {
+                                            title,
+                                            description,
+                                            image: orderImages,
+                                            url,
+                                            user
+                                        }
                                     })
+                                        .catch((err) => {
+                                            console.error(err)
+                                        })
 
                                 } else {
-                                    toast.error(result.message)
+                                    toast.error(result.data.message)
                                 }
                             })
                             .catch(err => {
-                                toast.error(err.message)
+                                toast.error(err?.response?.data?.message)
                             })
                     } else {
                         toast.error("Không tìm thấy trạng thái đơn hàng")
@@ -204,24 +204,18 @@ function Order() {
     React.useEffect(() => {
         setLoadingOrder(true)
         setRows([])
-        let query = `${api}/orders/filter`
+        let query = `/orders/filter`
         if (tabList[currentIndex].value) {
-            query = `${api}/orders/filter?status=${tabList[currentIndex].value}`
+            query = `/orders/filter?status=${tabList[currentIndex].value}`
         }
-        fetch(query, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => response.json())
+        authInstance.post(query)
             .then(result => {
-                if (result.status === "OK") {
+                if (result.data.status === "OK") {
                     setLoadingOrder(false)
-                    setRows(result.data)
+                    setRows(result.data.data)
                 } else {
                     setLoadingOrder(false)
-                    toast.error(result.message)
+                    toast.error(result.data.message)
                 }
             })
             .catch(error => {

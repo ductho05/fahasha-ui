@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import classNames from "classnames/bind"
 import styles from './EvaluateForm.module.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -8,11 +8,13 @@ import { useStore } from "../../../stores/hooks"
 import { api, appPath } from "../../../constants"
 import { useNavigate } from 'react-router-dom'
 import { Backdrop, CircularProgress } from "@mui/material"
-import SendNotification from "../../../service/SendNotification"
 import { message } from 'antd';
+import { getAuthInstance } from '../../../utils/axiosConfig'
 
 const cx = classNames.bind(styles)
-function EvaluateForm({ setShow, product, orderItem }) {
+function EvaluateForm({ totalRate, fetch, setShow, product, orderItem }) {
+
+    const authInstance = getAuthInstance()
 
     const navigate = useNavigate()
     const [rate, setRate] = useState(0)
@@ -20,6 +22,49 @@ function EvaluateForm({ setShow, product, orderItem }) {
     const [content, setContent] = useState('')
     const [state, dispatch] = useStore()
     const [showProgress, setShowProgress] = useState(false)
+
+    useEffect(() => {
+        const updateRate = (parseInt("0") * totalRate + rate) / (totalRate + 1)
+
+        console.log(updateRate)
+    }, [])
+
+    const updateRate = async (productEval) => {
+        const updateRate = (parseInt(productEval.rate) * totalRate + rate) / (totalRate + 1)
+
+        await authInstance.put(`/products/update/${productEval._id}`, {
+            rate: updateRate
+        }).then(result => {
+
+        }).catch(err => {
+            console.error(err)
+        })
+    }
+
+    const sendNotice = (productEval) => {
+        const title = "Thông báo sản phẩm"
+        const description = `${state.user.fullName} vừa đánh giá một sản phẩm. Xem ngay`
+        const image = productEval?.images
+        const url = `${appPath}/product-detail/${productEval?._id}/comments-detail`
+
+        authInstance.post("/webpush/send", {
+            filter: "admin",
+            notification: {
+                title,
+                description,
+                image,
+                url
+            }
+        })
+            .then(result => {
+                if (result.data.status === "OK") {
+                    state.socket.emit("send-notification")
+                }
+            })
+            .catch(err => {
+                console.error(err)
+            })
+    }
 
     const handleClickRate = (value) => {
         setRate(value)
@@ -33,54 +78,33 @@ function EvaluateForm({ setShow, product, orderItem }) {
         setShow(false)
     }
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         setShowProgress(true)
-        fetch(`${api}/evaluates/insert`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                rate: rate,
-                comment: content,
-                product: product,
-                user: state.user._id
-            })
-
+        await authInstance.post(`/evaluates/insert`, {
+            rate: rate,
+            comment: content,
+            product: product,
+            user: state.user._id
         })
-            .then(response => response.json())
             .then(result => {
-                if (result.status == 'OK') {
+
+                if (result.data.status == 'OK') {
+                    updateRate(result.data.data)
+                    sendNotice(result.data.data)
                     if (orderItem) {
-                        fetch(`${api}/orderitems/update/${orderItem._id}`, {
-                            method: 'PUT',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ status: 'DADANHGIA' })
-                        })
-                            .then(response => response.json())
+                        authInstance.put(`/orderitems/update/${orderItem._id}`, { status: 'DADANHGIA' })
                             .then(result => {
-                                if (result.status == 'OK') {
+                                if (result.data.status == 'OK') {
+                                    fetch()
                                     setShow(false)
                                     setShowProgress(false)
-
                                 }
                             })
                     } else {
                         setShow(false)
                         setShowProgress(false)
-
                     }
                     message.success("Đã đánh giá sản phẩm")
-
-                    const title = "Thông báo sản phẩm"
-                    const description = `${state.user.fullName} vừa đánh giá một sản phẩm. Xem ngay`
-                    const image = result.data.product.images
-                    const url = `${appPath}/product-detail/${result.data.product._id}/comments-detail`
-
-                    SendNotification("admin", {
-                        title,
-                        description,
-                        image,
-                        url
-                    })
                 } else {
                     setShow(false)
                     setShowProgress(false)
@@ -88,7 +112,8 @@ function EvaluateForm({ setShow, product, orderItem }) {
                 }
             })
             .catch(err => {
-                message.error("Lỗi khi đánh giá sản phẩm")
+                console.log(err)
+                message.error(`Lỗi ${err.message}`)
             })
     }
 

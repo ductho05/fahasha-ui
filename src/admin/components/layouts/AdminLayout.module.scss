@@ -22,3 +22,9 @@
 .animation-loading {
     width: 30%;
 }
+
+@media (max-width: 1500px) {
+    .navbar {
+        display: none;
+    }
+}

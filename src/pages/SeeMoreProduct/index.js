@@ -81,7 +81,7 @@ function SeeMoreProduct() {
 
     return (
         <div className={cx('wrapper')}>
-            <div className={cx('fillter', 'p-[20px] shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden')}>
+            <div className={cx('fillter', 'p-[20px] shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px]')}>
                 <div className={cx('fillter_arange')}>
                     <p>Sắp xếp theo:</p>
                     <DropMenu
@@ -102,7 +102,7 @@ function SeeMoreProduct() {
                 </div>
             </div>
 
-            <div className='p-[20px] shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden'>
+            <div className='p-[20px] shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px]'>
                 <div className={cx('product_list')}>
                     {
                         showProgress ? <GridProductLoading /> : <GridProduct products={products} />

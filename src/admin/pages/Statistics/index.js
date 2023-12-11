@@ -9,8 +9,8 @@ import DropMenu from '../../../components/DropMenu';
 import OrdersLatesTable from '../../components/OrdersLatesTable/OrdersLatesTable';
 import { api } from '../../../constants';
 import axios from 'axios';
-import { DatePicker, Space, Image, Button, Typography, message, Alert, Spin } from 'antd';
-import { authInstance } from '../../../utils/axiosConfig';
+import { DatePicker, Space, Image, Button, Typography, message,  Alert, Spin  } from 'antd';
+import { getAuthInstance } from '../../../utils/axiosConfig';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
 import { set } from 'react-hook-form';
@@ -128,6 +128,9 @@ const formatDateToString = (date) => {
     return ''; // Trả về chuỗi rỗng nếu date là null
 };
 function Statistics() {
+
+    const authInstance = getAuthInstance();
+
     const [optionSelected, setOptionSelected] = useState(options[0]);
     const { RangePicker } = DatePicker;
     const dateFormat = 'YYYY/MM/DD';
@@ -469,7 +472,7 @@ function Statistics() {
                 return (
                     formatDateToString(new Date(order.date)) <= formatDateToString(today) &&
                     formatDateToString(new Date(order.date)) >=
-                        formatDateToString(new Date(today.getFullYear(), today.getMonth(), 1))
+                    formatDateToString(new Date(today.getFullYear(), today.getMonth(), 1))
                 );
             });
 

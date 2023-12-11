@@ -3,9 +3,11 @@ import { Button, Select, Form, Input, Spin, message } from 'antd';
 import { api } from '../../../../constants';
 import { SendOutlined } from '@mui/icons-material'
 import { Backdrop } from '@mui/material';
+import { getAuthInstance } from "../../../../utils/axiosConfig"
 
 function SendNotice({ setOpenDialog }) {
 
+    const authInstance = getAuthInstance()
     const [optionUser, setOptionUser] = React.useState([])
     const [filter, setFilter] = React.useState("all")
     const [image, setImage] = React.useState()
@@ -14,11 +16,10 @@ function SendNotice({ setOpenDialog }) {
     const [loadingSend, setLoadingSend] = React.useState(false)
 
     React.useEffect(() => {
-        fetch(`${api}/users`)
-            .then(response => response.json())
+        authInstance.get(`/users`)
             .then(result => {
-                if (result.status == "OK") {
-                    const newList = result.data.map(user => {
+                if (result.data.status == "OK") {
+                    const newList = result.data.data.map(user => {
                         return {
                             label: user.email,
                             value: user._id
@@ -41,14 +42,10 @@ function SendNotice({ setOpenDialog }) {
         const formData = new FormData()
         formData.append("images", file)
         setLoading(true)
-        fetch(`${api}/upload-images`, {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.json())
+        authInstance.post(`/upload-images`, formData)
             .then(result => {
-                if (result.status == "OK") {
-                    setImage(result.data)
+                if (result.data.status == "OK") {
+                    setImage(result.data.data)
                 }
                 setLoading(false)
             })
@@ -65,17 +62,12 @@ function SendNotice({ setOpenDialog }) {
         }
 
         setLoadingSend(true)
-        fetch(`${api}/webpush/send`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                filter,
-                notification: values
-            })
+        authInstance.post(`/webpush/send`, {
+            filter,
+            notification: values
         })
-            .then(response => response.json())
             .then(result => {
-                if (result.status == "OK") {
+                if (result.data.status == "OK") {
                     message.success("Gửi thông báo thành công!")
                 } else {
                     message.error("Gửi thông thất bại!")

@@ -4,15 +4,20 @@ import { useStore } from '../../../../stores/hooks';
 import styles from './Evaluate.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
-import { api } from '../../../../constants';
+import { api, appPath } from '../../../../constants';
 import { Dialog } from '@mui/material';
 import EvaluateForm from '../../../../components/Forms/EvaluateForm';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from 'antd';
-import { authInstance } from '../../../../utils/axiosConfig'
+import { getAuthInstance } from '../../../../utils/axiosConfig'
+import SendNotification from "../../../../service/SendNotification"
+
 
 const cx = classNames.bind(styles);
 function Evaluate() {
+
+    const authInstance = getAuthInstance()
+
     const navigate = useNavigate();
     const rates = [1, 2, 3, 4, 5];
     const tabs = ['Nhận xét của tôi', 'Sản phẩm đã mua chưa đánh giá'];
@@ -24,6 +29,22 @@ function Evaluate() {
     const [product, setProduct] = useState();
     const [orderItem, setOrderItem] = useState();
     const [loading, setLoading] = useState(false)
+    const [totalRate, setTotalRate] = useState(0)
+
+    const fetchEvaluate = (productId) => {
+
+        fetch(`${api}/evaluates/count?_id=${productId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then((response) => response.json())
+            .then((result) => {
+                console.log(result)
+                setTotalRate(result.data.total);
+            });
+    };
 
     useEffect(() => {
         setLoading(true)
@@ -35,11 +56,11 @@ function Evaluate() {
                 setLoading(false)
             })
             .catch((err) => setLoading(false));
-    }, [showEvalDialog]);
+    }, [currentTab]);
 
-    useEffect(() => {
+    const fetchProductNoEvaluate = () => {
         setLoading(true)
-        authInstance.post(`${api}/orderitems/order/filter?status_order=HOANTHANH&status=CHUADANHGIA`)
+        authInstance.post(`/orderitems/order/filter?status_order=HOANTHANH&status=CHUADANHGIA`)
             .then((result) => {
                 if (result.data.status == 'OK') {
                     setProductNotRates(result.data.data);
@@ -47,7 +68,11 @@ function Evaluate() {
                 setLoading(false)
             })
             .catch((err) => setLoading(false));
-    }, [showEvalDialog]);
+    }
+
+    useEffect(() => {
+        fetchProductNoEvaluate()
+    }, [currentTab]);
 
     const handleTab = (index) => {
         setCurrentTab(index);
@@ -57,6 +82,7 @@ function Evaluate() {
         setOrderItem(item);
         setProduct(id);
         setShowEvalDialog(true);
+        fetchEvaluate(id)
     };
 
     const handleSeenDetailEval = (id) => {
@@ -66,7 +92,7 @@ function Evaluate() {
     return (
         <div className={cx('wrapper')}>
             <Dialog open={showEvalDialog}>
-                <EvaluateForm setShow={setShowEvalDialog} product={product} orderItem={orderItem} />
+                <EvaluateForm totalRate={totalRate} fetch={fetchProductNoEvaluate} setShow={setShowEvalDialog} product={product} orderItem={orderItem} />
             </Dialog>
             <ul className={cx('tab_list')}>
                 {tabs.map((tab, index) => (

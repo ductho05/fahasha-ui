@@ -18,7 +18,7 @@ function ForYou({ limit }) {
         category.forEach((item) => {
             axios
                 .post(
-                    `https://bookstore-api-0a2i.onrender.com/bookstore/api/v1/products/category?category=${item}&limit=${limit}`,
+                    `${api}/products/category?category=${item}&limit=${limit}`,
                 )
                 .then((res) => {
                     newArr.push(...res.data.data);
@@ -81,13 +81,19 @@ function ForYou({ limit }) {
                             <span>đ</span>
                         </div>
                         <div className={cx('price__old')}>
-                            <div className={cx('price')}>{numeral(item.old_price).format('0,0') + 'đ'}</div>
-                            <div className={cx('sale')}>{GetCoupon(item.price, item.old_price)}</div>
+                            <div style={{
+                                fontSize: '1.2rem',
+                                fontWeight: '400'
+                            }} className={cx('price')}>{numeral(item.old_price).format('0,0') + 'đ'}</div>
+                            <div style={{
+                                fontSize: '1.2rem',
+                                fontWeight: '400'
+                            }} className={cx('sale')}>{GetCoupon(item.price, item.old_price)}</div>
                         </div>
                     </div>
                     <div style={{ position: 'relative' }}>
                         <Progress
-                            percent={Math.random() * 100}
+                            percent={Math.floor((item.sold / item.quantity) * 100)}
                             status="active"
                             showInfo={false}
                             strokeWidth={25}
@@ -109,8 +115,8 @@ function ForYou({ limit }) {
                                 left: '50%',
                                 transform: 'translate(-50%, -50%)',
                                 color: 'black',
-                                fontWeight: '100',
-                                fontSize: '0.8rem',
+                                fontWeight: '400',
+                                fontSize: '1.2rem',
                                 width: '100%',
                                 textAlign: 'center',
                             }}

@@ -18,14 +18,14 @@ const urlBase64ToUint8Array = base64String => {
 }
 
 const saveSubscription = async (subscription, token) => {
-    const response = await fetch('https://bookstore-ta.onrender.com/bookstore/api/v1/webpush/subscription', {
+    const response = await fetch('https://bookstore-ta-v3.onrender.com/bookstore/api/v1/webpush/subscription', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-            subscription,
-            token
+            subscription
         })
     })
 
@@ -44,7 +44,8 @@ self.addEventListener("activate", async (e) => {
         applicationServerKey: urlBase64ToUint8Array(PUBLIC_KEY)
     })
 
-    await saveSubscription(subcription, token)
+    const response = await saveSubscription(subcription, token)
+    console.log(response)
 })
 
 self.addEventListener("push", (e) => {

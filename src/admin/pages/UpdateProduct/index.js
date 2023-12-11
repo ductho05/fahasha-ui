@@ -11,13 +11,16 @@ import dayjs from 'dayjs';
 import { toast, ToastContainer } from 'react-toastify'
 import "react-toastify/dist/ReactToastify.css";
 import { CircularProgress, Backdrop, LinearProgress } from "@mui/material";
-import { DatePicker } from 'antd';
+import { DatePicker, Select } from 'antd';
 
 import { Skeleton } from 'antd';
+import { getAuthInstance } from '../../../utils/axiosConfig'
 
 const cx = classNames.bind(styles)
 
 function UpdateProduct() {
+
+    const authInstance = getAuthInstance()
 
     const { pid } = useParams()
     const [options, setOptions] = React.useState([])
@@ -26,6 +29,8 @@ function UpdateProduct() {
     const [avatar, setAvatar] = React.useState()
     const [loading, setLoading] = React.useState(false)
     const [isAction, setIsAction] = React.useState(false)
+    const [isChanged, setIsChanged] = React.useState(false)
+    const [success, setSuccess] = React.useState(false)
     const [categoryName, setCategoryName] = React.useState({
         name: "--Chọn loại sản phẩm--",
         value: ""
@@ -35,15 +40,22 @@ function UpdateProduct() {
         register,
         handleSubmit,
         reset,
-        setValue
+        setValue,
+        watch
     } = useForm()
 
     React.useEffect(() => {
-        fetch(`${api}/categories`)
+        fetch(`${api}/categories?filter=simple`)
             .then(response => response.json())
             .then(result => {
                 if (result.status == "OK") {
-                    setOptions(result.data)
+                    const newList = result.data.map(category => {
+                        return {
+                            label: category.name,
+                            value: category._id
+                        }
+                    })
+                    setOptions(newList)
                 }
             })
             .catch(err => console.log(err.message))
@@ -62,7 +74,7 @@ function UpdateProduct() {
             .catch(err => {
                 setLoading(false)
             })
-    }, [isAction])
+    }, [success])
 
     React.useEffect(() => {
         Object.keys(product).forEach(key => {
@@ -72,10 +84,12 @@ function UpdateProduct() {
             name: product.categoryId?.name,
             value: product.categoryId?._id
         })
-        setPublished(dayjs(product.published_date))
+        setPublished(product.published_date)
+        console.log(watch())
     }, [product])
 
     const handleDate = (date, dateString) => {
+        console.log(dateString)
         setPublished(dateString)
     }
 
@@ -94,7 +108,7 @@ function UpdateProduct() {
         }
     }, [avatar]);
 
-    const onSubmit = (data) => {
+    const onSubmit = async (data) => {
         const formData = new FormData()
         Object.keys(data).forEach(key => {
             formData.append(key, data[key])
@@ -105,31 +119,46 @@ function UpdateProduct() {
         if (published != product.published_date) {
             formData.set('published_date', published)
         }
-        if (categoryName.value != product.categoryId?._id) {
-            formData.set("categoryId", categoryName.value)
-        }
-        setLoading(true)
+        formData.set("categoryId", categoryName.value)
+        formData.set('rate', product.rate)
         setIsAction(true)
-        fetch(`${api}/products/update/${product._id}`, {
-            method: 'PUT',
-            body: formData
-        })
-            .then(response => response.json())
+        await authInstance.put(`/products/update/${product?._id}`, formData)
             .then(result => {
-                if (result.status === "OK") {
+                if (result.data.status === "OK") {
                     toast.success('Cập nhật sản phẩm thành công!')
+                    setSuccess(prev => !prev)
                 } else {
-                    toast.error(result.message)
+                    toast.error(result.data.message)
                 }
-                setLoading(false)
                 setIsAction(false)
             })
             .catch(err => {
-                setLoading(false)
                 setIsAction(false)
-                toast.error(err.message)
+                toast.error(err?.response?.data?.message)
+                console.error(err)
             })
     }
+
+    const filterOption = (input, option) =>
+        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+
+    const handleChange = (value, option) => {
+        setCategoryName({
+            name: option.label,
+            value: option.value
+        })
+    }
+
+    React.useEffect(() => {
+
+        if (product.title != watch("title") || product.author != watch("author") || product.price != watch("price") || product.old_price != watch("old_price") ||
+            product.quantity != watch("quantity") || product.desciption != watch("desciption") || product.categoryId._id != categoryName.value || published != product.published_date || avatar) {
+            setIsChanged(true)
+        } else {
+            setIsChanged(false)
+        }
+
+    }, [watch(), avatar])
 
     return (
         <>
@@ -154,7 +183,7 @@ function UpdateProduct() {
                 />
                 <Backdrop
                     sx={{ color: '#fff', zIndex: 10000 }}
-                    open={loading}
+                    open={isAction}
                 >
                     {isAction && <CircularProgress color="error" />}
                 </Backdrop>
@@ -233,6 +262,7 @@ function UpdateProduct() {
                                         fullWidth
                                         placeholder='Nhập giá hiện tại'
                                         size='small'
+                                        type="number"
                                         InputProps={{
                                             style: {
                                                 color: "#333",
@@ -248,6 +278,23 @@ function UpdateProduct() {
                                         fullWidth
                                         placeholder='Nhập giá cũ'
                                         size='small'
+                                        type="number"
+                                        InputProps={{
+                                            style: {
+                                                color: "#333",
+                                                fontSize: "13px",
+                                                marginBottom: '16px',
+                                                backgroundColor: "#fff"
+                                            }
+                                        }}
+                                    />
+                                    <p className={cx('label')}>Số lượng đã nhập</p>
+                                    <TextField
+                                        {...register('quantity')}
+                                        fullWidth
+                                        placeholder='Nhập số lượng '
+                                        size='small'
+                                        type="number"
                                         InputProps={{
                                             style: {
                                                 color: "#333",
@@ -261,38 +308,20 @@ function UpdateProduct() {
                                     <DatePicker onChange={handleDate} defaultValue={dayjs(product.published_date)} />
                                     <p className={cx('label')}></p>
                                     <p className={cx('label')}>Loại sản phẩm</p>
-                                    <Dropdown title={categoryName.name}
-                                        menuClassName={cx("dropmenu")}
-                                        buttonClassName={cx("category")}
-                                        buttonVariant="special-success"
-                                        wrapperClassName={cx("submenu")}
-                                        position="top-right"
-                                    >
-                                        {
-                                            options.map((option, index) => (
-                                                <Dropdown.Item key={index}>
-                                                    {option._id}
-                                                    <Dropdown.Submenu
-                                                        position="right-top"
-                                                        className={cx("submenu")}
-                                                    >
-                                                        {
-                                                            option.categories.map((category, index) => (
-                                                                <Dropdown.Item key={index} onClick={() => setCategoryName({ name: category.name, value: category._id })}>
-                                                                    {category.name}
-                                                                </Dropdown.Item>
-                                                            ))
-                                                        }
-                                                    </Dropdown.Submenu>
-                                                </Dropdown.Item>
-                                            ))
-                                        }
-                                    </Dropdown>
+                                    <Select
+                                        onChange={handleChange}
+                                        value={categoryName}
+                                        showSearch
+                                        placeholder="Chọn loại sản phẩm"
+                                        optionFilterProp="children"
+                                        filterOption={filterOption}
+                                        options={options}
+                                    />
                                 </div>
                             </div>
                             <div className={cx('buttons')}>
                                 <p>
-                                    <Button primary>Lưu thay đổi</Button>
+                                    <Button disabled={!isChanged} primary>Lưu thay đổi</Button>
                                 </p>
                             </div>
                         </form>
