@@ -481,6 +481,7 @@ function ProgressChart() {
                                 }
                                 strokeWidth={6}
                                 styles={{
+                                    
                                     path: {
                                         stroke: systemKpi.kpi
                                             ? doanhthukpi < systemKpi.kpi

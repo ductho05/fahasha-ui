@@ -5,9 +5,10 @@ import classNames from 'classnames/bind';
 import SizeContext from 'antd/es/config-provider/SizeContext';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 const { Meta } = Card;
-function SimpleItem({ onClick, props }) {
+function SimpleItem({ onClick, props, type }) {
     const { title, image, sold, isLoading } = props;
-
+    //console.log('props', type);
+    // option = type == 'static' ? 'Doanh thu' : 'Tồn kho ';
     const cx = classNames.bind(styles);
     return isLoading == false ? (
         <Card
@@ -28,7 +29,7 @@ function SimpleItem({ onClick, props }) {
             }}
             cover={<LazyLoadImage effect="blur" alt="example" src={image} style={{ height: '130px', width: 'auto' }} />}
         >
-            <div className={cx('text-container')}>{`[Tồn kho: ${sold}] ${title}`}</div>
+            <div className={cx('text-container')}>{`[${type}: ${sold}] ${title}`}</div>
             <div className={cx('text-container')}></div>
         </Card>
     ) : (
