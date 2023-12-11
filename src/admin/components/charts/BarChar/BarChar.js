@@ -4,7 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'rec
 import images from '../../../../assets/images';
 import { autocompleteClasses } from '@mui/material';
 import SimpleItem from '../../SimpleItem';
-import { authInstance } from '../../../../utils/axiosConfig';
+import { getAuthInstance } from '../../../../utils/axiosConfig';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 
 import { useEffect } from 'react';
