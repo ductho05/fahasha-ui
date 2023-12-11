@@ -61,7 +61,7 @@ function BarChartExample() {
     const [pointSale, setPointSale] = useState(getTimeData().current_point_sale);
     useEffect(() => {
         setIsLoading(true);
-        authInstance
+        getAuthInstance()
             .get(`${api}/flashsales?sort=reverse&date=${date}&point=${pointSale == -1 ? '' : pointSale}`)
             .then((result) => {
                 setRows(result.data.data);
