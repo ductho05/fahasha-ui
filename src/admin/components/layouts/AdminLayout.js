@@ -38,6 +38,7 @@ function AdminLayout({ children }) {
             },
     );
     const [percent, setPercent] = useState(0);
+    const num = 10;
     const [data2, setData2] = useState(
         Object.keys(data).length !== 0
             ? data
@@ -98,7 +99,7 @@ function AdminLayout({ children }) {
         });
         if (Object.keys(data).length === 0) {
             setIsLoaded([false, false]);
-            fetch(`${api}/products?filter=sold&sort=asc`)
+            fetch(`${api}/products?filter=sold&sort=asc&num=${num}`)
                 .then((response) => {
                     return response.json();
                 })

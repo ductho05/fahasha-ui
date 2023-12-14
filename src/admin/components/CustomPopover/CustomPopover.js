@@ -19,7 +19,7 @@ import {
     Switch,
     Upload,
 } from 'antd';
-const App = ({ isToggle, func, props }) => {
+const App = ({ maxProduct, func, props, type }) => {
     const [clicked, setClicked] = useState(false);
 
     const [selectedDate, setSelectedDate] = useState(null);
@@ -29,11 +29,11 @@ const App = ({ isToggle, func, props }) => {
     };
     const formItemLayout = {
         labelCol: {
-            span: 10,
+            span: 7,
         },
 
         wrapperCol: {
-            span: 12,
+            span: 13,
         },
     };
     const { Option } = Select;
@@ -56,8 +56,10 @@ const App = ({ isToggle, func, props }) => {
     };
     const onFinish = (values) => {
         values.date_sale = formatDateToString(selectedDate);
+        values.time = values.time ? values.time.format('YYYY-MM') : null;
         func(values);
         setClicked(false);
+        console.log('Received values of form: ', values);
     };
     const hoverContent = (
         <>
@@ -67,66 +69,94 @@ const App = ({ isToggle, func, props }) => {
                 {...formItemLayout}
                 style={{
                     margin: '20px 0 0 0',
-                    minWidth: 250,
+                    minWidth: 300,
                 }}
             >
                 {' '}
-                <Form.Item
-                    name="point_sale"
-                    label="Khung giờ"
-                    hasFeedback
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Vui lòng chọn một khung giờ!',
-                        },
-                    ]}
-                >
-                    <Select placeholder="Chọn giờ">
-                        <Option key={0} value={-1}>
-                            Cả ngày
-                        </Option>
-                        {Array.from({ length: 8 }).map((_, i) => (
-                            <Option key={i + 1} value={i}>{`${i * 3}h - ${(i + 1) * 3}h`}</Option>
-                        ))}
-                    </Select>
-                </Form.Item>
-                <Form.Item
-                    name="date_sale"
-                    label="Ngày"
-                    rules={[
-                        {
-                            type: 'object',
-                            required: true,
-                            message: 'Chọn ngày giảm giá!',
-                        },
-                    ]}
-                >
-                    <DatePicker
-                        placeholder="Chọn ngày"
-                        showToday={false}
-                        selected={selectedDate}
-                        onChange={handleDateChange}
-                    />
-                </Form.Item>
-                {/* <Form.Item
-                    name="date_sale"
-                    label="đến Ngày"
-                    rules={[
-                        {
-                            type: 'object',
-                            required: true,
-                            message: 'Chọn ngày giảm giá!',
-                        },
-                    ]}
-                >
-                    <DatePicker
-                        placeholder="Chọn ngày"
-                        showToday={false}
-                        selected={selectedDate}
-                        onChange={handleDateChange}
-                    />
-                </Form.Item> */}
+                {type == 'static' ? (
+                    <>
+                        <Form.Item
+                            name="num"
+                            label="Số lượng"
+                            hasFeedback
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Vui lòng chọn số sản phẩm!',
+                                },
+                                {
+                                    type: 'number',
+                                    min: 2,
+                                    max: maxProduct < 2 ? 5 : maxProduct,
+                                    message: 'Nhập số lượng từ 2 - ' + `${maxProduct < 2 ? 5 : maxProduct}`,
+                                },
+                            ]}
+                        >
+                            <InputNumber placeholder="Chọn số lượng" />
+                        </Form.Item>
+                        <Form.Item
+                            name="time"
+                            label="Thời gian"
+                            rules={[
+                                {
+                                    type: 'object',
+                                    required: true,
+
+                                    message: 'Chọn thời gian',
+                                },
+                            ]}
+                        >
+                            <DatePicker
+                                picker="month"
+                                placeholder="Chọn tháng"
+                                showToday={false}
+                                selected={selectedDate}
+                                onChange={handleDateChange}
+                            />
+                        </Form.Item>{' '}
+                    </>
+                ) : (
+                    <>
+                        <Form.Item
+                            name="point_sale"
+                            label="Khung giờ"
+                            hasFeedback
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Vui lòng chọn một khung giờ!',
+                                },
+                            ]}
+                        >
+                            <Select placeholder="Chọn giờ">
+                                <Option key={0} value={-1}>
+                                    Cả ngày
+                                </Option>
+                                {Array.from({ length: 8 }).map((_, i) => (
+                                    <Option key={i + 1} value={i}>{`${i * 3}h - ${(i + 1) * 3}h`}</Option>
+                                ))}
+                            </Select>
+                        </Form.Item>
+                        <Form.Item
+                            name="date_sale"
+                            label="Ngày"
+                            rules={[
+                                {
+                                    type: 'object',
+                                    required: true,
+                                    message: 'Chọn ngày giảm giá!',
+                                },
+                            ]}
+                        >
+                            <DatePicker
+                                placeholder="Chọn ngày"
+                                showToday={false}
+                                selected={selectedDate}
+                                onChange={handleDateChange}
+                            />
+                        </Form.Item>{' '}
+                    </>
+                )}
                 <Form.Item
                     wrapperCol={{
                         span: 10,
@@ -145,7 +175,7 @@ const App = ({ isToggle, func, props }) => {
     return (
         <Popover
             content={<div>{hoverContent}</div>}
-            title="Bộ lọc thời gian"
+            title="Bộ lọc"
             placement="bottomRight"
             trigger="click"
             open={clicked}

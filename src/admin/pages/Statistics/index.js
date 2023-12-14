@@ -9,13 +9,18 @@ import DropMenu from '../../../components/DropMenu';
 import OrdersLatesTable from '../../components/OrdersLatesTable/OrdersLatesTable';
 import { api } from '../../../constants';
 import axios from 'axios';
-import { DatePicker, Space, Image, Button, Typography, message } from 'antd';
+import { DatePicker, Space, Image, Button, Typography, message,  Alert, Spin  } from 'antd';
 import { getAuthInstance } from '../../../utils/axiosConfig';
 import dayjs from 'dayjs';
+import { useNavigate } from 'react-router-dom';
 import { set } from 'react-hook-form';
+import BarChartExample from '../../components/charts/BarCharForStatic/BarCharForStatic';
+import EnhancedTable from '../../components/Table/EnhancedTable';
+
 const moment = require('moment-timezone');
 const cx = classNames.bind(styles);
 const { Text, Link } = Typography;
+
 // fetch data
 
 const options = [
@@ -129,17 +134,241 @@ function Statistics() {
     const [optionSelected, setOptionSelected] = useState(options[0]);
     const { RangePicker } = DatePicker;
     const dateFormat = 'YYYY/MM/DD';
+    const [spin, setSpin] = useState(false);
     //const rangeValue = fieldsValue['range-picker'];
     const [doanhthucustom, setDoanhThuCustom] = useState(0);
     const [start, setStart] = useState(formatDateToString(new Date()));
     const [end, setEnd] = useState(formatDateToString(new Date()));
+    const [numProduct, setNumProduct] = useState(5);
+    const [month, setMonth] = useState(new Date().getMonth() + 1);
+    const [year, setYear] = useState(new Date().getFullYear());
+    const [maxProduct, setMaxProduct] = useState(0); // số lượng sản phẩm trong tháng
     const num = 5;
+    const [rows, setRows] = useState([]);
+    const moment = require('moment-timezone');
+    // Đặt múi giờ cho Việt Nam
+    const vietnamTimeZone = 'Asia/Ho_Chi_Minh';
+    // Lấy thời gian hiện tại ở Việt Nam
+    const currentTimeInVietnam = moment().tz(vietnamTimeZone);
+    // Lấy số giờ hiện tại
+    const currentHourInVietnam = currentTimeInVietnam.get('hours');
     const [dataIncomes, setDataIncomes] = useState([]);
     const [top_usert, setTopUser] = useState([]);
-    console.log('totalToday1213', dataIncomes);
-    console.log('optionSelected1212', 'a');
+    const [top_products, setTopProducts] = useState([]);
+    const [isLoadingProduct, setIsLoadingProduct] = useState(false);
+    const spaceSizeCol = [30, 150, 80, 80, 70, 60, 80, 30, 80, 160];
+    const navigate = useNavigate();
+    console.log('top_products212', top_products);
+    const columns = [
+        {
+            field: 'rowNumber',
+            headerName: 'STT',
+            width: spaceSizeCol[0],
+            sortable: false,
+            editable: false,
+            headerAlign: 'center',
+            renderCell: (params) => {
+                return (
+                    <>
+                        <p
+                            style={{
+                                padding: '0 0 0 10px',
+                            }}
+                        >
+                            {params.value}
+                        </p>
+                    </>
+                );
+            },
+        },
+        {
+            field: 'user',
+            headerName: 'Tên khách hàng',
+            width: spaceSizeCol[1],
+            sortable: false,
+            editable: false,
 
-    console.log('userordersThisMonth', top_usert);
+            // renderCell: (params) => {
+            //     return (
+            //         <>
+            //             <p className={cx('text-container')}>
+            //                 {params.value.title ? params.value.title : '[Không có thông tin]'}
+            //             </p>
+            //         </>
+            //     );
+            // },
+        },
+
+        // {
+        //     field: 'point_sale',
+        //     headerName: 'Khung giờ',
+        //     sortable: true,
+        //     editable: false,
+        //     width: spaceSizeCol[2],
+        //     renderCell: (params) => {
+        //         return (
+        //             <p>{`${params.value * 3 < 10 ? `0${params.value * 3}` : params.value * 3}h - ${
+        //                 (params.value + 1) * 3 < 10 ? `0${(params.value + 1) * 3}` : (params.value + 1) * 3
+        //             }h`}</p>
+        //         );
+        //     },
+        // },
+        // {
+        //     field: 'date_sale',
+        //     headerName: 'Ngày sale',
+        //     sortable: true,
+        //     editable: false,
+        //     width: spaceSizeCol[3],
+        //     renderCell: (params) => {
+        //         return <p>{params.value}</p>;
+        //     },
+        // },
+        // {
+        //     field: 'num_sale',
+        //     headerName: 'Số lượng',
+        //     sortable: true,
+        //     editable: false,
+        //     width: spaceSizeCol[4],
+        // },
+        // {
+        //     field: 'sold_sale',
+        //     headerName: 'Đã bán',
+        //     sortable: true,
+        //     editable: false,
+        //     width: spaceSizeCol[5],
+        // },
+
+        // {
+        //     field: 'current_sale',
+        //     headerName: 'Đang sale',
+        //     editable: false,
+        //     sortable: true,
+        //     width: spaceSizeCol[6],
+        //     renderCell: (params) => {
+        //         return <p>{params.value} %</p>;
+        //     },
+        // },
+        // {
+        //     field: 'is_loop',
+        //     headerName: 'Lặp',
+        //     editable: false,
+        //     sortable: true,
+        //     width: spaceSizeCol[7],
+        //     renderCell: (params) => {
+        //         return <p>{params.value === true ? 'Có' : 'Không'}</p>;
+        //     },
+        // },
+        // {
+        //     headerName: 'Trạng thái',
+        //     sortable: false,
+        //     editable: false,
+        //     width: spaceSizeCol[8],
+        //     renderCell: (params) => {
+        //         const currentDate = new Date();
+        //         let current_point_sale = Math.floor(currentHourInVietnam / 3);
+        //         const year = currentDate.getUTCFullYear();
+        //         const month = (currentDate.getUTCMonth() + 1).toString().padStart(2, '0');
+        //         const day = currentDate.toString().slice(8, 10);
+        //         const utcTimeString = `${year}-${month}-${day}`;
+        //         let toDay = utcTimeString;
+
+        //         return (
+        //             <p
+        //                 className={
+        //                     params.row.date_sale == toDay && params.row.point_sale == current_point_sale
+        //                         ? cx('flashSaleText')
+        //                         : params.row.date_sale > toDay ||
+        //                           (params.row.date_sale == toDay && params.row.point_sale > current_point_sale)
+        //                         ? cx('noflashSaleText')
+        //                         : cx('')
+        //                 }
+        //             >
+        //                 {params.row.date_sale == toDay && params.row.point_sale == current_point_sale
+        //                     ? 'FlashSale'
+        //                     : params.row.date_sale > toDay ||
+        //                       (params.row.date_sale == toDay && params.row.point_sale > current_point_sale)
+        //                     ? 'Đang đợi'
+        //                     : 'Hết hạn'}
+        //             </p>
+        //         );
+        //     },
+        // },
+        // {
+        //     field: 'action',
+        //     headerName: 'Hành động',
+        //     sortable: true,
+        //     editable: false,
+        //     headerAlign: 'marginLeft',
+        //     width: spaceSizeCol[9],
+        //     // renderCell: (params) => {
+        //     //     const currentDate = new Date();
+
+        //     //     let current_point_sale = Math.floor(currentHourInVietnam / 3);
+        //     //     const year = currentDate.getUTCFullYear();
+        //     //     const month = (currentDate.getUTCMonth() + 1).toString().padStart(2, '0');
+        //     //     const day = currentDate.toString().slice(8, 10);
+        //     //     const utcTimeString = `${year}-${month}-${day}`;
+        //     //     let toDay = utcTimeString;
+
+        //     //     return (
+        //     //         <>
+        //     //             <Button
+        //     //                 type="primary"
+        //     //                 ghost
+        //     //                 style={{
+        //     //                     margin: '0 10px 0 0',
+        //     //                 }}
+        //     //                 onClick={() => {
+        //     //                     navigate(`/admin/flashsale/${params.row._id}`);
+        //     //                 }}
+        //     //             >
+        //     //                 Chi tiết
+        //     //             </Button>
+
+        //     //             <CustomPopconfirm
+        //     //                 title="Xóa flashsale?"
+        //     //                 description="Không hiển thị lại thông báo này"
+        //     //                 props={{
+        //     //                     disable:
+        //     //                         params.row.date_sale == toDay && params.row.point_sale == current_point_sale
+        //     //                             ? true
+        //     //                             : params.row.date_sale > toDay ||
+        //     //                               (params.row.date_sale == toDay && params.row.point_sale > current_point_sale)
+        //     //                             ? false
+        //     //                             : false,
+        //     //                     isloadingdelete: isloadingdelete,
+        //     //                 }}
+        //     //                 func={() => {
+        //     //                     setIsloadingdetele(true);
+        //     //                     fetch(`${api}/flashsales/delete/${params.row._id}`, {
+        //     //                         method: 'GET',
+        //     //                     })
+        //     //                         .then((response) => response.json())
+        //     //                         .then((result) => {
+        //     //                             if (result.status == 'OK') {
+        //     //                                 //localStorage.setItem('isFlashsaleLoading', true);
+        //     //                                 setData({
+        //     //                                     ...JSON.parse(data),
+        //     //                                     flashsales: JSON.parse(data).flashsales.filter(
+        //     //                                         (item) => item._id != params.row._id,
+        //     //                                     ),
+        //     //                                 });
+        //     //                                 setRows(
+        //     //                                     JSON.parse(data).flashsales.filter(
+        //     //                                         (item) => item._id != params.row._id,
+        //     //                                     ),
+        //     //                                 );
+        //     //                             }
+        //     //                             setIsloadingdetele(false);
+        //     //                         })
+        //     //                         .catch((err) => console.log(err));
+        //     //                 }}
+        //     //             />
+        //     //         </>
+        //     //     );
+        //     // },
+        // },
+    ];
     const addCommasToNumber = (number) => {
         // Chuyển đổi số thành chuỗi
         const numberString = number.toString();
@@ -173,6 +402,63 @@ function Statistics() {
     };
 
     const [messageApi, contextHolder] = message.useMessage();
+
+    useEffect(() => {
+        setSpin(true);
+        authInstance.get(`/orderitems`).then((res) => {
+            const today = new Date();
+            // lấy tất cả những đơn hàng trong tháng này
+            const orderitems = res.data.data;
+
+            const ordersThisMonth = orderitems.filter((order) => {
+                if (order.order != null) {
+                    return (
+                        formatDateToString(new Date(order.order.date)) <=
+                            formatDateToString(
+                                new Date(today.getFullYear(), month ? month + 1 : today.getMonth() + 1, 0),
+                            ) &&
+                        formatDateToString(new Date(order.order.date)) >=
+                            formatDateToString(new Date(today.getFullYear(), month ? month : today.getMonth(), 1))
+                    );
+                }
+            });
+            console.log('ordersThis12Mon21th', ordersThisMonth);
+            // lấy ra doanh thu của từng sản phẩm trong tháng
+            const productOrdersThisMonth = [];
+            const product = [];
+            // {
+            //     avatar: 'A',
+            //     name: 'phan van duc anh',
+            //     value: 250,
+            // },
+            ordersThisMonth.forEach((element) => {
+                if (productOrdersThisMonth.includes(element.product._id)) {
+                    product[productOrdersThisMonth.indexOf(element.product._id)].value += element.price;
+                    product[productOrdersThisMonth.indexOf(element.product._id)].orders.push(element.order);
+                } else {
+                    productOrdersThisMonth.push(element.product._id);
+                    product.push({
+                        id: element.product._id,
+                        avatar: element.product.images,
+                        name: element.product.title,
+                        value: element.price,
+                        orders: [element.order],
+                    });
+                }
+            });
+
+            // sắp xếp theo thứ tự giảm dần
+            product.sort((a, b) => {
+                return b.value - a.value;
+            });
+            setMaxProduct(product.length);
+            // lấy 5 sản phẩm đầu tiên
+            product.splice(numProduct, product.length - numProduct);
+
+            setTopProducts(product);
+            setSpin(false);
+        });
+    }, [isLoadingProduct]);
 
     useEffect(() => {
         authInstance.get(`/orders`).then((res) => {
@@ -215,6 +501,9 @@ function Statistics() {
             user.sort((a, b) => {
                 return b.value - a.value;
             });
+
+            // lấy 10 người đầu tiên
+            user.splice(10, user.length - 10);
             setTopUser(user);
 
             const ordersToday = orders.filter((order) => {
@@ -513,77 +802,209 @@ function Statistics() {
             </div>
 
             <div className={cx('bottom')}>
-                <div className={cx('left')}>
-                    <h3 className={cx('title')}>KHÁCH HÀNG THÂN THIẾT THÁNG {new Date().getMonth() + 1}</h3>
-                    <div className={cx('content_user')}>
-                        {top_usert.map((user, index) => (
-                            <div className={cx('user')} key={index}>
-                                <div className={cx('index')}>
-                                    <div
-                                        className={cx('frame')}
-                                        style={{
-                                            backgroundColor:
-                                                index == 0
-                                                    ? '#f44336'
-                                                    : index == 1
-                                                        ? '#ff9800'
-                                                        : index == 2
-                                                            ? '#ffc107'
-                                                            : '#4caf50',
-                                        }}
-                                    >
-                                        {index + 1}
-                                    </div>
-                                </div>
-                                <div className={cx('avatar')}>
-                                    <div className={cx('img')}>
-                                        <Image
-                                            src={user.avatar}
-                                            preview={false}
-                                            style={{
-                                                margin: 'auto',
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                                <div className={cx('name')}>{user.name}</div>
-                                <div className={cx('value')}>{addCommasToNumber(Math.ceil(user.value / 1000))}K</div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-                <div className={cx('right')}>
-                    <h3 className={cx('title')}>TRI ÂN KHÁCH HÀNG</h3>
-                    <div className={cx('content_user')}>
-                        <div className={cx('header')}>
-                            Trao quà cho top người dùng trên hệ thống vào cuối tháng {new Date().getMonth() + 1}
-                        </div>
-                        <div className={cx('body')}>
-                            {dataWidgets.map((widget, index) => (
-                                <div className={cx('phanthuong')} key={index}>
+                <div className={cx('user_static')}>
+                    <div className={cx('left')}>
+                        <h3 className={cx('title')}>KHÁCH HÀNG THÂN THIẾT THÁNG {new Date().getMonth() + 1}</h3>
+                        <div className={cx('content_user')}>
+                            {top_usert.map((user, index) => (
+                                <div className={cx('user')} key={index}>
                                     <div className={cx('index')}>
-                                        <li
+                                        <div
+                                            className={cx('frame')}
                                             style={{
-                                                color:
+                                                backgroundColor:
                                                     index == 0
                                                         ? '#f44336'
                                                         : index == 1
-                                                            ? '#ff9800'
-                                                            : index == 2
-                                                                ? '#ffc107'
-                                                                : '#4caf50',
+                                                        ? '#ff9800'
+                                                        : index == 2
+                                                        ? '#ffc107'
+                                                        : '#4caf50',
                                             }}
                                         >
-                                            Top {widget.top}: {widget.phanthuong}
-                                        </li>
+                                            {index + 1}
+                                        </div>
                                     </div>
-                                    <div className={cx('btn_trao')}>
-                                        <div className={cx('btn')}>Trao quà</div>
-                                    </div>{' '}
+                                    <div className={cx('avatar')}>
+                                        <div className={cx('img')}>
+                                            <Image
+                                                src={user.avatar}
+                                                preview={false}
+                                                style={{
+                                                    margin: 'auto',
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className={cx('name')}>{user.name}</div>
+                                    <div className={cx('value')}>
+                                        {addCommasToNumber(Math.ceil(user.value / 1000))}K
+                                    </div>
                                 </div>
                             ))}
                         </div>
                     </div>
+                    <div className={cx('right')}>
+                        <h3 className={cx('title')}>TRI ÂN KHÁCH HÀNG</h3>
+                        <div className={cx('content_user')}>
+                            <div className={cx('header')}>
+                                Trao quà cho top người dùng trên hệ thống vào cuối tháng {new Date().getMonth() + 1}
+                            </div>
+                            <div className={cx('body')}>
+                                {dataWidgets.map((widget, index) => (
+                                    <div className={cx('phanthuong')} key={index}>
+                                        <div className={cx('index')}>
+                                            <li
+                                                style={{
+                                                    color:
+                                                        index == 0
+                                                            ? '#f44336'
+                                                            : index == 1
+                                                            ? '#ff9800'
+                                                            : index == 2
+                                                            ? '#ffc107'
+                                                            : '#4caf50',
+                                                }}
+                                            >
+                                                Top {widget.top}: {widget.phanthuong}
+                                            </li>
+                                        </div>
+                                        <div
+                                            className={cx('btn_trao')}
+                                            onClick={() => {
+                                                const today = new Date();
+                                                // giá trị ngày cuối tháng
+                                                const newDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+                                                if (formatDateToString(today) != formatDateToString(newDate)) {
+                                                    info(
+                                                        'warning',
+                                                        `Chỉ được trao quà vào ngày ${formatDateToString(newDate)}`,
+                                                    );
+                                                }
+                                                // const user = top_usert[index];
+                                                else info('success', 'Trao quà thành công');
+                                            }}
+                                        >
+                                            <div className={cx('btn')}>Trao quà</div>
+                                        </div>{' '}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {/* <span className={cx('line')}></span> */}
+                <div className={cx('product_static')}>
+                    {' '}
+                    <div className={cx('right')}>
+                        <div className={cx('state')}>
+                            {
+                                <BarChartExample
+                                    spin={spin}
+                                    setTimeMonth={setMonth}
+                                    setTimeYear={setYear}
+                                    maxProduct={maxProduct}
+                                    setNumProduct={setNumProduct}
+                                    data={top_products.map((item) => {
+                                        return {
+                                            id: item?.id,
+                                            name: item?.name,
+                                            sold: item?.value,
+                                            imageURL: item?.avatar,
+                                        };
+                                    })}
+                                    isLoadingProduct={isLoadingProduct}
+                                    setIsLoadingProduct={setIsLoadingProduct}
+                                />
+                            }
+                        </div>
+                    </div>
+                    <div className={cx('left')}>
+                        <h3 className={cx('title')}>
+                            TOP {numProduct} SẢN PHẨM CÓ DOANH THU CAO TRONG THÁNG {month}/{year}
+                        </h3>
+                        <div className={cx('content_user')}>
+                            {spin ? (
+                                <div
+                                    style={{
+                                        width: '100%',
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        margin: 'auto',
+                                    }}
+                                >
+                                    <Spin size="large"></Spin>{' '}
+                                </div>
+                            ) : top_products.length == 0 ? (
+                                <div
+                                    style={{
+                                        width: '350px',
+                                        height: '400px',
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        margin: 'auto',
+                                    }}
+                                >
+                                    <Alert message="Không có dữ liệu" type="warning" showIcon />
+                                </div>
+                            ) : (
+                                top_products.map((user, index) => (
+                                    <div className={cx('user')} key={index}>
+                                        <div className={cx('index')}>
+                                            <div
+                                                className={cx('frame')}
+                                                style={{
+                                                    backgroundColor:
+                                                        index == 0
+                                                            ? '#f44336'
+                                                            : index == 1
+                                                            ? '#ff9800'
+                                                            : index == 2
+                                                            ? '#ffc107'
+                                                            : '#4caf50',
+                                                }}
+                                            >
+                                                {index + 1}
+                                            </div>
+                                        </div>
+                                        <div className={cx('avatar')}>
+                                            <div className={cx('img')}>
+                                                <Image
+                                                    src={user.avatar}
+                                                    preview={false}
+                                                    style={{
+                                                        margin: 'auto',
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className={cx('name')}>{user.name}</div>
+                                        <div className={cx('value')}>
+                                            {addCommasToNumber(Math.ceil(user.value / 1000))}K
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+                <div className={cx('table')}>
+                    <EnhancedTable
+                        ischeckboxSelection={false}
+                        columns={columns}
+                        rows={rows.map((row, index) => ({
+                            ...row,
+                            rowNumber: index + 1,
+                        }))}
+                        // func={setSuggestFlash}
+                        // isStatus={{
+                        //     isToggle: isToggle,
+                        // }}
+                        pageSize={12}
+                    />
                 </div>
             </div>
         </div>
