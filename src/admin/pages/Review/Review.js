@@ -6,6 +6,7 @@ import { Rating } from '@mui/material';
 import { api } from '../../../constants';
 import LinearProgress from '@mui/material/LinearProgress';
 import { Skeleton } from 'antd';
+import { useData } from '../../../stores/DataContext';
 
 const cx = classNames.bind(styles);
 
@@ -49,19 +50,10 @@ function Review() {
 
     const [rows, setRows] = useState([])
     const [loading, setLoading] = useState(false)
+    const { data, setData } = useData()
 
     useEffect(() => {
-        setLoading(true)
-        fetch(`${api}/evaluates/get`)
-            .then(response => response.json())
-            .then(result => {
-                setLoading(false)
-                setRows(result.data)
-            })
-            .catch(err => {
-                setLoading(false)
-                console.log(err)
-            })
+        setRows(data.evaluates)
     }, [])
 
     return (

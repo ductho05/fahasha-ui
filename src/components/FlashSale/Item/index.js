@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import StarRoundedIcon from '@mui/icons-material/StarRounded';
 import { ShoppingCartOutlined } from '@ant-design/icons';
 import { faMinus, faPlus, faShareNodes, faStar, faCartShopping, faArrowRight } from '@fortawesome/free-solid-svg-icons';
-import { Progress, Button, Image } from 'antd';
+import { Progress, Button, Image, message } from 'antd';
 import { useStore } from '../../../stores/hooks';
 import { toast, ToastContainer } from 'react-toastify';
 import { Dialog } from '@mui/material';
@@ -78,13 +78,18 @@ function Item({ item, index, type, filter }) {
         navigate('/login-register');
     };
 
-    const handleAddToCart = (productId) => {
-        console.log('A');
+    const handleAddToCart = (product) => {
+
         if (Object.keys(state.user).length > 0) {
-            console.log('AN');
-            addCart(1, productId);
-            toast.success('Đã thêm sản phẩm vào giỏ hàng!');
-            //setIsShowDialog(!isShowDialog);
+
+            if (product.quantity == 0) {
+
+                message.warning("Sản phẩm tạm thời hết hàng")
+            } else {
+                addCart(1, product._id)
+                toast.success('Đã thêm sản phẩm vào giỏ hàng!')
+            }
+
         } else {
             console.log('AAN');
             setShowNolginDialog(true);
@@ -189,7 +194,7 @@ function Item({ item, index, type, filter }) {
                                 <div
                                     className={cx('item-content__gettocart')}
                                     onClick={() => {
-                                        handleAddToCart(item.product?._id);
+                                        handleAddToCart(item.product);
                                     }}
                                 >
                                     <ShoppingCartOutlined style={{ fontSize: '2rem', color: 'green' }} />

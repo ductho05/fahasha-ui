@@ -23,7 +23,7 @@ import {
     Switch,
     Upload,
 } from 'antd';
-import { api } from '../../../constants';
+import { api, appPath, flashSaleImage } from '../../../constants';
 import { set } from 'react-hook-form';
 import { useData } from '../../../stores/DataContext';
 import { getAuthInstance } from "../../../utils/axiosConfig"
@@ -91,7 +91,7 @@ function FlashSaleForm({ props, hideFunc }) {
         i == true && setShowProgress(false);
     };
 
-    const addFlashSale = (values, products) => {
+    const addFlashSale = async (values, products) => {
         let loop = 0,
             small_loop = 0;
         //console.log(values);
@@ -119,7 +119,7 @@ function FlashSaleForm({ props, hideFunc }) {
         products.map((item) => {
             values.point_sale == -1 &&
                 values.is_loop == true &&
-                small_time_points_filter.map((point) => {
+                small_time_points_filter.map(async (point) => {
                     const data = {
                         current_sale: values.current_sale,
                         num_sale: values.num_sale,
@@ -131,7 +131,7 @@ function FlashSaleForm({ props, hideFunc }) {
                     };
 
                     //console.log('data1', data);
-                    authInstance.post(`/flashsales/add`, data)
+                    await authInstance.post(`/flashsales/add`, data)
                         .then((result) => {
                             if (result.data.status == 'OK') {
                                 //addFlashsaleToLocal(result.data);
@@ -145,7 +145,9 @@ function FlashSaleForm({ props, hideFunc }) {
                                         title: 'Thiết đặt thành công',
                                         subTitle:
                                             'Vui lòng nhấn [Tiếp tục] để tiếp tục thiết đặt hoặc nhấn [Quản lý] để đến trang quản lý Sales Off!',
-                                    });
+                                    })
+
+
                             } else {
                                 setShowProgress(false);
                                 hideFunc({

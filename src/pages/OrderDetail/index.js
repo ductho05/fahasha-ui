@@ -68,6 +68,18 @@ function OrderDetail() {
         })
             .then(result => {
                 if (result.data.status === "OK") {
+
+                    orderItems.forEach(async item => {
+
+                        await authInstance.put(`/products/update/${item.product._id}`, {
+                            quantity: item.quantity + item.product.quantity,
+                            sold: item.product.sold - item.quantity
+                        })
+                            .catch(error => {
+                                console.error(error);
+                            })
+                    })
+
                     const title = "Thông báo đơn hàng"
                     const description = `${state.user.fullName} vừa hủy đơn hàng`
                     const image = cancelOrderImage
@@ -91,7 +103,17 @@ function OrderDetail() {
                     )
                         .then(result => {
                             if (result.data.status === "OK") {
-
+                                state.socket.emit("send-notification", {
+                                    type: "admin",
+                                    userId: null,
+                                    notification: {
+                                        title,
+                                        description,
+                                        image: cancelOrderImage,
+                                        url,
+                                        user: null
+                                    }
+                                })
                             }
                         })
                         .catch(err => {

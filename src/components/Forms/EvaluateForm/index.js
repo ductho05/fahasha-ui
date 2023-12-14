@@ -58,7 +58,17 @@ function EvaluateForm({ totalRate, fetch, setShow, product, orderItem }) {
         })
             .then(result => {
                 if (result.data.status === "OK") {
-                    state.socket.emit("send-notification")
+                    state.socket.emit("send-notification", {
+                        type: "admin",
+                        userId: null,
+                        notification: {
+                            title,
+                            description,
+                            image,
+                            url,
+                            user: null
+                        }
+                    })
                 }
             })
             .catch(err => {

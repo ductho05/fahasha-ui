@@ -203,12 +203,23 @@ function CheckOut() {
                     )
                         .then(result => {
                             if (result.data.status === "OK") {
-
+                                state.socket.emit("send-notification", {
+                                    type: "admin",
+                                    userId: null,
+                                    notification: {
+                                        title,
+                                        description,
+                                        image,
+                                        url,
+                                        user: null
+                                    }
+                                })
                             }
                         })
                         .catch(err => {
                             console.error(err)
                         })
+
                 } else {
                     setShowProgress(false);
                     navigate(`/order-success/err-E99`);

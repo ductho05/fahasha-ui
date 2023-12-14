@@ -15,6 +15,7 @@ import { DatePicker, Select } from 'antd';
 
 import { Skeleton } from 'antd';
 import { getAuthInstance } from '../../../utils/axiosConfig'
+import { useData } from '../../../stores/DataContext'
 
 const cx = classNames.bind(styles)
 
@@ -31,6 +32,7 @@ function UpdateProduct() {
     const [isAction, setIsAction] = React.useState(false)
     const [isChanged, setIsChanged] = React.useState(false)
     const [success, setSuccess] = React.useState(false)
+    const { data, setData } = useData();
     const [categoryName, setCategoryName] = React.useState({
         name: "--Chọn loại sản phẩm--",
         value: ""
@@ -76,6 +78,23 @@ function UpdateProduct() {
             })
     }, [success])
 
+    const fetchProduct = () => {
+
+        fetch(`${api}/products`)
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === "OK") {
+
+                    console.log("fetch lai")
+                    setData({ ...data, products: result.data })
+                }
+            })
+            .catch(error => {
+
+                console.log(error.message)
+            })
+    }
+
     React.useEffect(() => {
         Object.keys(product).forEach(key => {
             setValue(key, product[key])
@@ -85,11 +104,9 @@ function UpdateProduct() {
             value: product.categoryId?._id
         })
         setPublished(product.published_date)
-        console.log(watch())
     }, [product])
 
     const handleDate = (date, dateString) => {
-        console.log(dateString)
         setPublished(dateString)
     }
 
@@ -127,6 +144,7 @@ function UpdateProduct() {
                 if (result.data.status === "OK") {
                     toast.success('Cập nhật sản phẩm thành công!')
                     setSuccess(prev => !prev)
+                    fetchProduct()
                 } else {
                     toast.error(result.data.message)
                 }

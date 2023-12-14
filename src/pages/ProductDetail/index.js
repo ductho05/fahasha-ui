@@ -26,6 +26,7 @@ import EvaluateForm from '../../components/Forms/EvaluateForm';
 import LikeDislike from '../../components/LikeDislike';
 import Skeleton from '@mui/material/Skeleton';
 import { CheckCircleFilled, CheckCircleOutlined, StopFilled } from '@ant-design/icons';
+import { message } from 'antd';
 
 const cx = classNames.bind(styles);
 
@@ -195,9 +196,17 @@ function ProductDetail() {
         });
     };
     const handlePlus = () => {
-        setCurrentQuantity((prev) => {
-            return prev + 1;
-        });
+        if (product.quantity == 0) {
+
+            message.warning("Sản phẩm tạm thời hết hàng!")
+        } else if (product.quantity - (currentQuantity) == 0) {
+
+            message.warning("Vui lòng không đặt quá số lượng trong kho")
+        } else {
+            setCurrentQuantity((prev) => {
+                return prev + 1;
+            });
+        }
     };
 
     let handleLogin = () => {
@@ -363,10 +372,10 @@ function ProductDetail() {
                                 <img src={product.images} />
                             </div>
                             <div className={cx('product_btn', 'hide_on_tablet_mobile')}>
-                                <Button onClick={handleAddToCart} leftIcon={<FontAwesomeIcon icon={faCartShopping} />}>
+                                <Button disabled={product.quantity == 0} onClick={handleAddToCart} leftIcon={<FontAwesomeIcon icon={faCartShopping} />}>
                                     Thêm vào giỏ hàng
                                 </Button>
-                                <Button onClick={handleBuyNow} primary>
+                                <Button disabled={product.quantity == 0} onClick={handleBuyNow} primary>
                                     Mua ngay
                                 </Button>
                             </div>
@@ -440,15 +449,15 @@ function ProductDetail() {
                             <div className="flex items-center mt-[20px]">
                                 <div className={`flex items-center p-[10px] rounded-[6px] ${product.sold == product.quantity ? "bg-[#f2f4f5] text-[#7a7e7f]" : "bg-[rgba(201,33,39,0.06)] text-[#c92127]"}`}>
                                     {
-                                        product.sold == product.quantity ? <StopFilled /> : <CheckCircleFilled />
+                                        product.quantity === 0 ? <StopFilled /> : <CheckCircleFilled />
                                     }
                                     <p className="font-[600] ml-[10px]">
                                         {
-                                            product.sold == product.quantity ? "Hết hàng" : "Còn hàng"
+                                            product.quantity === 0 ? "Hết hàng" : "Còn hàng"
                                         }
                                     </p>
                                 </div>
-                                <p className="text-[14px] ml-[10px] text-[#7a7e7f] font-[500]">{product.quantity - product.sold} sản phẩm có sẵn</p>
+                                <p className="text-[14px] ml-[10px] text-[#7a7e7f] font-[500]">{product.quantity} sản phẩm có sẵn</p>
                             </div>
                         </div>
                     </div>

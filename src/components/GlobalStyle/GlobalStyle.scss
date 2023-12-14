@@ -88,3 +88,21 @@ body {
 .slick-active {
     background-color: #c92127 !important;
 }
+
+.ant-tabs-nav {
+    justify-content: flex-start;
+    align-items: flex-start;
+    max-height: 100vh;
+}
+
+.ant-notification-notice-description {
+    margin-left: 60px;
+}
+
+.ant-notification-notice-message {
+    margin-left: 60px;
+}
+
+.ant-notification-notice-icon {
+    top: 6px;
+}

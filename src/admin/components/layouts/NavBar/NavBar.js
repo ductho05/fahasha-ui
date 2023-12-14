@@ -69,8 +69,8 @@ function NavBar() {
     return (
         <div className={cx('wrapper')}>
             <Dialog open={expired}>
-                <div className={cx('dialog_end_session_login')}>
-                    <h1 className={cx('notice')}>Đã hết phiên đăng nhập. Vui lòng đăng nhập lại</h1>
+                <div className={cx('p-[20px] flex flex-col items-center justify-center')}>
+                    <h1 className={cx('uppercase text-[#c92127]')}>Đã hết phiên đăng nhập. Vui lòng đăng nhập lại</h1>
                     <RegisterLogin
                         setShowForm={setIsShowForm}
                         indexForm={indexForm}

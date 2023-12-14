@@ -5,6 +5,8 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import styles from './FlashSaleModal.module.scss';
 import FlashSaleForm from '../FlashSaleForm';
 import { useNavigate } from 'react-router-dom';
+import { useStore } from '../../../stores/hooks'
+import { api, appPath, flashSaleImage } from '../../../constants';
 // import Abc from './Abc';
 
 const FlashSaleModal = ({ props, handelLoading, func, isStatus, style }) => {
@@ -12,6 +14,7 @@ const FlashSaleModal = ({ props, handelLoading, func, isStatus, style }) => {
     const [open, setOpen] = useState(false);
     const [hideForm, setHideForm] = useState(false);
     const [stateResult, setStateResult] = useState({});
+    const [state, dispatch] = useStore()
     const navigate = useNavigate();
     //console.log('props', props);
     const showModal = () => {
@@ -52,36 +55,36 @@ const FlashSaleModal = ({ props, handelLoading, func, isStatus, style }) => {
                         extra={
                             stateResult.status == 'success'
                                 ? [
-                                      <Button
-                                          key={stateResult.status}
-                                          type="primary"
-                                          onClick={() => {
-                                              //handelLoading && handelLoading();
+                                    <Button
+                                        key={stateResult.status}
+                                        type="primary"
+                                        onClick={() => {
+                                            //handelLoading && handelLoading();
 
-                                              handleCancel();
-                                          }}
-                                      >
-                                          Tiếp tục
-                                      </Button>,
-                                      <Button
-                                          key="buy"
-                                          onClick={() => {
-                                              navigate('/admin/flashsale');
-                                          }}
-                                      >
-                                          Quản lý
-                                      </Button>,
-                                  ]
+                                            handleCancel();
+                                        }}
+                                    >
+                                        Tiếp tục
+                                    </Button>,
+                                    <Button
+                                        key="buy"
+                                        onClick={() => {
+                                            navigate('/admin/flashsale');
+                                        }}
+                                    >
+                                        Quản lý
+                                    </Button>,
+                                ]
                                 : [
-                                      <Button
-                                          key={stateResult.status}
-                                          onClick={() => {
-                                              handleCancel();
-                                          }}
-                                      >
-                                          Thử lại
-                                      </Button>,
-                                  ]
+                                    <Button
+                                        key={stateResult.status}
+                                        onClick={() => {
+                                            handleCancel();
+                                        }}
+                                    >
+                                        Thử lại
+                                    </Button>,
+                                ]
                         }
                     />
                 ) : (

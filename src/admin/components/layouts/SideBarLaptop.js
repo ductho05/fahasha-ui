@@ -13,6 +13,7 @@ import LoyaltyIcon from '@mui/icons-material/Loyalty';
 import AccountBoxOutlinedIcon from '@mui/icons-material/AccountBoxOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import ReviewsIcon from '@mui/icons-material/Reviews';
+import CategoryIcon from '@mui/icons-material/Category';
 import { Tooltip } from 'antd'
 
 const tabList = [
@@ -50,8 +51,9 @@ const tabList = [
             },
             {
                 id: 4,
-                icon: LocalShippingOutlinedIcon,
-                name: 'Vận chuyển',
+                icon: CategoryIcon,
+                name: 'Loại sản phẩm',
+                link: '/admin/categories'
             },
             {
                 id: 5,

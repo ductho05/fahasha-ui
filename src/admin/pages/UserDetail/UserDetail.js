@@ -13,6 +13,7 @@ import { api } from '../../../constants';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getAuthInstance } from '../../../utils/axiosConfig';
+import { useData } from '../../../stores/DataContext';
 
 const cx = classNames.bind(styles);
 const dataIncomes = [
@@ -77,6 +78,7 @@ function UserDetail() {
     const [orders, setOrders] = useState([]);
     const [ischanged, setIsChanged] = useState(false)
     const [loading, setLoading] = useState(false)
+    const { data, setData } = useData()
 
     const handleClickEdit = () => {
         setShowDialog(true);
@@ -90,7 +92,19 @@ function UserDetail() {
         clearErrors();
         setAvatar({});
         setShowDialog(false);
-    };
+    }
+
+    const fetchUsers = () => {
+
+        authInstance.get(`/users`)
+            .then(result => {
+                setData({ ...data, users: result.data.data })
+            })
+            .catch(err => {
+
+                console.log(err)
+            })
+    }
 
     useEffect(() => {
         authInstance.get(`/users/${userId}`)
@@ -175,7 +189,7 @@ function UserDetail() {
 
     }, [watch(), avatar])
 
-    const handleSave = (data) => {
+    const handleSave = async (data) => {
         const formData = new FormData();
         Object.keys(data).forEach((key) => {
             formData.append(key, data[key]);
@@ -185,11 +199,12 @@ function UserDetail() {
         }
 
         setLoading(true)
-        authInstance.put(`/users/update/${userId}`, formData)
+        await authInstance.put(`/users/update/${userId}`, formData)
             .then((result) => {
                 if (result.data.status === 'OK') {
                     setUser(result.data.data)
                     toast.success('Cập nhật thành công!');
+                    fetchUsers()
                 } else {
                     toast.error('Thất bại! Có lỗi xảy ra');
                 }

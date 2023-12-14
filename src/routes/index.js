@@ -24,6 +24,7 @@ import FlashSaleForGuest from '../pages/FlashSaleForGuest';
 import Notifications from '../admin/pages/Notifications';
 import FlashSaleDetail from '../admin/pages/UseFul/FlashSale/FlashSaleDetail';
 import Statistics from '../admin/pages/Statistics';
+import Categories from '../admin/pages/Categories/Categories';
 
 // Public Routes
 const publicRoutes = [
@@ -61,6 +62,7 @@ const adminRoutes = [
     { path: '/admin/products', component: Product },
     { path: '/admin/update-product/:pid', component: UpdateProduct },
     { path: '/admin/notifications', component: Notifications },
+    { path: '/admin/categories', component: Categories }
 ];
 
 // Auth routes

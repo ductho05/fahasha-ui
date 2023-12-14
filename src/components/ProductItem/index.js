@@ -24,7 +24,7 @@ function ProductItem({ product }) {
                 <p className={cx('name')}>{product.title}</p>
                 <div className={cx('mid_body')}>
                     <p className={cx('price')}>{
-                        product.price.toLocaleString('vi-VN', {
+                        product?.price?.toLocaleString('vi-VN', {
                             style: 'currency',
                             currency: 'VND'
                         })
@@ -35,7 +35,7 @@ function ProductItem({ product }) {
                     </p>
                 </div>
                 <p className={product.price === product.old_price ? cx('hidden') : cx('discount_price')}>{
-                    product.old_price.toLocaleString('vi-VN', {
+                    product?.old_price?.toLocaleString('vi-VN', {
                         style: 'currency',
                         currency: 'VND'
                     })
