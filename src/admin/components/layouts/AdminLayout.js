@@ -38,7 +38,7 @@ function AdminLayout({ children }) {
             },
     );
     const [percent, setPercent] = useState(0);
-    const num = 10;
+    const num = '';
     const [data2, setData2] = useState(
         Object.keys(data).length !== 0
             ? data
@@ -189,14 +189,41 @@ function AdminLayout({ children }) {
             )}
             {!(!(isLoaded.evaluates && isLoaded.categories && isLoaded.orders && isLoaded.users && isLoaded.flashsales && isLoaded.products) && Object.keys(data).length === 0) && (
                 <div className={cx('wrapper')}>
-                    <div className={cx('navbar')}>
+                    <div
+                        className={cx('navbar')}
+                        style={{
+                            maxHeight: '100vh',
+                            position: 'fixed',
+                            top: 0,
+                            backgroundColor: 'yourNavbarBackgroundColor', // Thay thế bằng màu nền mong muốn
+                            zIndex: 1000, // Tăng giá trị nếu cần
+                        }}
+                    >
                         <SideBar />
                     </div>
-                    <SideBarLaptop />
-                    <Scrollbar style={{ width: 250, height: '100vh' }} className={cx('container')}>
-                        <NavBar />
+                    <div
+                        className={cx('navbarlap')}
+                        style={{
+                            maxHeight: '100vh',
+                            position: 'fixed',
+                            top: 0,
+                            backgroundColor: 'yourNavbarBackgroundColor', // Thay thế bằng màu nền mong muốn
+                            zIndex: 1000, // Tăng giá trị nếu cần
+                        }}
+                    >
+                        <SideBarLaptop />
+                    </div>
+                    <div style={{ width: 250, height: '100vh' }} className={cx('container')}>
+                        <NavBar
+                            style={{
+                                position: 'fixed',
+                                top: 0,
+                                backgroundColor: 'yourNavbarBackgroundColor', // Thay thế bằng màu nền mong muốn
+                                zIndex: 1000, // Tăng giá trị nếu cần
+                            }}
+                        />
                         {children}
-                    </Scrollbar>
+                    </div>
                 </div>
             )}
         </>

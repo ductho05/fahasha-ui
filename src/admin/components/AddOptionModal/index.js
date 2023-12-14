@@ -116,15 +116,16 @@ const AddOptionModal = ({ handelLoading, func, isStatus }) => {
             <Modal
                 open={open}
                 title={
-                    <span>
-                        THIẾT LẬP FLASHSALE{' '}
-                        <HelpIcon
-                            className={cx('help-icon')}
-                            onClick={() => {
-                                setOpenGuide(true);
-                            }}
-                        />
-                    </span>
+                    <div className={cx('header')}>
+                        <div className={cx('header-title')}>THIẾT LẬP FLASHSALE </div>
+                        <div className={cx('help-icon')}>
+                            <HelpIcon
+                                onClick={() => {
+                                    setOpenGuide(true);
+                                }}
+                            />
+                        </div>
+                    </div>
                 }
                 footer={null}
                 header={true}

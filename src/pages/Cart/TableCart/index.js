@@ -72,7 +72,6 @@ function TableCart() {
         });
     }, []);
 
-
     // Lấy trạng thái chọn mua từ local
     function GetLocalCart() {
         var initIscheckout = [];
@@ -464,9 +463,7 @@ function TableCart() {
                             transition: 'background-color 0.3s', // Hiệu ứng hover
                         }}
                     >
-                        <Link to="/checkout">
-                            Thanh toán
-                        </Link>
+                        <Link to="/checkout">Thanh toán</Link>
                     </Button>
                 </div>
             </div>

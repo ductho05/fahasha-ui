@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import classNames from 'classnames/bind';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import styles from './FlashSaleForm.module.scss';
@@ -9,6 +9,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import {
     Button,
     Checkbox,
+    Modal,
     Col,
     ColorPicker,
     Form,
@@ -26,12 +27,11 @@ import {
 import { api, appPath, flashSaleImage } from '../../../constants';
 import { set } from 'react-hook-form';
 import { useData } from '../../../stores/DataContext';
-import { getAuthInstance } from "../../../utils/axiosConfig"
+import { getAuthInstance } from '../../../utils/axiosConfig';
 
-function FlashSaleForm({ props, hideFunc }) {
-
-    const authInstance = getAuthInstance()
-
+function FlashSaleForm({ props, hideFunc, style }) {
+    const authInstance = getAuthInstance();
+    const [openMaxProduct, setOpenMaxProduct] = useState(false);
     const [showProgress, setShowProgress] = useState(false);
     const [title, setTitle] = useState('');
     const { Option } = Select;
@@ -40,7 +40,10 @@ function FlashSaleForm({ props, hideFunc }) {
     const [valuepoint, setValuepoint] = useState(null);
     const formRef = useRef(null);
     const { data, setData } = useData();
+    const [values, setValues] = useState({});
     const moment = require('moment-timezone');
+    // const { data, setData } = useData();
+    console.log('value122121212s', data.products);
 
     // Đặt múi giờ cho Việt Nam
     const vietnamTimeZone = 'Asia/Ho_Chi_Minh';
@@ -58,7 +61,32 @@ function FlashSaleForm({ props, hideFunc }) {
             span: 14,
         },
     };
-    const { products } = props;
+
+    // // xóa những item bên trong props có id trùng nhau
+
+    //     props.products.map((item) => {
+    //         let newData = item;
+    //         item = data.products.filter((item1) => item1._id == newData);
+    //     })
+    // console.log('value1213212s', props);
+
+    //const { products } = props;
+
+    //console.log('value121121212s', products);
+
+    // chuyển những item trong products sang data
+    const products = style == 'custom' ? props.products.map((item, index) => {
+        // Tìm kiếm sản phẩm trong mảng data dựa trên _id
+        const foundProduct = data.products.find((item1) => item1._id === item);
+
+        // Nếu tìm thấy sản phẩm, thì gán nó vào newData
+        let newData = foundProduct ? foundProduct : null;
+
+        // newData sẽ chứa thông tin của sản phẩm từ data
+        return newData;
+    }) : props.products;
+
+    //console.log('pro', products);
 
     const [selectedDate, setSelectedDate] = useState(null);
 
@@ -91,7 +119,8 @@ function FlashSaleForm({ props, hideFunc }) {
         i == true && setShowProgress(false);
     };
 
-    const addFlashSale = async (values, products) => {
+    const addFlashSale = (values, products) => {
+        console.log('value121212s', values, products);
         let loop = 0,
             small_loop = 0;
         //console.log(values);
@@ -107,22 +136,24 @@ function FlashSaleForm({ props, hideFunc }) {
         const time_points_filter =
             values.point_sale == -1
                 ? time_points.filter(
-                    (point) =>
-                        (current_date == values.date_sale && point >= current_point) ||
-                        current_date < values.date_sale,
-                )
+                      (point) =>
+                          (current_date == values.date_sale && point >= current_point) ||
+                          current_date < values.date_sale,
+                  )
                 : [values.point_sale];
 
         // lấy ra các point sale nhỏ hơn point sale hiện tại
         const small_time_points_filter = time_points.filter((point) => point < current_point);
         //console.log(small_time_points_filter);
-        products.map((item) => {
+        products.length > 0
+            ? products.map((item) => {
             values.point_sale == -1 &&
                 values.is_loop == true &&
                 small_time_points_filter.map(async (point) => {
                     const data = {
                         current_sale: values.current_sale,
-                        num_sale: values.num_sale,
+                        num_sale: values.num_sale > item.quantity ? item.quantity : values.num_sale,
+                              
                         // ngày + 1
                         date_sale: formatDateToString(new Date(new Date(values.date_sale).getTime() + 86400000)),
                         is_loop: values.is_loop,
@@ -145,9 +176,7 @@ function FlashSaleForm({ props, hideFunc }) {
                                         title: 'Thiết đặt thành công',
                                         subTitle:
                                             'Vui lòng nhấn [Tiếp tục] để tiếp tục thiết đặt hoặc nhấn [Quản lý] để đến trang quản lý Sales Off!',
-                                    })
-
-
+                                    });
                             } else {
                                 setShowProgress(false);
                                 hideFunc({
@@ -168,54 +197,77 @@ function FlashSaleForm({ props, hideFunc }) {
             time_points_filter.map((point, index) => {
                 const data = {
                     current_sale: values.current_sale,
-                    num_sale: values.num_sale,
+                    num_sale: values.num_sale > item.quantity ? item.quantity : values.num_sale,
                     date_sale: values.date_sale,
                     is_loop: values.is_loop,
                     product: item,
                     point_sale: point,
                 };
 
-                authInstance.post(`/flashsales/add`, data)
-                    .then((result) => {
-                        if (result.data.status == 'OK') {
-                            //addFlashsaleToLocal(result.data);
-                            localStorage.setItem('isFlashsaleLoading', true);
-                            //console.log(result.status);
-                            //setShowProgress(false);
-                            checktooffprogress(time_points_filter.length * products.length - 1 == loop);
+                      authInstance
+                          .post(`/flashsales/add`, data)
+                          .then((result) => {
+                              if (result.data.status == 'OK') {
+                                  //addFlashsaleToLocal(result.data);
+                                  localStorage.setItem('isFlashsaleLoading', true);
+                                  //console.log(result.status);
+                                  //setShowProgress(false);
+                                  checktooffprogress(time_points_filter.length * products.length - 1 == loop);
 
-                            time_points_filter.length * products.length - 1 == loop++ &&
-                                hideFunc({
-                                    status: 'success',
-                                    title: 'Thiết đặt thành công',
-                                    subTitle:
-                                        result.message == 'Update product quantity successfully'
-                                            ? `Hệ thống phát hiện ID này đã tồn tại trong khung giờ này, hệ thống đã tự động cập nhật số lượng và mức giá cho flashsale này
+                                  time_points_filter.length * products.length - 1 == loop++ &&
+                                      hideFunc({
+                                          status: 'success',
+                                          title: 'Thiết đặt thành công',
+                                          subTitle:
+                                              result.data.message == 'Update product quantity successfully'
+                                                  ? `Hệ thống phát hiện ID này đã tồn tại trong khung giờ này, hệ thống đã tự động cập nhật số lượng và mức giá cho flashsale này
                                             Vui lòng nhấn [Tiếp tục] để tiếp tục thiết đặt hoặc nhấn [Quản lý] để đến trang quản lý Sales Off`
-                                            : 'Vui lòng nhấn [Tiếp tục] để tiếp tục thiết đặt hoặc nhấn [Quản lý] để đến trang quản lý Sales Off!',
-                                });
-                        } else {
-                            //checktooffprogress(time_points_filter.length * products.length - 1 == loop++);
-                            setShowProgress(false);
-                            hideFunc({
-                                status: 'error',
-                                title: 'Thiết đặt không thành công',
-                                subTitle: result.message
-                                    ? result.message
-                                    : 'Đã có lỗi xãy ra trong quá trình thiết đặt, vui lòng kiểm tra kết nối mạng!',
-                            });
-                        }
-                    })
-                    .catch((err) => {
-                        setShowProgress(false);
-                        console.log(err);
-                    });
-            });
-        });
+                                                  : 'Vui lòng nhấn [Tiếp tục] để tiếp tục thiết đặt hoặc nhấn [Quản lý] để đến trang quản lý Sales Off!',
+                                      });
+                              } else {
+                                  //checktooffprogress(time_points_filter.length * products.length - 1 == loop++);
+                                  setShowProgress(false);
+                                  console.log('asasasa', result);
+                                  hideFunc({
+                                      status: 'error',
+                                      title: 'Thiết đặt không thành công',
+                                      subTitle: result.data.message
+                                          ? result.data.message
+                                          : 'Đã có lỗi xãy ra trong quá trình thiết đặt, vui lòng kiểm tra kết nối mạng!',
+                                  });
+                              }
+                          })
+                          .catch((err) => {
+                              setShowProgress(false);
+                              console.log(err);
+                          });
+                  });
+              })
+            : hideFunc({
+                  status: 'error',
+                  title: 'Thiết đặt không thành công',
+                  subTitle: 'Không có sản phẩm nào đủ số lượng để thiết đặt flashsale!',
+              });
     };
     const onFinish = (values) => {
         values.date_sale = formatDateToString(selectedDate);
         values.is_loop = show;
+        // tìm số lượng sản phẩm nhỏ nhất
+        console.log('valueqưqws2212', products[0]);
+        let minQuality = products[0].quantity;
+        products.map((item) => {
+            console.log('value2qưqws', item);
+            if (item.quantity < minQuality) {
+                minQuality = item.quantity;
+            }
+        });
+        console.log('valueqưqws212', minQuality);
+        if (values.num_sale > minQuality) {
+            console.log('valueqư23qws', minQuality);
+            setOpenMaxProduct(true);
+            setValues(values);
+            return;
+        }
         addFlashSale(values, products);
     };
 
@@ -342,15 +394,28 @@ function FlashSaleForm({ props, hideFunc }) {
                                 required: true,
                                 message: 'Vui lòng nhập số lượng!',
                             },
+                            ({ getFieldValue }) => ({
+                                validator(_, value) {
+                                    const integerValue = parseInt(value, 10);
+                                    const isInteger = Number.isInteger(integerValue);
+                                    const isPositive = integerValue > 0;
+
+                                    if (
+                                        !isInteger ||
+                                        !isPositive ||
+                                        String(value).includes('.') ||
+                                        String(value).includes(',')
+                                    ) {
+                                        return Promise.reject('Số lượng sản phẩm phải là số nguyên dương.');
+                                    }
+                                    return Promise.resolve();
+                                },
+                            }),
+
                             {
                                 type: 'number',
-                                min: 1,
-                                message: 'Số lượng sản phẩm phải là số nguyên dương.',
-                            },
-                            {
-                                type: 'number',
-                                max: 200,
-                                message: 'Số lượng Flashsale tối đa trong 1 khung giờ là 200.',
+                                max: 500,
+                                message: 'Số lượng Flashsale tối đa trong 1 khung giờ là 500.',
                             },
                         ]}
                     >
@@ -378,6 +443,93 @@ function FlashSaleForm({ props, hideFunc }) {
                     </Space>
                 </Form.Item>
             </Form>
+            <Modal
+                // vị trí hiển thị của modal
+                style={{
+                    top: '15%',
+                }}
+                title="Cảnh báo số lượng hàng trong kho không đủ"
+                open={openMaxProduct}
+                footer={null}
+                maskClosable={false}
+                onCancel={() => setOpenMaxProduct(false)}
+            >
+                <div
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        marginBottom: 20,
+                    }}
+                >
+                    <img
+                        style={{
+                            width: 100,
+                            height: 100,
+                        }}
+                        src="https://img.icons8.com/color/48/000000/warning-shield.png"
+                    />
+                </div>
+                <p>
+                    Hệ thống phát hiện tồn tại những sản phẩm có số lượng hàng trong kho nhỏ hơn số lượng sản phẩm bạn
+                    đang thiết đặt.
+                    <li>Có 3 sự lựa chọn dành cho bạn:</li>
+                    <li>
+                        1. Hệ thống sẽ lấy số lượng tối đa hiện tại của những sản phẩm này để thiết đặt flashsale. Nhấn{' '}
+                        <strong>[Đồng ý]</strong> để tiếp tục thiết đặt.
+                    </li>
+                    <li>
+                        {' '}
+                        2. Hệ thống sẽ loại bỏ những sản phẩm này ra. Nhấn <strong>[Loại bỏ]</strong> để loại bỏ.
+                    </li>
+                    <li>
+                        {' '}
+                        3. Nhấn <strong>[Đóng]</strong> để thiết đặt lại.
+                    </li>
+                </p>
+                <div
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                        flexDirection: 'row',
+                        marginTop: 20,
+                    }}
+                >
+                    <Button
+                        onClick={() => {
+                            addFlashSale(values, products);
+                            setOpenMaxProduct(false);
+                        }}
+                        style={{
+                            marginRight: 10,
+                        }}
+                    >
+                        Đồng ý
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            addFlashSale(
+                                values,
+                                products.filter((item) => item.quantity >= values.num_sale),
+                            );
+                            setOpenMaxProduct(false);
+                        }}
+                        style={{
+                            marginRight: 10,
+                        }}
+                    >
+                        Loại bỏ
+                    </Button>
+
+                    <Button
+                        onClick={() => {
+                            setOpenMaxProduct(false);
+                        }}
+                    >
+                        Đóng
+                    </Button>
+                </div>
+            </Modal>
         </>
     );
 }

@@ -63,14 +63,15 @@ function BarChartExample() {
     const [pointSale, setPointSale] = useState(getTimeData().current_point_sale);
     useEffect(() => {
         setIsLoading(true);
-        authInstance
-            .get(`${api}/flashsales?sort=reverse&date=${date}&point=${pointSale == -1 ? '' : pointSale}`)
-            .then((result) => {
-                setRows(result.data.data);
+        fetch(`${api}/flashsales?sort=reverse&date=${date}&point=${pointSale == -1 ? '' : pointSale}`)
+            .then((res) => res.json())
+            .then((res) => {
+                //console.log('A212121', res.data);
+                setRows(res.data);
                 setIsLoading(false);
-                //console.log('A', result.data);
+                //.log('A212121', res.data);
             })
-            .catch((err) => console.log(err));
+            .catch((err) => console.log('sdasda', err));
     }, [isToggle]);
 
     const getDatePointSale = (values) => {
@@ -113,7 +114,7 @@ function BarChartExample() {
                             sold: `${payload[0]?.value}`,
                             isLoading: false,
                         }}
-                        type={'Tồn kho'}
+                        type={'Số lượng'}
                     />
                 </div>
             );
@@ -231,7 +232,7 @@ function BarChartExample() {
                     margin: '4.5% 0 0 0',
                 }}
             >
-                Biểu đồ số lượng sản phẩm đã bán
+                Biểu đồ flashsale đã đặt trong khung giờ
             </text>
         </>
     );

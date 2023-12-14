@@ -34,8 +34,24 @@
     margin: 5% 5%;
 }
 
-.help-icon {
-    color: #464646;
-    margin: 5px 0 0 5px;
-    cursor: pointer;
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    margin-bottom: 4%;
+
+    .header-title {
+        font-size: 1.8rem;
+        font-weight: 600;
+    }
+
+    .help-icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #464646;
+        margin-left: 2%;
+        cursor: pointer;
+    }
 }

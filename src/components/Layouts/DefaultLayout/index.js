@@ -32,22 +32,21 @@ function DefaultLayout(props) {
         props.setIsLogin(localstorage.get().length > 0);
     }, [state]);
     setInterval(() => {
-
         if (isLogin()) {
-
-            axios.get(`${api}/users/get/profile`, {
-                headers: {
-                    'Authorization': `Bearer ${localstorge.get()}`
-                }
-            }).then(result => {
-
-                if (result.data.message == "Jwt expired") {
-                    setExpired(true)
-                }
-            }).catch(() => {
-                setExpired(true)
-            })
-
+            axios
+                .get(`${api}/users/get/profile`, {
+                    headers: {
+                        Authorization: `Bearer ${localstorge.get()}`,
+                    },
+                })
+                .then((result) => {
+                    if (result.data.message == 'Jwt expired') {
+                        setExpired(true);
+                    }
+                })
+                .catch(() => {
+                    setExpired(false);
+                });
         }
     }, 6000);
 
@@ -63,7 +62,7 @@ function DefaultLayout(props) {
             dispatch(noAction());
             setExpired(false);
         } else if (state.action == LOGIN) {
-            console.log("Login thanh cong")
+            console.log('Login thanh cong');
             navigate('/');
             toast.success('Đăng nhập thành công');
             dispatch(noAction());

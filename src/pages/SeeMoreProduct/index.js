@@ -293,14 +293,14 @@ function SeeMoreProduct() {
 
                     </div>
                     {
-                        products.length <= 0 ?
+                        products?.length <= 0 ?
                             <div className="w-full p-[20px] border border-[#fcd344] bg-[#fafaec]">
                                 <p className="text-[#333] text-[1.6rem] font-[500]">Không có sản phẩm phù hợp với từ khóa tìm kiếm</p>
                             </div> : ""
                     }
 
                     {
-                        products.length > 0 ? <div className={numPages > 1 || !showProgress ? cx('bottom') : cx('hidden')}>
+                        products?.length > 0 ? <div className={numPages > 1 || !showProgress ? cx('bottom') : cx('hidden')}>
                             <Paging
                                 numPages={numPages}
                                 pages={pages}

@@ -6,10 +6,11 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { api } from '../../../../constants';
 import { Modal, Popover, Button, Form, Statistic, message, Input, Select, Radio, Checkbox, Typography } from 'antd';
-import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
+import { ArrowDownOutlined, ArrowUpOutlined, InfoCircleFilled } from '@ant-design/icons';
 import { set } from 'react-hook-form';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+
 import { getAuthInstance, postData } from '../../../../utils/axiosConfig';
 
 const { Option } = Select;
@@ -17,8 +18,7 @@ const { Text } = Typography;
 const cx = classNames.bind(styles);
 
 function ProgressChart() {
-
-    const authInstance = getAuthInstance()
+    const authInstance = getAuthInstance();
 
     const [doanhThu, setDoanhThu] = useState(0);
     const [doanhThuHomQua, setDoanhThuHomQua] = useState(0);
@@ -85,7 +85,7 @@ function ProgressChart() {
                     // tính doanh thu từ start đến hôm nay
                     const today = new Date();
                     authInstance
-                        .get(`/orders`)
+                        .post(`/orders/filter?status=HOANTHANH`)
                         .then((res) => {
                             const orders = res.data.data;
                             const ordersToday = orders.filter((order) => {
@@ -198,7 +198,7 @@ function ProgressChart() {
     };
     useEffect(() => {
         authInstance
-            .get(`/orders`)
+            .post(`/orders/filter?status=HOANTHANH`)
             .then((res) => {
                 const orders = res.data.data;
                 //console.log('orders', orders[7].createdAt);
@@ -470,28 +470,27 @@ function ProgressChart() {
                                     doanhthukpi < systemKpi.kpi
                                         ? (doanhthukpi / systemKpi.kpi) * 100
                                         : doanhthukpi == systemKpi.kpi
-                                            ? 100
-                                            : ((doanhthukpi % systemKpi.kpi) / systemKpi.kpi) * 100
+                                        ? 100
+                                        : ((doanhthukpi % systemKpi.kpi) / systemKpi.kpi) * 100
                                 }
                                 text={
                                     systemKpi.kpi
                                         ? doanhthukpi < systemKpi.kpi
                                             ? ((doanhthukpi / systemKpi.kpi) * 100).toFixed(0) + '%'
                                             : doanhthukpi == systemKpi.kpi
-                                                ? '100%'
-                                                : '+' + ((doanhthukpi / systemKpi.kpi) * 100 - 100).toFixed(0) + '%'
+                                            ? '100%'
+                                            : '+' + ((doanhthukpi / systemKpi.kpi) * 100 - 100).toFixed(0) + '%'
                                         : 'chưa thiết lập'
                                 }
                                 strokeWidth={6}
                                 styles={{
-                                    
                                     path: {
                                         stroke: systemKpi.kpi
                                             ? doanhthukpi < systemKpi.kpi
                                                 ? '#f88'
                                                 : doanhthukpi == systemKpi.kpi
-                                                    ? '#4EEE94'
-                                                    : '#0000EE'
+                                                ? '#4EEE94'
+                                                : '#0000EE'
                                             : 'gray',
                                         transition: 'stroke-dashoffset 0.5s ease 0s',
                                     },
@@ -500,8 +499,8 @@ function ProgressChart() {
                                             ? doanhthukpi < systemKpi.kpi
                                                 ? '#DDDDDD'
                                                 : doanhthukpi == systemKpi.kpi
-                                                    ? '#4EEE94'
-                                                    : 'green'
+                                                ? '#4EEE94'
+                                                : 'green'
                                             : 'gray',
                                     },
                                     text: {
@@ -509,8 +508,8 @@ function ProgressChart() {
                                             ? doanhthukpi < systemKpi.kpi
                                                 ? '#f88'
                                                 : doanhthukpi == systemKpi.kpi
-                                                    ? '#4EEE94'
-                                                    : '#0000EE'
+                                                ? '#4EEE94'
+                                                : '#0000EE'
                                             : 'gray',
                                         fontSize: systemKpi.kpi ? '1.8rem' : '1.2rem',
                                     },
@@ -519,15 +518,33 @@ function ProgressChart() {
                                             doanhthukpi < systemKpi.kpi
                                                 ? 'gray'
                                                 : doanhthukpi == systemKpi.kpi
-                                                    ? '#4EEE94'
-                                                    : 'black', //parseInt(doanhthukpi / systemKpi.kpi) < 1 ? '#f88' : '#4EEE94',
+                                                ? '#4EEE94'
+                                                : 'black', //parseInt(doanhthukpi / systemKpi.kpi) < 1 ? '#f88' : '#4EEE94',
                                     },
                                 }}
                             />
                         </div>
                     </Popover>
                     <div className={cx('total_')}>
-                        <p className={cx('total_title')}>Tổng doanh thu</p>
+                        <p className={cx('total_title')}>
+                            {' '}
+                            Tổng doanh thu
+                            <Popover
+                                content={'Tổng doanh thu đã bao gồm phí vận chuyển từ các đơn hàng'}
+                                trigger="hover"
+                                // className={cx('kpi')}
+                            >
+                                <span
+                                    style={{
+                                        marginLeft: '8px',
+                                        // cursor: 'pointer',
+                                        fontSize: '2rem',
+                                    }}
+                                >
+                                    <InfoCircleFilled />
+                                </span>
+                            </Popover>{' '}
+                        </p>
                         <p className={cx('total_value')}>
                             {doanhThu.toLocaleString('vi-VN', {
                                 style: 'currency',

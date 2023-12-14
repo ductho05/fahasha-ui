@@ -33,6 +33,8 @@ function AutoFlashSale() {
     const [isLoading, setIsLoading] = useState(false); // loading cho button
     const [isLoading2, setIsLoading2] = useState(false); // loading cho sản phẩm để hiển thị skeleton
     const { data, setData } = useData();
+
+    console.log('123WQ', suggestFlash);
     useEffect(() => {
         if (Object.keys(data).length !== 0) {
             //var data1 = data.products;
@@ -103,6 +105,7 @@ function AutoFlashSale() {
                             props={{ products: suggestFlash }}
                             handelLoading={handelLoading}
                             disabled={true}
+                            style={'auto'}
                         />
                     ) : (
                         <FlashSaleModal />
@@ -124,6 +127,7 @@ function AutoFlashSale() {
                                       sold: item.quantity,
                                       isLoading: isLoading2,
                                   }}
+                                  type={'Tồn kho'}
                               />
                           );
                       })

@@ -6,7 +6,7 @@ import classNames from 'classnames/bind';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import localstorage from '../../localstorage';
 import { faCircleCheck, faTimesCircle, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
-
+import { api, appPath, namecart, orderImages } from '../../constants';
 import styles from './OrderSuccess.module.scss';
 
 const cx = classNames.bind(styles);
@@ -26,6 +26,11 @@ function OrderSuccess() {
         {
             code: 'E07',
             content: 'Trừ tiền thành công. Giao dịch bị nghi ngờ (liên quan tới lừa đảo, giao dịch bất thường).',
+        },
+        {
+            code: 'E08',
+            content:
+                'Hệ thống xin lỗi quý khách vì đơn hàng của bạn tồn tại sản phẩm mà cửa hàng chúng tôi không đủ số lượng để giao hàng. Xin quý khách vui lòng mua lại sau.',
         },
         {
             code: 'E09',
@@ -77,82 +82,103 @@ function OrderSuccess() {
         ? JSON.parse(localStorage.getItem('curent_checkoutid'))
         : {};
 
-        // const addUserFlashSale = (data) => {
-        //     setShowProgress(true);
-        //     fetch(`${api}/orders/insert`, {
-        //         method: 'POST',
-        //         headers: { 'Content-Type': 'application/json' },
-        //         body: JSON.stringify(data),
-        //     })
-        //         .then((response) => response.json())
-        //         .then((result) => {
-        //             if (result.status == 'OK') {
-        //                 const order = result.data;
-        //                 let item_order_checkout = [];
-        //                 if (type == 'vnp') {
-        //                     item_order_checkout = localStorage.getItem('item_order_checkout')
-        //                         ? JSON.parse(localStorage.getItem('item_order_checkout'))
-        //                         : [];
-        //                 } else if (type == 'cash') {
-        //                     item_order_checkout = listCheckouts;
-        //                 }
-        //                 const orderItems = item_order_checkout.map((item) => {
-        //                     return {
-        //                         quantity: item.quantity,
-        //                         price: item.product.price * item.quantity,
-        //                         order: result.data._id,
-        //                         product: item.product._id,
-        //                     };
-        //                 });
-        //                 if (item_order_checkout.length) {
-        //                     orderItems.forEach((orderItem) => {
-        //                         fetch(`${api}/orderitems/insert`, {
-        //                             method: 'POST',
-        //                             headers: { 'Content-Type': 'application/json' },
-        //                             body: JSON.stringify(orderItem),
-        //                         })
-        //                             .then((response) => response.json())
-        //                             .then((result) => {
-        //                                 if (result.status == 'OK') {
-        //                                     const carts = localStorage.getItem(namecart)
-        //                                         ? JSON.parse(localStorage.getItem(namecart))
-        //                                         : [];
-        //                                     const newCarts = {
-        //                                         id: state.user._id,
-        //                                         items: carts.items.filter((cart) => cart.id !== orderItem.product),
-        //                                     };
-        //                                     localstorage.set(namecart, newCarts);
-        //                                     setShowProgress(false);
-        //                                     setOrder(order);
-        //                                 }
-        //                             })
-        //                             .catch((err) => {
-        //                                 console.log(err);
-        //                             });
-        //                     });
-        //                 } else {
-        //                     setShowProgress(false);
-        //                     setOrder(order);
-        //                 }
-        //                 const title = "Thông báo đơn hàng"
-        //                 const description = `${state.user.fullName} vừa đặt đơn hàng mới. Chuẩn bị hàng thôi!`
-        //                 const image = orderImages
-        //                 const url = `${appPath}/admin/orders`
-    
-        //                 SendNotification("admin", {
-        //                     title,
-        //                     description,
-        //                     image,
-        //                     url
-        //                 })
-        //             } else {
-        //                 setShowProgress(false);
-        //                 navigate(`/order-success/err-E99`);
-        //             }
-        //         })
-        //         .catch((err) => { });
-        // };
-    
+    const productNot = localStorage.getItem('dataNotQuanlity')
+        ? JSON.parse(localStorage.getItem('dataNotQuanlity'))
+        : [];
+    console.log('productNot', productNot);
+    const [productNotEnough, setProductNotEnough] = useState([]);
+    useEffect(() => {
+        if (productNot.length) {
+            productNot.map((item) => {
+                console.log('2121asa', item);
+                fetch(`${api}/products/id/${item}`)
+                    .then((response) => response.json())
+                    .then((result) => {
+                        if (result.status == 'OK') {
+                            const product = result.data;
+                            console.log('afhadbsfsh', product);
+                        }
+                    })
+                    .catch((err) => console.log(err));
+            });
+        }
+    }, []);
+
+    // const addUserFlashSale = (data) => {
+    //     setShowProgress(true);
+    //     fetch(`${api}/orders/insert`, {
+    //         method: 'POST',
+    //         headers: { 'Content-Type': 'application/json' },
+    //         body: JSON.stringify(data),
+    //     })
+    //         .then((response) => response.json())
+    //         .then((result) => {
+    //             if (result.status == 'OK') {
+    //                 const order = result.data;
+    //                 let item_order_checkout = [];
+    //                 if (type == 'vnp') {
+    //                     item_order_checkout = localStorage.getItem('item_order_checkout')
+    //                         ? JSON.parse(localStorage.getItem('item_order_checkout'))
+    //                         : [];
+    //                 } else if (type == 'cash') {
+    //                     item_order_checkout = listCheckouts;
+    //                 }
+    //                 const orderItems = item_order_checkout.map((item) => {
+    //                     return {
+    //                         quantity: item.quantity,
+    //                         price: item.product.price * item.quantity,
+    //                         order: result.data._id,
+    //                         product: item.product._id,
+    //                     };
+    //                 });
+    //                 if (item_order_checkout.length) {
+    //                     orderItems.forEach((orderItem) => {
+    //                         fetch(`${api}/orderitems/insert`, {
+    //                             method: 'POST',
+    //                             headers: { 'Content-Type': 'application/json' },
+    //                             body: JSON.stringify(orderItem),
+    //                         })
+    //                             .then((response) => response.json())
+    //                             .then((result) => {
+    //                                 if (result.status == 'OK') {
+    //                                     const carts = localStorage.getItem(namecart)
+    //                                         ? JSON.parse(localStorage.getItem(namecart))
+    //                                         : [];
+    //                                     const newCarts = {
+    //                                         id: state.user._id,
+    //                                         items: carts.items.filter((cart) => cart.id !== orderItem.product),
+    //                                     };
+    //                                     localstorage.set(namecart, newCarts);
+    //                                     setShowProgress(false);
+    //                                     setOrder(order);
+    //                                 }
+    //                             })
+    //                             .catch((err) => {
+    //                                 console.log(err);
+    //                             });
+    //                     });
+    //                 } else {
+    //                     setShowProgress(false);
+    //                     setOrder(order);
+    //                 }
+    //                 const title = "Thông báo đơn hàng"
+    //                 const description = `${state.user.fullName} vừa đặt đơn hàng mới. Chuẩn bị hàng thôi!`
+    //                 const image = orderImages
+    //                 const url = `${appPath}/admin/orders`
+
+    //                 SendNotification("admin", {
+    //                     title,
+    //                     description,
+    //                     image,
+    //                     url
+    //                 })
+    //             } else {
+    //                 setShowProgress(false);
+    //                 navigate(`/order-success/err-E99`);
+    //             }
+    //         })
+    //         .catch((err) => { });
+    // };
 
     useEffect(() => {
         if (curent_checkoutid === orderId) {
@@ -186,6 +212,8 @@ function OrderSuccess() {
     };
 
     const handleOption = () => {
+        if (orderId === 'err-E08') {
+        }
         if (option.includes('Chi tiết đơn hàng')) navigate(`/account/order/detail/${orderId}`);
         else if (option.includes('Tất cả đơn hàng')) navigate('/account/1');
         else navigate(`/checkout`);
@@ -193,7 +221,12 @@ function OrderSuccess() {
 
     return (
         <div className="p-[10px] md:p-[20px] lg:p-[40px]">
-            <div className={cx('dialog', 'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden')}>
+            <div
+                className={cx(
+                    'dialog',
+                    'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden',
+                )}
+            >
                 <div className={cx('heading')}>
                     <FontAwesomeIcon
                         icon={iconInfo.type}
