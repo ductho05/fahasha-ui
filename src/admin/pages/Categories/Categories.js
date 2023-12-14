@@ -2,24 +2,33 @@ import React from 'react'
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import EnhancedTable from '../../components/Table/EnhancedTable';
 import { useData } from '../../../stores/DataContext';
-import { Button, Form, Input, Modal, Tooltip } from 'antd';
+import { Button, Form, Input, Modal, Select, Tooltip } from 'antd';
+import { Backdrop, CircularProgress, Dialog } from '@mui/material';
+import { useStore } from '../../../stores/hooks';
+import { toast, ToastContainer } from 'react-toastify';
+import { api } from '../../../constants';
+import { useNavigate } from "react-router-dom"
 
 function Categories() {
 
     const [rows, setRows] = React.useState([])
     const { data, setData } = useData()
     const [displayForm, setDisplayForm] = React.useState(false)
+    const [loading, setLoading] = React.useState(false)
+    const [success, setSuccess] = React.useState(0)
+    const [state, dispatch] = useStore()
+    const navigate = useNavigate()
 
     React.useState(() => {
 
-        const newRows = data.categories.map((category, index) => {
+        const newRows = data?.categories?.map((category, index) => {
             return {
                 ...category,
                 rowNumber: index + 1,
             }
         })
         setRows(newRows)
-    }, [])
+    }, [data])
 
     const columns = [
         {
@@ -56,7 +65,13 @@ function Categories() {
             sortable: false,
             editable: true,
             width: 180,
-
+            renderCell: (params) => {
+                return (
+                    <p className={`font-[600] ${params.value == "Hoạt động" ? "text-green-600" : "text-red-600"}`}>
+                        {params.value}
+                    </p>
+                )
+            }
         },
         {
             field: '_id',
@@ -76,6 +91,7 @@ function Categories() {
                             style={{
                                 margin: '0 10px 0 0',
                             }}
+                            onClick={() => navigate(`/admin/categories/${params.value}`)}
 
                         >
                             Chi tiết
@@ -120,8 +136,45 @@ function Categories() {
         setDisplayForm(true)
     }
 
+    const fetchCategory = () => {
+
+        fetch(`${api}/categories?filter=simple`)
+            .then(response => response.json())
+            .then(result => {
+                if (result.status == "OK") {
+                    setData({ ...data, categories: result.data })
+                }
+            })
+            .catch(err => console.log(err.message))
+    }
+
+    React.useEffect(() => {
+
+        if (success != 0) {
+
+            fetchCategory()
+        }
+    }, [success])
+
     const handleOk = (value) => {
-        console.log(value)
+
+        setLoading(true)
+        state.authInstance.post("/categories", { ...value })
+            .then(async response => {
+                if (response.data.status == "OK") {
+                    setDisplayForm(false)
+                    toast.success("Thêm thành công!")
+                    setSuccess(prev => prev += 1)
+                } else {
+                    toast.error(response.data.message)
+                }
+                setLoading(false)
+            })
+            .catch(err => {
+                console.error(err)
+                toast.error(err.response.data.message)
+                setLoading(false)
+            })
     };
     const handleCancel = () => {
         setDisplayForm(false)
@@ -129,58 +182,67 @@ function Categories() {
 
     return (
         <div className="p-[20px]">
-            <Modal
-                title="Thêm mới loại sản phẩm"
-                open={displayForm}
-                onCancel={handleCancel}
+            <ToastContainer
+                position="top-right"
+                autoClose={2000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
+            <Backdrop
+                sx={{ color: '#fff', zIndex: 10000 }}
+                open={loading}
             >
-                <Form
-                    layout='vertical'
-                    onFinish={handleOk}
-                    autoComplete="off"
-                    style={{
-                        width: '100%'
-                    }}
-                >
-                    <Form.Item
-                        label="Username"
-                        name="username"
-                        rules={[
-                            {
-                                required: true,
-                                message: 'Please input your username!',
-                            },
-                        ]}
-                    >
-                        <Input />
-                    </Form.Item>
-
-                    <Form.Item
-                        label="Password"
-                        name="password"
-                        rules={[
-                            {
-                                required: true,
-                                message: 'Please input your password!',
-                            },
-                        ]}
-                    >
-                        <Input.Password />
-                    </Form.Item>
-
-                    <Form.Item
+                <CircularProgress color="error" />
+            </Backdrop>
+            <Dialog
+                open={displayForm}
+                onClose={handleCancel}
+            >
+                <div className="p-[20px] w-[50rem]">
+                    <h1 className="py-[20px] text-[2rem] text-[#333] font-[600]">
+                        Thêm mới loại sản phẩm
+                    </h1>
+                    <Form
+                        layout='vertical'
+                        onFinish={handleOk}
+                        autoComplete="off"
                         style={{
-                            width: '100%',
-                            display: 'flex',
-                            justifyContent: 'center'
+                            width: '100%'
                         }}
                     >
-                        <Button type="primary" htmlType="submit">
-                            Thêm
-                        </Button>
-                    </Form.Item>
-                </Form>
-            </Modal>
+                        <Form.Item
+                            label="Tên"
+                            name="name"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Vui lòng không để trống thông tin này',
+                                },
+                            ]}
+                        >
+                            <Input />
+                        </Form.Item>
+
+                        <Form.Item
+                            style={{
+                                width: '100%',
+                                display: 'flex',
+                                justifyContent: 'center'
+                            }}
+                        >
+                            <Button type="primary" htmlType="submit">
+                                Thêm
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                </div>
+            </Dialog>
 
             <div className="flex items-center justify-between p-[20px] shadow-lg rounded-[8px]">
                 <h1 className="text-[2rem] uppercase text-[#333] font-[500]">Quản lý loại sản phẩm</h1>

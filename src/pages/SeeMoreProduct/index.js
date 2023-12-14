@@ -54,8 +54,8 @@ function SeeMoreProduct() {
     const [listCurrentPage, setListCurrentPage] = useState([])
     const [optionSelected, setOptionSelected] = useState(
         {
-            title: '10 sản phẩm',
-            value: 10
+            title: '12 sản phẩm',
+            value: 12
         }
     )
     const [optionSelectedFilter, setOptionSelectedFilter] = useState(

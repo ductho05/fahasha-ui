@@ -99,7 +99,7 @@ function AdminLayout({ children }) {
         });
         if (Object.keys(data).length === 0) {
             setIsLoaded([false, false]);
-            fetch(`${api}/products?filter=sold&sort=asc&num=${num}`)
+            fetch(`${api}/products?filter=sold&sort=asc`)
                 .then((response) => {
                     return response.json();
                 })

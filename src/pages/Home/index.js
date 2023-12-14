@@ -345,7 +345,7 @@ function Home() {
                             </h3>
                         </div>
 
-                        <ProductFrame isLoading={isLoading} productList={productsHots} Component={GridProduct} />
+                        <ProductFrame isLoading={isLoading} productList={productsHots} isHomePage={true} Component={GridProduct} />
                     </div>
 
                     <div

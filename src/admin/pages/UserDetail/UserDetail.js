@@ -14,57 +14,68 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getAuthInstance } from '../../../utils/axiosConfig';
 import { useData } from '../../../stores/DataContext';
+const moment = require('moment-timezone')
 
 const cx = classNames.bind(styles);
-const dataIncomes = [
-    {
-        date: '31/7/2023',
-        value: 340,
-    },
-    {
-        date: '1/8/2023',
-        value: 500,
-    },
-    {
-        date: '2/8/2023',
-        value: 400,
-    },
-    {
-        date: '3/8/2023',
-        value: 900,
-    },
-    {
-        date: '4/8/2023',
-        value: 700,
-    },
-    {
-        date: '5/8/2023',
-        value: 990,
-    },
-];
 
 const options = [
     {
-        title: '6 ngày gần nhất',
-        value: 'createdAt',
-        type: 'desc',
+        title: '6 giờ gần nhất',
+        value: 1,
     },
     {
+        title: '6 ngày gần nhất',
+        value: 2,
+    },
+
+    {
         title: '6 tuần gần nhất',
-        value: 'createdAt',
-        type: 'desc',
+        value: 3,
     },
     {
         title: '6 tháng gần nhất',
-        value: 'createdAt',
-        type: 'desc',
+        value: 4,
     },
     {
         title: '6 năm gần nhất',
-        value: 'createdAt',
-        type: 'desc',
+        value: 5,
     },
-];
+]
+
+function chuyenDoiThang(tenVietTat) {
+    const thangDict = {
+        Jan: '01',
+        Feb: '02',
+        Mar: '03',
+        Apr: '04',
+        May: '05',
+        Jun: '06',
+        Jul: '07',
+        Aug: '08',
+        Sep: '09',
+        Oct: '10',
+        Nov: '11',
+        Dec: '12',
+    };
+
+    // Chuyển đổi viết tắt thành số tương ứng, mặc định là undefined nếu không tìm thấy
+    const soThang = thangDict[tenVietTat];
+
+    return soThang;
+}
+
+const formatDateToString = (date) => {
+    if (date) {
+        date = date.$d ? date.$d : date;
+        const year = date.getUTCFullYear();
+        const month = chuyenDoiThang(date.toString().slice(4, 7));
+        const day = date.toString().slice(8, 10);
+        const utcTimeString = `${year}-${month}-${day}`;
+        return utcTimeString;
+        // return date.toISOString().slice(0, 10); // Lấy YYYY-MM-DD
+    }
+    return ''; // Trả về chuỗi rỗng nếu date là null
+}
 
 function UserDetail() {
 
@@ -79,6 +90,8 @@ function UserDetail() {
     const [ischanged, setIsChanged] = useState(false)
     const [loading, setLoading] = useState(false)
     const { data, setData } = useData()
+    const [dataIncomes, setDataIncomes] = useState([])
+    const num = 5
 
     const handleClickEdit = () => {
         setShowDialog(true);
@@ -137,8 +150,7 @@ function UserDetail() {
         file.preview = URL.createObjectURL(file);
 
         setAvatar(file);
-    };
-
+    }
     // Validate
     const {
         clearErrors,
@@ -217,13 +229,225 @@ function UserDetail() {
                 toast.error(err.message);
                 console.error(err)
             });
-    };
+    }
+
+    useEffect(() => {
+
+        const today = new Date()
+        if (optionSelected.title == '6 ngày gần nhất') {
+            const incomeData = [];
+
+            for (let i = num + 1; i >= 0; i--) {
+                const customday = new Date();
+                customday.setDate(customday.getDate() - i);
+                const orderscustom = orders.filter((order) => {
+                    return formatDateToString(new Date(order.date)) == formatDateToString(customday);
+                });
+                const totalToday = orderscustom.reduce((total, order) => {
+                    return total + order.price;
+                }, 0);
+                incomeData.push({
+                    date: formatDateToString(customday),
+                    value: totalToday,
+                });
+            }
+            setDataIncomes(incomeData);
+        } else if (optionSelected.title == '6 giờ gần nhất') {
+            const incomeData = [];
+            // toi muon lặp 6 lần
+            for (let i = num + 1; i >= 0; i--) {
+                const customday = new Date();
+                // Đặt múi giờ cho Việt Nam
+                const vietnamTimeZone = 'Asia/Ho_Chi_Minh';
+                // Lấy thời gian hiện tại ở Việt Nam
+                let currentTimeInVietnam = moment().tz(vietnamTimeZone).get('hour') - i;
+                console.log('currentTimeInVietnam', currentTimeInVietnam);
+                //customday.setDate(customday.getDate() - i);
+                if (currentTimeInVietnam < 0) {
+                    currentTimeInVietnam = currentTimeInVietnam + 24;
+                    customday.setDate(customday.getDate() - 1);
+                }
+                const orderscustom = orders.filter((order) => {
+                    //console.log('order.date', order?.date);
+                    console.log('order.date2', order?.date?.slice(11, 13));
+                    return (
+                        order?.date?.slice(11, 13) == currentTimeInVietnam &&
+                        formatDateToString(new Date(order.date)) == formatDateToString(customday)
+                    );
+                });
+                const totalToday = orderscustom.reduce((total, order) => {
+                    return total + order.price;
+                }, 0);
+                console.log('totalTod212ay1213', totalToday);
+                incomeData.push({
+                    date: currentTimeInVietnam + 'h',
+                    value: totalToday,
+                });
+            }
+            setDataIncomes(incomeData);
+        } else if (optionSelected.title == '6 tuần gần nhất') {
+            console.log('optionSelected1212', optionSelected);
+            const incomeData = [];
+            // toi muon lặp 6 lần
+            for (let i = num; i >= 0; i--) {
+                // lấy giá trị ngày thứ 2 tuần trước
+                const date = new Date();
+                const day = date.getDay();
+                const diff = date.getDate() - day + (day == 0 ? -6 : 1) - 7;
+                const mondaylast = new Date(new Date().setDate(diff - 7 * i));
+                const sundaylast = new Date(new Date().setDate(diff - 7 * i + 6));
+                console.log('11321', diff, mondaylast, sundaylast);
+                const orderscustom = orders.filter((order) => {
+                    // lấy giá trị thứ 2 tuần sau
+                    // const mondaynext = new Date(date.setDate(diff + 14));
+                    // console.log('mondaylast', mondaylast, sundaylast, mondaynext);
+                    // in ra những đơn hàng trong tuần trước
+                    return (
+                        formatDateToString(new Date(order.date)) >= formatDateToString(mondaylast) &&
+                        formatDateToString(new Date(order.date)) <= formatDateToString(sundaylast)
+                    );
+                });
+                const totalToday = orderscustom.reduce((total, order) => {
+                    return total + order.price;
+                }, 0);
+                incomeData.push({
+                    date: formatDateToString(mondaylast) + '->' + formatDateToString(sundaylast),
+                    value: totalToday,
+                });
+            }
+            const date = new Date();
+            const day = date.getDay();
+            const diff = date.getDate() - day + (day == 0 ? -6 : 1) - 7;
+            const mondaylast = new Date(date.setDate(diff + 7));
+            const orderscustom = orders.filter((order) => {
+                // lấy giá trị thứ 2 tuần sau
+                // const mondaynext = new Date(date.setDate(diff + 14));
+                // console.log('mondaylast', mondaylast, sundaylast, mondaynext);
+                // in ra những đơn hàng trong tuần trước
+                return (
+                    formatDateToString(new Date(order.date)) >= formatDateToString(mondaylast) &&
+                    formatDateToString(new Date(order.date)) <= formatDateToString(today)
+                );
+            });
+            const totalToday = orderscustom.reduce((total, order) => {
+                return total + order.price;
+            }, 0);
+            incomeData.push({
+                date: formatDateToString(mondaylast) + '->' + formatDateToString(today),
+                value: totalToday,
+            });
+            console.log('incomeData', incomeData);
+            setDataIncomes(incomeData);
+        } else if (optionSelected.title == '6 tháng gần nhất') {
+            console.log('optionSelected1212', optionSelected);
+            const incomeData = [];
+            // toi muon lặp 6 lần
+            for (let i = num + 1; i >= 1; i--) {
+                // lấy giá trị ngày thứ 2 tuần trước
+                const date = new Date();
+                const firstDay = new Date(date.getFullYear(), date.getMonth() - i, 1);
+                const lastDay = new Date(date.getFullYear(), date.getMonth() - i + 1, 0);
+                console.log('firstDay232223233', formatDateToString(firstDay), formatDateToString(lastDay));
+
+                const orderscustom = orders.filter((order) => {
+                    // lấy giá trị thứ 2 tuần sau
+                    // const mondaynext = new Date(date.setDate(diff + 14));
+                    // console.log('mondaylast', mondaylast, sundaylast, mondaynext);
+                    // in ra những đơn hàng trong tuần trước
+                    return (
+                        formatDateToString(new Date(order.date)) >= formatDateToString(firstDay) &&
+                        formatDateToString(new Date(order.date)) <= formatDateToString(lastDay)
+                    );
+                });
+                const totalToday = orderscustom.reduce((total, order) => {
+                    return total + order.price;
+                }, 0);
+                incomeData.push({
+                    date: 'T' + (date.getMonth() - i + 1),
+                    value: totalToday,
+                });
+            }
+            const date = new Date();
+            const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+            console.log('firstDay2322121223233', formatDateToString(firstDay));
+            const orderscustom = orders.filter((order) => {
+                // lấy giá trị thứ 2 tuần sau
+                // const mondaynext = new Date(date.setDate(diff + 14));
+                // console.log('mondaylast', mondaylast, sundaylast, mondaynext);
+                // in ra những đơn hàng trong tuần trước
+                return (
+                    formatDateToString(new Date(order.date)) >= formatDateToString(firstDay) &&
+                    formatDateToString(new Date(order.date)) <= formatDateToString(today)
+                );
+            });
+            const totalToday = orderscustom.reduce((total, order) => {
+                return total + order.price;
+            }, 0);
+            incomeData.push({
+                date: 'T' + (date.getMonth() + 1),
+                value: totalToday,
+            });
+            console.log('incomeData', incomeData);
+            setDataIncomes(incomeData);
+        } else if (optionSelected.title == '6 năm gần nhất') {
+            console.log('optionSelected1212', optionSelected);
+            const incomeData = [];
+            // toi muon lặp 6 lần
+            for (let i = num + 1; i >= 1; i--) {
+                const date = new Date();
+                // lấy giá trị ngày thứ 2 tuần trước
+                const firstDay = new Date(new Date().getFullYear() - i, 0, 1);
+                // ngày cuối của năm
+                const lastDay = new Date(new Date().getFullYear() - i, 11, 31);
+                console.log('first232Day2323', formatDateToString(firstDay), formatDateToString(lastDay));
+
+                const orderscustom = orders.filter((order) => {
+                    // lấy giá trị thứ 2 tuần sau
+                    // const mondaynext = new Date(date.setDate(diff + 14));
+                    // console.log('mondaylast', mondaylast, sundaylast, mondaynext);
+                    // in ra những đơn hàng trong tuần trước
+                    return (
+                        formatDateToString(new Date(order.date)) >= formatDateToString(firstDay) &&
+                        formatDateToString(new Date(order.date)) <= formatDateToString(lastDay)
+                    );
+                });
+                const totalToday = orderscustom.reduce((total, order) => {
+                    return total + order.price;
+                }, 0);
+                incomeData.push({
+                    date: new Date().getFullYear() - i,
+                    value: totalToday,
+                });
+            }
+            const date = new Date();
+            const firstDay = new Date(date.getFullYear(), 1, 1);
+            const orderscustom = orders.filter((order) => {
+                // lấy giá trị thứ 2 tuần sau
+                // const mondaynext = new Date(date.setDate(diff + 14));
+                // console.log('mondaylast', mondaylast, sundaylast, mondaynext);
+                // in ra những đơn hàng trong tuần trước
+                return (
+                    formatDateToString(new Date(order.date)) >= formatDateToString(firstDay) &&
+                    formatDateToString(new Date(order.date)) <= formatDateToString(today)
+                );
+            });
+            const totalToday = orderscustom.reduce((total, order) => {
+                return total + order.price;
+            }, 0);
+            incomeData.push({
+                date: new Date().getFullYear(),
+                value: totalToday,
+            });
+            console.log('incomeData', incomeData);
+            setDataIncomes(incomeData);
+        }
+    }, [optionSelected])
 
     return (
         <div className={cx('wrapper')}>
             <ToastContainer
                 position="top-right"
-                autoClose={5000}
+                autoClose={2000}
                 hideProgressBar={false}
                 newestOnTop={false}
                 closeOnClick
