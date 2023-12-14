@@ -165,8 +165,6 @@ function Product() {
             })
     }
 
-    console.log(data.products)
-
     React.useEffect(() => {
 
         setRows(data.products)

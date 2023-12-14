@@ -4,7 +4,11 @@ import classNames from 'classnames/bind';
 import styles from './IncomeChart.module.scss';
 import { Point } from 'victory';
 
-const cx = classNames.bind(styles);
+const cx = classNames.bind(styles)
+
+const formatPrice = (price) => {
+    return price >= 1000000 ? `${(price / 1000000).toFixed(2)}M` : `${(price / 1000).toFixed(2)}K`
+}
 
 function IncomeChart({ data, size, setClick }) {
     const handleMouseMove = (e) => {
@@ -14,12 +18,12 @@ function IncomeChart({ data, size, setClick }) {
         setClick !== undefined && setClick(dataPoint.id);
     };
     return (
-        <>
+        <div className='py-[20px]'>
             <ResponsiveContainer width="100%" aspect={size}>
                 <AreaChart
-                    fontSize={'1.4rem'}
+                    fontSize={'1.3rem'}
                     width={730}
-                    height={250}
+                    height={220}
                     data={data}
                     margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
                     onClick={handleMouseMove}
@@ -31,9 +35,9 @@ function IncomeChart({ data, size, setClick }) {
                         </linearGradient>
                     </defs>
                     <XAxis dataKey="date" />
-                    <YAxis />
+                    <YAxis tickFormatter={formatPrice} />
                     <CartesianGrid strokeDasharray="3 3" />
-                    <Tooltip />
+                    <Tooltip formatter={formatPrice} />
                     <Area
                         style={{
                             cursor: 'pointer',
@@ -44,10 +48,10 @@ function IncomeChart({ data, size, setClick }) {
                         fillOpacity={1}
                         fill="url(#income)"
                     />
-                
+
                 </AreaChart>
             </ResponsiveContainer>
-        </>
+        </div>
     );
 }
 

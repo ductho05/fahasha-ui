@@ -9,7 +9,7 @@ import DropMenu from '../../../components/DropMenu';
 import OrdersLatesTable from '../../components/OrdersLatesTable/OrdersLatesTable';
 import { api } from '../../../constants';
 import axios from 'axios';
-import { DatePicker, Space, Image, Button, Typography, message, Alert, Spin, Popover } from 'antd';
+import { DatePicker, Space, Image, Button, Typography, message,  Alert, Spin, Popover  } from 'antd';
 import { getAuthInstance } from '../../../utils/axiosConfig';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
@@ -430,11 +430,11 @@ function Statistics() {
                 if (order.order != null) {
                     return (
                         formatDateToString(new Date(order.order.date)) <=
-                            formatDateToString(
-                                new Date(today.getFullYear(), month ? month + 1 : today.getMonth() + 1, 0),
-                            ) &&
+                        formatDateToString(
+                            new Date(today.getFullYear(), month ? month + 1 : today.getMonth() + 1, 0),
+                        ) &&
                         formatDateToString(new Date(order.order.date)) >=
-                            formatDateToString(new Date(today.getFullYear(), month ? month : today.getMonth(), 1))
+                        formatDateToString(new Date(today.getFullYear(), month ? month : today.getMonth(), 1))
                     );
                 }
             });
@@ -873,10 +873,10 @@ function Statistics() {
                                                     index == 0
                                                         ? '#f44336'
                                                         : index == 1
-                                                        ? '#ff9800'
-                                                        : index == 2
-                                                        ? '#ffc107'
-                                                        : '#4caf50',
+                                                            ? '#ff9800'
+                                                            : index == 2
+                                                                ? '#ffc107'
+                                                                : '#4caf50',
                                             }}
                                         >
                                             {index + 1}
@@ -935,10 +935,10 @@ function Statistics() {
                                                         index == 0
                                                             ? '#f44336'
                                                             : index == 1
-                                                            ? '#ff9800'
-                                                            : index == 2
-                                                            ? '#ffc107'
-                                                            : '#4caf50',
+                                                                ? '#ff9800'
+                                                                : index == 2
+                                                                    ? '#ffc107'
+                                                                    : '#4caf50',
                                                 }}
                                             >
                                                 Top {widget.top}: {widget.phanthuong}
@@ -1051,10 +1051,10 @@ function Statistics() {
                                                         index == 0
                                                             ? '#f44336'
                                                             : index == 1
-                                                            ? '#ff9800'
-                                                            : index == 2
-                                                            ? '#ffc107'
-                                                            : '#4caf50',
+                                                                ? '#ff9800'
+                                                                : index == 2
+                                                                    ? '#ffc107'
+                                                                    : '#4caf50',
                                                 }}
                                             >
                                                 {index + 1}

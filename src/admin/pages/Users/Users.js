@@ -249,7 +249,8 @@ function Users() {
         if (superAdminCode === superAdmin) {
 
             setIsSuperAdmin(true)
-            message.success("Kiểm tra thành công!")
+            localStorage.setItem("spc", true)
+            message.success("Xác nhận thành công!")
         } else {
 
             message.error(`Mã super admin sai!`)

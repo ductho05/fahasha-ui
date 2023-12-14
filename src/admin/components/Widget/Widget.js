@@ -7,6 +7,7 @@ import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined
 import VignetteOutlinedIcon from '@mui/icons-material/VignetteOutlined';
 import MonetizationOnOutlinedIcon from '@mui/icons-material/MonetizationOnOutlined';
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
+import { Link } from "react-router-dom";
 
 const cx = classNames.bind(styles)
 function Widget({ widget }) {
@@ -37,13 +38,9 @@ function Widget({ widget }) {
             <div className={cx('right')}>
                 <h3 className={cx('title')}>{widget.title}</h3>
                 <p className={cx('value')}>{widget.type == 'earnings' ? formatPrice(widget.value) : widget.value}</p>
-                <p className={cx('see_all')}>Xem tất cả</p>
+                <Link to={widget.url} className={cx('see_all')}>Xem tất cả</Link>
             </div>
             <div className={cx('left')}>
-                <div className={widget.percent >= 0 ? cx('result') : cx('result', 'reduce')}>
-                    {widget.percent >= 0 ? <ArrowDropUpOutlinedIcon /> : <ArrowDropDownOutlinedIcon />}
-                    <p className={cx('result_percent')}>{widget.percent * 100}%</p>
-                </div>
                 <div className={cx('title_icon', `${widget.type}`)}>
                     <TitleIcon />
                 </div>

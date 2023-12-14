@@ -7,7 +7,7 @@ import Skeleton from 'react-loading-skeleton';
 import CircularProgress from '@mui/material/CircularProgress';
 
 const cx = classNames.bind(styles);
-function ProductFrame({ isLoading, productList, Component }) {
+function ProductFrame({ isLoading, productList, Component, isHomePage }) {
     const title = productList.reduce((acc, item) => {
         return item.title ? (acc += 1) : acc;
     }, 0);
@@ -43,7 +43,7 @@ function ProductFrame({ isLoading, productList, Component }) {
                         key={index}
                         className={currentTab === index ? cx('product_list', 'content_active') : cx('product_list')}
                     >
-                        <Component isLoading={isLoading} products={category.products}></Component>
+                        <Component isHomePage={isHomePage} isLoading={isLoading} products={category.products}></Component>
                     </div>
                 ))}
                 {productList.length <= 0 && (

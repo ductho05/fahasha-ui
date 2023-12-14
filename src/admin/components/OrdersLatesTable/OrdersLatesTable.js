@@ -23,18 +23,21 @@ function OrdersLatesTable({ rows }) {
                             <TableCell className={cx('tableCell')}>Số điện thoại</TableCell>
                             <TableCell className={cx('tableCell')}>Số lượng</TableCell>
                             <TableCell className={cx('tableCell')}>Thành tiền</TableCell>
-                            <TableCell className={cx('tableCell')}>Phí giao hàng</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {rows.map((row) => (
+                        {rows?.map((row) => (
                             <TableRow key={row._id}>
                                 <TableCell className={cx('tableCell')}>{row.name}</TableCell>
                                 <TableCell className={cx('tableCell')}>{`${row.address}, ${row.wards}, ${row.districs}, ${row.city}, ${row.country}`}</TableCell>
                                 <TableCell className={cx('tableCell')}>{row.phone}</TableCell>
                                 <TableCell className={cx('tableCell')}>{row.quantity}</TableCell>
-                                <TableCell className={cx('tableCell')}>{row.price}</TableCell>
-                                <TableCell className={cx('tableCell')}>{row.shippingCost}</TableCell>
+                                <TableCell className={cx('tableCell')}>
+                                    {row.price.toLocaleString('vi-VN', {
+                                        style: 'currency',
+                                        currency: 'VND',
+                                    })}
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

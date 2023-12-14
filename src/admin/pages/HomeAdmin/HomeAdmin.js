@@ -6,91 +6,125 @@ import ProgressChart from '../../components/charts/ProgressChart/ProgressChart';
 import IncomeChart from '../../components/charts/IncomeChart/IncomeChart';
 import DropMenu from '../../../components/DropMenu';
 import OrdersLatesTable from '../../components/OrdersLatesTable/OrdersLatesTable';
-import { Scrollbar } from 'react-scrollbars-custom';
+import { useData } from '../../../stores/DataContext'
+import { Button } from 'antd';
+import { ArrowRightOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 
 
-const cx = classNames.bind(styles);
-// fetch data
-const dataWidgets = [
-    {
-        title: 'Người dùng',
-        type: 'users',
-        value: 250,
-        percent: 0.05,
-    },
-    {
-        title: 'Đơn hàng',
-        type: 'orders',
-        value: 1000,
-        percent: -0.03,
-    },
-    {
-        title: 'Thu nhập',
-        type: 'earnings',
-        value: 10000000,
-        percent: 0.12,
-    },
-    {
-        title: 'Đánh giá',
-        type: 'reviews',
-        value: 20,
-        percent: -0.01,
-    },
-];
+const cx = classNames.bind(styles)
 
-const options = [
-    {
-        title: '6 ngày gần nhất',
-        value: 'createdAt',
-        type: 'desc',
-    },
-    {
-        title: '6 tuần gần nhất',
-        value: 'createdAt',
-        type: 'desc',
-    },
-    {
-        title: '6 tháng gần nhất',
-        value: 'createdAt',
-        type: 'desc',
-    },
-    {
-        title: '6 năm gần nhất',
-        value: 'createdAt',
-        type: 'desc',
-    },
-];
+function chuyenDoiThang(tenVietTat) {
+    const thangDict = {
+        Jan: '01',
+        Feb: '02',
+        Mar: '03',
+        Apr: '04',
+        May: '05',
+        Jun: '06',
+        Jul: '07',
+        Aug: '08',
+        Sep: '09',
+        Oct: '10',
+        Nov: '11',
+        Dec: '12',
+    };
 
-const dataIncomes = [
-    {
-        date: '31/7/2023',
-        value: 340,
-    },
-    {
-        date: '1/8/2023',
-        value: 500,
-    },
-    {
-        date: '2/8/2023',
-        value: 400,
-    },
-    {
-        date: '3/8/2023',
-        value: 900,
-    },
-    {
-        date: '4/8/2023',
-        value: 700,
-    },
-    {
-        date: '5/8/2023',
-        value: 990,
-    },
-];
+    const soThang = thangDict[tenVietTat];
+
+    return soThang;
+}
+
+const formatDateToString = (date) => {
+    if (date) {
+        date = date.$d ? date.$d : date;
+        const year = date.getUTCFullYear();
+        const month = chuyenDoiThang(date.toString().slice(4, 7));
+        const day = date.toString().slice(8, 10);
+        const utcTimeString = `${year}-${month}-${day}`;
+        return utcTimeString;
+    }
+    return '';
+}
+
 function HomeAdmin() {
 
+    const [dataWidgets, setDataWidgets] = useState([])
+    const { data, setData } = useData()
+    const [rows, setRows] = useState([])
+    const [dataIncomes, setDataIncomes] = useState([])
+    const navigate = useNavigate()
 
-    const [optionSelected, setOptionSelected] = useState(options[0]);
+    const num = 5
+
+    useEffect(() => {
+        const countUsers = data?.users?.length
+        const countOrders = data?.orders?.filter(order => order.status !== "DAHUY")?.length
+        const listOrderComplete = data?.orders?.filter(order => order.status == "HOANTHANH")
+        let incomes = 0
+        if (listOrderComplete) {
+            incomes = listOrderComplete?.reduce((acc, order) => acc + order.price, 0)
+        }
+        const countEvaluate = data?.evaluates?.length
+        const listNewOrderComplete = data?.orders?.filter((order) => order.status == "HOANTHANH")?.slice(0, 10)
+
+        const incomeData = []
+
+
+        for (let i = num + 1; i >= 0; i--) {
+            const customday = new Date();
+            customday.setDate(customday.getDate() - i);
+            const orderscustom = data?.orders?.filter((order) => {
+                return formatDateToString(new Date(order.date)) == formatDateToString(customday);
+            });
+            let totalToday = 0
+            if (orderscustom) {
+                totalToday = orderscustom.reduce((total, order) => {
+                    return total + order.price;
+                }, 0);
+            }
+            incomeData.push({
+                date: formatDateToString(customday),
+                value: totalToday,
+            });
+        }
+        setDataIncomes(incomeData);
+
+        setDataWidgets([
+            {
+                title: 'Người dùng',
+                type: 'users',
+                value: countUsers,
+                url: '/admin/user'
+            },
+            {
+                title: 'Đơn hàng',
+                type: 'orders',
+                value: countOrders,
+                url: '/admin/orders'
+            },
+            {
+                title: 'Thu nhập',
+                type: 'earnings',
+                value: incomes,
+                url: '/admin/statistics'
+            },
+            {
+                title: 'Đánh giá',
+                type: 'reviews',
+                value: countEvaluate,
+                url: '/admin/reviews'
+            },
+        ])
+
+        setRows(listNewOrderComplete)
+
+    }, [data])
+
+    const handleToStatistic = () => {
+
+        navigate("/admin/statistics")
+    }
 
     return (
         <div className={cx('wrapper')}>
@@ -100,25 +134,21 @@ function HomeAdmin() {
                 ))}
             </div>
             <div className={cx('chart')}>
-                <div className={cx('left')}>
-                    <ProgressChart />
-                </div>
                 <div className={cx('right')}>
-                    <div className={cx('heading')}>
-                        <h3 className={cx('income_title')}>Thu nhập</h3>
-                        <DropMenu
-                            options={options}
-                            size="small"
-                            optionSelected={optionSelected}
-                            setOptionSelected={setOptionSelected}
-                        />
+                    <div className={cx('heading p-[20px]')}>
+                        <Button onClick={handleToStatistic} icon={<ArrowRightOutlined />} danger>Xem tất cả</Button>
                     </div>
-                    <IncomeChart data={dataIncomes} size={2 / 1} />
+                    <div>
+                        <h3 className="mb-[20px] text-[2rem] uppercase text-[#333] font-[600] text-center">
+                            Thu nhập 6 ngày gần nhất
+                        </h3>
+                        <IncomeChart data={dataIncomes} size={3 / 1} />
+                    </div>
                 </div>
             </div>
 
             <div className={cx('table')}>
-                <OrdersLatesTable rows={[]} />
+                <OrdersLatesTable rows={rows} />
             </div>
         </div>
     );
