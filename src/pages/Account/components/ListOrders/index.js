@@ -57,7 +57,7 @@ function ListOrders() {
                 })
         } else {
             setLoading(true)
-            authInstance.post(`${api}/orders/filter?status=${tabList[currentIndex].value}`)
+            authInstance.post(`${api}/orders/filter?status=${tabList[currentIndex].value}&user=${state.user._id}`)
                 .then(result => {
                     if (result.data.status == 'OK') {
                         setListOrders(result.data.data)

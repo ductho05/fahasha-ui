@@ -141,7 +141,7 @@ function FlashSale() {
                                 reload={reloadFlashSale}
                                 isLoading={isLoading}
                                 props={{
-                                    fontSize: '3rem',
+                                    fontSize: '2rem',
                                     color: '#ffe818',
                                     justifyContent: 'left',
                                     margin: '0 1rem 0 0',
@@ -153,7 +153,7 @@ function FlashSale() {
                                 reload={reloadFlashSale}
                                 isLoading={isLoading}
                                 props={{
-                                    fontSize: '3rem',
+                                    fontSize: '2rem',
                                     color: '#ffe818',
                                     justifyContent: 'left',
                                     margin: '0 1rem 0 0',

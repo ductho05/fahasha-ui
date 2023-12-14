@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { seeNotice } from '../../../../stores/actions';
 import { Skeleton } from 'antd';
 import { getAuthInstance } from '../../../../utils/axiosConfig'
+import SendNotification from '../../../../service/SendNotification';
 
 const cx = classNames.bind(styles)
 function Notifition() {

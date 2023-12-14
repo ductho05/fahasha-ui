@@ -10,7 +10,11 @@ export const registerImages = 'https://quicklaunch.io/wp-content/uploads/2019/10
 export const cancelOrderImage =
     'https://commercemarketplace.adobe.com/media/catalog/product/f/8/f80e_cancel-order-240x240_3.png';
 
+export const flashSaleImage = 'https://img.freepik.com/free-vector/special-flash-sale-modern-banner-design-vector-illustration_1017-38337.jpg'
+
 export const listJustWatched = JSON.parse(localStorage.getItem('mycategory')) || [];
+
+export const superAdmin = "superadmin1811"
 
 export const listPathHots = [
     {

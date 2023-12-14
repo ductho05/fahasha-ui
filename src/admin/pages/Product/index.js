@@ -21,6 +21,7 @@ import Dropdown from 'react-multilevel-dropdown';
 import { Input, DatePicker, Form, Button, Skeleton, Popconfirm, Select } from 'antd';
 import SendNotification from '../../../service/SendNotification';
 import { getAuthInstance } from '../../../utils/axiosConfig';
+import { useData } from '../../../stores/DataContext';
 
 const cx = classNames.bind(styles)
 function Product() {
@@ -35,7 +36,8 @@ function Product() {
     const [loadingProduct, setLoadingProduct] = useState(false)
     const [isAction, setIsAction] = useState(false)
     const [options, setOptions] = useState([])
-    const [success, setSuccess] = useState(false)
+    const [success, setSuccess] = useState(0)
+    const { data, setData } = useData()
     const [categoryName, setCategoryName] = useState({
         name: "--Chọn loại sản phẩm--",
         value: ""
@@ -111,7 +113,7 @@ function Product() {
                         .then(result => {
                             if (result.data.status === 'OK') {
                                 toast.success('Xóa thành công!')
-                                setSuccess(prev => !prev)
+                                setSuccess(prev => prev + 1)
                             } else {
                                 toast.error(result.data.message)
                             }
@@ -146,22 +148,35 @@ function Product() {
         },
     ];
 
-    React.useEffect(() => {
-        setLoadingProduct(true)
+    const fetchProduct = () => {
+
         fetch(`${api}/products`)
             .then(response => response.json())
             .then(result => {
                 if (result.status === "OK") {
-                    setLoadingProduct(false)
-                    setRows(result.data)
-                } else {
-                    setLoadingProduct(false)
+
+                    console.log("fetch lai")
+                    setData({ ...data, products: result.data.products })
                 }
             })
             .catch(error => {
-                setLoadingProduct(false)
+
                 console.log(error.message)
             })
+    }
+
+    console.log(data.products)
+
+    React.useEffect(() => {
+
+        setRows(data.products)
+    }, [data])
+
+    React.useEffect(() => {
+
+        if (success !== 0) {
+            fetchProduct()
+        }
     }, [success])
 
     useEffect(() => {
@@ -198,7 +213,7 @@ function Product() {
             .then(async result => {
 
                 if (result.data.status === "OK") {
-                    setSuccess(prev => !prev)
+                    setSuccess(prev => prev + 1)
                     toast.success("Thêm mới sản phẩm thành công")
                     const title = "Thông báo sản phẩm"
                     const description = "TA Book Store vừa ra mắt sản phẩm mới. Xem ngay"

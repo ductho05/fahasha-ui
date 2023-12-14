@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import classNames from "classnames/bind"
 import styles from './Users.module.scss'
 import EnhancedTable from "../../components/Table/EnhancedTable"
-import { api } from '../../../constants'
+import { api, superAdmin } from '../../../constants'
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import { Delete, View } from '../../components/Button/Button';
 import { confirmAlert } from 'react-confirm-alert';
@@ -17,8 +17,10 @@ import DropMenu from "../../../components/DropMenu"
 import Button from "../../../components/Button"
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { CircularProgress, Backdrop } from "@mui/material"
-import { Input, Form, Skeleton, DatePicker, Popconfirm } from 'antd';
+import { Input, Form, Skeleton, DatePicker, Popconfirm, Modal, message } from 'antd';
 import { getAuthInstance } from "../../../utils/axiosConfig"
+import { useData } from "../../../stores/DataContext"
+import { useNavigate } from "react-router-dom"
 
 const cx = classNames.bind(styles)
 
@@ -39,6 +41,7 @@ function Users() {
 
     const authInstance = getAuthInstance()
 
+    const navigate = useNavigate()
     const [rows, setRows] = useState([])
     const [avatar, setAvatar] = useState()
     const [showDialog, setShowDialog] = useState(false)
@@ -47,6 +50,9 @@ function Users() {
     const [isAction, setIsAction] = useState(false)
     const [gender, setGender] = useState()
     const [isInsert, setIsInsert] = useState(false)
+    const { data, setData } = useData()
+    const [isSuperAdmin, setIsSuperAdmin] = useState(false)
+    const [superAdminCode, setSuperAdminCode] = useState("")
     const [role, setRole] = useState({
         title: '-- Chọn --',
         value: '',
@@ -105,6 +111,7 @@ function Users() {
                             if (result.data.status === 'OK') {
                                 setIsAction(prev => !prev)
                                 toast.success('Xóa thành công!')
+                                fetchUsers()
                             } else {
                                 toast.error(result.message)
                             }
@@ -135,20 +142,24 @@ function Users() {
                 </div>
             }
         },
-    ];
+    ]
 
     useEffect(() => {
-        setLoadingUsers(true)
+
+        setRows(data.users)
+    }, [data])
+
+    const fetchUsers = () => {
+
         authInstance.get(`/users`)
             .then(result => {
-                setLoadingUsers(false)
-                setRows(result.data.data)
+                setData({ ...data, users: result.data.data })
             })
             .catch(err => {
-                setLoadingUsers(false)
+
                 console.log(err)
             })
-    }, [isAction])
+    }
 
     useEffect(() => {
         return () => {
@@ -169,7 +180,7 @@ function Users() {
         setGender(gender)
     }
 
-    const onFinish = (data) => {
+    const onFinish = async (data) => {
         const formData = new FormData()
         Object.keys(data).forEach(key => {
             formData.append(key, data[key])
@@ -187,11 +198,12 @@ function Users() {
             formData.append('gender', gender)
         }
         setIsInsert(true)
-        authInstance.post(`/users/insert`, formData)
+        await authInstance.post(`/users/insert`, formData)
             .then(result => {
                 if (result.data.status === 'OK') {
                     setIsAction(prev => !prev)
                     toast.success("Thêm mới tài khoản thành công!")
+                    fetchUsers()
                 } else {
                     toast.error(`${result.data.message}`)
                 }
@@ -227,8 +239,38 @@ function Users() {
         setGender()
     }
 
+    const handleChangeCode = (e) => {
+
+        setSuperAdminCode(e.target.value)
+    }
+
+    const handleCheckCode = () => {
+
+        if (superAdminCode === superAdmin) {
+
+            setIsSuperAdmin(true)
+            message.success("Kiểm tra thành công!")
+        } else {
+
+            message.error(`Mã super admin sai!`)
+        }
+    }
+
+    const handleCancelCheck = () => {
+
+        navigate("/admin")
+    }
+
     return (
         <div className={cx('wrapper')}>
+            <Modal
+                title="Vui lòng nhập mã SupperAdmin để quản lý người dùng!"
+                open={!isSuperAdmin}
+                onOk={handleCheckCode}
+                onCancel={handleCancelCheck}
+            >
+                <Input value={superAdminCode} type="text" onChange={(e) => handleChangeCode(e)} />
+            </Modal>
             <ToastContainer
                 position="top-right"
                 autoClose={5000}
@@ -432,15 +474,12 @@ function Users() {
                 </p>
             </div>
             {
-                loadingUsers &&
-                <div>
-                    <LinearProgress />
-                </div>
-            }
-            {
-                loadingUsers === false ? <div className={cx('table')}>
-                    <EnhancedTable columns={columns} rows={rows} />
-                </div>
+                loadingUsers === false ?
+                    <div className={cx('table')}>
+                        {
+                            isSuperAdmin && <EnhancedTable columns={columns} rows={rows} />
+                        }
+                    </div>
                     : <div className="mt-[20px]">
                         <Skeleton
                             active

@@ -137,7 +137,7 @@ function Statistics() {
     const [doanhthucustom, setDoanhThuCustom] = useState(0);
     const [start, setStart] = useState(formatDateToString(new Date()));
     const [end, setEnd] = useState(formatDateToString(new Date()));
-    const [numProduct, setNumProduct] = useState();
+    const [numProduct, setNumProduct] = useState(5);
     const [month, setMonth] = useState(new Date().getMonth() + 1);
     const [year, setYear] = useState(new Date().getFullYear());
     const [maxProduct, setMaxProduct] = useState(); // số lượng sản phẩm trong tháng
@@ -447,8 +447,10 @@ function Statistics() {
             //     name: 'phan van duc anh',
             //     value: 250,
             // },
-            ordersThisMonth.forEach((element) => {
+            ordersThisMonth.forEach((element, index) => {
+                console.log('element1', index, element);
                 if (productOrdersThisMonth.includes(element?.product?._id)) {
+                    console.log('iiii', index);
                     product[productOrdersThisMonth.indexOf(element?.product?._id)].value += element?.price;
                     product[productOrdersThisMonth.indexOf(element?.product?._id)].orders.push({
                         ...element?.order,
@@ -459,6 +461,7 @@ function Statistics() {
                         priceElement: element?.price,
                     });
                 } else {
+                    console.log('iiii2', index);
                     productOrdersThisMonth.push(element?.product?._id);
                     product.push({
                         id: element?.product?._id,
@@ -479,6 +482,8 @@ function Statistics() {
                     });
                 }
             });
+
+            console.log('product1212', product);
 
             // sắp xếp theo thứ tự giảm dần
             product.sort((a, b) => {
@@ -518,18 +523,20 @@ function Statistics() {
             //     value: 250,
             // },
             ordersThisMonth.forEach((element) => {
-                if (userOrdersThisMonth.includes(element.user.id)) {
-                    user[userOrdersThisMonth.indexOf(element.user.id)].value += element.price;
+                if (userOrdersThisMonth.includes(element.user._id)) {
+                    user[userOrdersThisMonth.indexOf(element.user._id)].value += element.price;
                 } else {
-                    userOrdersThisMonth.push(element.user.id);
+                    userOrdersThisMonth.push(element.user._id);
                     user.push({
-                        id: element.user.id,
+                        id: element.user._id,
                         avatar: element.user.images,
                         name: element.user.fullName,
                         value: element.price,
                     });
                 }
             });
+
+            console.log('user1212', user);
             // sắp xếp theo thứ tự giảm dần
             user.sort((a, b) => {
                 return b.value - a.value;
@@ -577,7 +584,7 @@ function Statistics() {
                     // Đặt múi giờ cho Việt Nam
                     const vietnamTimeZone = 'Asia/Ho_Chi_Minh';
                     // Lấy thời gian hiện tại ở Việt Nam
-                    const currentTimeInVietnam = moment().tz(vietnamTimeZone).get('hour') - i;
+                    let currentTimeInVietnam = moment().tz(vietnamTimeZone).get('hour') - i;
                     console.log('currentTimeInVietnam', currentTimeInVietnam);
                     //customday.setDate(customday.getDate() - i);
                     if (currentTimeInVietnam < 0) {
@@ -592,7 +599,7 @@ function Statistics() {
                             formatDateToString(new Date(order.date)) == formatDateToString(customday)
                         );
                     });
-                    const totalToday = orderscustom.reduce((total, order) => {
+                    let totalToday = orderscustom.reduce((total, order) => {
                         return total + order.price;
                     }, 0);
                     console.log('totalTod212ay1213', totalToday);

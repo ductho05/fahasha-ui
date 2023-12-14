@@ -63,6 +63,7 @@ function TableCart() {
                                 price: products.data.price,
                                 count: item.count,
                                 total: item.count * products.data.price,
+                                quantity: products.data.quantity
                             },
                         ];
                     });
@@ -293,8 +294,12 @@ function TableCart() {
                                     const newData = [...data];
                                     newData.map((item, index) => {
                                         if (item.key === record.key) {
-                                            item.count += 1;
-                                            item.total = item.count * item.price;
+                                            if (item.quantity - item.count == 0) {
+                                                message.warning("Vui lòng không đặt quá số lượng trong kho")
+                                            } else {
+                                                item.count += 1;
+                                                item.total = item.count * item.price;
+                                            }
                                         }
                                     });
                                     setData(newData);

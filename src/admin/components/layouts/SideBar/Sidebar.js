@@ -13,6 +13,7 @@ import LoyaltyIcon from '@mui/icons-material/Loyalty';
 import AccountBoxOutlinedIcon from '@mui/icons-material/AccountBoxOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { Scrollbar } from 'react-scrollbars-custom';
+import CategoryIcon from '@mui/icons-material/Category';
 
 import ReviewsIcon from '@mui/icons-material/Reviews';
 
@@ -52,8 +53,9 @@ const tabList = [
             },
             {
                 id: 4,
-                icon: LocalShippingOutlinedIcon,
-                name: 'Vận chuyển',
+                icon: CategoryIcon,
+                name: 'Loại sản phẩm',
+                link: '/admin/categories'
             },
             {
                 id: 5,
@@ -114,7 +116,7 @@ function SideBar() {
     return (
         <div className={cx('wrapper')}>
             <div className={cx('top')}>
-                <h2>Fahasha Admin</h2>
+                <h2>TA BookStore Admin</h2>
             </div>
             <Scrollbar removeTrackYWhenNotUsed style={{ width: 250, height: '100vh' }}>
                 <div className={cx('bottom')}>

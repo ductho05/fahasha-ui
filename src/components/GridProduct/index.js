@@ -3,7 +3,7 @@ import ProductItem from '../ProductItem'
 function GridProduct({ isLoading, products }) {
 
     return (
-        <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+        <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {
                 products.map(product => (
                     <div>

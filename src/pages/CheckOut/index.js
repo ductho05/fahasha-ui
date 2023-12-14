@@ -62,14 +62,16 @@ function CheckOut() {
         setProduct(localStorage.getItem(namecart) ? JSON.parse(localStorage.getItem(namecart)).items : []);
     }, [isLoading]);
 
+    console.log('mychecko2121ut', listCheckouts);
     if (mycheckout.length == 0) {
         navigate('/cart');
     }
 
-    console.log('mycheckou12t', mycheckout);
+    console.log('mycheckou12t', productFlash);
 
     const addUserFlash = () => {
         productFlash.map((item) => {
+            console.log('item1212', item);
             authInstance
                 .post(`/flashusers/add`, {
                     ...item,
@@ -149,7 +151,14 @@ function CheckOut() {
                         if (response.message == 'Not enough quantity') {
                             console.log('abasdhgc', response.data);
                             setProductNotQuanlity((prev1) => {
-                                return [...prev1, response.data];
+                                // kiểm tra sản phẩm có trong mảng chưa
+                                const index = prev1.findIndex(
+                                    (item1) => item1.product._id == response.data.product._id,
+                                );
+                                if (index == -1) {
+                                    return [...prev1, response.data];
+                                }
+                                return prev1;
                             });
                             setOpen(true);
                         }
@@ -160,11 +169,12 @@ function CheckOut() {
     }, [productFlash]);
 
     const addCheckout = async (data, type) => {
+        console.log('data21423', data);
         setShowProgress(true);
         await authInstance
             .post(`/orders/insert`, {
                 ...data,
-                flashsales: productFlash,
+                flashsales: [], //productFlash,
             })
             .then((result) => {
                 if (result.data.status == 'OK') {
@@ -246,6 +256,17 @@ function CheckOut() {
                         )
                         .then((result) => {
                             if (result.data.status === 'OK') {
+                                state.socket.emit('send-notification', {
+                                    type: 'admin',
+                                    userId: null,
+                                    notification: {
+                                        title,
+                                        description,
+                                        image,
+                                        url,
+                                        user: null,
+                                    },
+                                });
                             }
                         })
                         .catch((err) => {
@@ -266,7 +287,7 @@ function CheckOut() {
             });
     };
 
-    // Chuyển hướng đến trang khác sau khi thanh toán bên VNpay
+    // Chuyển hướng về lại trang checkout sau khi thanh toán bên VNpay
     useEffect(() => {
         // Lấy chuỗi truy vấn (query string) sau dấu "?"
         const queryString = window.location.search;
@@ -275,6 +296,7 @@ function CheckOut() {
         // Lấy giá trị của tham số "name"
         const signed = urlParams.get('signed');
         const status = urlParams.get('status');
+        // kiểm tra trùng khớp thì pass
         if (JSON.stringify(dataCheckout) !== '{}' && dataCheckout.signed === signed) {
             delete dataCheckout.signed;
             localStorage.removeItem('is_order_success_page');
@@ -323,23 +345,34 @@ function CheckOut() {
     }, []);
 
     const submit = (data) => {
-        console.log('data', data);
+        console.log('data12121', data);
         if (data) {
             if (data.payment_method == 'Thanh toán bằng VNPay') {
                 localstorage.set('item_order_checkout', listCheckouts);
-
-                fetch(`${api}/orders/create_payment_url?amount=${data.price}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                })
-                    .then((response) => response.json())
+                authInstance
+                    .post(`/orders/create_payment_url?amount=${data.price}`)
                     .then((result) => {
-                        data.signed = result.signed;
+                        console.log('sdda33sdas', result.data.data);
+                        data.signed = result.data.data.signed;
                         localstorage.set(statusVNPayCheckout, data);
-                        window.location.href = result.data;
+                        window.location.href = result.data.data.data;
+                    })
+                    .catch((err) => {
+                        console.log('ádassdasd', err);
                     });
+                // fetch(`${api}/orders/create_payment_url?amount=${data.price}`, {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //     },
+                // })
+                //     .then((response) => response.json())
+                //     .then((result) => {
+                //         console.log('result1212', result);
+                //         data.signed = result.signed;
+                //         localstorage.set(statusVNPayCheckout, data);
+                //         //window.location.href = result.data;
+                //     });
             } else {
                 localStorage.removeItem('is_order_success_page');
                 addCheckout(data, 'cash');
@@ -545,6 +578,78 @@ function CheckOut() {
         setValue('shippingCost', shippingCost);
     }, [isSubmit]);
 
+    const updateListCheckouts = (deleteData) => {
+        const newListCheckouts = [];
+        // setProductFlash((prev) => {
+        //     return [
+        //         ...prev,
+        //         {
+        //             userid: state.user._id,
+        //             flashid: products.data[0]._id,
+        //             mount: item.count,
+        //         },
+        //     ];
+        // });
+        const newProductFlash = [];
+        productFlash.map((item) => {
+            const index = deleteData.findIndex((item1) => item1._id == item.flashid);
+            if (index == -1) {
+                newProductFlash.push(item);
+            } else {
+                newProductFlash.push({
+                    ...item,
+                    mount: deleteData[index].num_sale - deleteData[index].sold_sale,
+                });
+            }
+        });
+        //setProductFlash(newProductFlash);
+        console.log('newProductFlash2121', newProductFlash);
+        setProductFlash(newProductFlash);
+
+        deleteData.map((item) => {
+            // sales
+            newListCheckouts.push({
+                product: {
+                    ...item.product,
+                    title: item.product.title + ' (FlashSale)',
+                },
+                quantity: item.num_sale - item.sold_sale,
+            });
+            // giá gốc
+            newListCheckouts.push({
+                product: {
+                    ...item.product,
+                    price: item.product.containprice,
+                },
+                quantity:
+                    mycheckout.filter((phantu) => phantu.id == item.product._id)[0]?.count -
+                    item.num_sale +
+                    item.sold_sale,
+            });
+        });
+
+        listCheckouts.map((item) => {
+            const index = deleteData.findIndex((item1) => item1.product._id == item.product._id);
+            if (index == -1) {
+                newListCheckouts.push({
+                    product: item.product,
+                    quantity: item.quantity,
+                });
+            }
+        });
+
+        // lấy những sản phẩm không có trong mảng deleteData
+        // mycheckout.map((item) => {
+        //     if (!deleteData.includes(item)) {
+        //         newListCheckouts.push({
+        //             product: item.product,
+        //             quantity: item.count,
+        //         });
+        //     }
+        // });
+        setListCheckouts(newListCheckouts);
+        console.log('newListChec2kouts', newListCheckouts);
+    };
     // Update trạng thái chọn mua trong giỏ hàng lên local
     const updateLocalCart = (deleteData, option) => {
         console.log('deleteData', deleteData);
@@ -563,14 +668,16 @@ function CheckOut() {
         } else if (option == 'continue') {
             console.log('sdufgjsd', myCart, deleteData);
             deleteData.map((item) => {
-                myCart.items.filter((phantu) => phantu.id == item.product._id)[0].count = item.num_sale - item.sold_sale;
+                myCart.items.filter((phantu) => phantu.id == item.product._id)[0].count =
+                    item.num_sale - item.sold_sale;
             });
         }
-        else {
-            deleteData.map((item) => {
-                myCart.items.filter((phantu) => phantu.id == item.product._id)[0].count = item.num_sale - item.sold_sale;
-            });
-        }
+        // } else {
+        //     deleteData.map((item) => {
+        //         myCart.items.filter((phantu) => phantu.id == item.product._id)[0].count =
+        //             item.num_sale - item.sold_sale;
+        //     });
+        // }
         localStorage.setItem(namecart, JSON.stringify(myCart));
     };
 
@@ -616,7 +723,7 @@ function CheckOut() {
                     <li>Cụ thể là các sản phẩm sau:</li>
                     {productNotQuanlity.map((item, index) => (
                         <li key={index}>
-                            {item.product.title} <br /> Số lượng:{' '}
+                            <strong>{item.product.title}</strong> <br /> Số lượng:{' '}
                             {mycheckout.filter((phantu) => phantu.id == item.product._id)[0]?.count} - Được phép mua:{' '}
                             {item.num_sale - item.sold_sale}
                         </li>
@@ -664,11 +771,12 @@ function CheckOut() {
                             marginRight: 10,
                         }}
                         onClick={() => {
-                            updateLocalCart(productNotQuanlity, 'custom');
+                            // updateLocalCart(productNotQuanlity, 'custom');
+                            updateListCheckouts(productNotQuanlity);
                             // setIsLoading(!isLoading);
                             setOpen(false);
                             // load lại trang
-                            window.location.reload();
+                            //window.location.reload();
                         }}
                     >
                         Tùy chỉnh

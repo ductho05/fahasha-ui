@@ -4,6 +4,7 @@ import styles from './Order.module.scss'
 import EnhancedTable from '../../components/Table/EnhancedTable';
 import { api, CHOXACNHAN, DAHUY, DANGGIAO, HOANTHANH } from '../../../constants';
 import LinearProgress from '@mui/material/LinearProgress';
+import CircularProgress from '@mui/material/CircularProgress';
 import { Backdrop } from '@mui/material';
 import { toast, ToastContainer } from 'react-toastify'
 import "react-toastify/dist/ReactToastify.css";
@@ -14,6 +15,8 @@ import { Popconfirm, Skeleton } from 'antd';
 import SendNotification from '../../../service/SendNotification'
 import { appPath, orderImages } from '../../../constants';
 import { getAuthInstance } from '../../../utils/axiosConfig';
+import { useStore } from '../../../stores/hooks';
+import { useData } from '../../../stores/DataContext';
 
 const tabList = [
     {
@@ -46,7 +49,10 @@ function Order() {
     const [currentIndex, setCurrentIndex] = React.useState(0)
     const [loading, setLoading] = React.useState(false)
     const [loadingOrder, setLoadingOrder] = React.useState(false)
-    const [isUpdate, setIsUpdate] = React.useState(false)
+    const [isUpdate, setIsUpdate] = React.useState(0)
+    const [state, dispatch] = useStore()
+    const { data, setData } = useData()
+    const [allOrders, setAllOrders] = React.useState([])
     const columns = [
         {
             field: 'name',
@@ -132,14 +138,14 @@ function Order() {
                         updateStatus = HOANTHANH
                     }
                     if (updateStatus) {
-                        authInstance.put(`/orders/update/${params.row._id}`,
+                        setLoading(true)
+                        await authInstance.put(`/orders/update/${params.row._id}`,
                             { "status": updateStatus }
                         )
                             .then(async result => {
-                                console.log(result)
+
                                 if (result.data.status === 'OK') {
-                                    setIsUpdate(prev => !prev)
-                                    toast.success('Cập nhật thành công!')
+                                    setIsUpdate(prev => prev + 1)
                                     let description = "Đơn hàng của bạn đang trên đường giao. Hãy để ý điện thoại nhé!"
                                     if (result.data.status === DANGGIAO) {
                                         description = "Đơn hàng của bạn đã được giao thành công!"
@@ -158,6 +164,22 @@ function Order() {
                                             user
                                         }
                                     })
+                                        .then(result => {
+                                            if (result.data.status == "OK") {
+                                                state.socket.emit("send-notification", {
+                                                    type: "personal",
+                                                    userId: null,
+                                                    notification: {
+                                                        title,
+                                                        description,
+                                                        image: orderImages,
+                                                        url,
+                                                        user
+                                                    }
+                                                })
+                                                toast.success('Cập nhật thành công!')
+                                            }
+                                        })
                                         .catch((err) => {
                                             console.error(err)
                                         })
@@ -165,9 +187,11 @@ function Order() {
                                 } else {
                                     toast.error(result.data.message)
                                 }
+                                setLoading(false)
                             })
                             .catch(err => {
                                 toast.error(err?.response?.data?.message)
+                                setLoading(false)
                             })
                     } else {
                         toast.error("Không tìm thấy trạng thái đơn hàng")
@@ -201,28 +225,42 @@ function Order() {
         setCurrentIndex(index)
     }
 
-    React.useEffect(() => {
-        setLoadingOrder(true)
-        setRows([])
-        let query = `/orders/filter`
-        if (tabList[currentIndex].value) {
-            query = `/orders/filter?status=${tabList[currentIndex].value}`
-        }
-        authInstance.post(query)
+    const fetchOrders = () => {
+        authInstance.post("/orders/filter")
             .then(result => {
                 if (result.data.status === "OK") {
-                    setLoadingOrder(false)
-                    setRows(result.data.data)
-                } else {
-                    setLoadingOrder(false)
-                    toast.error(result.data.message)
+
+                    setData({ ...data, orders: result.data.data })
                 }
             })
             .catch(error => {
-                setLoadingOrder(false)
-                toast.error(error.message)
+                console.log(error)
             })
-    }, [currentIndex, isUpdate])
+    }
+
+    React.useEffect(() => {
+
+        fetchOrders()
+    }, [isUpdate])
+
+    React.useEffect(() => {
+
+        setAllOrders(data.orders)
+    }, [data])
+
+    React.useEffect(() => {
+
+        if (currentIndex === 0) {
+
+            setRows(data.orders)
+        } else {
+            const status = tabList[currentIndex].value
+
+            const newList = data.orders.filter(order => order.status === status)
+            setRows(newList)
+        }
+
+    }, [currentIndex, data])
     return (
         <div className={cx('wrapper')}>
             <ToastContainer
@@ -240,7 +278,9 @@ function Order() {
             <Backdrop
                 open={loading}
                 sx={{ color: '#fff', zIndex: 10000 }}
-            />
+            >
+                <CircularProgress color="error" />
+            </Backdrop>
             <div className={cx('heading')}>
                 <h3>Quản lý đơn hàng</h3>
             </div>

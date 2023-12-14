@@ -9,21 +9,33 @@ import { Scrollbar } from 'react-scrollbars-custom';
 import lottie from 'lottie-web';
 import { useData } from '../../../stores/DataContext';
 import SideBarLaptop from './SideBarLaptop';
+import { getAuthInstance } from '../../../utils/axiosConfig';
 const cx = classNames.bind(styles);
 function AdminLayout({ children }) {
+
+    const authInstance = getAuthInstance()
+
     const container = useRef(null);
     const { data, setData } = useData();
 
     const [isLoaded, setIsLoaded] = useState(
         Object.keys(data).length !== 0
             ? {
-                  products: true,
-                  flashsales: true,
-              }
+                evaluates: true,
+                orders: true,
+                users: true,
+                products: true,
+                flashsales: true,
+                categories: true
+            }
             : {
-                  products: false,
-                  flashsales: false,
-              },
+                evaluates: false,
+                orders: false,
+                users: false,
+                products: false,
+                flashsales: false,
+                categories: false
+            },
     );
     const [percent, setPercent] = useState(0);
     const num = '';
@@ -31,9 +43,13 @@ function AdminLayout({ children }) {
         Object.keys(data).length !== 0
             ? data
             : {
-                  products: [],
-                  flashsales: [],
-              },
+                evaluates: [],
+                orders: [],
+                users: [],
+                products: [],
+                flashsales: [],
+                categories: []
+            },
     );
 
     // useEffect(() => {
@@ -100,13 +116,63 @@ function AdminLayout({ children }) {
                     setIsLoaded((prev) => ({ ...prev, flashsales: true }));
                 })
                 .catch((err) => console.log(err));
+
+            fetch(`${api}/evaluates/get`)
+                .then(response => response.json())
+                .then(result => {
+
+                    setData2((prev) => ({ ...prev, evaluates: result.data }));
+                    setIsLoaded((prev) => ({ ...prev, evaluates: true }));
+                })
+                .catch(err => {
+
+                    console.log(err)
+                })
+            fetch(`${api}/categories?filter=simple`)
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status == "OK") {
+                        setData2((prev) => ({ ...prev, categories: result.data }));
+                        setIsLoaded((prev) => ({ ...prev, categories: true }));
+                    }
+                })
+                .catch(err => console.log(err.message))
+
+            authInstance.post("/orders/filter")
+                .then(result => {
+                    if (result.data.status === "OK") {
+
+                        setData2((prev) => ({ ...prev, orders: result.data.data }));
+                        setIsLoaded((prev) => ({ ...prev, orders: true }));
+                    }
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+
+            authInstance.get(`/users`)
+                .then(result => {
+                    setData2((prev) => ({ ...prev, users: result.data.data }));
+                    setIsLoaded((prev) => ({ ...prev, users: true }));
+                })
+                .catch(err => {
+
+                    console.log(err)
+                })
         } else {
-            setIsLoaded({ products: true, flashsales: true });
+            setIsLoaded({
+                evaluates: true,
+                orders: true,
+                users: true,
+                products: true,
+                flashsales: true,
+                categories: true
+            });
         }
     }, []);
 
     useEffect(() => {
-        if (isLoaded.flashsales && isLoaded.products && Object.keys(data).length === 0) {
+        if (isLoaded.evaluates && isLoaded.categories && isLoaded.orders && isLoaded.users && isLoaded.flashsales && isLoaded.products && Object.keys(data).length === 0) {
             //localStorage.setItem('temporary_data', JSON.stringify(data));
             setData(data2);
         }
@@ -116,12 +182,12 @@ function AdminLayout({ children }) {
 
     return (
         <>
-            {!(isLoaded.flashsales && isLoaded.products) && Object.keys(data).length === 0 && (
+            {!(isLoaded.evaluates && isLoaded.categories && isLoaded.orders && isLoaded.users && isLoaded.flashsales && isLoaded.products) && Object.keys(data).length === 0 && (
                 <div className={cx('wrapper-loading')}>
                     <div className={cx('animation-loading')} ref={container}></div>
                 </div>
             )}
-            {!(!(isLoaded.flashsales && isLoaded.products) && Object.keys(data).length === 0) && (
+            {!(!(isLoaded.evaluates && isLoaded.categories && isLoaded.orders && isLoaded.users && isLoaded.flashsales && isLoaded.products) && Object.keys(data).length === 0) && (
                 <div className={cx('wrapper')}>
                     <div
                         className={cx('navbar')}

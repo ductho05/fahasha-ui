@@ -53,7 +53,7 @@ function BarChartExample({
     const [isToggle, setIsToggle] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     //  const [rows, setRows] = useState([]);
-    const [num, setNum] = useState(maxProduct);
+    const [num, setNum] = useState(5);
     // const valueTop = document.documentElement.scrollHeight;
     console.log('afgjasfgajf', data);
     //
