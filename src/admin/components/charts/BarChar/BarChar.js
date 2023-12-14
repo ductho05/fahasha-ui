@@ -38,6 +38,8 @@ function BarChartExample() {
     const cx = classNames.bind(styles);
     const navigate = useNavigate();
 
+    const authInstance = getAuthInstance()
+
     const [isToggle, setIsToggle] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [rows, setRows] = useState([]);
