@@ -30,11 +30,7 @@ import 'react-loading-skeleton/dist/skeleton.css';
 import { seeNotice } from '../../../../stores/actions';
 import WidgetsIcon from '@mui/icons-material/Widgets';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import {
-    BellOutlined,
-    ShoppingCartOutlined,
-    UserOutlined
-} from '@ant-design/icons';
+import { BellOutlined, ShoppingCartOutlined, UserOutlined } from '@ant-design/icons';
 
 const cx = classNames.bind(styles);
 
@@ -59,32 +55,32 @@ function Header() {
     const [notice, setNotice] = useState([]);
     const [numNoticeNoAccess, setNumNoticeNoAccess] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
-    const [toNotice, setToNotice] = useState(false)
+    const [toNotice, setToNotice] = useState(false);
     const productQuality = 7;
 
-    const authInstance = state.authInstance
+    const authInstance = state.authInstance;
 
     useEffect(() => {
         state.socket.on('response-notification', () => {
-            console.log('Đã nhận thông báo')
-            setToNotice(prev => !prev)
-        })
-    }, [])
+            console.log('Đã nhận thông báo');
+            setToNotice((prev) => !prev);
+        });
+    }, []);
 
     useEffect(() => {
         if (state.user) {
-
             setUser(state.user);
         }
-        authInstance.post(`/webpush/get`)
-            .then(result => {
-                if (result.data.status === "OK") {
-                    setNotice(result.data.data)
+        authInstance
+            .post(`/webpush/get`)
+            .then((result) => {
+                if (result.data.status === 'OK') {
+                    setNotice(result.data.data);
                 }
             })
-            .catch(err => {
-                console.error(err)
-            })
+            .catch((err) => {
+                console.error(err);
+            });
     }, [state, toNotice]);
 
     useEffect(() => {
@@ -93,11 +89,11 @@ function Header() {
                 return acc + 1;
             }
 
-            return acc
-        }, 0)
+            return acc;
+        }, 0);
 
-        setNumNoticeNoAccess(num)
-    }, [notice])
+        setNumNoticeNoAccess(num);
+    }, [notice]);
     useEffect(() => {
         const handleScroll = () => {
             if (window.scrollY > 0) {
@@ -249,18 +245,18 @@ function Header() {
         fetch(`${api}/webpush/update`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: id })
+            body: JSON.stringify({ id: id }),
         })
-            .then(response => response.json())
-            .then(result => {
-                if (result.status === "OK") {
-                    dispatch(seeNotice())
+            .then((response) => response.json())
+            .then((result) => {
+                if (result.status === 'OK') {
+                    dispatch(seeNotice());
                 }
             })
-            .catch(err => {
-                console.err(err)
-            })
-    }
+            .catch((err) => {
+                console.error(err);
+            });
+    };
 
     return (
         <>
@@ -275,29 +271,34 @@ function Header() {
             </div>
             <div
                 style={{
-                    backgroundColor: "#fff",
-                    borderBottom: `${isHideBanner ? "" : "1px solid #7A7E7F"}`,
-                    zIndex: 100
+                    backgroundColor: '#fff',
+                    borderBottom: `${isHideBanner ? '' : '1px solid #7A7E7F'}`,
+                    zIndex: 100,
                 }}
-                className={cx('wrapper', `${isHideBanner && "shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] fixed left-0 top-[-1px]"}`)}>
+                className={cx(
+                    'wrapper',
+                    `${isHideBanner && 'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] fixed left-0 top-[-1px]'}`,
+                )}
+            >
                 <div className={isHideBanner ? cx('hide') : cx('hide-on-desktop')}>
                     <Link to={'/'}>
-                        <img
-                            className={cx('logo-tablet')}
-                            src={images.logo}
-                            alt="TA Bookstore"
-                        />
+                        <img className={cx('logo-tablet')} src={images.logo} alt="TA Bookstore" />
                     </Link>
                 </div>
                 <div className={cx('content')}>
                     <Link to={'/'}>
                         <p className={cx('home')}>TA Bookstore</p>
-                        <img style={{
-                            width: "180px",
-                            height: "60px",
-                            objectFit: "cover",
-                            marginLeft: "40px"
-                        }} className={cx('logo', 'hide-on-tablet-mobile')} src={images.logo} alt="TA BOOK" />
+                        <img
+                            style={{
+                                width: '180px',
+                                height: '60px',
+                                objectFit: 'cover',
+                                marginLeft: '40px',
+                            }}
+                            className={cx('logo', 'hide-on-tablet-mobile')}
+                            src={images.logo}
+                            alt="TA BOOK"
+                        />
                     </Link>
 
                     <div className={cx('tools')}>
@@ -305,21 +306,14 @@ function Header() {
                             interactive={true}
                             placement="bottom"
                             render={(attrs) => (
-                                <div
-                                    className={cx('menu_popper', 'hide-on-tablet-mobile')}
-                                    tabIndex="-1"
-                                    {...attrs}
-                                >
+                                <div className={cx('menu_popper', 'hide-on-tablet-mobile')} tabIndex="-1" {...attrs}>
                                     <PopperWrapper>
-
                                         <div className={cx('categories')}>
                                             <h2 className="p-[20px] text-[26px] uppercase">Danh mục sản phẩm</h2>
                                             <ul className="grid grid-cols-5">
                                                 {listCategories.map((category, index) => (
                                                     <li
-                                                        onClick={() =>
-                                                            handleOnClickCategory(category._id)
-                                                        }
+                                                        onClick={() => handleOnClickCategory(category._id)}
                                                         key={category._id}
                                                         className={cx('categories_child_item')}
                                                     >
@@ -327,7 +321,6 @@ function Header() {
                                                     </li>
                                                 ))}
                                             </ul>
-
                                         </div>
                                     </PopperWrapper>
                                 </div>
@@ -335,16 +328,20 @@ function Header() {
                         >
                             <div onClick={handleShowMenuOnTablet} className={cx('menu_dropdown')}>
                                 <span className={cx('icon_menu')}>
-                                    <WidgetsIcon style={{
-                                        fontSize: "30px",
-                                        color: "#7A7E7F"
-                                    }} />
+                                    <WidgetsIcon
+                                        style={{
+                                            fontSize: '30px',
+                                            color: '#7A7E7F',
+                                        }}
+                                    />
                                 </span>
                                 <span className={cx('icon_seemore')}>
-                                    <ArrowDropDownIcon style={{
-                                        fontSize: "20px",
-                                        color: "#7A7E7F"
-                                    }} />
+                                    <ArrowDropDownIcon
+                                        style={{
+                                            fontSize: '20px',
+                                            color: '#7A7E7F',
+                                        }}
+                                    />
                                 </span>
                             </div>
                         </Tippy>
@@ -358,9 +355,7 @@ function Header() {
                                 <div className={cx('search_result')} tabIndex="-1" {...attrs}>
                                     <PopperWrapper>
                                         <div className={cx('search_content')}>
-                                            <div
-                                                className={products.length > 0 ? cx('suggestions') : cx('hide')}
-                                            >
+                                            <div className={products.length > 0 ? cx('suggestions') : cx('hide')}>
                                                 <div className={cx('suggestions_heading')}>
                                                     <img src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/ico_searchtrending_black.svg" />
                                                     <h3>Gợi ý</h3>
@@ -368,24 +363,19 @@ function Header() {
                                                 <ul className={cx('suggestions_list')}>
                                                     {products.map((suggestion, index) => (
                                                         <li
-                                                            onClick={() =>
-                                                                handleClickItemSuggest(suggestion._id)
-                                                            }
+                                                            onClick={() => handleClickItemSuggest(suggestion._id)}
                                                             key={index}
                                                             className={cx('suggestions_item')}
                                                         >
                                                             <img src={suggestion.images} />
-                                                            <p className={cx('item_name')}>
-                                                                {suggestion.title}
-                                                            </p>
+                                                            <p className={cx('item_name')}>{suggestion.title}</p>
                                                         </li>
                                                     ))}
                                                 </ul>
                                             </div>
                                             <div
                                                 className={
-                                                    products.length > 0 ||
-                                                        localstorage.get('historys').length <= 0
+                                                    products.length > 0 || localstorage.get('historys').length <= 0
                                                         ? cx('hide')
                                                         : cx('keywords_hot')
                                                 }
@@ -416,11 +406,7 @@ function Header() {
                                                     ))}
                                                 </ul>
                                             </div>
-                                            <div
-                                                className={
-                                                    products.length > 0 ? cx('hide') : cx('keywords_hot')
-                                                }
-                                            >
+                                            <div className={products.length > 0 ? cx('hide') : cx('keywords_hot')}>
                                                 <div className={cx('hot_heading')}>
                                                     <img src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/ico_searchtrending_black.svg" />
                                                     <h3>Từ khóa hot</h3>
@@ -448,11 +434,12 @@ function Header() {
                         >
                             <div
                                 style={{
-                                    borderColor: "#7A7E7F"
+                                    borderColor: '#7A7E7F',
                                 }}
-                                className={cx('search')}>
+                                className={cx('search')}
+                            >
                                 <input
-                                    className='bg-transparent'
+                                    className="bg-transparent"
                                     onChange={handleChangeValue}
                                     //value={keyTextSearch}
                                     onFocus={handleOnFocus}
@@ -471,9 +458,7 @@ function Header() {
                                     onClick={() => {
                                         setKeyTextSearch('');
                                     }}
-                                    className={
-                                        keyTextSearch !== '' ? cx('clear_icon', 'hide-on-desktop') : cx('hide')
-                                    }
+                                    className={keyTextSearch !== '' ? cx('clear_icon', 'hide-on-desktop') : cx('hide')}
                                 >
                                     <FontAwesomeIcon icon={faX} />
                                 </p>
@@ -495,10 +480,9 @@ function Header() {
                                             <div className={cx('noti_nologin_heading')}>
                                                 <BellOutlined />
                                                 <h3>Thông báo</h3>
-                                                <Link to="/account/3"
-                                                    className={
-                                                        notice.length > 0 ? cx('seeall_notices') : cx('hide')
-                                                    }
+                                                <Link
+                                                    to="/account/3"
+                                                    className={notice.length > 0 ? cx('seeall_notices') : cx('hide')}
                                                 >
                                                     Xem tất cả
                                                 </Link>
@@ -506,9 +490,7 @@ function Header() {
 
                                             <div
                                                 className={
-                                                    Object.keys(user).length > 0
-                                                        ? cx('hide')
-                                                        : cx('noti_nologin_body')
+                                                    Object.keys(user).length > 0 ? cx('hide') : cx('noti_nologin_body')
                                                 }
                                             >
                                                 <img src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/customer/ico_login.svg" />
@@ -519,35 +501,39 @@ function Header() {
                                                 <Button onClick={handleRegister}>Đăng ký</Button>
                                             </div>
 
-                                            <ul className={notice.length <= 0 || Object.keys(state.user) <= 0 ? cx('hide') : cx('notice_list')}>
-                                                {
-                                                    notice.map((item, index) => (
-                                                        <Link
-                                                            to={item.notification.url}
-                                                            key={index}
-                                                            className={cx('notice_item')}
-                                                            onClick={() => updateNotification(item._id)}
-                                                        >
-                                                            <div className={cx('notice_icon')}>
-                                                                {item.isAccess === false && <p className={cx('notice_no_read')}></p>}
-                                                                <img src={item.notification.image} />
-                                                            </div>
-                                                            <div className={cx('notice_body')}>
-                                                                <h5 className={cx('notice_title')}>
-                                                                    {item.notification.title}
-                                                                </h5>
-                                                                <p className={cx('notice_content')}>
-                                                                    {item.notification.description}
-                                                                </p>
-                                                            </div>
-                                                        </Link>
-                                                    ))
+                                            <ul
+                                                className={
+                                                    notice.length <= 0 || Object.keys(state.user) <= 0
+                                                        ? cx('hide')
+                                                        : cx('notice_list')
                                                 }
+                                            >
+                                                {notice.map((item, index) => (
+                                                    <Link
+                                                        to={item.notification.url}
+                                                        key={index}
+                                                        className={cx('notice_item')}
+                                                        onClick={() => updateNotification(item._id)}
+                                                    >
+                                                        <div className={cx('notice_icon')}>
+                                                            {item.isAccess === false && (
+                                                                <p className={cx('notice_no_read')}></p>
+                                                            )}
+                                                            <img src={item.notification.image} />
+                                                        </div>
+                                                        <div className={cx('notice_body')}>
+                                                            <h5 className={cx('notice_title')}>
+                                                                {item.notification.title}
+                                                            </h5>
+                                                            <p className={cx('notice_content')}>
+                                                                {item.notification.description}
+                                                            </p>
+                                                        </div>
+                                                    </Link>
+                                                ))}
                                             </ul>
 
-                                            <div
-                                                className={notice.length > 0 ? cx('hide') : cx('notice_empty')}
-                                            >
+                                            <div className={notice.length > 0 ? cx('hide') : cx('notice_empty')}>
                                                 <p>Bạn chưa có thông báo nào</p>
                                             </div>
                                         </div>
@@ -557,26 +543,40 @@ function Header() {
                         >
                             <div
                                 style={{
-                                    color: "#7A7E7F"
+                                    color: '#7A7E7F',
                                 }}
-                                className={cx('notification', 'hide-on-tablet-mobile')}>
+                                className={cx('notification', 'hide-on-tablet-mobile')}
+                            >
                                 <BellOutlined className="text-[20px]" />
-                                <label style={{
-                                    color: "#7A7E7F",
-                                    fontSize: '1.4rem'
-                                }}>Thông báo</label>
-                                <p className={Object.keys(user).length > 0 ? cx('num_carts') : cx('hide')}>{numNoticeNoAccess}</p>
+                                <label
+                                    style={{
+                                        color: '#7A7E7F',
+                                        fontSize: '1.4rem',
+                                    }}
+                                >
+                                    Thông báo
+                                </label>
+                                <p className={Object.keys(user).length > 0 ? cx('num_carts') : cx('hide')}>
+                                    {numNoticeNoAccess}
+                                </p>
                             </div>
                         </Tippy>
 
                         <Link to="/cart" className={cx('cart')}>
-                            <ShoppingCartOutlined className="text-[20px]" style={{
-                                color: "#7A7E7F"
-                            }} />
-                            <label style={{
-                                color: "#7A7E7F",
-                                fontSize: '1.4rem'
-                            }}>Giỏ hàng</label>
+                            <ShoppingCartOutlined
+                                className="text-[20px]"
+                                style={{
+                                    color: '#7A7E7F',
+                                }}
+                            />
+                            <label
+                                style={{
+                                    color: '#7A7E7F',
+                                    fontSize: '1.4rem',
+                                }}
+                            >
+                                Giỏ hàng
+                            </label>
                             <p className={Object.keys(user).length > 0 ? cx('num_carts') : cx('hide')}>
                                 {Object.keys(localstorage.get(`myCart_${state.user._id}`)).length
                                     ? localstorage.get(`myCart_${state.user._id}`).items.length
@@ -612,13 +612,20 @@ function Header() {
                             hideOnClick={true}
                         >
                             <Link to={`/account/${0}`} className={cx('account')}>
-                                <UserOutlined className="text-[20px]" style={{
-                                    color: "#7A7E7F"
-                                }} />
-                                <label style={{
-                                    color: "#7A7E7F",
-                                    fontSize: '1.4rem'
-                                }}>{Object.keys(user).length > 0 ? user.fullName : 'Tài khoản'}</label>
+                                <UserOutlined
+                                    className="text-[20px]"
+                                    style={{
+                                        color: '#7A7E7F',
+                                    }}
+                                />
+                                <label
+                                    style={{
+                                        color: '#7A7E7F',
+                                        fontSize: '1.4rem',
+                                    }}
+                                >
+                                    {Object.keys(user).length > 0 ? user.fullName : 'Tài khoản'}
+                                </label>
                             </Link>
                         </Tippy>
                     </div>
@@ -652,9 +659,7 @@ function Header() {
                                 <li
                                     onClick={() => setTabMenuTablet(index)}
                                     key={index}
-                                    className={
-                                        tabMenuTablet === index ? cx('left_item', 'active') : cx('left_item')
-                                    }
+                                    className={tabMenuTablet === index ? cx('left_item', 'active') : cx('left_item')}
                                 >
                                     <img src={item.images} />
                                     <p>{item.title}</p>

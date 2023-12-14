@@ -17,23 +17,23 @@ function AdminLayout({ children }) {
     const [isLoaded, setIsLoaded] = useState(
         Object.keys(data).length !== 0
             ? {
-                products: true,
-                flashsales: true,
-            }
+                  products: true,
+                  flashsales: true,
+              }
             : {
-                products: false,
-                flashsales: false,
-            },
+                  products: false,
+                  flashsales: false,
+              },
     );
     const [percent, setPercent] = useState(0);
-    const num = 10;
+    const num = '';
     const [data2, setData2] = useState(
         Object.keys(data).length !== 0
             ? data
             : {
-                products: [],
-                flashsales: [],
-            },
+                  products: [],
+                  flashsales: [],
+              },
     );
 
     // useEffect(() => {
@@ -88,7 +88,7 @@ function AdminLayout({ children }) {
                     return response.json();
                 })
                 .then((flashsales) => {
-                    setData2((prev) => ({ ...prev, products: flashsales.data }));
+                    setData2((prev) => ({ ...prev, products: flashsales.data.products }));
                     setIsLoaded((prev) => ({ ...prev, products: true }));
                 })
                 .catch((err) => console.log(err));
@@ -123,14 +123,41 @@ function AdminLayout({ children }) {
             )}
             {!(!(isLoaded.flashsales && isLoaded.products) && Object.keys(data).length === 0) && (
                 <div className={cx('wrapper')}>
-                    <div className={cx('navbar')}>
+                    <div
+                        className={cx('navbar')}
+                        style={{
+                            maxHeight: '100vh',
+                            position: 'fixed',
+                            top: 0,
+                            backgroundColor: 'yourNavbarBackgroundColor', // Thay thế bằng màu nền mong muốn
+                            zIndex: 1000, // Tăng giá trị nếu cần
+                        }}
+                    >
                         <SideBar />
                     </div>
-                    <SideBarLaptop />
-                    <Scrollbar style={{ width: 250, height: '100vh' }} className={cx('container')}>
-                        <NavBar />
+                    <div
+                        className={cx('navbarlap')}
+                        style={{
+                            maxHeight: '100vh',
+                            position: 'fixed',
+                            top: 0,
+                            backgroundColor: 'yourNavbarBackgroundColor', // Thay thế bằng màu nền mong muốn
+                            zIndex: 1000, // Tăng giá trị nếu cần
+                        }}
+                    >
+                        <SideBarLaptop />
+                    </div>
+                    <div style={{ width: 250, height: '100vh' }} className={cx('container')}>
+                        <NavBar
+                            style={{
+                                position: 'fixed',
+                                top: 0,
+                                backgroundColor: 'yourNavbarBackgroundColor', // Thay thế bằng màu nền mong muốn
+                                zIndex: 1000, // Tăng giá trị nếu cần
+                            }}
+                        />
                         {children}
-                    </Scrollbar>
+                    </div>
                 </div>
             )}
         </>

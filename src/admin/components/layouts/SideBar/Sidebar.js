@@ -116,7 +116,7 @@ function SideBar() {
             <div className={cx('top')}>
                 <h2>Fahasha Admin</h2>
             </div>
-            <Scrollbar removeTrackYWhenNotUsed style={{ width: 250, height: 600 }}>
+            <Scrollbar removeTrackYWhenNotUsed style={{ width: 250, height: '100vh' }}>
                 <div className={cx('bottom')}>
                     <ul className={cx('items')}>
                         {tabList.map((tabItem, typeindex) => (

@@ -9,20 +9,19 @@ import DropMenu from '../../../components/DropMenu';
 import OrdersLatesTable from '../../components/OrdersLatesTable/OrdersLatesTable';
 import { api } from '../../../constants';
 import axios from 'axios';
-import { DatePicker, Space, Image, Button, Typography, message,  Alert, Spin  } from 'antd';
+import { DatePicker, Space, Image, Button, Typography, message, Alert, Spin, Popover } from 'antd';
 import { getAuthInstance } from '../../../utils/axiosConfig';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
 import { set } from 'react-hook-form';
 import BarChartExample from '../../components/charts/BarCharForStatic/BarCharForStatic';
 import EnhancedTable from '../../components/Table/EnhancedTable';
-
+import { InfoCircleFilled } from '@ant-design/icons';
 const moment = require('moment-timezone');
 const cx = classNames.bind(styles);
 const { Text, Link } = Typography;
 
 // fetch data
-
 const options = [
     {
         title: '6 giờ gần nhất',
@@ -128,23 +127,21 @@ const formatDateToString = (date) => {
     return ''; // Trả về chuỗi rỗng nếu date là null
 };
 function Statistics() {
-
     const authInstance = getAuthInstance();
-
     const [optionSelected, setOptionSelected] = useState(options[0]);
     const { RangePicker } = DatePicker;
     const dateFormat = 'YYYY/MM/DD';
     const [spin, setSpin] = useState(false);
     //const rangeValue = fieldsValue['range-picker'];
+    const [detailProduct, setDetailProduct] = useState({});
     const [doanhthucustom, setDoanhThuCustom] = useState(0);
     const [start, setStart] = useState(formatDateToString(new Date()));
     const [end, setEnd] = useState(formatDateToString(new Date()));
-    const [numProduct, setNumProduct] = useState(5);
+    const [numProduct, setNumProduct] = useState();
     const [month, setMonth] = useState(new Date().getMonth() + 1);
     const [year, setYear] = useState(new Date().getFullYear());
-    const [maxProduct, setMaxProduct] = useState(0); // số lượng sản phẩm trong tháng
+    const [maxProduct, setMaxProduct] = useState(); // số lượng sản phẩm trong tháng
     const num = 5;
-    const [rows, setRows] = useState([]);
     const moment = require('moment-timezone');
     // Đặt múi giờ cho Việt Nam
     const vietnamTimeZone = 'Asia/Ho_Chi_Minh';
@@ -156,9 +153,11 @@ function Statistics() {
     const [top_usert, setTopUser] = useState([]);
     const [top_products, setTopProducts] = useState([]);
     const [isLoadingProduct, setIsLoadingProduct] = useState(false);
-    const spaceSizeCol = [30, 150, 80, 80, 70, 60, 80, 30, 80, 160];
+    const spaceSizeCol = [30, 180, 120, 240, 150, 80, 100, 70, 70, 140];
     const navigate = useNavigate();
-    console.log('top_products212', top_products);
+    const [detail, setDetail] = useState([]);
+
+    console.log('top_products212', top_usert);
     const columns = [
         {
             field: 'rowNumber',
@@ -183,116 +182,118 @@ function Statistics() {
         },
         {
             field: 'user',
-            headerName: 'Tên khách hàng',
+            headerName: 'UserID',
             width: spaceSizeCol[1],
             sortable: false,
             editable: false,
 
+            renderCell: (params) => {
+                return (
+                    <>
+                        <p
+                            style={{
+                                fontWeight: 'bold',
+                                cursor: 'pointer',
+                            }}
+                            onClick={() => {
+                                navigate(`/admin/user/${params.value}`);
+                            }}
+                        >
+                            {params.value}
+                        </p>
+                    </>
+                );
+            },
+        },
+        {
+            field: 'name',
+            headerName: 'Tên người nhận',
+            sortable: true,
+            editable: false,
+            width: spaceSizeCol[2],
             // renderCell: (params) => {
             //     return (
-            //         <>
-            //             <p className={cx('text-container')}>
-            //                 {params.value.title ? params.value.title : '[Không có thông tin]'}
-            //             </p>
-            //         </>
+            //         <p>{`${params.value * 3 < 10 ? `0${params.value * 3}` : params.value * 3}h - ${
+            //             (params.value + 1) * 3 < 10 ? `0${(params.value + 1) * 3}` : (params.value + 1) * 3
+            //         }h`}</p>
             //     );
             // },
         },
+        {
+            field: 'address',
+            headerName: 'Địa chỉ',
+            sortable: true,
+            editable: false,
+            width: spaceSizeCol[3],
+            renderCell: (params) => {
+                return (
+                    <p>
+                        {params.value}- {params.row.city} - {params.row.country}
+                    </p>
+                );
+            },
+        },
+        {
+            field: 'date',
+            headerName: 'Ngày mua',
+            sortable: true,
+            editable: false,
+            width: spaceSizeCol[4],
+        },
+        {
+            field: 'message',
+            headerName: 'Lời nhắn',
+            sortable: true,
+            editable: false,
+            width: spaceSizeCol[5],
+            renderCell: (params) => {
+                return <p>{params.value == '' ? 'Trống' : params.value}</p>;
+            },
+        },
 
-        // {
-        //     field: 'point_sale',
-        //     headerName: 'Khung giờ',
-        //     sortable: true,
-        //     editable: false,
-        //     width: spaceSizeCol[2],
-        //     renderCell: (params) => {
-        //         return (
-        //             <p>{`${params.value * 3 < 10 ? `0${params.value * 3}` : params.value * 3}h - ${
-        //                 (params.value + 1) * 3 < 10 ? `0${(params.value + 1) * 3}` : (params.value + 1) * 3
-        //             }h`}</p>
-        //         );
-        //     },
-        // },
-        // {
-        //     field: 'date_sale',
-        //     headerName: 'Ngày sale',
-        //     sortable: true,
-        //     editable: false,
-        //     width: spaceSizeCol[3],
-        //     renderCell: (params) => {
-        //         return <p>{params.value}</p>;
-        //     },
-        // },
-        // {
-        //     field: 'num_sale',
-        //     headerName: 'Số lượng',
-        //     sortable: true,
-        //     editable: false,
-        //     width: spaceSizeCol[4],
-        // },
-        // {
-        //     field: 'sold_sale',
-        //     headerName: 'Đã bán',
-        //     sortable: true,
-        //     editable: false,
-        //     width: spaceSizeCol[5],
-        // },
+        {
+            field: 'payment_method',
+            headerName: 'Phương thức',
+            sortable: false,
+            editable: false,
+            width: spaceSizeCol[6],
+            renderCell: (params) => {
+                return <p>{params.value == 'Thanh toán bằng tiền mặt khi nhận hàng' ? 'Tiền mặt' : 'VNPAY'}</p>;
+            },
+        },
 
-        // {
-        //     field: 'current_sale',
-        //     headerName: 'Đang sale',
-        //     editable: false,
-        //     sortable: true,
-        //     width: spaceSizeCol[6],
-        //     renderCell: (params) => {
-        //         return <p>{params.value} %</p>;
-        //     },
-        // },
-        // {
-        //     field: 'is_loop',
-        //     headerName: 'Lặp',
-        //     editable: false,
-        //     sortable: true,
-        //     width: spaceSizeCol[7],
-        //     renderCell: (params) => {
-        //         return <p>{params.value === true ? 'Có' : 'Không'}</p>;
-        //     },
-        // },
-        // {
-        //     headerName: 'Trạng thái',
-        //     sortable: false,
-        //     editable: false,
-        //     width: spaceSizeCol[8],
-        //     renderCell: (params) => {
-        //         const currentDate = new Date();
-        //         let current_point_sale = Math.floor(currentHourInVietnam / 3);
-        //         const year = currentDate.getUTCFullYear();
-        //         const month = (currentDate.getUTCMonth() + 1).toString().padStart(2, '0');
-        //         const day = currentDate.toString().slice(8, 10);
-        //         const utcTimeString = `${year}-${month}-${day}`;
-        //         let toDay = utcTimeString;
+        {
+            field: 'numElement',
+            headerName: 'Số lượng',
+            editable: false,
+            sortable: true,
+            width: spaceSizeCol[7],
+            renderCell: (params) => {
+                return <p>{params.value}</p>;
+            },
+        },
+        {
+            field: 'priceElement',
+            headerName: 'Đơn giá',
+            editable: false,
+            sortable: true,
+            width: spaceSizeCol[8],
+            renderCell: (params) => {
+                return <p>{addCommasToNumber(Math.round(params.value / 1000))}K</p>;
+            },
+        },
 
-        //         return (
-        //             <p
-        //                 className={
-        //                     params.row.date_sale == toDay && params.row.point_sale == current_point_sale
-        //                         ? cx('flashSaleText')
-        //                         : params.row.date_sale > toDay ||
-        //                           (params.row.date_sale == toDay && params.row.point_sale > current_point_sale)
-        //                         ? cx('noflashSaleText')
-        //                         : cx('')
-        //                 }
-        //             >
-        //                 {params.row.date_sale == toDay && params.row.point_sale == current_point_sale
-        //                     ? 'FlashSale'
-        //                     : params.row.date_sale > toDay ||
-        //                       (params.row.date_sale == toDay && params.row.point_sale > current_point_sale)
-        //                     ? 'Đang đợi'
-        //                     : 'Hết hạn'}
-        //             </p>
-        //         );
-        //     },
-        // },
+        {
+            field: 'statusElement',
+            headerName: 'Trạng thái',
+            editable: false,
+            sortable: true,
+            width: spaceSizeCol[9],
+            renderCell: (params) => {
+                return <p>{params.value}</p>;
+            },
+        },
+
         // {
         //     field: 'action',
         //     headerName: 'Hành động',
@@ -369,6 +370,7 @@ function Statistics() {
         //     // },
         // },
     ];
+
     const addCommasToNumber = (number) => {
         // Chuyển đổi số thành chuỗi
         const numberString = number.toString();
@@ -403,12 +405,26 @@ function Statistics() {
 
     const [messageApi, contextHolder] = message.useMessage();
 
+    const content = <div>Doanh thu từ sản phẩm không bao gồm phí vận chuyển từ đơn hàng</div>;
+
+    useEffect(() => {
+        if (detail.length > 0) {
+            const valueTop = document.documentElement.scrollHeight;
+            window.scrollTo({
+                top: valueTop,
+                behavior: 'smooth',
+            });
+        }
+    }, [detail]);
+
     useEffect(() => {
         setSpin(true);
-        authInstance.get(`/orderitems`).then((res) => {
+        setDetail([]);
+        authInstance.post(`/orderitems/order/filter?status_order=HOANTHANH`).then((res) => {
             const today = new Date();
             // lấy tất cả những đơn hàng trong tháng này
             const orderitems = res.data.data;
+            console.log('rfugasbjfsa', orderitems);
 
             const ordersThisMonth = orderitems.filter((order) => {
                 if (order.order != null) {
@@ -432,17 +448,34 @@ function Statistics() {
             //     value: 250,
             // },
             ordersThisMonth.forEach((element) => {
-                if (productOrdersThisMonth.includes(element.product._id)) {
-                    product[productOrdersThisMonth.indexOf(element.product._id)].value += element.price;
-                    product[productOrdersThisMonth.indexOf(element.product._id)].orders.push(element.order);
+                if (productOrdersThisMonth.includes(element?.product?._id)) {
+                    product[productOrdersThisMonth.indexOf(element?.product?._id)].value += element?.price;
+                    product[productOrdersThisMonth.indexOf(element?.product?._id)].orders.push({
+                        ...element?.order,
+                        // số lượng sản phẩm này trong đơn
+                        numElement: element?.quantity,
+                        statusElement: element?.status,
+                        // giá của sản phẩm này trong đơn
+                        priceElement: element?.price,
+                    });
                 } else {
-                    productOrdersThisMonth.push(element.product._id);
+                    productOrdersThisMonth.push(element?.product?._id);
                     product.push({
-                        id: element.product._id,
-                        avatar: element.product.images,
-                        name: element.product.title,
-                        value: element.price,
-                        orders: [element.order],
+                        id: element?.product?._id,
+                        avatar: element?.product?.images,
+                        name: element?.product?.title,
+                        value: element?.price,
+                        orders: [
+                            {
+                                ...element?.order,
+                                // số lượng sản phẩm này trong đơn
+                                numElement: element?.quantity,
+                                // trang thai cua san pham trong don
+                                statusElement: element?.status,
+                                // gia cua san pham trong don
+                                priceElement: element?.price,
+                            },
+                        ],
                     });
                 }
             });
@@ -454,14 +487,13 @@ function Statistics() {
             setMaxProduct(product.length);
             // lấy 5 sản phẩm đầu tiên
             product.splice(numProduct, product.length - numProduct);
-
             setTopProducts(product);
             setSpin(false);
         });
     }, [isLoadingProduct]);
 
     useEffect(() => {
-        authInstance.get(`/orders`).then((res) => {
+        authInstance.post(`/orders/filter?status=HOANTHANH`).then((res) => {
             const today = new Date();
             const orders = res.data.data;
             console.log('ord1212ers', orders);
@@ -472,7 +504,7 @@ function Statistics() {
                 return (
                     formatDateToString(new Date(order.date)) <= formatDateToString(today) &&
                     formatDateToString(new Date(order.date)) >=
-                    formatDateToString(new Date(today.getFullYear(), today.getMonth(), 1))
+                        formatDateToString(new Date(today.getFullYear(), today.getMonth(), 1))
                 );
             });
 
@@ -491,6 +523,7 @@ function Statistics() {
                 } else {
                     userOrdersThisMonth.push(element.user.id);
                     user.push({
+                        id: element.user.id,
                         avatar: element.user.images,
                         name: element.user.fullName,
                         value: element.price,
@@ -518,7 +551,7 @@ function Statistics() {
             }, 0);
             setDoanhThuCustom(totalToday);
 
-            if (optionSelected.title == '6 ngày gần nhất') {
+            if (optionSelected?.title == '6 ngày gần nhất') {
                 const incomeData = [];
                 // toi muon lặp 6 lần
                 for (let i = num + 1; i >= 0; i--) {
@@ -622,7 +655,7 @@ function Statistics() {
                 });
                 console.log('incomeData', incomeData);
                 setDataIncomes(incomeData);
-            } else if (optionSelected.title == '6 tháng gần nhất') {
+            } else if (optionSelected?.title == '6 tháng gần nhất') {
                 console.log('optionSelected1212', optionSelected);
                 const incomeData = [];
                 // toi muon lặp 6 lần
@@ -673,7 +706,7 @@ function Statistics() {
                 });
                 console.log('incomeData', incomeData);
                 setDataIncomes(incomeData);
-            } else if (optionSelected.title == '6 năm gần nhất') {
+            } else if (optionSelected?.title == '6 năm gần nhất') {
                 console.log('optionSelected1212', optionSelected);
                 const incomeData = [];
                 // toi muon lặp 6 lần
@@ -726,7 +759,7 @@ function Statistics() {
                 setDataIncomes(incomeData);
             }
         });
-    }, [end, start, optionSelected.title]);
+    }, [end, start, optionSelected?.title]);
     return (
         <div className={cx('wrapper')}>
             {contextHolder}
@@ -793,7 +826,7 @@ function Statistics() {
                                     fontSize: 15,
                                     fontFamily: 'Arial',
                                 }}
-                                tickFormatter={(value) => addCommasToNumber(value / 1000) + 'k'}
+                                tickFormatter={(value) => addCommasToNumber(value / 1000) + 'K'}
                             />
                         </LineChart>
                         {/* <IncomeChart data={dataIncomes} size={2 / 1} customValueDisplay={(value) => `$${value}`} /> */}
@@ -804,7 +837,24 @@ function Statistics() {
             <div className={cx('bottom')}>
                 <div className={cx('user_static')}>
                     <div className={cx('left')}>
-                        <h3 className={cx('title')}>KHÁCH HÀNG THÂN THIẾT THÁNG {new Date().getMonth() + 1}</h3>
+                        <h3 className={cx('title')}>
+                            <Popover
+                                content={'Doanh thu từ người dùng đã bao gồm phí vận chuyển từ các đơn hàng'}
+                                trigger="hover"
+                                // className={cx('kpi')}
+                            >
+                                <span
+                                    style={{
+                                        marginRight: '8px',
+                                        // cursor: 'pointer',
+                                        fontSize: '2rem',
+                                    }}
+                                >
+                                    <InfoCircleFilled />
+                                </span>
+                            </Popover>{' '}
+                            KHÁCH HÀNG THÂN THIẾT THÁNG {new Date().getMonth() + 1}
+                        </h3>
                         <div className={cx('content_user')}>
                             {top_usert.map((user, index) => (
                                 <div className={cx('user')} key={index}>
@@ -825,7 +875,15 @@ function Statistics() {
                                             {index + 1}
                                         </div>
                                     </div>
-                                    <div className={cx('avatar')}>
+                                    <div
+                                        className={cx('avatar')}
+                                        style={{
+                                            cursor: 'pointer',
+                                        }}
+                                        onClick={() => {
+                                            navigate(`/admin/user/${user.id}`);
+                                        }}
+                                    >
                                         <div className={cx('img')}>
                                             <Image
                                                 src={user.avatar}
@@ -836,9 +894,19 @@ function Statistics() {
                                             />
                                         </div>
                                     </div>
-                                    <div className={cx('name')}>{user.name}</div>
+                                    <div
+                                        className={cx('name')}
+                                        style={{
+                                            cursor: 'pointer',
+                                        }}
+                                        onClick={() => {
+                                            navigate(`/admin/user/${user.id}`);
+                                        }}
+                                    >
+                                        {user.name}
+                                    </div>
                                     <div className={cx('value')}>
-                                        {addCommasToNumber(Math.ceil(user.value / 1000))}K
+                                        {addCommasToNumber(Math.round(user.value / 1000))}K
                                     </div>
                                 </div>
                             ))}
@@ -901,17 +969,20 @@ function Statistics() {
                         <div className={cx('state')}>
                             {
                                 <BarChartExample
+                                    setDetail={setDetail}
                                     spin={spin}
                                     setTimeMonth={setMonth}
                                     setTimeYear={setYear}
                                     maxProduct={maxProduct}
                                     setNumProduct={setNumProduct}
+                                    setDetailProduct={setDetailProduct}
                                     data={top_products.map((item) => {
                                         return {
                                             id: item?.id,
                                             name: item?.name,
                                             sold: item?.value,
                                             imageURL: item?.avatar,
+                                            orders: item?.orders,
                                         };
                                     })}
                                     isLoadingProduct={isLoadingProduct}
@@ -922,7 +993,19 @@ function Statistics() {
                     </div>
                     <div className={cx('left')}>
                         <h3 className={cx('title')}>
-                            TOP {numProduct} SẢN PHẨM CÓ DOANH THU CAO TRONG THÁNG {month}/{year}
+                            <Popover content={content} trigger="hover" className={cx('kpi')}>
+                                <span
+                                    style={{
+                                        marginRight: '8px',
+                                        // cursor: 'pointer',
+                                        fontSize: '2rem',
+                                    }}
+                                >
+                                    <InfoCircleFilled />
+                                </span>
+                            </Popover>
+                            TOP {numProduct ? numProduct : maxProduct} SẢN PHẨM CÓ DOANH THU CAO TRONG THÁNG {month}/
+                            {year}
                         </h3>
                         <div className={cx('content_user')}>
                             {spin ? (
@@ -970,7 +1053,15 @@ function Statistics() {
                                                 {index + 1}
                                             </div>
                                         </div>
-                                        <div className={cx('avatar')}>
+                                        <div
+                                            className={cx('avatar')}
+                                            style={{
+                                                cursor: 'pointer',
+                                            }}
+                                            onClick={() => {
+                                                navigate(`/admin/update-product/${user.id}`);
+                                            }}
+                                        >
                                             <div className={cx('img')}>
                                                 <Image
                                                     src={user.avatar}
@@ -981,9 +1072,19 @@ function Statistics() {
                                                 />
                                             </div>
                                         </div>
-                                        <div className={cx('name')}>{user.name}</div>
+                                        <div
+                                            className={cx('name')}
+                                            style={{
+                                                cursor: 'pointer',
+                                            }}
+                                            onClick={() => {
+                                                navigate(`/admin/update-product/${user.id}`);
+                                            }}
+                                        >
+                                            {user.name}
+                                        </div>
                                         <div className={cx('value')}>
-                                            {addCommasToNumber(Math.ceil(user.value / 1000))}K
+                                            {addCommasToNumber(Math.round(user.value / 1000))}K
                                         </div>
                                     </div>
                                 ))
@@ -991,21 +1092,53 @@ function Statistics() {
                         </div>
                     </div>
                 </div>
-                <div className={cx('table')}>
-                    <EnhancedTable
-                        ischeckboxSelection={false}
-                        columns={columns}
-                        rows={rows.map((row, index) => ({
-                            ...row,
-                            rowNumber: index + 1,
-                        }))}
-                        // func={setSuggestFlash}
-                        // isStatus={{
-                        //     isToggle: isToggle,
-                        // }}
-                        pageSize={12}
-                    />
-                </div>
+                {detail?.length > 0 && top_products.length > 0 && (
+                    <div className={cx('table')}>
+                        <h3 className={cx('title')}>
+                            <h3
+                                style={{
+                                    flex: 6,
+                                    // không cho tràn dòng
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    lineHeight: '2rem',
+                                }}
+                            >
+                                {detailProduct?.name}{' '}
+                            </h3>{' '}
+                            <h3
+                                style={{
+                                    flex: 2,
+                                }}
+                            >
+                                {' '}
+                                Thời gian: {month}/{year}{' '}
+                            </h3>
+                            <h3
+                                style={{
+                                    flex: 2,
+                                }}
+                            >
+                                Doanh thu: {addCommasToNumber(Math.round(detailProduct?.value / 1000))}K
+                            </h3>
+                        </h3>
+                        <EnhancedTable
+                            ischeckboxSelection={false}
+                            columns={columns}
+                            rows={detail?.map((row, index) => ({
+                                ...row,
+                                rowNumber: index + 1,
+                            }))}
+                            // func={setSuggestFlash}
+                            // isStatus={{
+                            //     isToggle: isToggle,
+                            // }}
+                            height={200}
+                            pageSize={2}
+                        />
+                    </div>
+                )}
             </div>
         </div>
     );

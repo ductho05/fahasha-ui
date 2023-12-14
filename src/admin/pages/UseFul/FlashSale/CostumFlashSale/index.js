@@ -10,6 +10,7 @@ import FlashSaleModal from '../../../../components/FlashSaleModal';
 import { Divider, Form, Radio, Skeleton, Space, Switch, Alert } from 'antd';
 import Marquee from 'react-fast-marquee';
 import { useData } from '../../../../../stores/DataContext';
+import { set } from 'react-hook-form';
 const cx = classNames.bind(styles);
 
 function CostumFlashSale() {
@@ -94,14 +95,23 @@ function CostumFlashSale() {
             headerName: 'Đã bán',
             sortable: true,
             editable: false,
-            width: 110,
+            width: 90,
         },
+        {
+            field: 'quantity',
+            headerName: 'Có sẵn',
+            sortable: true,
+            editable: false,
+            width: 90,
+        },
+        
+
         {
             field: '_id',
             headerName: 'Trạng thái',
             sortable: false,
             editable: false,
-            width: 110,
+            width: 90,
             renderCell: (params) => {
                 return <StateFlashSale params={params.value} isToggle={isToggle} />;
             },
@@ -110,9 +120,30 @@ function CostumFlashSale() {
 
     const [suggestFlash, setSuggestFlash] = useState([]);
 
+    //const [dataFlash, setDataFlash] = useState([]); // lưu lại những sản phẩm đã chọn để gợi ý
+
+    console.log('suggestFla21212sh', suggestFlash);
     const [isToggle, setIsToggle] = useState(false); // khi bấm nút tiếp tục thì gọi hàm này để \tắt chọn những sản phẩm đã chọn
 
     const [rows, setRows] = useState([]);
+
+  //  console.log('dataFlash1212', dataFlash);
+
+    // useEffect(() => {
+    //     // lấy quality nhỏ nhất từ mảng suggestFlash
+    //     if (suggestFlash.length > 0) {
+    //         // gọi api để lấy quality nhỏ nhất
+    //         suggestFlash.map((item) => {
+    //             fetch(`${api}/products/id/${item}`)
+    //                 .then((response) => response.json())
+    //                 .then((result) => {
+    //                     setDataFlash((dataFlash) => [...dataFlash, result.data]);
+    //                 })
+    //                 .catch((err) => console.log(err));
+    //         });
+    //     }
+    // }, [suggestFlash]);
+
     useEffect(() => {
         if (Object.keys(data).length !== 0) {
             var data1 = data.products;
@@ -171,6 +202,7 @@ function CostumFlashSale() {
                         isStatus={{
                             isToggle: isToggle,
                         }}
+                        style={'custom'}
                     />
                 </div>
             </div>

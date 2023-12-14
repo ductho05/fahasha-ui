@@ -331,7 +331,7 @@ function ProductDetail() {
             <Dialog open={isShowDialog}>
                 <div className={cx('dialog_add_to_cart')}>
                     <p className={cx('dialog_success')}>Sản phẩm đã được thêm thành công vào giỏ hàng của bạn</p>
-                    <img src={product.images} />
+                    <img src={product?.images} />
                     <div className={cx('option_btn')}>
                         <p onClick={handleCloseDialog} className={cx('btn')}>
                             Chọn Thêm
@@ -356,11 +356,18 @@ function ProductDetail() {
                         ></RegisterLogin>
                     </Modal>
                 </div>
-                {
-                    loading ? <Loading /> : <div className={cx('product_detail', 'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden')}>
+                {loading ? (
+                    <Loading />
+                ) : (
+                    <div
+                        className={cx(
+                            'product_detail',
+                            'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden',
+                        )}
+                    >
                         <div className={cx('product_left')}>
                             <div className={cx('product_thumnail')}>
-                                <img src={product.images} />
+                                <img src={product?.images} />
                             </div>
                             <div className={cx('product_btn', 'hide_on_tablet_mobile')}>
                                 <Button onClick={handleAddToCart} leftIcon={<FontAwesomeIcon icon={faCartShopping} />}>
@@ -373,7 +380,7 @@ function ProductDetail() {
                         </div>
 
                         <div className={cx('product_right')}>
-                            <p className={cx('product_name')}>{product.title}</p>
+                            <p className={cx('product_name')}>{product?.title}</p>
                             {/* <div className={cx('manu_brand', 'hide_on_mobile')}>
                             <p className={cx('manufacturer_name')}>
                                 Nhà cung cấp:
@@ -393,13 +400,17 @@ function ProductDetail() {
                                 {rates.map((rate, index) => (
                                     <span
                                         key={index}
-                                        className={rate <= product.rate ? cx('star_active', 'rate_star') : cx('rate_star')}
+                                        className={
+                                            rate <= product?.rate ? cx('star_active', 'rate_star') : cx('rate_star')
+                                        }
                                     >
                                         <FontAwesomeIcon icon={faStar} />
                                     </span>
                                 ))}
                                 <p className={cx('rate_number')}>({evaluate.total} đánh giá)</p>
-                                <p className={cx('rate_number', "px-[10px] border-l border-solid border-[#444]")}>Đã bán {product.sold}</p>
+                                <p className={cx('rate_number', 'px-[10px] border-l border-solid border-[#444]')}>
+                                    Đã bán {product?.sold}
+                                </p>
                                 <p className={cx('btn_share', 'hide_on_pc')}>
                                     <FontAwesomeIcon icon={faShareNodes} />
                                 </p>
@@ -407,24 +418,30 @@ function ProductDetail() {
 
                             <div className={cx('mid_content')}>
                                 <div className={cx('price')}>
-                                    <p className={cx('current_price')}>{numeral(product.price).format('0,0[.]00 VNĐ')} đ</p>
-                                    <p className={product.price === product.old_price ? cx('hidden') : cx('old_price')}>
-                                        {numeral(product.old_price).format('0,0[.]00 VNĐ')} đ
+                                    <p className={cx('current_price')}>
+                                        {numeral(product?.price).format('0,0[.]00 VNĐ')} đ
                                     </p>
-                                    <p className={product.price === product.old_price ? cx('hidden') : cx('discount')}>
-                                        -{(100 - (product.price / product.old_price) * 100).toFixed(1)}%
+                                    <p
+                                        className={
+                                            product?.price === product?.old_price ? cx('hidden') : cx('old_price')
+                                        }
+                                    >
+                                        {numeral(product?.old_price).format('0,0[.]00 VNĐ')} đ
+                                    </p>
+                                    <p
+                                        className={
+                                            product?.price === product?.old_price ? cx('hidden') : cx('discount')
+                                        }
+                                    >
+                                        -{(100 - (product?.price / product?.old_price) * 100).toFixed(1)}%
                                     </p>
                                 </div>
                                 <p className={cx('btn_share', 'hide_on_tablet_mobile')}>
                                     <FontAwesomeIcon icon={faShareNodes} />
                                 </p>
                             </div>
-                            <div className={cx('shipping')}>
-
-                            </div>
-                            <div className={cx('policy_lie')}>
-
-                            </div>
+                            <div className={cx('shipping')}></div>
+                            <div className={cx('policy_lie')}></div>
                             <div className={cx('quantity', 'hide_on_tablet_mobile')}>
                                 <p className={cx('label')}>Số lượng:</p>
                                 <div className={cx('quantity_btn')}>
@@ -438,34 +455,52 @@ function ProductDetail() {
                                 </div>
                             </div>
                             <div className="flex items-center mt-[20px]">
-                                <div className={`flex items-center p-[10px] rounded-[6px] ${product.sold == product.quantity ? "bg-[#f2f4f5] text-[#7a7e7f]" : "bg-[rgba(201,33,39,0.06)] text-[#c92127]"}`}>
-                                    {
-                                        product.sold == product.quantity ? <StopFilled /> : <CheckCircleFilled />
-                                    }
+                                <div
+                                    className={`flex items-center p-[10px] rounded-[6px] ${
+                                        product?.sold == product?.quantity
+                                            ? 'bg-[#f2f4f5] text-[#7a7e7f]'
+                                            : 'bg-[rgba(201,33,39,0.06)] text-[#c92127]'
+                                    }`}
+                                >
+                                    {product?.sold == product?.quantity ? <StopFilled /> : <CheckCircleFilled />}
                                     <p className="font-[600] ml-[10px]">
-                                        {
-                                            product.sold == product.quantity ? "Hết hàng" : "Còn hàng"
-                                        }
+                                        {product?.sold == product?.quantity ? 'Hết hàng' : 'Còn hàng'}
                                     </p>
                                 </div>
-                                <p className="text-[14px] ml-[10px] text-[#7a7e7f] font-[500]">{product.quantity - product.sold} sản phẩm có sẵn</p>
+                                <p className="text-[14px] ml-[10px] text-[#7a7e7f] font-[500]">
+                                    {product?.quantity - product?.sold} sản phẩm có sẵn
+                                </p>
                             </div>
                         </div>
                     </div>
-                }
+                )}
 
-
-                <div className={cx('introduction', 'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden')}>
+                <div
+                    className={cx(
+                        'introduction',
+                        'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden',
+                    )}
+                >
                     <h3>Fahasa giới thiệu</h3>
                     <ProductFrame productList={productNews} Component={ProductSlider}></ProductFrame>
                 </div>
 
-                <div className={cx('introduction', 'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden')}>
+                <div
+                    className={cx(
+                        'introduction',
+                        'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden',
+                    )}
+                >
                     <h3>Sách liên quan</h3>
                     <ProductFrame productList={productRelated} Component={ProductSlider}></ProductFrame>
                 </div>
 
-                <div className={cx('infomation', 'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden')}>
+                <div
+                    className={cx(
+                        'infomation',
+                        'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden',
+                    )}
+                >
                     <h3>Thông tin sản phẩm</h3>
                     <div className={cx('product_info')}>
                         <table className={cx('table_info')}>
@@ -475,22 +510,22 @@ function ProductDetail() {
                             <tbody>
                                 <tr>
                                     <th>Mã hàng</th>
-                                    <td>{product._id}</td>
+                                    <td>{product?._id}</td>
                                 </tr>
 
                                 <tr>
                                     <th>Tác giả</th>
-                                    <td>{product.author || 'Chưa rõ'}</td>
+                                    <td>{product?.author || 'Chưa rõ'}</td>
                                 </tr>
 
                                 <tr>
                                     <th>Ngày xuất bản</th>
-                                    <td>{product.published_date}</td>
+                                    <td>{product?.published_date}</td>
                                 </tr>
 
                                 <tr>
                                     <th>Đã bán</th>
-                                    <td>{product.sold}</td>
+                                    <td>{product?.sold}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -506,17 +541,22 @@ function ProductDetail() {
                     </div>
 
                     <div className={cx('description')}>
-                        <h5>{product.title}</h5>
-                        <ReadMore>{product.desciption}</ReadMore>
+                        <h5>{product?.title}</h5>
+                        <ReadMore>{product?.desciption}</ReadMore>
                     </div>
                 </div>
 
-                <div className={cx('rating_product', 'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden')}>
+                <div
+                    className={cx(
+                        'rating_product',
+                        'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden',
+                    )}
+                >
                     <h3>Đánh giá sản phẩm</h3>
                     <div className={cx('rating_body')}>
                         <div className={cx('list_rate')}>
                             <h3 className={cx('current_rate')}>
-                                {product.rate}
+                                {product?.rate}
                                 <p>/5</p>
                             </h3>
                             <div className={cx('rate')}>
@@ -524,7 +564,7 @@ function ProductDetail() {
                                     <span
                                         key={index}
                                         className={
-                                            item <= product.rate ? cx('star_active', 'rate_star') : cx('rate_star')
+                                            item <= product?.rate ? cx('star_active', 'rate_star') : cx('rate_star')
                                         }
                                     >
                                         <FontAwesomeIcon icon={faStar} />
@@ -547,7 +587,10 @@ function ProductDetail() {
                                             }
                                         ></div>
                                     </div>
-                                    <p>{evaluate.total ? (Math.floor((evaluate.rate[index] / evaluate.total) * 100)) : 0} %</p>
+                                    <p>
+                                        {evaluate.total ? Math.floor((evaluate.rate[index] / evaluate.total) * 100) : 0}{' '}
+                                        %
+                                    </p>
                                 </div>
                             ))}
                         </div>
@@ -582,9 +625,7 @@ function ProductDetail() {
                                                         ? comments[index].user.fullName
                                                         : comments[index].user.username}
                                                 </p>
-                                                <p className={cx('comments_day')}>
-                                                    {comments[index].createdAt}
-                                                </p>
+                                                <p className={cx('comments_day')}>{comments[index].createdAt}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -643,7 +684,12 @@ function ProductDetail() {
 function Loading() {
     return (
         <div className={cx('wrapper')}>
-            <div className={cx('product_detail', 'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden')}>
+            <div
+                className={cx(
+                    'product_detail',
+                    'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden',
+                )}
+            >
                 <div className={cx('product_left')}>
                     <div className={cx('product_thumnail')}>
                         <Skeleton variant="rectangular" width={300} height={300} />
@@ -691,7 +737,12 @@ function Loading() {
                     </div>
                 </div>
             </div>
-            <div className={cx('infomation', 'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden')}>
+            <div
+                className={cx(
+                    'infomation',
+                    'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden',
+                )}
+            >
                 <h3>
                     <Skeleton variant="text" sx={{ fontSize: '2rem' }} />
                 </h3>
@@ -702,31 +753,51 @@ function Loading() {
                         </colgroup>
                         <tbody>
                             <tr>
-                                <th><Skeleton variant="text" sx={{ fontSize: '1.3rem' }} /></th>
-                                <th><Skeleton variant="text" sx={{ fontSize: '1.3rem' }} /></th>
+                                <th>
+                                    <Skeleton variant="text" sx={{ fontSize: '1.3rem' }} />
+                                </th>
+                                <th>
+                                    <Skeleton variant="text" sx={{ fontSize: '1.3rem' }} />
+                                </th>
                             </tr>
 
                             <tr>
-                                <th><Skeleton variant="text" sx={{ fontSize: '1.3rem' }} /></th>
-                                <th><Skeleton variant="text" sx={{ fontSize: '1.3rem' }} /></th>
+                                <th>
+                                    <Skeleton variant="text" sx={{ fontSize: '1.3rem' }} />
+                                </th>
+                                <th>
+                                    <Skeleton variant="text" sx={{ fontSize: '1.3rem' }} />
+                                </th>
                             </tr>
 
                             <tr>
-                                <th><Skeleton variant="text" sx={{ fontSize: '1.3rem' }} /></th>
-                                <th><Skeleton variant="text" sx={{ fontSize: '1.3rem' }} /></th>
+                                <th>
+                                    <Skeleton variant="text" sx={{ fontSize: '1.3rem' }} />
+                                </th>
+                                <th>
+                                    <Skeleton variant="text" sx={{ fontSize: '1.3rem' }} />
+                                </th>
                             </tr>
 
                             <tr>
-                                <th><Skeleton variant="text" sx={{ fontSize: '1.3rem' }} /></th>
-                                <th><Skeleton variant="text" sx={{ fontSize: '1.3rem' }} /></th>
+                                <th>
+                                    <Skeleton variant="text" sx={{ fontSize: '1.3rem' }} />
+                                </th>
+                                <th>
+                                    <Skeleton variant="text" sx={{ fontSize: '1.3rem' }} />
+                                </th>
                             </tr>
                         </tbody>
                     </table>
                     <p>
-                        <th><Skeleton variant="text" sx={{ fontSize: '1.3rem' }} /></th>
+                        <th>
+                            <Skeleton variant="text" sx={{ fontSize: '1.3rem' }} />
+                        </th>
                     </p>
                     <span>
-                        <th><Skeleton variant="text" sx={{ fontSize: '1.3rem' }} /></th>
+                        <th>
+                            <Skeleton variant="text" sx={{ fontSize: '1.3rem' }} />
+                        </th>
                     </span>
                 </div>
 
@@ -737,7 +808,12 @@ function Loading() {
                 </div>
             </div>
 
-            <div className={cx('rating_product', 'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden')}>
+            <div
+                className={cx(
+                    'rating_product',
+                    'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden',
+                )}
+            >
                 <h3>
                     <Skeleton variant="text" sx={{ fontSize: '2rem' }} />
                 </h3>
@@ -757,18 +833,22 @@ function Loading() {
                     <div className={cx('rate_percent')}>
                         {[1, 2, 3, 4, 5].map((rate, index) => (
                             <div key={index} className={cx('rate_percent_item')}>
-                                <p><Skeleton variant="text" sx={{ fontSize: '1.6rem' }} /></p>
+                                <p>
+                                    <Skeleton variant="text" sx={{ fontSize: '1.6rem' }} />
+                                </p>
                                 <div className={cx('review_rating')}>
                                     <Skeleton variant="text" sx={{ fontSize: '1.6rem' }} />
                                 </div>
-                                <p><Skeleton variant="text" sx={{ fontSize: '1.6rem' }} /></p>
+                                <p>
+                                    <Skeleton variant="text" sx={{ fontSize: '1.6rem' }} />
+                                </p>
                             </div>
                         ))}
                     </div>
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
 export default ProductDetail;

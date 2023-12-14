@@ -2,6 +2,7 @@
     display: flex;
     position: relative;
     align-items: center;
+    cursor: pointer;
     height: 40px;
     border: 1px solid #cdcfd0;
     padding: 0 20px;
@@ -15,7 +16,6 @@
     }
 
     .select_icon {
-        cursor: pointer;
         font-size: 1.6rem;
     }
 }

@@ -24,7 +24,7 @@ function ProductItem({ product }) {
                 <p className={cx('name')}>{product.title}</p>
                 <div className={cx('mid_body')}>
                     <p className={cx('price')}>{
-                        product.price.toLocaleString('vi-VN', {
+                        product?.price?.toLocaleString('vi-VN', {
                             style: 'currency',
                             currency: 'VND'
                         })

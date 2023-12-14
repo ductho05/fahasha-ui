@@ -13,9 +13,10 @@ import BarChartExample from '../../../components/charts/BarChar/BarChar';
 import CustomPopconfirm from '../../../components/CustomPopconfirm/CustomPopconfirm';
 import Marquee from 'react-fast-marquee';
 import { useData } from '../../../../stores/DataContext';
-
+import { getAuthInstance } from '../../../../utils/axiosConfig';
 function FlashSale() {
     const container1 = useRef(null);
+    const authInstance = getAuthInstance();
     const navigate = useNavigate();
     const cx = classNames.bind(styles);
     const { data, setData } = useData();
@@ -220,24 +221,18 @@ function FlashSale() {
                             }}
                             func={() => {
                                 setIsloadingdetele(true);
-                                fetch(`${api}/flashsales/delete/${params.row._id}`, {
-                                    method: 'GET',
-                                })
-                                    .then((response) => response.json())
+                                console.log(params.row._id);
+                                authInstance(`/flashsales/delete/${params.row._id}`)
                                     .then((result) => {
-                                        if (result.status == 'OK') {
+                                        if (result.data.status == 'OK') {
                                             //localStorage.setItem('isFlashsaleLoading', true);
                                             setData({
-                                                ...JSON.parse(data),
-                                                flashsales: JSON.parse(data).flashsales.filter(
+                                                data,
+                                                flashsales: data.flashsales.filter(
                                                     (item) => item._id != params.row._id,
                                                 ),
                                             });
-                                            setRows(
-                                                JSON.parse(data).flashsales.filter(
-                                                    (item) => item._id != params.row._id,
-                                                ),
-                                            );
+                                            setRows(data.flashsales.filter((item) => item._id != params.row._id));
                                         }
                                         setIsloadingdetele(false);
                                     })
@@ -266,7 +261,7 @@ function FlashSale() {
                     .then((result) => {
                         setRows(result.data);
                         setData({
-                            ...JSON.parse(data),
+                            data,
                             flashsales: result.data,
                         });
                         localStorage.removeItem('isFlashsaleLoading');

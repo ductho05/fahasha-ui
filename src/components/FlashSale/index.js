@@ -41,6 +41,8 @@ function FlashSale() {
         setIsLoading(!isLoading);
     };
 
+    console.log('gift1212s', gifts);
+
     useEffect(() => {
         lottie.loadAnimation({
             container: container.current,
@@ -55,6 +57,7 @@ function FlashSale() {
         axios
             .get(`${api}/flashsales?sort=reverse&filter=expired&num=${numFlash}`)
             .then((res) => {
+                console.log('res.dat1312a.data', res);
                 setInterval(() => {
                     res.data.data.length === 0 && setIsShow(true);
                 }, 15000);

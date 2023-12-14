@@ -42,16 +42,15 @@ import DropMenu from '../../../../../components/DropMenu/index';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { useForm, useController, set } from 'react-hook-form';
 import 'react-toastify/dist/ReactToastify.css';
-import { getAuthInstance } from "../../../../../utils/axiosConfig"
+import { getAuthInstance } from '../../../../../utils/axiosConfig';
 
-function getRandomElementsWithBias(arr, num) {
-
-    const originalIndices = Array.from(arr.keys());
-    const shuffledIndices = shuffleArray(originalIndices);
-    const selectedIndices = shuffledIndices.slice(0, num);
-    const selectedElements = selectedIndices.map((index) => arr[index]);
-    return selectedElements;
-}
+// function getRandomElementsWithBias(arr, num) {
+//     const originalIndices = Array.from(arr.keys());
+//     const shuffledIndices = shuffleArray(originalIndices);
+//     const selectedIndices = shuffledIndices.slice(0, num);
+//     const selectedElements = selectedIndices.map((index) => arr[index]);
+//     return selectedElements;
+// }
 
 const { Option } = Select;
 
@@ -63,34 +62,33 @@ function shuffleArray(array) {
     return array;
 }
 
-const options = [
-    {
-        title: '6 ngày gần nhất',
-        value: '1',
-        type: 'desc',
-    },
-    {
-        title: '6 tuần gần nhất',
-        value: '2',
-        type: 'desc',
-    },
-    {
-        title: '6 tháng gần nhất',
-        value: '3',
-        type: 'desc',
-    },
-    {
-        title: '6 năm gần nhất',
-        value: '4',
-        type: 'desc',
-    },
-];
+//     {
+//         title: '6 ngày gần nhất',
+//         value: '1',
+//         type: 'desc',
+//     },
+//     {
+//         title: '6 tuần gần nhất',
+//         value: '2',
+//         type: 'desc',
+//     },
+//     {
+//         title: '6 tháng gần nhất',
+//         value: '3',
+//         type: 'desc',
+//     },
+//     {
+//         title: '6 năm gần nhất',
+//         value: '4',
+//         type: 'desc',
+//     },
+// ];
 
 function FlashSaleDetail() {
-
-    const authInstance = getAuthInstance()
-
+    const authInstance = getAuthInstance();
+    const [openMaxProduct, setOpenMaxProduct] = useState(false);
     const cx = classNames.bind(styles);
+    const [values, setValues] = useState({});
     const navigate = useNavigate();
     const moment = require('moment-timezone');
 
@@ -269,15 +267,17 @@ function FlashSaleDetail() {
                 .toString()
                 .slice(8, 10)}` && flash.point_sale == Math.floor(currentHourInVietnam / 3)
             ? localStorage.setItem(
-                'date_flash',
-                `${flash.date_sale.slice(5, 7)} ${flash.date_sale.slice(8, 10)}, ${flash.date_sale.slice(0, 4)} ${(flash.point_sale + 1) * 3
-                }:00:00`,
-            )
+                  'date_flash',
+                  `${flash.date_sale.slice(5, 7)} ${flash.date_sale.slice(8, 10)}, ${flash.date_sale.slice(0, 4)} ${
+                      (flash.point_sale + 1) * 3
+                  }:00:00`,
+              )
             : localStorage.setItem(
-                'date_flash',
-                `${flash?.date_sale.slice(5, 7)} ${flash?.date_sale.slice(8, 10)}, ${flash?.date_sale.slice(0, 4)} ${flash?.point_sale * 3
-                }:00:00`,
-            );
+                  'date_flash',
+                  `${flash?.date_sale.slice(5, 7)} ${flash?.date_sale.slice(8, 10)}, ${flash?.date_sale.slice(0, 4)} ${
+                      flash?.point_sale * 3
+                  }:00:00`,
+              );
     };
 
     const handleAutoSetting = () => {
@@ -345,11 +345,20 @@ function FlashSaleDetail() {
         Object.keys(values).forEach((key) => {
             formData.append(key, values[key]);
         });
-        // if (Object.keys(avatar).length > 0) {
-        //     formData.append('images', avatar);
-        // }
+        console.log('values21212', flash);
+        if (values.num_sale > flash.product.quantity) {
+            //console.log('valueqư23qws', minQuality);
+            setOpenMaxProduct(true);
+            setValues(values);
+            return;
+        }
+        console.log('values21212', values);
+        updateFlashSale(values);
+    };
 
-        authInstance.post(`/flashsales/update/${flashId}`, values)
+    const updateFlashSale = (values) => {
+        authInstance
+            .post(`/flashsales/update/${flashId}`, values)
             .then((result) => {
                 if (result.data.status === 'OK') {
                     setShowDialog(false);
@@ -363,7 +372,6 @@ function FlashSaleDetail() {
                 setShowDialog(false);
                 toast.error(err.message);
             });
-        //addFlashSale(values, products);
     };
 
     const formItemLayout = {
@@ -485,8 +493,9 @@ function FlashSaleDetail() {
                                         <span style={{ color: show ? '#1890ff' : '#ccc' }}>
                                             {show &&
                                                 (valuepoint > -1
-                                                    ? `Giảm giá từ ${`${valuepoint * 3}h - ${(valuepoint + 1) * 3
-                                                    }h`} hàng ngày`
+                                                    ? `Giảm giá từ ${`${valuepoint * 3}h - ${
+                                                          (valuepoint + 1) * 3
+                                                      }h`} hàng ngày`
                                                     : `Giảm giá tất cả khung giờ hàng ngày`)}
                                         </span>
                                     </Space>
@@ -523,17 +532,30 @@ function FlashSaleDetail() {
                                                 required: true,
                                                 message: 'Vui lòng nhập số lượng!',
                                             },
+                                            ({ getFieldValue }) => ({
+                                                validator(_, value) {
+                                                    const integerValue = parseInt(value, 10);
+                                                    const isInteger = Number.isInteger(integerValue);
+                                                    const isPositive = integerValue > 0;
+
+                                                    if (
+                                                        !isInteger ||
+                                                        !isPositive ||
+                                                        String(value).includes('.') ||
+                                                        String(value).includes(',')
+                                                    ) {
+                                                        return Promise.reject(
+                                                            'Số lượng sản phẩm phải là số nguyên dương.',
+                                                        );
+                                                    }
+                                                    return Promise.resolve();
+                                                },
+                                            }),
+
                                             {
                                                 type: 'number',
-                                                min: 1,
-
-                                                message: 'Số lượng sản phẩm phải là số nguyên dương.',
-                                            },
-                                            {
-                                                type: 'number',
-
-                                                max: 200,
-                                                message: 'Số lượng Flashsale tối đa trong 1 khung giờ là 200.',
+                                                max: 500,
+                                                message: 'Số lượng Flashsale tối đa trong 1 khung giờ là 500.',
                                             },
                                         ]}
                                     >
@@ -572,6 +594,78 @@ function FlashSaleDetail() {
                     </div>
                 </div>
             </Modal>
+            <Modal
+                // vị trí hiển thị của modal
+                style={{
+                    top: '15%',
+                }}
+                title="Cảnh báo số lượng hàng trong kho không đủ"
+                open={openMaxProduct}
+                footer={null}
+                maskClosable={false}
+                onCancel={() => setOpenMaxProduct(false)}
+            >
+                <div
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        marginBottom: 20,
+                    }}
+                >
+                    <img
+                        style={{
+                            width: 100,
+                            height: 100,
+                        }}
+                        src="https://img.icons8.com/color/48/000000/warning-shield.png"
+                    />
+                </div>
+                <p>
+                    Hệ thống phát hiện số lượng hàng trong kho nhỏ hơn số lượng sản phẩm bạn đang thiết đặt.
+                    <li>Có 2 sự lựa chọn dành cho bạn:</li>
+                    <li>
+                        1. Hệ thống sẽ lấy số lượng tối đa hiện tại của sản phẩm này để thiết đặt flashsale. Nhấn{' '}
+                        <strong>[Đồng ý]</strong> để tiếp tục thiết đặt.
+                    </li>
+                    <li>
+                        {' '}
+                        2. Nhấn <strong>[Đóng]</strong> để thiết đặt lại.
+                    </li>
+                </p>
+                <div
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                        flexDirection: 'row',
+                        marginTop: 20,
+                    }}
+                >
+                    <Button
+                        type="primary"
+                        onClick={() => {
+                            updateFlashSale({
+                                ...values,
+                                num_sale: flash.product.quantity,
+                            });
+                            setOpenMaxProduct(false);
+                        }}
+                        style={{
+                            marginRight: 10,
+                        }}
+                    >
+                        Đồng ý
+                    </Button>
+
+                    <Button
+                        onClick={() => {
+                            setOpenMaxProduct(false);
+                        }}
+                    >
+                        Đóng
+                    </Button>
+                </div>
+            </Modal>
             <div className={cx('top')}>
                 <div className={cx('infomation')} ref={infoDivRef}>
                     <div className={cx('content')}>
@@ -582,7 +676,7 @@ function FlashSaleDetail() {
                                     `${new Date().getUTCFullYear()}-${(new Date().getUTCMonth() + 1)
                                         .toString()
                                         .padStart(2, '0')}-${new Date().toString().slice(8, 10)}` &&
-                                    flash.point_sale == Math.floor(currentHourInVietnam / 3) ? (
+                                flash.point_sale == Math.floor(currentHourInVietnam / 3) ? (
                                     <CountDownCustom title={'Thời gian còn lại:'} isLoading={isLoading} />
                                 ) : (
                                     <CountDownCustom title={'Đếm ngược đến giờ mở bán:'} isLoading={isLoading} />
@@ -658,14 +752,21 @@ function FlashSaleDetail() {
                                         })}
                                     </p>
                                     <p className={cx('info_other')}>
-                                        Giá giảm trước:{' '}
-                                        {flash?.product?.containprice.toLocaleString('vi-VN', {
-                                            style: 'currency',
-                                            currency: 'VND',
-                                        })}
+                                        Giá không sales:{' '}
+                                        {flash?.product?.containprice != 1
+                                            ? flash?.product?.containprice?.toLocaleString('vi-VN', {
+                                                  style: 'currency',
+                                                  currency: 'VND',
+                                              })
+                                            : flash?.product?.price?.toLocaleString('vi-VN', {
+                                                  style: 'currency',
+                                                  currency: 'VND',
+                                              })}
                                     </p>
                                     <p className={cx('info_other')}>Đánh giá: {flash?.product?.rate} sao</p>
-                                    <p className={cx('info_other')}>Trạng thái: {flash?.product?.status}</p>{' '}
+                                    <p className={cx('info_other')}>
+                                        Số lượng trong kho: {flash?.product?.quantity}
+                                    </p>{' '}
                                 </div>
                                 <div className={cx('body_description')}>
                                     <p className={cx('info_other')}>Ngày Sale: {flash.date_sale}</p>

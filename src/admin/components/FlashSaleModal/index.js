@@ -7,13 +7,30 @@ import FlashSaleForm from '../FlashSaleForm';
 import { useNavigate } from 'react-router-dom';
 // import Abc from './Abc';
 
-const FlashSaleModal = ({ props, handelLoading, func, isStatus, style }) => {
+const FlashSaleModal = ({ props, handelLoading, func, isStatus, style, min }) => {
     const cx = classNames.bind(styles);
     const [open, setOpen] = useState(false);
     const [hideForm, setHideForm] = useState(false);
     const [stateResult, setStateResult] = useState({});
     const navigate = useNavigate();
-    //console.log('props', props);
+    console.log('prop12121s', props);
+    
+
+    // useEffect(() => {
+    //     // lấy quality nhỏ nhất từ mảng suggestFlash
+    //     if (props.length > 0) {
+    //         // gọi api để lấy quality nhỏ nhất
+    //         props.map((item) => {
+    //             fetch(`${api}/products/id/${item}`)
+    //                 .then((response) => response.json())
+    //                 .then((result) => {
+    //                     setDataFlash((dataFlash) => [...dataFlash, result.data]);
+    //                 })
+    //                 .catch((err) => console.log(err));
+    //         });
+    //     }
+    // }, [props]);
+
     const showModal = () => {
         setHideForm(false);
         setOpen(true);
@@ -85,7 +102,7 @@ const FlashSaleModal = ({ props, handelLoading, func, isStatus, style }) => {
                         }
                     />
                 ) : (
-                    <FlashSaleForm props={props} hideFunc={hideFunc}></FlashSaleForm>
+                    <FlashSaleForm props={props} style={style} hideFunc={hideFunc}></FlashSaleForm>
                 )}
             </Modal>
         </>

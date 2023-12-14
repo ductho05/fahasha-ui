@@ -23,6 +23,7 @@ import {
     SyncOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { set } from 'react-hook-form';
 
 const moment = require('moment-timezone');
 
@@ -35,7 +36,9 @@ const currentTimeInVietnam = moment().tz(vietnamTimeZone);
 // Lấy số giờ hiện tại
 const currentHourInVietnam = currentTimeInVietnam.get('hours');
 function BarChartExample({
+    setDetail,
     spin,
+    setDetailProduct,
     data,
     setNumProduct,
     setTimeYear,
@@ -50,7 +53,9 @@ function BarChartExample({
     const [isToggle, setIsToggle] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     //  const [rows, setRows] = useState([]);
-    const [num, setNum] = useState(5);
+    const [num, setNum] = useState(maxProduct);
+    // const valueTop = document.documentElement.scrollHeight;
+    console.log('afgjasfgajf', data);
     //
     const addCommasToNumber = (number) => {
         // Chuyển đổi số thành chuỗi
@@ -84,7 +89,7 @@ function BarChartExample({
         const month = (currentDate.getUTCMonth() + 1).toString().padStart(2, '0');
         const day = currentDate.toString().slice(8, 10);
         const utcTimeString = `${year}-${month}-${day}`;
-        let current_point_sale = Math.floor(currentHourInVietnam / 3);
+        let current_point_sale = Math.round(currentHourInVietnam / 3);
         let toDay = utcTimeString;
 
         return { current_point_sale, toDay };
@@ -111,7 +116,7 @@ function BarChartExample({
         setTimeMonth(parseInt(values?.time.slice(5, 7)));
         setTimeYear(parseInt(values?.time.slice(0, 4)));
         setTime1(values.time);
-        console.log('values', values);
+        console.log('values1323', values);
         setNumProduct(values.num);
         setNum(values.num);
     };
@@ -148,7 +153,7 @@ function BarChartExample({
                         props={{
                             image: payload[0]?.payload.imageURL,
                             title: payload[0]?.payload.name,
-                            sold: `${addCommasToNumber(Math.ceil(payload[0]?.value / 1000))}K`,
+                            sold: `${addCommasToNumber(Math.round(payload[0]?.value / 1000))}K`,
                             isLoading: false,
                         }}
                         type="Doanh thu"
@@ -180,7 +185,7 @@ function BarChartExample({
                         justifyContent: 'center', // Căn giữa theo chiều ngang
                     }}
                 >
-                    {'Số sản phẩm: ' + num}
+                    {'Số sản phẩm: ' + (num ? num : maxProduct)}
                 </Tag>
                 <Tag
                     color="cyan"
@@ -279,20 +284,41 @@ function BarChartExample({
                                     : value > 999999
                                     ? addCommasToNumber((value / 1000000).toFixed(2)) + 'M'
                                     : value > 999
-                                    ? addCommasToNumber(Math.ceil(value / 1000)) + 'K'
+                                    ? addCommasToNumber(Math.round(value / 1000)) + 'K'
                                     : value;
                             }}
                         />
                         <Tooltip content={<CustomTooltip />} />
                         <Bar
                             dataKey="sold"
-                            fill="#f44336"
+                            fill={
+                                // mauf xanh tim
+                                '#8884d8'
+                            }
                             style={{
                                 cursor: 'pointer',
-                                
                             }}
-                            onClick={(data) => {
-                                console.log('sdrguawejbf', data);
+                            onClick={(e) => {
+                                console.log('sdrguasasawejbf', data);
+                                const products = data.filter((item) => item.id == e.id);
+                                const orders = products[0].orders;
+                                console.log('sdrguaw21ejbf', orders);
+                                setDetailProduct({
+                                    name: products[0].name,
+                                    value: products[0].sold,
+                                });
+                                setDetail(
+                                    // user: orders[0].orders[0].user,
+                                    // address: `${orders[0].orders[0].address} - ${orders[0].orders[0].wards} - ${orders[0].orders[0].districs} - ${orders[0].orders.city}`,
+                                    // date: orders[0].orders[0].date,
+                                    // message: orders[0].orders[0].message,
+                                    // payment_method: orders[0].orders[0].payment_method,
+                                    // quantity: 9,
+                                    // status: orders[0].status,
+                                    // name: orders[0].orders[0].name,
+                                    // value: orders[0].sold,
+                                    orders,
+                                );
                             }}
                         />
                     </BarChart>
