@@ -18,12 +18,89 @@ import { CircularProgress, Backdrop } from "@mui/material";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import Dropdown from 'react-multilevel-dropdown';
-import { Input, DatePicker, Form, Button, Skeleton, Popconfirm, Select } from 'antd';
+import { Input, DatePicker, Form, Button, Skeleton, Popconfirm, Select, Rate, Checkbox, Tooltip } from 'antd';
 import SendNotification from '../../../service/SendNotification';
 import { getAuthInstance } from '../../../utils/axiosConfig';
 import { useData } from '../../../stores/DataContext';
+import Tippy from '@tippyjs/react/headless';
+import 'tippy.js/dist/tippy.css';
+import { Wrapper as PopperWrapper } from '../../../components/Popper';
+import { CloseOutlined, FilterOutlined, EditOutlined, LockOutlined, UnlockOutlined } from '@ant-design/icons';
+import BlockIcon from '@mui/icons-material/Block';
 
 const cx = classNames.bind(styles)
+
+const sortOptions = [
+    {
+        label: "Giá cao nhất",
+        value: "price_desc"
+    },
+    {
+        label: "Giá thấp nhất",
+        value: "price_asc"
+    },
+    {
+        label: "Đánh giá cao nhất",
+        value: "rate_desc"
+    },
+    {
+        label: "Đánh giá thấp nhất",
+        value: "rate_asc"
+    }
+]
+
+const priceOptions = [
+    {
+        label: "0đ - 150,000 đ",
+        valueMin: 0,
+        valueMax: 150000
+    },
+    {
+        label: "150000 đ - 300,000 đ",
+        valueMin: 150000,
+        valueMax: 300000
+    },
+    {
+        label: "300,000 đ - 500,000 đ",
+        valueMin: 300000,
+        valueMax: 500000
+    },
+    {
+        label: "500,000 đ - 700,000 đ",
+        valueMin: 500000,
+        valueMax: 700000
+    },
+    {
+        label: "700.000 đ - Trở lên",
+        valueMin: 700000
+    }
+]
+
+const rateOptions = [1, 2, 3, 4, 5]
+
+const quantityOptions = [
+    {
+        label: "Còn hàng",
+        value: true
+    },
+    {
+        label: "Hết hàng",
+        value: false
+    }
+]
+
+const statusOptions = [
+    {
+        label: "Hoạt động",
+        value: true
+    },
+
+    {
+        label: "Ngưng bán",
+        value: false
+    }
+]
+
 function Product() {
 
     const authInstance = getAuthInstance()
@@ -33,15 +110,19 @@ function Product() {
     const [rows, setRows] = React.useState([])
     const [avatar, setAvatar] = useState()
     const [loading, setLoading] = useState(false)
-    const [loadingProduct, setLoadingProduct] = useState(false)
     const [isAction, setIsAction] = useState(false)
     const [options, setOptions] = useState([])
     const [success, setSuccess] = useState(0)
     const { data, setData } = useData()
-    const [categoryName, setCategoryName] = useState({
-        name: "--Chọn loại sản phẩm--",
-        value: ""
-    })
+    const [errors, setErrors] = useState({})
+    const [price, setPrice] = useState(null)
+    const [rate, setRate] = useState(null)
+    const [selectCategory, setSelectCategory] = useState(null)
+    const [selectSort, setSelectSort] = useState(null)
+    const [showFilter, setShowFilter] = useState(false)
+    const [keywords, setKeywords] = useState(null)
+    const [status, setStatus] = useState(null)
+    const [quantity, setQuantity] = useState(null)
 
     const columns = [
         {
@@ -49,7 +130,7 @@ function Product() {
             headerName: 'Sản phẩm',
             sortable: false,
             editable: true,
-            width: 240,
+            width: 320,
             renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : "Trống"}</p>
         },
         {
@@ -68,13 +149,6 @@ function Product() {
             renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : "Trống"}</p>
         },
         {
-            field: 'published_date',
-            headerName: 'Ngày xuất bản',
-            width: 160,
-            sortable: false,
-            renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : "Trống"}</p>
-        },
-        {
             field: 'price',
             headerName: 'Giá hiện tại(đ)',
             width: 100,
@@ -82,18 +156,29 @@ function Product() {
             renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? numeral(params.value).format('0,0[.]00 VNĐ') : "Trống"}</p>
         },
         {
-            field: 'old_price',
-            headerName: 'Giá cũ(đ)',
-            width: 100,
-            sortable: false,
-            renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? numeral(params.value).format('0,0[.]00 VNĐ') : "Trống"}</p>
-        },
-        {
             field: 'rate',
             headerName: 'Đánh giá',
-            width: 160,
+            width: 120,
             sortable: true,
             renderCell: (params) => <Rating name="read-only" value={params.value} readOnly />
+        },
+        {
+            field: 'status_sell',
+            headerName: 'Trạng thái',
+            width: 120,
+            renderCell: (params) => {
+                return <p className={params ? params?.value == false ? "text-red-500" : "text-green-500" : "text-green-500"
+                }> {params ? params?.value == false ? "Ngưng bán" : "Hoạt động" : "Hoạt động"}</p >
+            }
+        },
+        {
+            field: 'quantity',
+            headerName: 'Tình trạng',
+            width: 120,
+            renderCell: (params) => {
+                return <p className={params?.value === 0 ? "text-red-500" : "text-green-500"
+                }> {params?.value === 0 ? "Hết hàng" : "Còn hàng"}</p >
+            }
         },
 
         {
@@ -101,18 +186,46 @@ function Product() {
             headerName: 'Hành động',
             disableColumnMenu: true,
             sortable: false,
-            width: 160,
+            width: 120,
             renderCell: (params) => {
                 const handleOnCLick = (e) => {
                     e.stopPropagation();
                 }
-                const handleDelete = () => {
+
+                const handleUpdateStatus = (status_sell) => {
+                    let status
+                    if (params.row.hasOwnProperty('status_sell') && status_sell === false) {
+                        status = true
+                    } else {
+                        status = false
+                    }
                     setLoading(true)
                     setIsAction(true)
-                    authInstance.get(`${api}/products/delete/${params.value}`)
-                        .then(result => {
+                    authInstance.put(`${api}/products/update/${params.row._id}`, {
+                        status_sell: status
+                    })
+                        .then(async result => {
                             if (result.data.status === 'OK') {
-                                toast.success('Xóa thành công!')
+                                const title = "Thông báo sản phẩm"
+                                let description = `${result.data.data.title} vừa được mở bán trở lại`
+                                if (!result.data.data.status_sell) {
+                                    description = `${result.data.data.title} tạm thời ngưng bán`
+                                }
+                                const url = `${appPath}/admin/update-product/${result.data.data._id}`
+                                const image = result.data.data.images
+                                await authInstance.post("/webpush/send", {
+                                    filter: "admin",
+                                    notification: {
+                                        title,
+                                        description,
+                                        image: image,
+                                        url
+                                    }
+                                })
+                                    .catch((err) => {
+                                        console.error(err)
+                                    })
+                                toast.success('Cập nhật thành công!')
                                 setSuccess(prev => prev + 1)
                             } else {
                                 toast.error(result.data.message)
@@ -130,23 +243,43 @@ function Product() {
                 return <div style={{ display: 'flex' }} onClick={handleOnCLick}>
                     <Popconfirm
                         title="Xác nhận?"
-                        description="Sản phẩm sẽ bị xóa khỏi hệ thống"
-                        onConfirm={handleDelete}
+                        description={
+                            params.row.hasOwnProperty('status_sell') ? params.row.status_sell === false
+                                ? "Sản phẩm sẽ được bán lại trên hệ thống"
+                                : "Sản phẩm sẽ không bán trên hệ thống cho đến khi mở lại"
+                                : "Sản phẩm sẽ không bán trên hệ thống cho đến khi mở lại"
+                        }
+                        onConfirm={() => handleUpdateStatus(params.row.status_sell)}
                         onCancel={() => { }}
                         okText="Đồng ý"
                         cancelText="Hủy"
                     >
-                        <p>
-                            <Delete />
-                        </p>
+                        <Tooltip title={
+                            params.row.hasOwnProperty('status_sell') ? params.row.status_sell === false
+                                ? "Mở bán lại sản phẩm"
+                                : "Ngưng bán sản phẩm"
+                                : "Ngưng bán sản phẩm"
+                        }>
+                            <Button className="mr-[20px]" icon={
+                                params.row.hasOwnProperty('status_sell') ? params.row.status_sell === false
+                                    ? <UnlockOutlined />
+                                    : <LockOutlined />
+                                    : <LockOutlined />
+
+                            } danger
+                            />
+                        </Tooltip>
+
                     </Popconfirm>
                     <Link to={`/admin/update-product/${params.row._id}`}>
-                        <Update />
+                        <Tooltip title="Chỉnh sửa">
+                            <Button type="primary" ghost icon={<EditOutlined />} />
+                        </Tooltip>
                     </Link>
                 </div>
             }
         },
-    ];
+    ]
 
     const fetchProduct = () => {
 
@@ -195,54 +328,74 @@ function Product() {
     }, [])
 
     const onFinish = async (data) => {
-        const formData = new FormData()
-        Object.keys(data).forEach(key => {
-            formData.append(key, data[key])
-        })
-        if (avatar) {
-            formData.append("images", avatar)
-        }
-        if (published) {
-            formData.append("published_date", published)
-        }
-        setLoading(true)
-        setIsAction(true)
-        await authInstance.post(`/products/add`, formData)
-            .then(async result => {
 
-                if (result.data.status === "OK") {
-                    setSuccess(prev => prev + 1)
-                    toast.success("Thêm mới sản phẩm thành công")
-                    const title = "Thông báo sản phẩm"
-                    const description = "TA Book Store vừa ra mắt sản phẩm mới. Xem ngay"
-                    const url = `${appPath}/product-detail/${result.data.data._id}`
-                    const image = result.data.data.images
-                    await authInstance.post("/webpush/send", {
-                        filter: "all",
-                        notification: {
-                            title,
-                            description,
-                            image: image,
-                            url
+        if (Object.keys(errors).length <= 0) {
+            if (!avatar) {
+
+                setErrors(prev => {
+                    return {
+                        ...prev,
+                        image: "Vui lòng chọn hình ảnh"
+                    }
+                })
+            } else if (!published) {
+
+                setErrors(prev => {
+                    return {
+                        ...prev,
+                        published: "Vui lòng chọn ngày xuất bản"
+                    }
+                })
+            } else if (data.old_price < data.price) {
+                setErrors(prev => {
+                    return {
+                        ...prev,
+                        old_price: "Giá cũ phải lớn hơn hoặc bằng giá hiện tại"
+                    }
+                })
+            } else {
+                const formData = new FormData()
+                Object.keys(data).forEach(key => {
+                    formData.append(key, data[key])
+                })
+                formData.append("images", avatar)
+                formData.append("published_date", published)
+
+                setLoading(true)
+                await authInstance.post(`/products/add`, formData)
+                    .then(async result => {
+
+                        if (result.data.status === "OK") {
+                            setSuccess(prev => prev + 1)
+                            toast.success("Thêm mới sản phẩm thành công")
+                            const title = "Thông báo sản phẩm"
+                            const description = "TA Book Store vừa ra mắt sản phẩm mới. Xem ngay"
+                            const url = `${appPath}/product-detail/${result.data.data._id}`
+                            const image = result.data.data.images
+                            await authInstance.post("/webpush/send", {
+                                filter: "all",
+                                notification: {
+                                    title,
+                                    description,
+                                    image: image,
+                                    url
+                                }
+                            })
+                                .catch((err) => {
+                                    console.error(err)
+                                })
+                            setShowDialog(false)
+                        } else {
+                            toast.error(result.data.message)
                         }
+                        setLoading(false)
                     })
-                        .catch((err) => {
-                            console.error(err)
-                        })
-                } else {
-                    toast.error(result.data.message)
-                }
-                setIsAction(false)
-                setLoading(false)
-                setShowDialog(false)
-            })
-            .catch(err => {
-                setIsAction(false)
-                setLoading(false)
-                setShowDialog(false)
-                toast.error(err?.response?.data?.message)
-            })
-
+                    .catch(err => {
+                        setLoading(false)
+                        toast.error(err?.response?.data?.message)
+                    })
+            }
+        }
     }
 
     const onFinishFailed = (errorInfo) => {
@@ -250,39 +403,244 @@ function Product() {
     };
 
     useEffect(() => {
+
+        if (published) {
+
+            setErrors(prev => {
+
+                delete prev.published
+                return {
+                    ...prev
+                }
+            })
+        }
+    }, [published])
+
+    useEffect(() => {
+        if (avatar) {
+            setErrors(prev => {
+
+                delete prev.image
+                return {
+                    ...prev
+                }
+            })
+        }
         return () => {
             avatar && URL.revokeObjectURL(avatar.preview)
         }
     }, [avatar]);
 
     const handleChooseImage = (e) => {
-        if (e.target.files.length > 0) {
-            const file = e.target.files[0]
-            file.preview = URL.createObjectURL(file)
 
-            setAvatar(file)
+        if (e.target.files.length > 0) {
+            if (e.target.files[0].type.startsWith("image")) {
+
+                const file = e.target.files[0]
+                file.preview = URL.createObjectURL(file)
+
+                setAvatar(file)
+            } else {
+
+                setAvatar(null)
+                setErrors(prev => {
+                    return {
+                        ...prev,
+                        image: "Vui lòng chọn loại tệp hình ảnh"
+                    }
+                })
+            }
         }
     }
 
     const changeDate = (date, dateString) => {
-        setPublished(dateString)
+        if (dateString) {
+
+            const currentDate = new Date()
+            const datePublish = new Date(dateString)
+
+            if (currentDate < datePublish) {
+                setErrors(prev => {
+                    return {
+                        ...prev,
+                        published: "Vui lòng không chọn ngày xuất bản trong tương lai"
+                    }
+                })
+            } else {
+
+                setErrors(prev => {
+
+                    delete prev.published
+                    return {
+                        ...prev
+                    }
+                })
+                setPublished(dateString)
+            }
+        } else {
+
+            setErrors(prev => {
+                return {
+                    ...prev,
+                    published: "Vui lòng chọn ngày xuất bản"
+                }
+            })
+        }
     }
 
     const handleShowDialog = () => {
-        if (avatar) {
-            URL.revokeObjectURL(avatar.preview)
-            setAvatar()
-        }
-        setCategoryName({
-            name: "--Chọn loại sản phẩm--",
-            value: ""
-        })
-        setPublished()
         setShowDialog(true)
+        setErrors({})
     }
 
     const filterOption = (input, option) =>
         (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
+
+    const handleChangeCategory = (value, option) => {
+
+        setSelectCategory(option)
+    }
+
+    const handleSortChange = (value, option) => {
+
+        setSelectSort(option)
+    }
+
+    const handleChangePrice = (option) => {
+
+        setPrice(option)
+    }
+
+    const handleChangeRate = (rateItem) => {
+
+        setRate(rateItem)
+    }
+
+    const handleShowFilter = () => {
+
+        setShowFilter(prev => !prev)
+    }
+
+    const handleClearFilter = () => {
+        setPrice(null)
+        setRate(null)
+        setSelectCategory(null)
+        setQuantity(null)
+        setStatus(null)
+        setRows(data?.products)
+    }
+
+    const handleSearch = (value) => {
+
+        setKeywords(value)
+    }
+
+    const sortProduct = (sort) => {
+
+        const newList = [...data?.products].sort((a, b) => {
+
+            if (sort.value == "price_asc") {
+                return a.price - b.price
+            } else if (sort.value == "price_desc") {
+                return b.price - a.price
+            } else if (sort.value == "rate_asc") {
+                return a.rate - b.rate
+            } else {
+                return b.rate - a.rate
+            }
+        })
+
+        setRows(newList)
+    }
+
+    const filterProduct = (rate, price, category, keywords, quantity, status) => {
+
+        let newList = data?.products?.filter(product => {
+            if (keywords) {
+
+                if (rate && price && selectCategory) {
+                    if (price.valueMax) {
+                        return product.title.toLowerCase().includes(keywords.toLowerCase()) && product.rate === rate && product.categoryId._id === category.value && product.price >= price.valueMin && product.price <= price.valueMax
+                    } else {
+                        return product.title.toLowerCase().includes(keywords.toLowerCase()) && product.rate === rate && product.categoryId._id === category.value && product.price >= price.valueMin
+                    }
+                } else if (rate && price) {
+                    return product.title.toLowerCase().includes(keywords.toLowerCase()) && product.rate === rate && product.price >= price.valueMin && product.price <= price.valueMax
+                } else if (rate && category) {
+                    return product.title.toLowerCase().includes(keywords.toLowerCase()) && product.rate === rate && product.categoryId._id === category.value
+                } else if (price && category) {
+                    return product.title.toLowerCase().includes(keywords.toLowerCase()) && product.price >= price.valueMin && product.price <= price.valueMax && product.categoryId._id === category.value
+                } else if (rate) {
+                    return product.title.toLowerCase().includes(keywords.toLowerCase()) && product.rate === rate
+                } else if (price) {
+                    return product.title.toLowerCase().includes(keywords.toLowerCase()) && product.price >= price.valueMin && product.price <= price.valueMax
+                } else if (category) {
+                    return product.title.toLowerCase().includes(keywords.toLowerCase()) && product.categoryId._id === category.value
+                } else return product.title.toLowerCase().includes(keywords.toLowerCase())
+            } else {
+                if (rate && price && selectCategory) {
+                    if (price.valueMax) {
+                        return product.rate === rate && product.categoryId._id === category.value && product.price >= price.valueMin && product.price <= price.valueMax
+                    } else {
+                        return product.rate === rate && product.categoryId._id === category.value && product.price >= price.valueMin
+                    }
+                } else if (rate && price) {
+                    return product.rate === rate && product.price >= price.valueMin && product.price <= price.valueMax
+                } else if (rate && category) {
+                    return product.rate === rate && product.categoryId._id === category.value
+                } else if (price && category) {
+                    return product.price >= price.valueMin && product.price <= price.valueMax && product.categoryId._id === category.value
+                } else if (rate) {
+                    return product.rate === rate
+                } else if (price) {
+                    return price.valueMax ? (product.price >= price.valueMin && product.price <= price.valueMax) : product.price >= price.valueMin
+                } else if (category) {
+                    return product.categoryId._id === category.value
+                } else return product
+            }
+        })
+
+        if (quantity) {
+            const list2 = newList?.filter(product => {
+                if (quantity.value) {
+                    return product.quantity > 0
+                } else return product.quantity === 0
+            })
+            newList = [...list2]
+        }
+
+        if (status) {
+            const list3 = newList.filter(product => {
+                if (product.hasOwnProperty('status_sell')) {
+                    return product.status_sell === status.value
+                } else {
+
+                    if (status.value) {
+                        return product
+                    } else {
+                        return null
+                    }
+                }
+            })
+            newList = [...list3]
+        }
+        setRows(newList)
+    }
+
+    useEffect(() => {
+
+        filterProduct(rate, price, selectCategory, keywords, quantity, status)
+
+    }, [rate, price, selectCategory, keywords, quantity, status])
+
+    useEffect(() => {
+
+        if (selectSort) {
+
+            sortProduct(selectSort)
+        }
+
+    }, [selectSort])
 
     return (
         <div className={cx('wrapper')}>
@@ -300,25 +658,21 @@ function Product() {
             />
             <Dialog
                 open={showDialog}
+                onClose={() => {
+                    setErrors({})
+                    setShowDialog(false)
+                }}
             >
                 <div className={cx("dialog_add_user")}>
+                    <h1 className="uppercase text-red-500 font-[600] text-center mb-[20px]">Thêm sản phẩm mới</h1>
                     <p className={cx('btn_close')} onClick={() => setShowDialog(false)}>
                         <CloseOutlinedIcon className={cx('btn_icon')} />
                     </p>
                     <Form
-                        name="basic"
-                        labelCol={{
-                            span: 6,
-                        }}
-                        wrapperCol={{
-                            span: 18,
-                        }}
-                        style={{
-                            maxWidth: 600,
-                        }}
+                        layout="vertical"
                         onFinish={onFinish}
                         onFinishFailed={onFinishFailed}
-                        autoComplete="off"
+                        autoComplete="true"
                     >
                         <Form.Item
                             label="Tên"
@@ -356,7 +710,7 @@ function Product() {
                                 },
                             ]}
                         >
-                            <Input placeholder='Nhập giá hiện tại' />
+                            <Input type="number" placeholder='Nhập giá hiện tại' min="1000" />
                         </Form.Item>
 
                         <Form.Item
@@ -369,8 +723,11 @@ function Product() {
                                 },
                             ]}
                         >
-                            <Input placeholder='Nhập giá cũ' />
+                            <Input type="number" placeholder='Nhập giá cũ' min="1000" />
                         </Form.Item>
+                        {
+                            errors.old_price && <p className="text-red-500 mt-[10px]">{errors.old_price}</p>
+                        }
 
                         <Form.Item
                             label="Loại sản phẩm"
@@ -400,17 +757,22 @@ function Product() {
                                 },
                             ]}
                         >
-                            <Input type="number" />
+                            <Input type="number" min="1" />
                         </Form.Item>
                         <p className={cx('label')}></p>
-                        <div className="flex items-center">
-                            <p className='text-red-600 text-right'>*</p>
-                            <p className={cx('label')}>Năm xuất bản:</p>
+                        <div className="flex flex-col">
+                            <p className={cx('label')}>
+                                <span className="text-red-500 text-right mr-[5px]">*</span>
+                                Năm xuất bản:
+                            </p>
                             <div className="flex flex-[18] justify-start">
                                 <DatePicker
                                     onChange={changeDate}
                                 />
                             </div>
+                            {
+                                errors.published && <p className="text-red-500 mt-[10px]">{errors.published}</p>
+                            }
                         </div>
                         <p className={cx('label')}></p>
                         <Form.Item
@@ -428,9 +790,11 @@ function Product() {
                                 rows={5}
                             />
                         </Form.Item>
-                        <div className='flex items-center mb-[20px]'>
-                            <p className='text-red-600 text-right'>*</p>
-                            <p className={cx('label')}>Hình ảnh:</p>
+                        <div className='flex flex-col mb-[20px]'>
+                            <p className={cx('label')}>
+                                <span className="text-red-500 text-right mr-[5px]">*</span>
+                                Hình ảnh:
+                            </p>
                             <div className={cx('avatar')}>
                                 <p className={cx('edit_avatar')}>
                                     <label for="image">
@@ -443,11 +807,15 @@ function Product() {
                                     avatar && <img src={avatar.preview} />
                                 }
                             </div>
+                            {
+                                errors.image && <p className="text-red-500 mt-[10px]">{errors.image}</p>
+                            }
                         </div>
                         <Form.Item
-                            wrapperCol={{
-                                offset: 8,
-                                span: 16,
+                            style={{
+                                width: "100%",
+                                display: "flex",
+                                justifyContent: "center"
                             }}
                         >
                             <Button type="primary" htmlType="submit">
@@ -461,7 +829,7 @@ function Product() {
                 sx={{ color: '#fff', zIndex: 10000 }}
                 open={loading}
             >
-                {isAction && <CircularProgress color="error" />}
+                <CircularProgress color="error" />
             </Backdrop>
             <div className={cx('heading')}>
                 <h3>Quản lý sản phẩm</h3>
@@ -470,24 +838,181 @@ function Product() {
                     <span>Thêm mới</span>
                 </p>
             </div>
-            {
-                loadingProduct &&
-                <div>
-                    <LinearProgress />
+
+            <div className="flex items-center justify-between px[20px] py-[10px] shadow-sm border rounded-[12px] my-[20px]">
+                <div className='px-[20px] flex items-center'>
+                    <p className='text-[1.4rem] text-[#333] mr-[10px]'>Sắp xếp theo: </p>
+                    <Select
+                        className='w-[200px]'
+                        placeholder="Chọn..."
+                        options={sortOptions}
+                        onChange={handleSortChange}
+                    />
                 </div>
-            }
-            {
-                loadingProduct === false ? <div className={cx('table')}>
-                    <EnhancedTable columns={columns} rows={rows} />
+                <div className='px-[20px] flex items-center'>
+                    <Input.Search onSearch={handleSearch} className='w-[400px]' placeholder='Tìm kiếm sản phẩm...' />
                 </div>
-                    : <div className="mt-[20px]">
-                        <Skeleton
-                            active
-                            paragraph={{
-                                rows: 8,
-                            }}
-                        />
-                    </div>
+                <div className='px-[20px] flex items-center'>
+                    <Tippy
+                        interactive={true}
+                        visible={showFilter}
+                        placement="bottom"
+                        render={(attrs) => (
+                            <div className='tippy-admin max-w-max min-w-[280px] shadow-lg max-h-[64vh] overflow-y-scroll' tabIndex="-1" {...attrs}>
+                                <PopperWrapper>
+                                    <div className='relative h-max px-[20px] pb-[20px] pt-[30px] rounded-[12px]'>
+
+                                        {
+                                            rate || price || selectCategory || quantity || status ?
+                                                <div>
+                                                    {
+                                                        status &&
+                                                        <div className="mb-[10px] w-max px-[10px] py-[4px] rounded-[12px] flex items-center justify-center text-orange-500 border border-orange-500">
+                                                            <p className='text-[1.3rem] flex flex-wrap'>Trạng thái: {status.label}</p>
+                                                            <CloseOutlined onClick={() => setStatus(null)} className='ml-[8px] cursor-pointer' />
+                                                        </div>
+                                                    }
+                                                    {
+                                                        quantity &&
+                                                        <div className="mb-[10px] w-max px-[10px] py-[4px] rounded-[12px] flex items-center justify-center text-orange-500 border border-orange-500">
+                                                            <p className='text-[1.3rem] flex flex-wrap'>Tình trạng: {quantity.label}</p>
+                                                            <CloseOutlined onClick={() => setQuantity(null)} className='ml-[8px] cursor-pointer' />
+                                                        </div>
+                                                    }
+                                                    {
+                                                        selectCategory &&
+                                                        <div className="mb-[10px] w-max px-[10px] py-[4px] rounded-[12px] flex items-center justify-center text-orange-500 border border-orange-500">
+                                                            <p className='text-[1.3rem] flex flex-wrap'>Nhóm: {selectCategory.label}</p>
+                                                            <CloseOutlined onClick={() => setSelectCategory(null)} className='ml-[8px] cursor-pointer' />
+                                                        </div>
+                                                    }
+                                                    {
+                                                        rate &&
+                                                        <div className="mb-[10px] w-max px-[10px] py-[4px] rounded-[12px] flex items-center justify-center text-orange-500 border border-orange-500">
+                                                            <p className='text-[1.3rem]'>Sao: {rate}</p>
+                                                            <CloseOutlined onClick={() => setRate(null)} className='ml-[8px] cursor-pointer' />
+                                                        </div>
+                                                    }
+                                                    {
+                                                        price &&
+                                                        <div className="mb-[10px] w-max px-[10px] py-[4px] rounded-[12px] flex items-center justify-center text-orange-500 border border-orange-500">
+                                                            <p className='text-[1.3rem]'>Giá: {price.label}</p>
+                                                            <CloseOutlined onClick={() => setPrice(null)} className='ml-[8px] cursor-pointer' />
+                                                        </div>
+                                                    }
+                                                    <div onClick={handleClearFilter} className="mb-[10px] cursor-pointer w-max px-[10px] py-[4px] rounded-[12px] flex items-center justify-center text-orange-500 border border-orange-500">
+                                                        <p className='text-[1.3rem]'>Xóa bộ lọc</p>
+                                                    </div>
+                                                </div>
+                                                : ""
+                                        }
+                                        <div
+                                            className="absolute top-[8px] right-[8px] p-[6px] cursor-pointer hover:bg-slate-200 rounded-[50%]"
+                                            onClick={() => setShowFilter(false)}
+                                        >
+                                            <CloseOutlined className='text-[1.4rem]' />
+                                        </div>
+                                        <div className="border-b">
+                                            <h1 className="text-[1.4rem] text-[#333] uppercase font-[600]">
+                                                Nhóm sản phẩm
+                                            </h1>
+                                            <Select
+                                                onChange={handleChangeCategory}
+                                                showSearch
+                                                placeholder="Chọn danh mục"
+                                                optionFilterProp="children"
+                                                filterOption={filterOption}
+                                                options={options}
+                                                className="my-[20px] w-full"
+                                            />
+                                        </div>
+                                        <div className="border-b pt-[20px]">
+                                            <h1 className="text-[1.3rem] text-[#333] uppercase font-[600]">
+                                                Trạng thái
+                                            </h1>
+                                            {
+                                                statusOptions.map(option => (
+                                                    <div key={option.label} className="p-[10px]">
+                                                        <Checkbox
+                                                            onChange={() => { setStatus(option) }}
+                                                            checked={option.value === status?.value}
+                                                            className="text-[1.4rem] text-[#333] font-[500]"
+                                                        >
+                                                            {option?.label}
+                                                        </Checkbox>
+                                                    </div>
+                                                ))
+                                            }
+                                        </div>
+                                        <div className="border-b pt-[20px]">
+                                            <h1 className="text-[1.3rem] text-[#333] uppercase font-[600]">
+                                                Tình trạng
+                                            </h1>
+                                            {
+                                                quantityOptions.map(option => (
+                                                    <div key={option.label} className="p-[10px]">
+                                                        <Checkbox
+                                                            onChange={() => { setQuantity(option) }}
+                                                            checked={option.value === quantity?.value}
+                                                            className="text-[1.4rem] text-[#333] font-[500]"
+                                                        >
+                                                            {option.label}
+                                                        </Checkbox>
+                                                    </div>
+                                                ))
+                                            }
+                                        </div>
+                                        <div className="border-b pt-[20px]">
+                                            <h1 className="text-[1.3rem] text-[#333] uppercase font-[600]">
+                                                Giá
+                                            </h1>
+                                            {
+                                                priceOptions.map(option => (
+                                                    <div key={option.label} className="p-[10px]">
+                                                        <Checkbox
+                                                            onChange={() => handleChangePrice(option)}
+                                                            checked={option.valueMin === price?.valueMin}
+                                                            className="text-[1.4rem] text-[#333] font-[500]"
+                                                        >
+                                                            {option.label}
+                                                        </Checkbox>
+                                                    </div>
+                                                ))
+                                            }
+                                        </div>
+                                        <div className="border-b pt-[20px]">
+                                            <h1 className="text-[1.3rem] text-[#333] uppercase font-[600]">
+                                                Đánh giá
+                                            </h1>
+                                            {
+                                                rateOptions.map(rateItem => (
+                                                    <div key={rateItem} className="p-[10px]">
+                                                        <Checkbox
+                                                            onChange={() => handleChangeRate(rateItem)}
+                                                            checked={rate === rateItem}
+                                                            className="text-[1.4rem] text-[#333] font-[500]"
+                                                        >
+                                                            <Rate style={{
+                                                                fontSize: "1.4rem"
+                                                            }} disabled defaultValue={rateItem} />
+                                                        </Checkbox>
+                                                    </div>
+                                                ))
+                                            }
+                                        </div>
+                                    </div>
+                                </PopperWrapper>
+                            </div>
+                        )}
+                    >
+                        <Button icon={<FilterOutlined />} className="w-[200px]" onClick={handleShowFilter}>
+                            Lọc
+                        </Button>
+                    </Tippy>
+                </div>
+            </div>
+            {
+                <EnhancedTable ischeckboxSelection={false} columns={columns} rows={rows} />
             }
         </div>
     )

@@ -53,10 +53,9 @@ function ProductDetail() {
     const [showNolginDialog, setShowNolginDialog] = useState(false);
     const [currentTab, setCurrentTab] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [isFlashSale, setIsFlashSale] = useState(false);
 
     var category = JSON.parse(localStorage.getItem('mycategory')) || [];
-
-    const [isFlashSale, setIsFlashSale] = useState(false);
 
     useEffect(() => {
         axios
@@ -71,8 +70,24 @@ function ProductDetail() {
             .catch((err) => {
                 console.log(err);
             });
-            setCurrentQuantity(1)
+        setCurrentQuantity(1)
     }, [productId]);
+
+    useEffect(() => {
+        axios
+            .get(`${api}/flashsales?filter=expired&productId=${productId}`)
+            .then((res) => {
+                if (res.data.data.length > 0) {
+                    setIsFlashSale(true)
+                } else {
+                    setIsFlashSale(false)
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+        setCurrentQuantity(1)
+    }, [productId])
 
     useEffect(() => {
         if (resultEval == true) {
@@ -444,23 +459,24 @@ function ProductDetail() {
                                     <FontAwesomeIcon icon={faShareNodes} />
                                 </p>
                             </div>
-                            {isFlashSale && (
+                            {
+                                isFlashSale &&
                                 <div
                                     style={{
-                                        background:
-                                            'transparent linear-gradient(180deg, #FF6D6D 0%, #FF5247 100%) 0% 0% no-repeat padding-box',
+                                        background: "transparent linear-gradient(180deg, #FF6D6D 0%, #FF5247 100%) 0% 0% no-repeat padding-box"
                                     }}
-                                    className="flex items-center my-[20px] w-full px-[10px] py-[10px] rounded-[12px]"
+                                    className='flex items-center my-[20px] w-full px-[10px] py-[10px] rounded-[12px]'
                                 >
-                                    <div className="bg-[#fff] flex items-center px-[40px] rounded-[12px]">
+                                    <div className='bg-[#fff] flex items-center px-[40px] rounded-[12px]'>
                                         <img
-                                            className="w-[100px] h-[40px] object-contain"
+                                            className='w-[100px] h-[40px] object-contain'
                                             src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/flashsale/label-flashsale.svg"
                                         />
                                         <App />
                                     </div>
                                 </div>
-                            )}
+                            }
+
                             <div className={cx('mid_content')}>
                                 <div className={cx('price')}>
                                     <p className={cx('current_price')}>
@@ -501,11 +517,10 @@ function ProductDetail() {
                             </div>
                             <div className="flex items-center mt-[20px]">
                                 <div
-                                    className={`flex items-center p-[10px] rounded-[6px] ${
-                                        product.sold == product.quantity
-                                            ? 'bg-[#f2f4f5] text-[#7a7e7f]'
-                                            : 'bg-[rgba(201,33,39,0.06)] text-[#c92127]'
-                                    }`}
+                                    className={`flex items-center p-[10px] rounded-[6px] ${product.sold == product.quantity
+                                        ? 'bg-[#f2f4f5] text-[#7a7e7f]'
+                                        : 'bg-[rgba(201,33,39,0.06)] text-[#c92127]'
+                                        }`}
                                 >
                                     {product.quantity === 0 ? <StopFilled /> : <CheckCircleFilled />}
                                     <p className="font-[600] ml-[10px]">

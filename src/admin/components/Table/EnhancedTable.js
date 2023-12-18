@@ -42,8 +42,34 @@ export default function EnhancedTable({
 
     return (
         <>
-            <div style={height ? { minHeight: height } : { height: 534 }}>
+            <div style={height ? { minHeight: height } : { height: "100vh" }}>
                 <DataGrid
+                    sx={{
+                        "& .MuiDataGrid-columnHeaderTitle": {
+                            whiteSpace: "normal",
+                            lineHeight: "normal"
+                        },
+                        "& .MuiDataGrid-columnHeader": {
+                            // Forced to use important since overriding inline styles
+                            height: "unset !important"
+                        },
+                        "& .MuiDataGrid-columnHeaders": {
+                            // Forced to use important since overriding inline styles
+                            maxHeight: "168px !important"
+                        },
+                        "& .MuiDataGrid-cell": {
+                            maxHeight: "max-content !important",
+                            whiteSpace: "wrap !important"
+                        },
+                        "& .MuiDataGrid-row": {
+                            maxHeight: "max-content !important",
+                            minHeight: "max-content !important",
+                            paddingTop: "10px"
+                        }
+                    }}
+                    disableSelectionOnClick={true}
+                    disableColumnMenu={true}
+                    disableColumnFilter={true}
                     getRowId={(row) => row._id}
                     style={{
                         fontSize: '1.3rem',

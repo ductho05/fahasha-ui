@@ -192,7 +192,7 @@ function Item({ item, index, type, filter }) {
                             </div>
                             {filter !== undefined && filter == true && item.sold_sale == item.num_sale && (
                                 <div
-                                    className={cx('item-content__gettocart')}
+                                    className={cx(`item-content__gettocart`)}
                                     onClick={() => {
                                         handleAddToCart(item.product);
                                     }}

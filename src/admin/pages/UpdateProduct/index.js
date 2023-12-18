@@ -219,6 +219,16 @@ function UpdateProduct() {
                         : <form onSubmit={handleSubmit(onSubmit)} className={cx('form')}>
                             <div className={cx('content')}>
                                 <div className={cx('left')}>
+                                    <p className={cx('label')}>Trạng thái:
+                                        <span className={`ml-[10px] font-[800] ${product.hasOwnProperty('status_sell') ? product.status_sell === false ? "text-red-500" : "text-green-500" : "text-green-500"}`}>
+                                            {product.hasOwnProperty('status_sell') ? product.status_sell === false ? "Ngưng bán" : "Hoạt động" : "Hoạt động"}
+                                        </span>
+                                    </p>
+                                    <p className={cx('label')}>Tình trạng:
+                                        <span className={`ml-[10px] font-[800] ${product.quantity === 0 ? "text-red-500" : "text-green-500"}`}>
+                                            {product.quantity === 0 ? "Hết hàng" : "Còn hàng"}
+                                        </span>
+                                    </p>
                                     <p className={cx('label')}>Hình ảnh</p>
                                     <div className={cx('images')}>
                                         <img src={avatar ? avatar.preview : product?.images} alt="images" />
@@ -306,7 +316,7 @@ function UpdateProduct() {
                                             }
                                         }}
                                     />
-                                    <p className={cx('label')}>Số lượng đã nhập</p>
+                                    <p className={cx('label')}>Số lượng trong kho</p>
                                     <TextField
                                         {...register('quantity')}
                                         fullWidth
