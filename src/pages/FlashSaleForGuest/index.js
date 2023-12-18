@@ -188,7 +188,7 @@ function FlashSaleForGuest() {
     const [valueOptionDate, setValueOptionDate] = useState(formatDateToString(new Date()));
     const [isLastPage, setIsLastPage] = useState(false);
     const [isfirstget, setIsFirstGet] = useState(true);
-    const valueTop = 530;
+    const valueTop = 320;
 
     //const container = useRef(null);
     const container2 = useRef(null);
@@ -483,6 +483,7 @@ function FlashSaleForGuest() {
                                 onClick={() => {
                                     setValueOptionTimePoint(item.value.slice(0, 1));
                                     setValueOptionDate(item.value.slice(2, 12));
+                                    setPageNum(1);
                                 }}
                                 style={{
                                     backgroundColor:
@@ -544,7 +545,6 @@ function FlashSaleForGuest() {
                                             setValueOptionCategory(item._id);
                                             window.scrollTo({
                                                 top: valueTop,
-
                                                 behavior: 'smooth',
                                             });
                                             setPageNum(1);
