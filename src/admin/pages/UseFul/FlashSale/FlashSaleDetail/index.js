@@ -509,16 +509,27 @@ function FlashSaleDetail() {
                                             required: true,
                                             message: 'Chọn mức giảm giá!',
                                         },
+                                        // giảm tối đa 90%
                                     ]}
                                 >
                                     <Slider
+                                        min={10}
+                                        max={90}
+                                        // style={{
+                                        //     width: '85%',
+                                        //     // hiện thị bên phải
+                                        //     float: 'right',
+                                        // }}
                                         marks={{
-                                            0: '0%',
-                                            20: '20%',
-                                            40: '40%',
-                                            60: '60%',
-                                            80: '80%',
-                                            100: '100%',
+                                            10: '10%',
+                                           
+                                            30: '30%',
+                                         
+                                            50: '50%',
+                                           
+                                            70: '70%',
+                                         
+                                            90: '90%',
                                         }}
                                     />
                                 </Form.Item>
@@ -740,7 +751,14 @@ function FlashSaleDetail() {
                             <div className={cx('description')}>
                                 <div className={cx('body_description')}>
                                     <p className={cx('info_other')}>
-                                        <span style={{ fontSize: '1.5rem' }}>{flash?.product?._id}</span>
+                                        <span
+                                            style={{ fontSize: '1.5rem', cursor: 'pointer' }}
+                                            onClick={() => {
+                                                navigate(`/product-detail/${flash?.product?._id}`);
+                                            }}
+                                        >
+                                            {flash?.product?._id}
+                                        </span>
                                     </p>
                                     <p className={cx('info_other')}>Tác giả: {flash.product?.author}</p>
                                     <p className={cx('info_other')}>Thể loại: {flash?.product?.categoryId?.name}</p>

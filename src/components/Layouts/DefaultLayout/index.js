@@ -45,7 +45,7 @@ function DefaultLayout(props) {
                     }
                 })
                 .catch(() => {
-                    setExpired(false);
+                    setExpired(true);
                 });
         }
     }, 6000);

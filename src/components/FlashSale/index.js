@@ -33,7 +33,7 @@ function FlashSale() {
     var [gifts, setGifts] = useState([]);
     const navigate = useNavigate();
     const container = useRef(null);
-    const numFlash = 25;
+    const numFlash = 15;
     const [isLoading, setIsLoading] = useState(false);
     const [isShow, setIsShow] = useState(false); // show khi chờ 10s không có data
     // hàm load lại cục flashsale
@@ -58,10 +58,21 @@ function FlashSale() {
             .get(`${api}/flashsales?sort=reverse&filter=expired&num=${numFlash}`)
             .then((res) => {
                 console.log('res.dat1312a.data', res);
+                // sau 15s nếu data trống thì show thông báo
                 setInterval(() => {
                     res.data.data.length === 0 && setIsShow(true);
                 }, 15000);
-                setGifts(res.data.data);
+                const newData = [];
+                res.data.data.map((item) => {
+                    // // nếu số lượng đã bán bằng số lượng bán thì ko thêm
+                    // if (item.sold_sale === item.num_sale) {
+                    //     console.log(item, 'đã hết hàng');
+                    // } else {
+                        newData.push(item);
+                    // }
+                });
+                console.log('data ne: ', newData);
+                setGifts(newData);
             })
             .catch((err) => {
                 console.log(err);

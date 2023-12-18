@@ -67,17 +67,22 @@ function CheckOut() {
         navigate('/cart');
     }
 
-    console.log('mycheckou12t', productFlash);
+    // console.log('mycheckou12t', productFlash);
 
     const addUserFlash = () => {
         productFlash.map((item) => {
             console.log('item1212', item);
-            authInstance
-                .post(`/flashusers/add`, {
-                    ...item,
-                })
+            fetch(`${api}/flashusers/add`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(item),
+            })
                 .then((result) => {
-                    //console.log('sddasdas', result);
+                    console.log('sddasd21212as', result);
+                    localstorage.set('curent_checkoutid', order._id);
+                    navigate(`/order-success/${order._id}`);
                 })
                 .catch((err) => {
                     console.log('ádassdasd', err);
@@ -88,12 +93,13 @@ function CheckOut() {
     useEffect(() => {
         if (order) {
             addUserFlash();
-            localstorage.set('curent_checkoutid', order._id);
-            navigate(`/order-success/${order._id}`);
         }
     }, [order]);
 
     useEffect(() => {
+        const listNotQuanlity = localStorage.getItem('dataNotQuanlity')
+            ? JSON.parse(localStorage.getItem('dataNotQuanlity'))
+            : [];
         mycheckout.map((item) => {
             // check product flash sale
             fetch(`${api}/flashsales?productId=${item.id}&filter=expired`)
@@ -124,6 +130,23 @@ function CheckOut() {
                     //     product: products.data,
                     //     quantity: item.count,
                     // });
+
+                    // if (listNotQuanlity.length) {
+                    //     const index = listNotQuanlity.findIndex((item1) => item1._id == products.data._id);
+                    //     if (index == -1) {
+                    //         setListCheckouts((prev1) => {
+                    //             return [
+                    //                 ...prev1,
+                    //                 {
+                    //                     product: products.data,
+                    //                     quantity: item.count,
+                    //                 },
+                    //             ];
+                    //         });
+                    //     }
+                    // }
+                    // else
+
                     setListCheckouts((prev1) => {
                         return [
                             ...prev1,
@@ -169,14 +192,16 @@ function CheckOut() {
     }, [productFlash]);
 
     const addCheckout = async (data, type) => {
-        console.log('data21423', data);
+        console.log('data21423', data, listCheckouts);
         setShowProgress(true);
         await authInstance
             .post(`/orders/insert`, {
                 ...data,
-                flashsales: [], //productFlash,
+                flashsales: productFlash,
+                items: listCheckouts, // gửi xuống kiểm tra sl có đủ để giao không
             })
             .then((result) => {
+                console.log('result12233312', result);
                 if (result.data.status == 'OK') {
                     const order = result.data.data;
                     let item_order_checkout = [];
@@ -196,6 +221,7 @@ function CheckOut() {
                         };
                     });
                     if (item_order_checkout.length) {
+                        console.log('orderItems2121242', orderItems);
                         orderItems.forEach((orderItem) => {
                             authInstance
                                 .post(`/orderitems/insert`, {
@@ -210,17 +236,16 @@ function CheckOut() {
                                             id: state.user._id,
                                             items: carts.items.filter((cart) => cart.id !== orderItem.product),
                                         };
-                                        localstorage.set(namecart, newCarts);
-                                        setShowProgress(false);
-                                        setOrder(order);
-
                                         authInstance
                                             .put(`/products/update-sold/${orderItem.product}`, {
                                                 sold: orderItem.quantity,
                                             })
                                             .catch((err) => {
-                                                console.error(err);
+                                                console.error('err21', err);
                                             });
+                                        localstorage.set(namecart, newCarts);
+                                        setShowProgress(false);
+                                        setOrder(order);
                                     }
                                 })
                                 .catch((err) => {
@@ -272,7 +297,14 @@ function CheckOut() {
                         .catch((err) => {
                             console.error(err);
                         });
+                } else if (result.data.status == 'Not enough quantity in flash sale') {
+                    // không đủ sl trong chương trình FLashSale
+                    console.log('result.data.data1213', result.data.data);
+                    setShowProgress(false);
+                    localStorage.setItem('dataNotQuanlity', JSON.stringify(result.data.data));
+                    navigate(`/order-success/err-E14`);
                 } else if (result.data.status == 'Not enough quantity') {
+                    // không đủ sl trong kho
                     setShowProgress(false);
                     localStorage.setItem('dataNotQuanlity', JSON.stringify(result.data.data));
                     navigate(`/order-success/err-E08`);
@@ -608,13 +640,14 @@ function CheckOut() {
 
         deleteData.map((item) => {
             // sales
-            newListCheckouts.push({
-                product: {
-                    ...item.product,
-                    title: item.product.title + ' (FlashSale)',
-                },
-                quantity: item.num_sale - item.sold_sale,
-            });
+            item.num_sale - item.sold_sale > 0 &&
+                newListCheckouts.push({
+                    product: {
+                        ...item.product,
+                        title: item.product.title + ' (FlashSale)',
+                    },
+                    quantity: item.num_sale - item.sold_sale,
+                });
             // giá gốc
             newListCheckouts.push({
                 product: {

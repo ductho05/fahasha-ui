@@ -1,9 +1,12 @@
-export const api = 'https://bookstore-ta-v3.onrender.com/bookstore/api/v1';
-//export const api = 'http://127.0.0.1:3000/bookstore/api/v1';
+
+export const isDeploy = false;
+export const api = isDeploy ? 'https://bookstore-ta-v3.onrender.com/bookstore/api/v1' : 'http://127.0.0.1:3000/bookstore/api/v1';
+// export const api = 'http://127.0.0.1:3000/bookstore/api/v1';
 export const apiProvinces = 'https://provinces.open-api.vn/api/?depth=3';
 export const apiMaps = 'https://api.mapbox.com/';
 // export const appPath = 'http://localhost:8080'
-export const appPath = 'https://bookstore-ta.vercel.app';
+
+export const appPath = isDeploy ? 'https://bookstore-ta.vercel.app' : 'http://localhost:3456';
 
 export const orderImages = 'https://www.advotics.com/wp-content/uploads/2022/02/surat-jalan-01-1-4-1536x984.png';
 export const registerImages = 'https://quicklaunch.io/wp-content/uploads/2019/10/user-registration.png';
