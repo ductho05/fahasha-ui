@@ -57,8 +57,6 @@ function ProductDetail() {
 
     var category = JSON.parse(localStorage.getItem('mycategory')) || [];
 
-    const [isFlashSale, setIsFlashSale] = useState(false);
-
     useEffect(() => {
         axios
             .get(`${api}/flashsales?filter=expired&productId=${productId}`)
@@ -520,8 +518,8 @@ function ProductDetail() {
                             <div className="flex items-center mt-[20px]">
                                 <div
                                     className={`flex items-center p-[10px] rounded-[6px] ${product.sold == product.quantity
-                                            ? 'bg-[#f2f4f5] text-[#7a7e7f]'
-                                            : 'bg-[rgba(201,33,39,0.06)] text-[#c92127]'
+                                        ? 'bg-[#f2f4f5] text-[#7a7e7f]'
+                                        : 'bg-[rgba(201,33,39,0.06)] text-[#c92127]'
                                         }`}
                                 >
                                     {product.quantity === 0 ? <StopFilled /> : <CheckCircleFilled />}
