@@ -6,7 +6,6 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import styles from './ProductDetail.module.scss';
 import Avatar from '@mui/material/Avatar';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus, faShareNodes, faStar, faCartShopping, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import Button from '../../components/Button';
@@ -27,11 +26,10 @@ import LikeDislike from '../../components/LikeDislike';
 import Skeleton from '@mui/material/Skeleton';
 import { CheckCircleFilled, CheckCircleOutlined, StopFilled } from '@ant-design/icons';
 import { message } from 'antd';
-import App from '../../components/CountDownCustom';
 import axios from 'axios';
+import App from '../../components/CountDownCustom';
 
 const cx = classNames.bind(styles);
-
 const tabs = ['Mới nhất', 'Yêu thích nhất'];
 
 function ProductDetail() {
@@ -58,6 +56,24 @@ function ProductDetail() {
     const [isFlashSale, setIsFlashSale] = useState(false);
 
     var category = JSON.parse(localStorage.getItem('mycategory')) || [];
+
+    const [isFlashSale, setIsFlashSale] = useState(false);
+
+    useEffect(() => {
+        axios
+            .get(`${api}/flashsales?filter=expired&productId=${productId}`)
+            .then((res) => {
+                if (res.data.data.length > 0) {
+                    setIsFlashSale(true);
+                } else {
+                    setIsFlashSale(false);
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+        setCurrentQuantity(1)
+    }, [productId]);
 
     useEffect(() => {
         axios
@@ -216,11 +232,9 @@ function ProductDetail() {
     };
     const handlePlus = () => {
         if (product.quantity == 0) {
-
-            message.warning("Sản phẩm tạm thời hết hàng!")
-        } else if (product.quantity - (currentQuantity) == 0) {
-
-            message.warning("Vui lòng không đặt quá số lượng trong kho")
+            message.warning('Sản phẩm tạm thời hết hàng!');
+        } else if (product.quantity - currentQuantity == 0) {
+            message.warning('Vui lòng không đặt quá số lượng trong kho');
         } else {
             setCurrentQuantity((prev) => {
                 return prev + 1;
@@ -398,7 +412,11 @@ function ProductDetail() {
                                 <img src={product?.images} />
                             </div>
                             <div className={cx('product_btn', 'hide_on_tablet_mobile')}>
-                                <Button disabled={product.quantity == 0} onClick={handleAddToCart} leftIcon={<FontAwesomeIcon icon={faCartShopping} />}>
+                                <Button
+                                    disabled={product.quantity == 0}
+                                    onClick={handleAddToCart}
+                                    leftIcon={<FontAwesomeIcon icon={faCartShopping} />}
+                                >
                                     Thêm vào giỏ hàng
                                 </Button>
                                 <Button disabled={product.quantity == 0} onClick={handleBuyNow} primary>
@@ -500,17 +518,20 @@ function ProductDetail() {
                                 </div>
                             </div>
                             <div className="flex items-center mt-[20px]">
-                                <div className={`flex items-center p-[10px] rounded-[6px] ${product.sold == product.quantity ? "bg-[#f2f4f5] text-[#7a7e7f]" : "bg-[rgba(201,33,39,0.06)] text-[#c92127]"}`}>
-                                    {
-                                        product.quantity === 0 ? <StopFilled /> : <CheckCircleFilled />
-                                    }
+                                <div
+                                    className={`flex items-center p-[10px] rounded-[6px] ${product.sold == product.quantity
+                                            ? 'bg-[#f2f4f5] text-[#7a7e7f]'
+                                            : 'bg-[rgba(201,33,39,0.06)] text-[#c92127]'
+                                        }`}
+                                >
+                                    {product.quantity === 0 ? <StopFilled /> : <CheckCircleFilled />}
                                     <p className="font-[600] ml-[10px]">
-                                        {
-                                            product.quantity === 0 ? "Hết hàng" : "Còn hàng"
-                                        }
+                                        {product.quantity === 0 ? 'Hết hàng' : 'Còn hàng'}
                                     </p>
                                 </div>
-                                <p className="text-[14px] ml-[10px] text-[#7a7e7f] font-[500]">{product.quantity} sản phẩm có sẵn</p>
+                                <p className="text-[14px] ml-[10px] text-[#7a7e7f] font-[500]">
+                                    {product.quantity} sản phẩm có sẵn
+                                </p>
                             </div>
                         </div>
                     </div>

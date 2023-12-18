@@ -163,8 +163,8 @@ function CostumFlashSale() {
             <div className={cx('top')}>
                 <p
                     style={{
-                        margin: '0 0 0 20px',
-                        flex: 2.5,
+                        margin: '0 0 0 10px',
+                        flex: 2,
                     }}
                 >
                     THIẾT LẬP TÙY CHỈNH
@@ -188,8 +188,8 @@ function CostumFlashSale() {
                             </Marquee>
                         }
                         style={{
-                            width: '80%',
-                            margin: '0 5% 0 0',
+                            width: '85%',
+                            margin: '0 4% 0 0',
                             borderRadius: '6px',
                         }}
                     />

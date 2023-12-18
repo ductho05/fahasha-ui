@@ -75,16 +75,19 @@ function FlashSaleForm({ props, hideFunc, style }) {
     //console.log('value121121212s', products);
 
     // chuyển những item trong products sang data
-    const products = style == 'custom' ? props.products.map((item, index) => {
-        // Tìm kiếm sản phẩm trong mảng data dựa trên _id
-        const foundProduct = data.products.find((item1) => item1._id === item);
+    const products =
+        style == 'custom'
+            ? props.products.map((item, index) => {
+                  // Tìm kiếm sản phẩm trong mảng data dựa trên _id
+                  const foundProduct = data.products.find((item1) => item1._id === item);
 
-        // Nếu tìm thấy sản phẩm, thì gán nó vào newData
-        let newData = foundProduct ? foundProduct : null;
+                  // Nếu tìm thấy sản phẩm, thì gán nó vào newData
+                  let newData = foundProduct ? foundProduct : null;
 
-        // newData sẽ chứa thông tin của sản phẩm từ data
-        return newData;
-    }) : props.products;
+                  // newData sẽ chứa thông tin của sản phẩm từ data
+                  return newData;
+              })
+            : props.products;
 
     //console.log('pro', products);
 
@@ -147,62 +150,65 @@ function FlashSaleForm({ props, hideFunc, style }) {
         //console.log(small_time_points_filter);
         products.length > 0
             ? products.map((item) => {
-            values.point_sale == -1 &&
-                values.is_loop == true &&
-                small_time_points_filter.map(async (point) => {
-                    const data = {
-                        current_sale: values.current_sale,
-                        num_sale: values.num_sale > item.quantity ? item.quantity : values.num_sale,
-                              
-                        // ngày + 1
-                        date_sale: formatDateToString(new Date(new Date(values.date_sale).getTime() + 86400000)),
-                        is_loop: values.is_loop,
-                        product: item,
-                        point_sale: point,
-                    };
+                  values.point_sale == -1 &&
+                      values.is_loop == true &&
+                      small_time_points_filter.map(async (point) => {
+                          const data = {
+                              current_sale: values.current_sale,
+                              num_sale: values.num_sale > item.quantity ? item.quantity : values.num_sale,
 
-                    //console.log('data1', data);
-                    await authInstance.post(`/flashsales/add`, data)
-                        .then((result) => {
-                            if (result.data.status == 'OK') {
-                                //addFlashsaleToLocal(result.data);
-                                localStorage.setItem('isFlashsaleLoading', true);
-                                //console.log(result.status);
-                                //setShowProgress(false);
-                                checktooffprogress(small_time_points_filter.length * products.length - 1 == small_loop);
-                                small_time_points_filter.length * products.length - 1 == small_loop++ &&
-                                    hideFunc({
-                                        status: 'success',
-                                        title: 'Thiết đặt thành công',
-                                        subTitle:
-                                            'Vui lòng nhấn [Tiếp tục] để tiếp tục thiết đặt hoặc nhấn [Quản lý] để đến trang quản lý Sales Off!',
-                                    });
-                            } else {
-                                setShowProgress(false);
-                                hideFunc({
-                                    status: 'error',
-                                    title: 'Thiết đặt không thành công',
-                                    subTitle: result.message
-                                        ? result.message
-                                        : 'Đã có lỗi xãy ra trong quá trình thiết đặt, vui lòng kiểm tra kết nối mạng!',
-                                });
-                            }
-                        })
-                        .catch((err) => {
-                            setShowProgress(false);
-                            console.log(err);
-                        });
-                });
+                              // ngày + 1
+                              date_sale: formatDateToString(new Date(new Date(values.date_sale).getTime() + 86400000)),
+                              is_loop: values.is_loop,
+                              product: item,
+                              point_sale: point,
+                          };
 
-            time_points_filter.map((point, index) => {
-                const data = {
-                    current_sale: values.current_sale,
-                    num_sale: values.num_sale > item.quantity ? item.quantity : values.num_sale,
-                    date_sale: values.date_sale,
-                    is_loop: values.is_loop,
-                    product: item,
-                    point_sale: point,
-                };
+                          //console.log('data1', data);
+                          await authInstance
+                              .post(`/flashsales/add`, data)
+                              .then((result) => {
+                                  if (result.data.status == 'OK') {
+                                      //addFlashsaleToLocal(result.data);
+                                      localStorage.setItem('isFlashsaleLoading', true);
+                                      //console.log(result.status);
+                                      //setShowProgress(false);
+                                      checktooffprogress(
+                                          small_time_points_filter.length * products.length - 1 == small_loop,
+                                      );
+                                      small_time_points_filter.length * products.length - 1 == small_loop++ &&
+                                          hideFunc({
+                                              status: 'success',
+                                              title: 'Thiết đặt thành công',
+                                              subTitle:
+                                                  'Vui lòng nhấn [Tiếp tục] để tiếp tục thiết đặt hoặc nhấn [Quản lý] để đến trang quản lý Sales Off!',
+                                          });
+                                  } else {
+                                      setShowProgress(false);
+                                      hideFunc({
+                                          status: 'error',
+                                          title: 'Thiết đặt không thành công',
+                                          subTitle: result.message
+                                              ? result.message
+                                              : 'Đã có lỗi xãy ra trong quá trình thiết đặt, vui lòng kiểm tra kết nối mạng!',
+                                      });
+                                  }
+                              })
+                              .catch((err) => {
+                                  setShowProgress(false);
+                                  console.log(err);
+                              });
+                      });
+
+                  time_points_filter.map((point, index) => {
+                      const data = {
+                          current_sale: values.current_sale,
+                          num_sale: values.num_sale > item.quantity ? item.quantity : values.num_sale,
+                          date_sale: values.date_sale,
+                          is_loop: values.is_loop,
+                          product: item,
+                          point_sale: point,
+                      };
 
                       authInstance
                           .post(`/flashsales/add`, data)
@@ -374,13 +380,23 @@ function FlashSaleForm({ props, hideFunc, style }) {
                     ]}
                 >
                     <Slider
+                        min={10}
+                        max={90}
+                        // style={{
+                        //     width: '85%',
+                        //     // hiện thị bên phải
+                        //     float: 'right',
+                        // }}
                         marks={{
-                            0: '0%',
-                            20: '20%',
-                            40: '40%',
-                            60: '60%',
-                            80: '80%',
-                            100: '100%',
+                            10: '10%',
+
+                            30: '30%',
+
+                            50: '50%',
+
+                            70: '70%',
+
+                            90: '90%',
                         }}
                     />
                 </Form.Item>

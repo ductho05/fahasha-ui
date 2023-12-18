@@ -283,8 +283,8 @@ function FlashSale() {
             <div className={cx('top')}>
                 <p
                     style={{
-                        margin: '0 0 0 20px',
-                        flex: 2.5,
+                        margin: '0 0 0 15px',
+                        flex: 1.3,
                     }}
                 >
                     FLASH SALE

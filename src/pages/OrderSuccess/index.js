@@ -6,12 +6,13 @@ import classNames from 'classnames/bind';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import localstorage from '../../localstorage';
 import { faCircleCheck, faTimesCircle, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
-import { api, appPath, namecart, orderImages } from '../../constants';
+import { api, appPath, orderImages } from '../../constants';
 import styles from './OrderSuccess.module.scss';
 
 const cx = classNames.bind(styles);
 function OrderSuccess() {
     const navigate = useNavigate();
+    const [productNotEnough, setProductNotEnough] = useState([]);
     const { orderId } = useParams();
     const [state, dispatch] = useStore();
     const [option, setOption] = useState('Tất cả đơn hàng');
@@ -19,6 +20,8 @@ function OrderSuccess() {
         type: faInfoCircle,
         color: '#6f88ec',
     });
+    const namecart = `myCart_${state.user._id}`;
+    console.log('productNotEnough', productNotEnough);
 
     const [status_content, setStatus_content] = useState('Đơn hàng không tồn tại hoặc đã được thanh toán trước đó!');
     const statusVNPayCheckout = `statusVNPayCheckout_${state.user._id}`;
@@ -29,9 +32,9 @@ function OrderSuccess() {
         },
         {
             code: 'E08',
-            content:
-                'Hệ thống xin lỗi quý khách vì đơn hàng của bạn tồn tại sản phẩm mà cửa hàng chúng tôi không đủ số lượng để giao hàng. Xin quý khách vui lòng mua lại sau.',
+            content: `Chúng tôi xin lỗi vì đơn hàng của bạn tồn tại sản phẩm có số lượng vượt quá kho hàng. Có lẽ 1 người nào đó đã nhanh tay hơn, xin quý khách vui lòng thực hiện lại giao dịch sau khi chúng tôi nhập hàng.`,
         },
+
         {
             code: 'E09',
             content:
@@ -51,6 +54,10 @@ function OrderSuccess() {
             code: 'E13',
             content:
                 'Giao dịch không thành công do Quý khách nhập sai mật khẩu xác thực giao dịch (OTP). Xin quý khách vui lòng thực hiện lại giao dịch.',
+        },
+        {
+            code: 'E14',
+            content: `Chúng tôi xin lỗi vì đơn hàng của bạn tồn tại sản phẩm có số lượng vượt quá giới hạn của chương trình FlashSale. Có lẽ 1 người nào đó đã nhanh tay hơn bạn, xin quý khách vui lòng thanh toán lại.`,
         },
         { code: 'E24', content: 'Giao dịch không thành công do: Khách hàng hủy giao dịch' },
         {
@@ -86,99 +93,23 @@ function OrderSuccess() {
         ? JSON.parse(localStorage.getItem('dataNotQuanlity'))
         : [];
     console.log('productNot', productNot);
-    const [productNotEnough, setProductNotEnough] = useState([]);
     useEffect(() => {
         if (productNot.length) {
             productNot.map((item) => {
                 console.log('2121asa', item);
-                fetch(`${api}/products/id/${item}`)
+                fetch(`${api}/${orderId === 'err-E08' ? `products/id` : `flashsales`}/${item}`)
                     .then((response) => response.json())
                     .then((result) => {
                         if (result.status == 'OK') {
                             const product = result.data;
                             console.log('afhadbsfsh', product);
+                            setProductNotEnough((productNotEnough) => [...productNotEnough, product]);
                         }
                     })
                     .catch((err) => console.log(err));
             });
         }
     }, []);
-
-    // const addUserFlashSale = (data) => {
-    //     setShowProgress(true);
-    //     fetch(`${api}/orders/insert`, {
-    //         method: 'POST',
-    //         headers: { 'Content-Type': 'application/json' },
-    //         body: JSON.stringify(data),
-    //     })
-    //         .then((response) => response.json())
-    //         .then((result) => {
-    //             if (result.status == 'OK') {
-    //                 const order = result.data;
-    //                 let item_order_checkout = [];
-    //                 if (type == 'vnp') {
-    //                     item_order_checkout = localStorage.getItem('item_order_checkout')
-    //                         ? JSON.parse(localStorage.getItem('item_order_checkout'))
-    //                         : [];
-    //                 } else if (type == 'cash') {
-    //                     item_order_checkout = listCheckouts;
-    //                 }
-    //                 const orderItems = item_order_checkout.map((item) => {
-    //                     return {
-    //                         quantity: item.quantity,
-    //                         price: item.product.price * item.quantity,
-    //                         order: result.data._id,
-    //                         product: item.product._id,
-    //                     };
-    //                 });
-    //                 if (item_order_checkout.length) {
-    //                     orderItems.forEach((orderItem) => {
-    //                         fetch(`${api}/orderitems/insert`, {
-    //                             method: 'POST',
-    //                             headers: { 'Content-Type': 'application/json' },
-    //                             body: JSON.stringify(orderItem),
-    //                         })
-    //                             .then((response) => response.json())
-    //                             .then((result) => {
-    //                                 if (result.status == 'OK') {
-    //                                     const carts = localStorage.getItem(namecart)
-    //                                         ? JSON.parse(localStorage.getItem(namecart))
-    //                                         : [];
-    //                                     const newCarts = {
-    //                                         id: state.user._id,
-    //                                         items: carts.items.filter((cart) => cart.id !== orderItem.product),
-    //                                     };
-    //                                     localstorage.set(namecart, newCarts);
-    //                                     setShowProgress(false);
-    //                                     setOrder(order);
-    //                                 }
-    //                             })
-    //                             .catch((err) => {
-    //                                 console.log(err);
-    //                             });
-    //                     });
-    //                 } else {
-    //                     setShowProgress(false);
-    //                     setOrder(order);
-    //                 }
-    //                 const title = "Thông báo đơn hàng"
-    //                 const description = `${state.user.fullName} vừa đặt đơn hàng mới. Chuẩn bị hàng thôi!`
-    //                 const image = orderImages
-    //                 const url = `${appPath}/admin/orders`
-
-    //                 SendNotification("admin", {
-    //                     title,
-    //                     description,
-    //                     image,
-    //                     url
-    //                 })
-    //             } else {
-    //                 setShowProgress(false);
-    //                 navigate(`/order-success/err-E99`);
-    //             }
-    //         })
-    //         .catch((err) => { });
-    // };
 
     useEffect(() => {
         if (curent_checkoutid === orderId) {
@@ -211,10 +142,43 @@ function OrderSuccess() {
         navigate('/cart');
     };
 
+    // Update số lượng của sản phẩm không đủ trong giỏ hàng lên local
+    const updateCheckout = () => {
+        // console.log('deleteData', deleteData);
+        var myCart = JSON.parse(localStorage.getItem(namecart));
+        if (orderId === 'err-E08') {
+            productNotEnough.map((item) => {
+                myCart.items.map((item2) => {
+                    if (item._id === item2.id) {
+                        item2.count = item.quantity;
+                    }
+                });
+            });
+        } else if (orderId === 'err-E14') {
+            productNotEnough.map((item) => {
+                myCart.items.map((item2) => {
+                    if (item.product._id === item2.id) {
+                        item2.count = item.num_sale - item.sold_sale;
+                    }
+                });
+            });
+        }
+
+        console.log('1212dsa', myCart);
+
+        localStorage.setItem(namecart, JSON.stringify(myCart));
+    };
+
     const handleOption = () => {
         if (orderId === 'err-E08') {
-        }
-        if (option.includes('Chi tiết đơn hàng')) navigate(`/account/order/detail/${orderId}`);
+            console.log('productNotEno2121ugh', productNotEnough);
+            updateCheckout();
+            navigate(`/checkout`);
+        } else if (orderId === 'err-E14') {
+            console.log('productNotEno2121ugh', productNotEnough);
+            updateCheckout();
+            navigate(`/checkout`);
+        } else if (option.includes('Chi tiết đơn hàng')) navigate(`/account/order/detail/${orderId}`);
         else if (option.includes('Tất cả đơn hàng')) navigate('/account/1');
         else navigate(`/checkout`);
     };
@@ -233,10 +197,35 @@ function OrderSuccess() {
                         style={{
                             height: '140px',
                             color: iconInfo.color,
+                            margin: '0 0 3% 0',
                         }}
                     />
                 </div>
-                <p className={cx('dialog_notice')}>{status_content}</p>
+                <p className={cx('dialog_notice')}>
+                    {status_content}
+                    {(orderId === 'err-E14' || orderId === 'err-E08') && (
+                        <>
+                            <p style={{ textAlign: 'left' }}>Sản phẩm không đủ số lượng:</p>{' '}
+                            {productNotEnough.map((item, index) => (
+                                <li
+                                    style={{
+                                        color: 'red',
+                                        textAlign: 'left',
+                                    }}
+                                >
+                                    {orderId === 'err-E08' ? item.title : item.product.title} -{' '}
+                                    {orderId === 'err-E08'
+                                        ? `Có sẵn: ` + item.quantity
+                                        : `Còn lại: ` + (item.num_sale - item.sold_sale)}
+                                </li>
+                            ))}
+                            <p style={{ textAlign: 'left' }}>
+                                Nhấn <strong>[Thanh toán lại]</strong> để thanh toán lại với số lượng{' '}
+                                {orderId === 'err-E08' ? `có sẵn` : `còn lại của chương trình`}{' '}
+                            </p>{' '}
+                        </>
+                    )}
+                </p>
                 <ul className={cx('btns')}>
                     <li className={cx('btn', 'back_to_cart')} onClick={handleBackToCart}>
                         Quay lại giỏ hàng

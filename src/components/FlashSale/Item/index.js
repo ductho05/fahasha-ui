@@ -190,7 +190,7 @@ function Item({ item, index, type, filter }) {
                                     </div>
                                 </div>
                             </div>
-                            {filter !== undefined && filter == true && item.sold_sale !== item.num_sale && (
+                            {filter !== undefined && filter == true && item.sold_sale == item.num_sale && (
                                 <div
                                     className={cx(`item-content__gettocart`)}
                                     onClick={() => {
