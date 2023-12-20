@@ -1,5 +1,5 @@
 
-export const isDeploy = true;
+export const isDeploy = false;
 export const api = isDeploy ? 'https://bookstore-ta-v3.onrender.com/bookstore/api/v1' : 'http://127.0.0.1:3000/bookstore/api/v1';
 // export const api = 'http://127.0.0.1:3000/bookstore/api/v1';
 export const apiProvinces = 'https://provinces.open-api.vn/api/?depth=3';

@@ -54,7 +54,7 @@ function Review() {
 
     useEffect(() => {
         setRows(data.evaluates)
-    }, [])
+    }, [data])
 
     return (
         <div className={cx('wrapper')}>
@@ -63,25 +63,10 @@ function Review() {
             </div>
 
             {
-                loading &&
-                <div>
-                    <LinearProgress />
+                rows &&
+                <div className={cx('table')}>
+                    <EnhancedTable columns={columns} rows={rows} />
                 </div>
-            }
-
-            {
-                loading === false
-                    ? <div className={cx('table')}>
-                        <EnhancedTable columns={columns} rows={rows} />
-                    </div>
-                    : <div className="mt-[20px]">
-                        <Skeleton
-                            active
-                            paragraph={{
-                                rows: 8,
-                            }}
-                        />
-                    </div>
             }
         </div>
     );

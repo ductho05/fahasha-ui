@@ -1,13 +1,13 @@
-import React from 'react'
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import EnhancedTable from '../../components/Table/EnhancedTable';
 import { useData } from '../../../stores/DataContext';
-import { Button, Form, Input, Modal, Select, Tooltip } from 'antd';
+import { Button, Form, Input, Tooltip } from 'antd';
 import { Backdrop, CircularProgress, Dialog } from '@mui/material';
-import { useStore } from '../../../stores/hooks';
 import { toast, ToastContainer } from 'react-toastify';
 import { api } from '../../../constants';
 import { useNavigate } from "react-router-dom"
+import { getAuthInstance } from "../../../utils/axiosConfig"
+import React from 'react';
 
 function Categories() {
 
@@ -16,20 +16,8 @@ function Categories() {
     const [displayForm, setDisplayForm] = React.useState(false)
     const [loading, setLoading] = React.useState(false)
     const [success, setSuccess] = React.useState(0)
-    const [state, dispatch] = useStore()
     const navigate = useNavigate()
-
-    React.useState(() => {
-
-        const newRows = data?.categories?.map((category, index) => {
-            return {
-                ...category,
-                rowNumber: index + 1,
-            }
-        })
-        setRows(newRows)
-    }, [data])
-
+    const authInstance = getAuthInstance()
     const columns = [
         {
             field: 'rowNumber',
@@ -100,35 +88,7 @@ function Categories() {
                 )
             }
 
-        },
-        // {
-        //     field: 'published_date',
-        //     headerName: 'Ngày xuất bản',
-        //     width: 160,
-        //     sortable: false,
-        //     renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : "Trống"}</p>
-        // },
-        // {
-        //     field: 'price',
-        //     headerName: 'Giá hiện tại(đ)',
-        //     width: 100,
-        //     sortable: false,
-        //     renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? numeral(params.value).format('0,0[.]00 VNĐ') : "Trống"}</p>
-        // },
-        // {
-        //     field: 'old_price',
-        //     headerName: 'Giá cũ(đ)',
-        //     width: 100,
-        //     sortable: false,
-        //     renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? numeral(params.value).format('0,0[.]00 VNĐ') : "Trống"}</p>
-        // },
-        // {
-        //     field: 'rate',
-        //     headerName: 'Đánh giá',
-        //     width: 160,
-        //     sortable: true,
-        //     renderCell: (params) => <Rating name="read-only" value={params.value} readOnly />
-        // },
+        }
     ]
 
     const handleDisplayForm = () => {
@@ -136,9 +96,9 @@ function Categories() {
         setDisplayForm(true)
     }
 
-    const fetchCategory = () => {
+    const fetchCategory = async () => {
 
-        fetch(`${api}/categories?filter=simple`)
+        await fetch(`${api}/categories?filter=simple`)
             .then(response => response.json())
             .then(result => {
                 if (result.status == "OK") {
@@ -156,10 +116,25 @@ function Categories() {
         }
     }, [success])
 
+    React.useState(() => {
+
+        if (data.categories) {
+            const newRows = data?.categories?.map((category, index) => {
+                return {
+                    ...category,
+                    rowNumber: index + 1,
+                }
+            })
+            setRows(newRows)
+        } else {
+            fetchCategory()
+        }
+    }, [data])
+
     const handleOk = (value) => {
 
         setLoading(true)
-        state.authInstance.post("/categories", { ...value })
+        authInstance.post("/categories", { ...value })
             .then(async response => {
                 if (response.data.status == "OK") {
                     setDisplayForm(false)
@@ -178,7 +153,7 @@ function Categories() {
     };
     const handleCancel = () => {
         setDisplayForm(false)
-    };
+    }
 
     return (
         <div className="p-[20px]">
@@ -253,11 +228,13 @@ function Categories() {
             </div>
 
             <div className="mt-[20px]">
-                <EnhancedTable
-                    ischeckboxSelection={false}
-                    columns={columns}
-                    rows={rows}
-                />
+                {
+                    rows && <EnhancedTable
+                        ischeckboxSelection={false}
+                        columns={columns}
+                        rows={rows}
+                    />
+                }
             </div>
         </div>
     )

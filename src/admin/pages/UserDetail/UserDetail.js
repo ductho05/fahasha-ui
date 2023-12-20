@@ -5,15 +5,17 @@ import IncomeChart from '../../components/charts/IncomeChart/IncomeChart';
 import DropMenu from '../../../components/DropMenu';
 import OrdersLatesTable from '../../components/OrdersLatesTable/OrdersLatesTable';
 import { Backdrop, CircularProgress, Dialog } from '@mui/material';
-import Button from '../../../components/Button';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { useForm, useController } from 'react-hook-form';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { api } from '../../../constants';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getAuthInstance } from '../../../utils/axiosConfig';
 import { useData } from '../../../stores/DataContext';
+import EnhancedTable from '../../components/Table/EnhancedTable';
+import numeral from 'numeral';
+import { Button } from 'antd';
 const moment = require('moment-timezone')
 
 const cx = classNames.bind(styles);
@@ -93,6 +95,70 @@ function UserDetail() {
     const [dataIncomes, setDataIncomes] = useState([])
     const num = 5
 
+    const columns = [
+        {
+            field: 'name',
+            headerName: 'Người nhận',
+            sortable: false,
+            editable: true,
+            width: 160,
+            renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : "Trống"}</p>
+        },
+        {
+            field: 'user',
+            headerName: 'Tài khoản',
+            sortable: false,
+            editable: true,
+            width: 160,
+            renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value?.fullName : "Trống"}</p>
+        },
+        {
+            field: 'address',
+            headerName: 'Địa chỉ',
+            width: 300,
+            sortable: false,
+            renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : "Trống"}</p>
+        },
+        {
+            field: 'phone',
+            headerName: 'Điện thoại',
+            width: 160,
+            sortable: false,
+            renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : "Trống"}</p>
+        },
+        {
+            field: 'quantity',
+            headerName: 'Số lượng',
+            width: 100,
+            sortable: false,
+            renderCell: (params) => <p className={params.value ? cx('text-center') : cx('null')}>{params.value ? params.value : "Trống"}</p>
+        },
+        {
+            field: 'price',
+            headerName: 'Thành tiền(đ)',
+            width: 120,
+            sortable: false,
+            renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? numeral(params.value).format('0,0[.]00 VNĐ') : "Trống"}</p>
+        },
+        {
+            field: '_id',
+            headerName: 'Hành động',
+            disableColumnMenu: true,
+            sortable: false,
+            width: 140,
+            renderCell: (params) => {
+                const handleOnCLick = (e) => {
+                    e.stopPropagation();
+                }
+
+                return <Link to={`/admin/order/detail/${params.value}`}>
+                    <Button type='primary' ghost>Chi tiết</Button>
+                </Link>
+
+            }
+        },
+    ];
+
     const handleClickEdit = () => {
         setShowDialog(true);
         setValue('fullName', user.fullName);
@@ -130,7 +196,7 @@ function UserDetail() {
     }, [user]);
 
     useEffect(() => {
-        authInstance.post(`/orders/filter?page=1&limit=5&status=HOANTHANH&user=${userId}`)
+        authInstance.post(`/orders/filter?user=${userId}`)
             .then((result) => {
                 if (result.data.status === 'OK') {
                     setOrders(result.data.data);
@@ -166,17 +232,6 @@ function UserDetail() {
     const nameController = useController({
         name: 'fullName',
         control,
-    });
-
-    const emailController = useController({
-        name: 'email',
-        control,
-        rules: {
-            pattern: {
-                value: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
-                message: 'Email không đúng định dạng',
-            },
-        },
     });
 
     const phoneController = useController({
@@ -499,17 +554,6 @@ function UserDetail() {
                                 <p className={cx('error_message')}>{errors?.fullName?.message}</p>
                             </div>
 
-                            <div className={errors.email ? cx('form_group', 'error') : cx('form_group')}>
-                                <p className={cx('label')}>Email</p>
-                                <input
-                                    {...emailController.field}
-                                    onBlur={emailController.field.onBlur}
-                                    type="text"
-                                    placeholder="Nhập email"
-                                />
-                                <p className={cx('error_message')}>{errors?.email?.message}</p>
-                            </div>
-
                             <div className={errors.phone ? cx('form_group', 'error') : cx('form_group')}>
                                 <p className={cx('label')}>Số điện thoại</p>
                                 <input
@@ -533,7 +577,7 @@ function UserDetail() {
                             </div>
 
                             <p className={cx('btn_edit')}>
-                                <Button disabled={!ischanged} primary>Lưu thay đổi</Button>
+                                <Button disabled={!ischanged} type="primary">Lưu thay đổi</Button>
                             </p>
                         </div>
                     </form>
@@ -570,7 +614,7 @@ function UserDetail() {
                 </div>
             </div>
             <div className={cx('bottom')}>
-                <OrdersLatesTable rows={orders} />
+                <EnhancedTable columns={columns} rows={orders} />
             </div>
         </div>
     );

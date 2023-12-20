@@ -124,183 +124,49 @@ function Product() {
     const [status, setStatus] = useState(null)
     const [quantity, setQuantity] = useState(null)
 
-    const columns = [
-        {
-            field: 'title',
-            headerName: 'Sản phẩm',
-            sortable: false,
-            editable: true,
-            width: 320,
-            renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : "Trống"}</p>
-        },
-        {
-            field: 'images',
-            headerName: 'Images',
-            sortable: false,
-            editable: true,
-            renderCell: (params) => <img className={cx('image')} src={params.value} />
-        },
-        {
-            field: 'author',
-            headerName: 'Tác giả',
-            sortable: false,
-            editable: true,
-            width: 180,
-            renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : "Trống"}</p>
-        },
-        {
-            field: 'price',
-            headerName: 'Giá hiện tại(đ)',
-            width: 100,
-            sortable: false,
-            renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? numeral(params.value).format('0,0[.]00 VNĐ') : "Trống"}</p>
-        },
-        {
-            field: 'rate',
-            headerName: 'Đánh giá',
-            width: 120,
-            sortable: true,
-            renderCell: (params) => <Rating name="read-only" value={params.value} readOnly />
-        },
-        {
-            field: 'status_sell',
-            headerName: 'Trạng thái',
-            width: 120,
-            renderCell: (params) => {
-                return <p className={params ? params?.value == false ? "text-red-500" : "text-green-500" : "text-green-500"
-                }> {params ? params?.value == false ? "Ngưng bán" : "Hoạt động" : "Hoạt động"}</p >
-            }
-        },
-        {
-            field: 'quantity',
-            headerName: 'Tình trạng',
-            width: 120,
-            renderCell: (params) => {
-                return <p className={params?.value === 0 ? "text-red-500" : "text-green-500"
-                }> {params?.value === 0 ? "Hết hàng" : "Còn hàng"}</p >
-            }
-        },
 
-        {
-            field: '_id',
-            headerName: 'Hành động',
-            disableColumnMenu: true,
-            sortable: false,
-            width: 120,
-            renderCell: (params) => {
-                const handleOnCLick = (e) => {
-                    e.stopPropagation();
-                }
+    const updateProductData = (product) => {
 
-                const handleUpdateStatus = (status_sell) => {
-                    let status
-                    if (params.row.hasOwnProperty('status_sell') && status_sell === false) {
-                        status = true
-                    } else {
-                        status = false
-                    }
-                    setLoading(true)
-                    setIsAction(true)
-                    authInstance.put(`${api}/products/update/${params.row._id}`, {
-                        status_sell: status
-                    })
-                        .then(async result => {
-                            if (result.data.status === 'OK') {
-                                const title = "Thông báo sản phẩm"
-                                let description = `${result.data.data.title} vừa được mở bán trở lại`
-                                if (!result.data.data.status_sell) {
-                                    description = `${result.data.data.title} tạm thời ngưng bán`
-                                }
-                                const url = `${appPath}/admin/update-product/${result.data.data._id}`
-                                const image = result.data.data.images
-                                await authInstance.post("/webpush/send", {
-                                    filter: "admin",
-                                    notification: {
-                                        title,
-                                        description,
-                                        image: image,
-                                        url
-                                    }
-                                })
-                                    .catch((err) => {
-                                        console.error(err)
-                                    })
-                                toast.success('Cập nhật thành công!')
-                                setSuccess(prev => prev + 1)
-                            } else {
-                                toast.error(result.data.message)
-                            }
-                            setLoading(false)
-                            setIsAction(false)
-                        })
-                        .catch(err => {
-                            setLoading(false)
-                            setIsAction(false)
-                            toast.error(err?.response?.data?.message)
-                        })
-                }
+        const newListProduct = data.products?.map(p => {
+            if (p._id === product._id) {
+                return { ...product }
+            } else return p
+        })
 
-                return <div style={{ display: 'flex' }} onClick={handleOnCLick}>
-                    <Popconfirm
-                        title="Xác nhận?"
-                        description={
-                            params.row.hasOwnProperty('status_sell') ? params.row.status_sell === false
-                                ? "Sản phẩm sẽ được bán lại trên hệ thống"
-                                : "Sản phẩm sẽ không bán trên hệ thống cho đến khi mở lại"
-                                : "Sản phẩm sẽ không bán trên hệ thống cho đến khi mở lại"
-                        }
-                        onConfirm={() => handleUpdateStatus(params.row.status_sell)}
-                        onCancel={() => { }}
-                        okText="Đồng ý"
-                        cancelText="Hủy"
-                    >
-                        <Tooltip title={
-                            params.row.hasOwnProperty('status_sell') ? params.row.status_sell === false
-                                ? "Mở bán lại sản phẩm"
-                                : "Ngưng bán sản phẩm"
-                                : "Ngưng bán sản phẩm"
-                        }>
-                            <Button className="mr-[20px]" icon={
-                                params.row.hasOwnProperty('status_sell') ? params.row.status_sell === false
-                                    ? <UnlockOutlined />
-                                    : <LockOutlined />
-                                    : <LockOutlined />
+        setData({ ...data, products: newListProduct })
+    }
 
-                            } danger
-                            />
-                        </Tooltip>
+    const insertProductData = (product) => {
 
-                    </Popconfirm>
-                    <Link to={`/admin/update-product/${params.row._id}`}>
-                        <Tooltip title="Chỉnh sửa">
-                            <Button type="primary" ghost icon={<EditOutlined />} />
-                        </Tooltip>
-                    </Link>
-                </div>
-            }
-        },
-    ]
+        const newList = data?.products
+        newList.push(product)
+        setData({ ...data, products: newList })
+    }
 
     const fetchProduct = () => {
 
-        fetch(`${api}/products`)
-            .then(response => response.json())
-            .then(result => {
-                if (result.status === "OK") {
+        // fetch(`${api}/products`)
+        //     .then(response => response.json())
+        //     .then(result => {
+        //         if (result.status === "OK") {
 
-                    console.log("fetch lai")
-                    setData({ ...data, products: result.data.products })
-                }
-            })
-            .catch(error => {
+        //             console.log("fetch lai")
+        //             setData({ ...data, products: result.data.products })
+        //         }
+        //     })
+        //     .catch(error => {
 
-                console.log(error.message)
-            })
+        //         console.log(error.message)
+        //     })
     }
 
     React.useEffect(() => {
 
-        setRows(data.products)
+        console.log(data)
+        if (data.products) {
+
+            setRows(data.products)
+        }
     }, [data])
 
     React.useEffect(() => {
@@ -367,6 +233,7 @@ function Product() {
 
                         if (result.data.status === "OK") {
                             setSuccess(prev => prev + 1)
+                            insertProductData(result.data.data)
                             toast.success("Thêm mới sản phẩm thành công")
                             const title = "Thông báo sản phẩm"
                             const description = "TA Book Store vừa ra mắt sản phẩm mới. Xem ngay"
@@ -641,6 +508,166 @@ function Product() {
         }
 
     }, [selectSort])
+
+    const columns = [
+        {
+            field: 'title',
+            headerName: 'Sản phẩm',
+            sortable: false,
+            editable: true,
+            width: 320,
+            renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : "Trống"}</p>
+        },
+        {
+            field: 'images',
+            headerName: 'Images',
+            sortable: false,
+            editable: true,
+            renderCell: (params) => <img className={cx('image')} src={params.value} />
+        },
+        {
+            field: 'author',
+            headerName: 'Tác giả',
+            sortable: false,
+            editable: true,
+            width: 180,
+            renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : "Trống"}</p>
+        },
+        {
+            field: 'price',
+            headerName: 'Giá hiện tại(đ)',
+            width: 100,
+            sortable: false,
+            renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? numeral(params.value).format('0,0[.]00 VNĐ') : "Trống"}</p>
+        },
+        {
+            field: 'rate',
+            headerName: 'Đánh giá',
+            width: 120,
+            sortable: true,
+            renderCell: (params) => <Rating name="read-only" value={params.value} readOnly />
+        },
+        {
+            field: 'status_sell',
+            headerName: 'Trạng thái',
+            width: 120,
+            renderCell: (params) => {
+                return <p className={params ? params?.value == false ? "text-red-500" : "text-green-500" : "text-green-500"
+                }> {params ? params?.value == false ? "Ngưng bán" : "Hoạt động" : "Hoạt động"}</p >
+            }
+        },
+        {
+            field: 'quantity',
+            headerName: 'Tình trạng',
+            width: 120,
+            renderCell: (params) => {
+                return <p className={params?.value === 0 ? "text-red-500" : "text-green-500"
+                }> {params?.value === 0 ? "Hết hàng" : "Còn hàng"}</p >
+            }
+        },
+
+        {
+            field: '_id',
+            headerName: 'Hành động',
+            disableColumnMenu: true,
+            sortable: false,
+            width: 120,
+            renderCell: (params) => {
+                const handleOnCLick = (e) => {
+                    e.stopPropagation();
+                }
+
+                const handleUpdateStatus = (status_sell) => {
+                    let status
+                    if (params.row.hasOwnProperty('status_sell') && status_sell === false) {
+                        status = true
+                    } else {
+                        status = false
+                    }
+                    setLoading(true)
+                    setIsAction(true)
+                    authInstance.put(`${api}/products/update/${params.row._id}`, {
+                        status_sell: status
+                    })
+                        .then(async result => {
+                            if (result.data.status === 'OK') {
+                                const title = "Thông báo sản phẩm"
+                                let description = `${result.data.data.title} vừa được mở bán trở lại`
+                                if (result.data.data.hasOwnProperty('status_sell') && result.data.data.status_sell === false) {
+
+                                    description = `${result.data.data.title} tạm thời ngưng bán`
+                                }
+                                const url = `${appPath}/admin/update-product/${result.data.data._id}`
+                                const image = result.data.data.images
+                                await authInstance.post("/webpush/send", {
+                                    filter: "admin",
+                                    notification: {
+                                        title,
+                                        description,
+                                        image: image,
+                                        url
+                                    }
+                                })
+                                    .catch((err) => {
+                                        console.error(err)
+                                    })
+                                updateProductData(result.data.data)
+                                toast.success('Cập nhật thành công!')
+                                setSuccess(prev => prev + 1)
+                            } else {
+                                toast.error(result.data.message)
+                            }
+                            setLoading(false)
+                            setIsAction(false)
+                        })
+                        .catch(err => {
+                            setLoading(false)
+                            setIsAction(false)
+                            toast.error(err?.response?.data?.message)
+                        })
+                }
+
+                return <div style={{ display: 'flex' }} onClick={handleOnCLick}>
+                    <Popconfirm
+                        title="Xác nhận?"
+                        description={
+                            params.row.hasOwnProperty('status_sell') ? params.row.status_sell === false
+                                ? "Sản phẩm sẽ được bán lại trên hệ thống"
+                                : "Sản phẩm sẽ không bán trên hệ thống cho đến khi mở lại"
+                                : "Sản phẩm sẽ không bán trên hệ thống cho đến khi mở lại"
+                        }
+                        onConfirm={() => handleUpdateStatus(params.row.status_sell)}
+                        onCancel={() => { }}
+                        okText="Đồng ý"
+                        cancelText="Hủy"
+                    >
+                        <Tooltip title={
+                            params.row.hasOwnProperty('status_sell') ? params.row.status_sell === false
+                                ? "Mở bán lại sản phẩm"
+                                : "Ngưng bán sản phẩm"
+                                : "Ngưng bán sản phẩm"
+                        }>
+                            <Button className="mr-[20px]" icon={
+                                params.row.hasOwnProperty('status_sell') ? params.row.status_sell === false
+                                    ? <UnlockOutlined />
+                                    : <LockOutlined />
+                                    : <LockOutlined />
+
+                            } danger
+                            />
+                        </Tooltip>
+
+                    </Popconfirm>
+                    <Link to={`/admin/update-product/${params.row._id}`}>
+                        <Tooltip title="Chỉnh sửa">
+                            <Button type="primary" ghost icon={<EditOutlined />} />
+                        </Tooltip>
+                    </Link>
+                </div>
+            }
+        },
+    ]
+
 
     return (
         <div className={cx('wrapper')}>
@@ -1012,7 +1039,7 @@ function Product() {
                 </div>
             </div>
             {
-                <EnhancedTable ischeckboxSelection={false} columns={columns} rows={rows} />
+                rows && <EnhancedTable ischeckboxSelection={false} columns={columns} rows={rows} />
             }
         </div>
     )

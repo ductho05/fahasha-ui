@@ -54,6 +54,7 @@ function ProductDetail() {
     const [currentTab, setCurrentTab] = useState(0);
     const [loading, setLoading] = useState(false);
     const [isFlashSale, setIsFlashSale] = useState(false);
+    const [showNoProduct, setShowNoProduct] = useState(false);
 
     var category = JSON.parse(localStorage.getItem('mycategory')) || [];
 
@@ -72,22 +73,6 @@ function ProductDetail() {
             });
         setCurrentQuantity(1)
     }, [productId]);
-
-    useEffect(() => {
-        axios
-            .get(`${api}/flashsales?filter=expired&productId=${productId}`)
-            .then((res) => {
-                if (res.data.data.length > 0) {
-                    setIsFlashSale(true)
-                } else {
-                    setIsFlashSale(false)
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            })
-        setCurrentQuantity(1)
-    }, [productId])
 
     useEffect(() => {
         if (resultEval == true) {
@@ -186,9 +171,14 @@ function ProductDetail() {
         fetch(`${api}/products/id/${productId}`)
             .then((response) => response.json())
             .then((result) => {
+                if (result.status == "OK") {
+                    setProduct(result.data);
+                    fetchProductRelated(result.data);
+                    setShowNoProduct(false)
+                } else {
+                    setShowNoProduct(true)
+                }
                 setLoading(false);
-                setProduct(result.data);
-                fetchProductRelated(result.data);
             })
             .catch((error) => {
                 setLoading(false);
@@ -221,7 +211,7 @@ function ProductDetail() {
         fetchComments(productId);
     }, [productId, resultEval, currentTab]);
 
-    var lengthComments = comments.length;
+    var lengthComments = comments?.length;
     var tempArray = Array(lengthComments).fill(1);
     const handleMinus = () => {
         setCurrentQuantity((prev) => {
@@ -353,6 +343,15 @@ function ProductDetail() {
                 theme="light"
             />
 
+            <Dialog open={showNoProduct}>
+                <div className="p-[20px] w-[400px] flex flex-col items-center">
+                    <p className='p-[20px] leading-[1.5] text-center text-[18px] text-[#333] font-[600]'>{`Cửa hàng không có sản phẩm id ${productId}`}</p>
+                    <button onClick={() => navigate("/")} className="border-none px-[20px] py-[10px] rounded-[6px] bg-red-500 text-[#fff]">
+                        Quay lại trang chủ
+                    </button>
+                </div>
+            </Dialog>
+
             <Dialog open={showNolginDialog}>
                 <div className={cx('dialog_nologin')}>
                     <h3 className={cx('dialog_nologin_message')}>Vui lòng đăng nhập để mua hàng</h3>
@@ -411,13 +410,13 @@ function ProductDetail() {
                             </div>
                             <div className={cx('product_btn', 'hide_on_tablet_mobile')}>
                                 <Button
-                                    disabled={product.quantity == 0}
+                                    disabled={product?.quantity == 0}
                                     onClick={handleAddToCart}
                                     leftIcon={<FontAwesomeIcon icon={faCartShopping} />}
                                 >
                                     Thêm vào giỏ hàng
                                 </Button>
-                                <Button disabled={product.quantity == 0} onClick={handleBuyNow} primary>
+                                <Button disabled={product?.quantity == 0} onClick={handleBuyNow} primary>
                                     Mua ngay
                                 </Button>
                             </div>
@@ -451,7 +450,7 @@ function ProductDetail() {
                                         <FontAwesomeIcon icon={faStar} />
                                     </span>
                                 ))}
-                                <p className={cx('rate_number')}>({evaluate.total} đánh giá)</p>
+                                <p className={cx('rate_number')}>({evaluate?.total} đánh giá)</p>
                                 <p className={cx('rate_number', 'px-[10px] border-l border-solid border-[#444]')}>
                                     Đã bán {product?.sold}
                                 </p>
@@ -517,18 +516,18 @@ function ProductDetail() {
                             </div>
                             <div className="flex items-center mt-[20px]">
                                 <div
-                                    className={`flex items-center p-[10px] rounded-[6px] ${product.sold == product.quantity
+                                    className={`flex items-center p-[10px] rounded-[6px] ${product?.sold == product?.quantity
                                         ? 'bg-[#f2f4f5] text-[#7a7e7f]'
                                         : 'bg-[rgba(201,33,39,0.06)] text-[#c92127]'
                                         }`}
                                 >
-                                    {product.quantity === 0 ? <StopFilled /> : <CheckCircleFilled />}
+                                    {product?.quantity === 0 ? <StopFilled /> : <CheckCircleFilled />}
                                     <p className="font-[600] ml-[10px]">
-                                        {product.quantity === 0 ? 'Hết hàng' : 'Còn hàng'}
+                                        {product?.quantity === 0 ? 'Hết hàng' : 'Còn hàng'}
                                     </p>
                                 </div>
                                 <p className="text-[14px] ml-[10px] text-[#7a7e7f] font-[500]">
-                                    {product.quantity} sản phẩm có sẵn
+                                    {product?.quantity} sản phẩm có sẵn
                                 </p>
                             </div>
                         </div>
@@ -620,7 +619,7 @@ function ProductDetail() {
                                 <p>/5</p>
                             </h3>
                             <div className={cx('rate')}>
-                                {rates.map((item, index) => (
+                                {rates?.map((item, index) => (
                                     <span
                                         key={index}
                                         className={
@@ -631,24 +630,24 @@ function ProductDetail() {
                                     </span>
                                 ))}
                             </div>
-                            <p className={cx('rate_number')}>({evaluate.total} đánh giá)</p>
+                            <p className={cx('rate_number')}>({evaluate?.total} đánh giá)</p>
                         </div>
 
                         <div className={cx('rate_percent')}>
-                            {rates.map((rate, index) => (
+                            {rates?.map((rate, index) => (
                                 <div key={index} className={cx('rate_percent_item')}>
                                     <p>{index + 1} Sao</p>
                                     <div className={cx('review_rating')}>
                                         <div
                                             style={
-                                                evaluate.total
-                                                    ? { width: `${(evaluate.rate[index] / evaluate.total) * 100}%` }
+                                                evaluate?.total
+                                                    ? { width: `${(evaluate?.rate[index] / evaluate.total) * 100}%` }
                                                     : { width: `0%` }
                                             }
                                         ></div>
                                     </div>
                                     <p>
-                                        {evaluate.total ? Math.floor((evaluate.rate[index] / evaluate.total) * 100) : 0}{' '}
+                                        {evaluate?.total ? Math.floor((evaluate.rate[index] / evaluate.total) * 100) : 0}{' '}
                                         %
                                     </p>
                                 </div>
@@ -674,41 +673,44 @@ function ProductDetail() {
                         </ul>
 
                         <div className={cx('list_comment')}>
-                            {tempArray.map((item, index) => (
-                                <div key={index} ref={commentRef} className={cx('comments_inner')}>
-                                    <div className={cx('comments_left')}>
-                                        <div className={cx('comments_user')}>
-                                            <Avatar alt="Avatar" src={comments[index].user.images} />
-                                            <div className="user_info">
-                                                <p className={cx('name')}>
-                                                    {comments[index].user.fullName
-                                                        ? comments[index].user.fullName
-                                                        : comments[index].user.username}
-                                                </p>
-                                                <p className={cx('comments_day')}>{comments[index].createdAt}</p>
+                            {
+                                comments &&
+                                tempArray.map((item, index) => (
+                                    <div key={index} ref={commentRef} className={cx('comments_inner')}>
+                                        <div className={cx('comments_left')}>
+                                            <div className={cx('comments_user')}>
+                                                <Avatar alt="Avatar" src={comments[index]?.user?.images} />
+                                                <div className="user_info">
+                                                    <p className={cx('name')}>
+                                                        {comments[index]?.user?.fullName
+                                                            ? comments[index]?.user?.fullName
+                                                            : comments[index]?.user?.username}
+                                                    </p>
+                                                    <p className={cx('comments_day')}>{comments[index]?.createdAt}</p>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div className={cx('comments_right')}>
-                                        <div className={cx('rate')}>
-                                            {rates.map((item, indexRate) => (
-                                                <span
-                                                    key={indexRate}
-                                                    className={
-                                                        item <= comments[index].rate
-                                                            ? cx('star_active', 'rate_star')
-                                                            : cx('rate_star')
-                                                    }
-                                                >
-                                                    <FontAwesomeIcon icon={faStar} />
-                                                </span>
-                                            ))}
+                                        <div className={cx('comments_right')}>
+                                            <div className={cx('rate')}>
+                                                {rates.map((item, indexRate) => (
+                                                    <span
+                                                        key={indexRate}
+                                                        className={
+                                                            item <= comments[index]?.rate
+                                                                ? cx('star_active', 'rate_star')
+                                                                : cx('rate_star')
+                                                        }
+                                                    >
+                                                        <FontAwesomeIcon icon={faStar} />
+                                                    </span>
+                                                ))}
+                                            </div>
+                                            <ReadMore>{comments[index]?.comment}</ReadMore>
+                                            <LikeDislike user={state.user} comment={comments[index]} />
                                         </div>
-                                        <ReadMore>{comments[index].comment}</ReadMore>
-                                        <LikeDislike user={state.user} comment={comments[index]} />
                                     </div>
-                                </div>
-                            ))}
+                                ))
+                            }
                         </div>
                     </div>
                 </div>
