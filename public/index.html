@@ -42,6 +42,11 @@
     var chatbox = document.getElementById('fb-customer-chat');
     chatbox.setAttribute("page_id", "198008766726901");
     chatbox.setAttribute("attribution", "biz_inbox");
+
+    var pathName = window.location.pathname
+    if (pathName.startsWith("admin")) {
+      chatbox.hidden
+    }
   </script>
 
   <!-- Your SDK code -->
