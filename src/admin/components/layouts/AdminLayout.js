@@ -49,7 +49,13 @@ function AdminLayout({ children }) {
                 flashsales: [],
                 categories: [],
             },
-    );
+    )
+
+    useEffect(() => {
+
+        var chatbox = document.getElementById('fb-customer-chat')
+        chatbox.hidden
+    }, [])
 
     // useEffect(() => {
     //     // Hàm này sẽ được gọi khi component được mount và mỗi khi localStorage thay đổi.
