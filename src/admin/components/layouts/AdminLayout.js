@@ -54,7 +54,7 @@ function AdminLayout({ children }) {
     useEffect(() => {
 
         var chatbox = document.getElementById('fb-customer-chat')
-        chatbox.hidden
+        chatbox.style.display = 'none';
     }, [])
 
     // useEffect(() => {
