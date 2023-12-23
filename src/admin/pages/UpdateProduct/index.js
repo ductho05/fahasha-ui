@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom'
 import classNames from 'classnames/bind'
 import styles from './UpdateProduct.module.scss'
 import { TextField } from '@mui/material'
-import Dropdown from 'react-multilevel-dropdown';
 import Button from "../../../components/Button";
 import { api } from '../../../constants'
 import { useForm } from "react-hook-form"
@@ -37,15 +36,35 @@ function UpdateProduct() {
         name: "--Chọn loại sản phẩm--",
         value: ""
     })
+    const [imageErrors, setImageError] = React.useState(null)
+    const [priceErrors, setPriceError] = React.useState(null)
+    const [publishedErrors, setPublishedError] = React.useState(null)
 
     const {
         register,
         handleSubmit,
         reset,
         setValue,
-        watch
+        watch,
+        unregister,
+        formState: { errors }
     } = useForm()
 
+    const updateProductData = (product) => {
+        console.log(product)
+        const newListProduct = data.products?.map(p => {
+            if (p._id === product._id) {
+                return { ...product }
+            } else return p
+        })
+
+        setData({ ...data, products: newListProduct })
+    }
+
+    React.useEffect(() => {
+
+        console.log(data)
+    }, [data])
     React.useEffect(() => {
         fetch(`${api}/categories?filter=simple`)
             .then(response => response.json())
@@ -104,20 +123,55 @@ function UpdateProduct() {
             value: product.categoryId?._id
         })
         setPublished(product.published_date)
+        unregister("__v")
     }, [product])
 
     const handleDate = (date, dateString) => {
-        setPublished(dateString)
+        if (dateString) {
+
+            const currentDate = new Date()
+            const datePublish = new Date(dateString)
+
+            if (currentDate < datePublish) {
+                setPublishedError("Vui lòng không chọn ngày xuất bản trong tương lai")
+            } else {
+
+                setPublishedError(null)
+                setPublished(dateString)
+            }
+        } else {
+
+            setPublishedError("Vui lòng chọn ngày xuất bản")
+        }
     }
 
     const handleChangeImage = (e) => {
         if (e.target.files.length > 0) {
-            const file = e.target.files[0]
-            file.preview = URL.createObjectURL(file)
+            if (e.target.files[0].type.startsWith("image")) {
 
-            setAvatar(file)
+                const file = e.target.files[0]
+                file.preview = URL.createObjectURL(file)
+
+                setAvatar(file)
+                setImageError(null)
+
+            } else {
+                setImageError("Vui lòng chọn loại tệp hình ảnh")
+            }
         }
     }
+
+    React.useEffect(() => {
+
+        if (watch("price") > watch("old_price")) {
+
+            setPriceError("Giá cũ phải lớn hơn hoặc bằng giá hiện tại")
+        } else {
+
+            setPriceError(null)
+        }
+
+    }, [watch()])
 
     React.useEffect(() => {
         return () => {
@@ -126,6 +180,7 @@ function UpdateProduct() {
     }, [avatar]);
 
     const onSubmit = async (data) => {
+        console.log(data)
         const formData = new FormData()
         Object.keys(data).forEach(key => {
             formData.append(key, data[key])
@@ -141,10 +196,11 @@ function UpdateProduct() {
         setIsAction(true)
         await authInstance.put(`/products/update/${product?._id}`, formData)
             .then(result => {
+
                 if (result.data.status === "OK") {
                     toast.success('Cập nhật sản phẩm thành công!')
                     setSuccess(prev => !prev)
-                    fetchProduct()
+                    updateProductData(result.data.data)
                 } else {
                     toast.error(result.data.message)
                 }
@@ -235,9 +291,10 @@ function UpdateProduct() {
                                         <input onChange={(e) => handleChangeImage(e)} type="file" id="images" className={cx('input_images')} />
                                         <label for="images" id="images">Chỉnh sửa ảnh</label>
                                     </div>
+                                    {imageErrors && <p className='text-red-500 my-[10px] text-[1.4rem]'>{imageErrors}</p>}
                                     <p className={cx('label')}>Mô tả</p>
                                     <TextField
-                                        {...register('desciption')}
+                                        {...register('desciption', { required: true })}
                                         multiline
                                         fullWidth
                                         placeholder='Mô tả sản phẩm...'
@@ -252,11 +309,12 @@ function UpdateProduct() {
                                             }
                                         }}
                                     />
+                                    {errors?.desciption && <p className='text-red-500 my-[10px] text-[1.4rem]'>Vui lòng nhập mô tả</p>}
                                 </div>
                                 <div className={cx('right')}>
                                     <p className={cx('label')}>Tên sản phẩm</p>
                                     <TextField
-                                        {...register('title')}
+                                        {...register('title', { required: true })}
                                         fullWidth
                                         placeholder='Nhập tên sản phẩm'
                                         size='small'
@@ -269,9 +327,10 @@ function UpdateProduct() {
                                             }
                                         }}
                                     />
+                                    {errors?.title && <p className='text-red-500 my-[10px] text-[1.4rem]'>Vui lòng nhập tên</p>}
                                     <p className={cx('label')}>Tác giả</p>
                                     <TextField
-                                        {...register('author')}
+                                        {...register('author', { required: true })}
                                         fullWidth
                                         placeholder='Nhập tên tác giả'
                                         size='small'
@@ -284,9 +343,10 @@ function UpdateProduct() {
                                             }
                                         }}
                                     />
+                                    {errors.author && <p className='text-red-500 my-[10px] text-[1.4rem]'>Vui lòng nhập tên tác giả</p>}
                                     <p className={cx('label')}>Giá hiện tại</p>
                                     <TextField
-                                        {...register('price')}
+                                        {...register('price', { min: 0, required: true })}
                                         fullWidth
                                         placeholder='Nhập giá hiện tại'
                                         size='small'
@@ -300,9 +360,10 @@ function UpdateProduct() {
                                             }
                                         }}
                                     />
+                                    {errors?.price && <p className='text-red-500 my-[10px] text-[1.4rem]'>Giá hiện tại phải lớn hơn hoặc bằng 0</p>}
                                     <p className={cx('label')}>Giá cũ</p>
                                     <TextField
-                                        {...register('old_price')}
+                                        {...register('old_price', { min: 0, required: true })}
                                         fullWidth
                                         placeholder='Nhập giá cũ'
                                         size='small'
@@ -316,9 +377,11 @@ function UpdateProduct() {
                                             }
                                         }}
                                     />
+                                    {errors?.old_price && <p className='text-red-500 my-[10px] text-[1.4rem]'>Giá cũ phải lớn hơn hoặc bằng 0</p>}
+                                    {priceErrors && <p className='text-red-500 my-[10px] text-[1.4rem]'>{priceErrors}</p>}
                                     <p className={cx('label')}>Số lượng trong kho</p>
                                     <TextField
-                                        {...register('quantity')}
+                                        {...register('quantity', { min: 0, required: true })}
                                         fullWidth
                                         placeholder='Nhập số lượng '
                                         size='small'
@@ -332,8 +395,10 @@ function UpdateProduct() {
                                             }
                                         }}
                                     />
+                                    {errors?.quantity && <p className='text-red-500 my-[10px] text-[1.4rem]'>Số lượng phải lớn hơn hoặc bằng 0</p>}
                                     <p className={cx('label')}>Năm xuất bản</p>
                                     <DatePicker onChange={handleDate} defaultValue={dayjs(product.published_date)} />
+                                    {publishedErrors && <p className='text-red-500 my-[10px] text-[1.4rem]'>{publishedErrors}</p>}
                                     <p className={cx('label')}></p>
                                     <p className={cx('label')}>Loại sản phẩm</p>
                                     <Select
@@ -344,12 +409,15 @@ function UpdateProduct() {
                                         optionFilterProp="children"
                                         filterOption={filterOption}
                                         options={options}
+                                        style={{
+                                            minWidth: "250px"
+                                        }}
                                     />
                                 </div>
                             </div>
                             <div className={cx('buttons')}>
                                 <p>
-                                    <Button disabled={!isChanged} primary>Lưu thay đổi</Button>
+                                    <Button disabled={!isChanged || Object.keys(errors).length > 0 || imageErrors || priceErrors || publishedErrors} primary>Lưu thay đổi</Button>
                                 </p>
                             </div>
                         </form>

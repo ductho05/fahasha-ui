@@ -127,6 +127,22 @@ function Product() {
     const [status, setStatus] = useState(null);
     const [quantity, setQuantity] = useState(null);
 
+    const updateProductData = (product) => {
+        const newListProduct = data.products?.map((p) => {
+            if (p._id === product._id) {
+                return { ...product };
+            } else return p;
+        });
+
+        setData({ ...data, products: newListProduct });
+    };
+
+    const insertProductData = (product) => {
+        const newList = data?.products;
+        newList.push(product);
+        setData({ ...data, products: newList });
+    };
+
     const columns = [
         {
             field: 'title',
@@ -230,6 +246,7 @@ function Product() {
                         })
                         .then(async (result) => {
                             if (result.data.status === 'OK') {
+                                updateProductData(result.data.data)
                                 const title = 'Thông báo sản phẩm';
                                 let description = `${result.data.data.title} vừa được mở bán trở lại`;
                                 if (!result.data.data.status_sell) {
@@ -320,55 +337,28 @@ function Product() {
 
     console.log('dat3123a', rows);
 
-    const fetchProduct = () => {
-        fetch(`${api}/products`)
-            .then((response) => response.json())
-            .then((result) => {
-                if (result.status === 'OK') {
-                    console.log('fetch lai');
-                    setData({ ...data, products: result.data.products });
-                }
-            })
-            .catch((error) => {
-                console.log(error.message);
-            });
-    };
+    // fetch(`${api}/products`)
+    //     .then((response) => response.json())
+    //     .then((result) => {
+    //         if (result.status === 'OK') {
+    //             console.log('fetch lai');
+    //             setData({ ...data, products: result.data.products });
+    //         }
+    //     })
+    //     .catch((error) => {
+    //         console.log(error.message);
+    //     });
 
-    console.log('àhugj', temporary_data);
+    // React.useEffect(() => {
+    //     setRows(data.products);
+    // }, [data]);
 
-    useEffect(() => {
-        // setRows(data.products);
-        if (data?.products?.length > 0) {
-            //var data1 = data.products;
-            // console.log('kdhas', data1);
-            handleClearFilter();
-            //setRows(data1.sort((a, b) => a.title.localeCompare(b.title)));
-        } else {
-            console.log('g321hádfb', data, temporary_data.length);
-            if (data.products?.length == 0) {
-                // ngăn load lại 2 lần data không cần thiết
-                // fetch(`${api}/products?perPage=50`)
-                //     .then((response) => response.json())
-                //     .then((result) => {
-                //         console.log('ghádfb2');
-                if (data?.tem_products?.length > 0) {
-                    console.log('ghádfb3234', data.tem_products);
-                    setTemporary_data(data.tem_products);
-                    setRows([...data.tem_products].sort((a, b) => a.title.localeCompare(b.title)));
-                }
-            }
-        }
-    }, [data]);
+    // React.useEffect(() => {
 
-    console.log('rơssss', rows);
-
-    console.log('data1213', data, rows);
-
-    useEffect(() => {
-        if (success !== 0) {
-            fetchProduct();
-        }
-    }, [success]);
+    //     if (success !== 0) {
+    //         fetchProduct();
+    //     }
+    // }, [success]);
 
     useEffect(() => {
         fetch(`${api}/categories?filter=simple`)
@@ -424,6 +414,7 @@ function Product() {
                     .then(async (result) => {
                         if (result.data.status === 'OK') {
                             setSuccess((prev) => prev + 1);
+                            insertProductData(result.data.data);
                             toast.success('Thêm mới sản phẩm thành công');
                             const title = 'Thông báo sản phẩm';
                             const description = 'TA Book Store vừa ra mắt sản phẩm mới. Xem ngay';
@@ -577,7 +568,7 @@ function Product() {
     const handleSearch = (value) => {
         setKeywords(value);
     };
-    console.log('adugas213hbj', rows)
+    console.log('adugas213hbj', rows);
 
     console.log('sfyugasjh', rows, data);
 
@@ -737,29 +728,6 @@ function Product() {
             // setIsSort(false);
         }
     }, [selectSort]);
-
-    useEffect(() => {
-        if (data?.products?.length > 0) {
-            //var data1 = data.products;
-            // console.log('kdhas', data1);
-            handleClearFilter();
-            //setRows(data1.sort((a, b) => a.title.localeCompare(b.title)));
-        } else {
-            console.log('g321hádfb', data, temporary_data.length);
-            if (data.products?.length == 0) {
-                // ngăn load lại 2 lần data không cần thiết
-                // fetch(`${api}/products?perPage=50`)
-                //     .then((response) => response.json())
-                //     .then((result) => {
-                //         console.log('ghádfb2');
-                if (data?.tem_products?.length > 0) {
-                    // console.log('ghádfb3234', data.tem_products);
-                    setTemporary_data(data.tem_products);
-                    setRows([...data.tem_products].sort((a, b) => a.title.localeCompare(b.title)));
-                }
-            }
-        }
-    }, [data]);
 
     return (
         <div className={cx('wrapper')}>
@@ -1142,7 +1110,7 @@ function Product() {
                     </Tippy>
                 </div>
             </div>
-            {<EnhancedTable ischeckboxSelection={false} columns={columns} rows={rows} />}
+            {rows && <EnhancedTable ischeckboxSelection={false} columns={columns} rows={rows} />}
         </div>
     );
 }
