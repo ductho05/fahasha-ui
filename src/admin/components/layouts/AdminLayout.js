@@ -53,8 +53,8 @@ function AdminLayout({ children }) {
 
     useEffect(() => {
 
-        var chatbox = document.getElementById('fb-customer-chat')
-        chatbox.style.display = 'none';
+        var chat_content = document.querySelector(".fb_dialog_content")
+        chat_content.style.display = 'none';
     }, [])
 
     // useEffect(() => {

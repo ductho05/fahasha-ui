@@ -44,9 +44,10 @@
     chatbox.setAttribute("attribution", "biz_inbox");
 
     var pathName = window.location.pathname
+    var chat_content = document.querySelector(".fb_dialog_content")
     console.log(pathName)
     if (pathName.startsWith("/admin")) {
-      chatbox.style.display = 'none'
+      chat_content.style.display = 'none'
     }
   </script>
 
