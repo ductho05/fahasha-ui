@@ -11,11 +11,43 @@ import { useData } from '../../../stores/DataContext';
 import SideBarLaptop from './SideBarLaptop';
 import { getAuthInstance } from '../../../utils/axiosConfig';
 const cx = classNames.bind(styles);
+const maxProducts = 1189;
+const perPage = 50;
 function AdminLayout({ children }) {
     const authInstance = getAuthInstance();
-
     const container = useRef(null);
     const { data, setData } = useData();
+    // const [isComplete, setIsComplete] = useState(false);
+
+    // async function fetchData() {
+    //     let i = 2;
+    //     let shouldContinue = true;
+    //     let newData = [];
+    //     //  console.log('dang chay ne...', shouldContinue, data?.products?.length, Math.ceil(maxProducts / perPage));
+    //     while (i < Math.floor(maxProducts / perPage) - 15 && shouldContinue) {
+    //         try {
+    //             console.log('chay ne...', i, data);
+    //             const response = await fetch(`${api}/products?perPage=${perPage}&page=${i}`);
+    //             const flashsales = await response.json();
+    //             newData = [...newData, ...flashsales.data.products];
+
+    //             // setData({
+    //             //     ...data,
+    //             //     products: newData,
+    //             // });
+
+    //             i++;
+    //         } catch (err) {
+    //             console.log('asghd', err);
+    //             shouldContinue = false; // Dừng vòng lặp nếu có lỗi
+    //         }
+    //     }
+    //     // setData({
+    //     //     ...data,
+    //     //     products: newData,
+    //     // });
+    //     return newData;
+    // }
 
     const [isLoaded, setIsLoaded] = useState(
         Object.keys(data).length !== 0
@@ -24,6 +56,7 @@ function AdminLayout({ children }) {
                   orders: true,
                   users: true,
                   products: true,
+                  tem_products: true,
                   flashsales: true,
                   categories: true,
               }
@@ -32,6 +65,7 @@ function AdminLayout({ children }) {
                   orders: false,
                   users: false,
                   products: false,
+                  tem_products: false,
                   flashsales: false,
                   categories: false,
               },
@@ -46,10 +80,13 @@ function AdminLayout({ children }) {
                   orders: [],
                   users: [],
                   products: [],
+                  tem_products: [],
                   flashsales: [],
                   categories: [],
               },
     );
+
+    console.log('afuhuadjnf', data, isLoaded.products);
 
     // useEffect(() => {
     //     // Hàm này sẽ được gọi khi component được mount và mỗi khi localStorage thay đổi.
@@ -97,14 +134,27 @@ function AdminLayout({ children }) {
             animationData: require('../../../assets/json/loadAdminPage.json'),
         });
         if (Object.keys(data).length === 0) {
-            setIsLoaded([false, false]);
-            fetch(`${api}/products?filter=sold&sort=asc&num=50`)
+            // setIsLoaded([false, false]);
+            setIsLoaded((prev) => ({ ...prev, products: true }));
+            fetch(`${api}/products?perPage=${maxProducts}&page=1`)
                 .then((response) => {
                     return response.json();
                 })
                 .then((flashsales) => {
-                    setData2((prev) => ({ ...prev, products: flashsales.data.products }));
-                    setIsLoaded((prev) => ({ ...prev, products: true }));
+                    console.log('flashsales121', flashsales);
+                    setData({ ...data, products: flashsales.data.products });
+                    //setIsLoaded((prev) => ({ ...prev, products: true }));
+                })
+                .catch((err) => console.log(err));
+
+            fetch(`${api}/products?perPage=${perPage}&page=1`)
+                .then((response) => {
+                    return response.json();
+                })
+                .then((flashsales) => {
+                    console.log('flashsales121', flashsales);
+                    setData2((prev) => ({ ...prev, tem_products: flashsales.data.products }));
+                    setIsLoaded((prev) => ({ ...prev, tem_products: true }));
                 })
                 .catch((err) => console.log(err));
 
@@ -162,6 +212,7 @@ function AdminLayout({ children }) {
                 orders: true,
                 users: true,
                 products: true,
+                tem_products: true,
                 flashsales: true,
                 categories: true,
             });
@@ -174,12 +225,14 @@ function AdminLayout({ children }) {
             isLoaded.categories &&
             isLoaded.orders &&
             isLoaded.users &&
+            isLoaded.tem_products &&
             isLoaded.flashsales &&
             isLoaded.products &&
             Object.keys(data).length === 0
         ) {
             //localStorage.setItem('temporary_data', JSON.stringify(data));
             setData(data2);
+            // setIsComplete(true);
         }
     }, [isLoaded]);
 
@@ -192,6 +245,7 @@ function AdminLayout({ children }) {
                 isLoaded.categories &&
                 isLoaded.orders &&
                 isLoaded.users &&
+                isLoaded.tem_products &&
                 isLoaded.flashsales &&
                 isLoaded.products
             ) &&
@@ -206,6 +260,7 @@ function AdminLayout({ children }) {
                     isLoaded.categories &&
                     isLoaded.orders &&
                     isLoaded.users &&
+                    isLoaded.tem_products &&
                     isLoaded.flashsales &&
                     isLoaded.products
                 ) && Object.keys(data).length === 0

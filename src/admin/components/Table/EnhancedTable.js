@@ -2,17 +2,10 @@ import { DataGrid, viVN } from '@mui/x-data-grid';
 import CustomToolbar from './Components/CustomToolBar.js';
 import CustomPagination from './Components/CustomPagonation';
 import { useState, useEffect, useRef } from 'react';
-
-function moveElementToFront(arr, idToMove) {
-    const index = arr?.findIndex((element) => element?._id === idToMove);
-    if (index !== -1) {
-        const elementToMove = arr?.splice(index, 1)[0]; // Loại bỏ phần tử từ vị trí cũ
-        arr?.unshift(elementToMove); // Thêm phần tử vào đầu mảng
-    }
-    return arr;
-}
+import { useData } from '../../../stores/DataContext';
 
 export default function EnhancedTable({
+    type,
     columns,
     rows,
     func,
@@ -24,7 +17,22 @@ export default function EnhancedTable({
 }) {
     const exe = func !== undefined && isStatus !== undefined;
     const [rowSelectionModel, setRowSelectionModel] = useState([]);
+    const { data, setData } = useData();
     // const [rowNew, setRowNew] = useState(rows);
+
+    function moveElementToFront(arr, idToMove) {
+        if (!Array.isArray(arr)) {
+            console.error('arr is not an array', arr);
+            return type == 'customFlashsale' && data.products;
+        }
+        const index = arr.findIndex((element) => element._id === idToMove);
+        if (index !== -1) {
+            const elementToMove = arr.splice(index, 1)[0]; // Loại bỏ phần tử từ vị trí cũ
+            arr.unshift(elementToMove); // Thêm phần tử vào đầu mảng
+        }
+        return arr;
+    }
+
     useEffect(() => {
         if (exe) func(rowSelectionModel);
     }, [rowSelectionModel]);
@@ -42,30 +50,46 @@ export default function EnhancedTable({
 
     return (
         <>
-            <div style={height ? { minHeight: height } : { height: "100vh" }}>
+            <div
+                style={
+                    height
+                        ? type !== undefined &&
+                          (type == 'customFlashsale' ||
+                              type == 'statistics' ||
+                              type == 'flashsale' ||
+                              type == 'detailFLashsale') && {
+                              height: height,
+                          }
+                        : // : { minHeight: height }
+                          { height: '100vh' }
+                }
+            >
                 <DataGrid
                     sx={{
-                        "& .MuiDataGrid-columnHeaderTitle": {
-                            whiteSpace: "normal",
-                            lineHeight: "normal"
+                        '& .MuiDataGrid-columnHeaderTitle': {
+                            whiteSpace: 'normal',
+                            lineHeight: 'normal',
                         },
-                        "& .MuiDataGrid-columnHeader": {
+                        '& .MuiDataGrid-columnHeader': {
                             // Forced to use important since overriding inline styles
-                            height: "unset !important"
+                            height: 'unset !important',
                         },
-                        "& .MuiDataGrid-columnHeaders": {
+                        '& .MuiDataGrid-columnHeaders': {
                             // Forced to use important since overriding inline styles
-                            maxHeight: "168px !important"
+                            maxHeight: '168px !important',
                         },
-                        "& .MuiDataGrid-cell": {
-                            maxHeight: "max-content !important",
-                            whiteSpace: "wrap !important"
+                        '& .MuiDataGrid-cell': {
+                            maxHeight: 'max-content !important',
+                            whiteSpace: 'wrap !important',
                         },
-                        "& .MuiDataGrid-row": {
-                            maxHeight: "max-content !important",
-                            minHeight: "max-content !important",
-                            paddingTop: "10px"
-                        }
+                        '& .MuiDataGrid-row': {
+                            maxHeight: 'max-content !important',
+                            minHeight: 'max-content !important',
+                            paddingTop:
+                                type == 'flashsale' || type == 'detailFLashsale' || type == 'statistics'
+                                    ? '0px'
+                                    : '10px',
+                        },
                     }}
                     disableSelectionOnClick={true}
                     disableColumnMenu={true}

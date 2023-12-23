@@ -6,10 +6,10 @@ import { autocompleteClasses } from '@mui/material';
 import SimpleItem from '../../SimpleItem';
 import { getAuthInstance } from '../../../../utils/axiosConfig';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
-
+import { ImportOutlined } from '@ant-design/icons';
 import { useEffect } from 'react';
-import { Alert, Space, Spin, Tag } from 'antd';
-
+import { Alert, Space, Spin, Popover, Tag } from 'antd';
+import AlarmOnIcon from '@mui/icons-material/AlarmOn';
 import classNames from 'classnames/bind';
 import styles from './BarChar.module.scss';
 import CustomPopover from '../../CustomPopover/CustomPopover';
@@ -34,11 +34,12 @@ const currentTimeInVietnam = moment().tz(vietnamTimeZone);
 
 // Lấy số giờ hiện tại
 const currentHourInVietnam = currentTimeInVietnam.get('hours');
-function BarChartExample() {
+function BarChartExample(func) {
     const cx = classNames.bind(styles);
+    console.log('A212122ddd1', func);
     const navigate = useNavigate();
 
-    const authInstance = getAuthInstance()
+    const authInstance = getAuthInstance();
 
     const [isToggle, setIsToggle] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -59,20 +60,33 @@ function BarChartExample() {
         return { current_point_sale, toDay };
     };
 
+    //const [copyData, setCopyData] = useState(func?.data);
+    //   console.log('A21adsda2121', copyData);
     const [date, setDate] = useState(getTimeData().toDay);
     const [pointSale, setPointSale] = useState(getTimeData().current_point_sale);
     useEffect(() => {
         setIsLoading(true);
+        // setCopyData(func?.data);
         fetch(`${api}/flashsales?sort=reverse&date=${date}&point=${pointSale == -1 ? '' : pointSale}`)
             .then((res) => res.json())
             .then((res) => {
                 //console.log('A212121', res.data);
                 setRows(res.data);
+                // //setCopyData(res.data);
+                // console.log('ngukkk', func?.data, copyData);
+
+                // func.data && !isTime && func.func(copyData);
                 setIsLoading(false);
-                //.log('A212121', res.data);
+                // console.log('A212121', res.data);
             })
             .catch((err) => console.log('sdasda', err));
     }, [isToggle]);
+
+    useEffect(() => {
+        if (func.setIsTime[0]) {
+            func.func(rows);
+        }
+    }, [func.setIsTime[0]]);
 
     const getDatePointSale = (values) => {
         //console.log(values);
@@ -84,7 +98,7 @@ function BarChartExample() {
     const newData = rows.filter((item) => {
         return item.sold_sale > 0;
     });
-    //Phân biệt hibernatw và spring data jpa
+
     newData > 10 && newData.splice(10, newData.length - 10);
     const dataChart = newData.map((item) => {
         return {
@@ -123,12 +137,22 @@ function BarChartExample() {
     };
 
     return (
-        <>
+        <div
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '100%',
+                height: '100%',
+            }}
+        >
             <div
                 style={{
                     display: 'flex',
                     flexDirection: 'row',
-                    margin: '0 0 3% 0',
+
+                    margin: '3% 0',
                     width: '95%',
                 }}
             >
@@ -158,8 +182,30 @@ function BarChartExample() {
                 >
                     {date}
                 </Tag>
-                <div style={{ flex: 6 }}></div>
-                <p className={cx('btn_loading')}>
+                <div style={{ flex: 5 }}></div>
+                <p
+                    style={{
+                        margin: '0 0 0 0',
+                        color: func.setIsTime[0] ? '#1890ff' : 'black',
+                    }}
+                    className={cx('btn_loading')}
+                >
+                    <Popover content="Áp dụng khung thời gian cho bảng dữ liệu" trigger="hover">
+                        <AlarmOnIcon
+                            fontSize="large"
+                            onClick={() => {
+                                func.setIsTime[1](!func.setIsTime[0]);
+                            }}
+                        />
+                    </Popover>
+                </p>
+                <p
+                    className={cx('btn_loading')}
+                    style={{
+                        margin: '0 0 0 0',
+                        color: isLoading ? '#1890ff' : 'black',
+                    }}
+                >
                     <AutorenewIcon
                         fontSize="large"
                         onClick={() => {
@@ -167,12 +213,11 @@ function BarChartExample() {
                         }}
                     />
                 </p>
-
                 <CustomPopover isToggle={isToggle} func={getDatePointSale} props={cx('btn_loading')} />
             </div>
             <div
                 style={{
-                    minHeight: '440px',
+                    height: '397px',
                     width: '100%',
                     background: 'rgba(0, 0, 0, 0.05)',
                     padding: '11% 12% 0% 0',
@@ -229,12 +274,17 @@ function BarChartExample() {
                 textAnchor="middle"
                 dominantBaseline="middle"
                 style={{
-                    margin: '4.5% 0 0 0',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    fontSize: '1.5rem',
+                    fontWeight: 'bold',
+                    height: '40px',
                 }}
             >
                 Biểu đồ flashsale đã đặt trong khung giờ
             </text>
-        </>
+        </div>
     );
 }
 

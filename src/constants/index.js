@@ -1,5 +1,7 @@
-export const isDeploy = true;
-export const api = isDeploy ? 'https://bookstore-ta-v3.onrender.com/bookstore/api/v1' : 'http://127.0.0.1:3000/bookstore/api/v1';
+export const isDeploy = false;
+export const api = isDeploy
+    ? 'https://bookstore-ta-v3.onrender.com/bookstore/api/v1'
+    : 'http://127.0.0.1:3000/bookstore/api/v1';
 // export const api = 'http://127.0.0.1:3000/bookstore/api/v1';
 export const apiProvinces = 'https://provinces.open-api.vn/api/?depth=3';
 export const apiMaps = 'https://api.mapbox.com/';
@@ -12,11 +14,12 @@ export const registerImages = 'https://quicklaunch.io/wp-content/uploads/2019/10
 export const cancelOrderImage =
     'https://commercemarketplace.adobe.com/media/catalog/product/f/8/f80e_cancel-order-240x240_3.png';
 
-export const flashSaleImage = 'https://img.freepik.com/free-vector/special-flash-sale-modern-banner-design-vector-illustration_1017-38337.jpg'
+export const flashSaleImage =
+    'https://img.freepik.com/free-vector/special-flash-sale-modern-banner-design-vector-illustration_1017-38337.jpg';
 
 export const listJustWatched = JSON.parse(localStorage.getItem('mycategory')) || [];
 
-export const superAdmin = "superadmin1811"
+export const superAdmin = 'superadmin1811';
 
 export const listPathHots = [
     {

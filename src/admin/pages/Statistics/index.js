@@ -9,10 +9,11 @@ import DropMenu from '../../../components/DropMenu';
 import OrdersLatesTable from '../../components/OrdersLatesTable/OrdersLatesTable';
 import { api } from '../../../constants';
 import axios from 'axios';
-import { DatePicker, Space, Image, Button, Typography, message,  Alert, Spin, Popover  } from 'antd';
+import { DatePicker, Space, Image, Button, Typography, message, Alert, Spin, Popover } from 'antd';
 import { getAuthInstance } from '../../../utils/axiosConfig';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
+import Marquee from 'react-fast-marquee';
 import { set } from 'react-hook-form';
 import BarChartExample from '../../components/charts/BarCharForStatic/BarCharForStatic';
 import EnhancedTable from '../../components/Table/EnhancedTable';
@@ -182,7 +183,7 @@ function Statistics() {
         },
         {
             field: 'user',
-            headerName: 'UserID',
+            headerName: 'UserID người mua',
             width: spaceSizeCol[1],
             sortable: false,
             editable: false,
@@ -430,11 +431,11 @@ function Statistics() {
                 if (order.order != null) {
                     return (
                         formatDateToString(new Date(order.order.date)) <=
-                        formatDateToString(
-                            new Date(today.getFullYear(), month ? month + 1 : today.getMonth() + 1, 0),
-                        ) &&
+                            formatDateToString(
+                                new Date(today.getFullYear(), month ? month + 1 : today.getMonth() + 1, 0),
+                            ) &&
                         formatDateToString(new Date(order.order.date)) >=
-                        formatDateToString(new Date(today.getFullYear(), month ? month : today.getMonth(), 1))
+                            formatDateToString(new Date(today.getFullYear(), month ? month : today.getMonth(), 1))
                     );
                 }
             });
@@ -775,6 +776,42 @@ function Statistics() {
                     <Widget key={index} widget={widget} />
                 ))}
             </div> */}
+            <div className={cx('top')}>
+                <p
+                    style={{
+                        margin: '0 0 0 15px',
+                        flex: 1,
+                    }}
+                >
+                    THỐNG KÊ
+                </p>
+
+                <div
+                    style={{
+                        display: 'flex',
+                        flex: 9,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}
+                >
+                    <Alert
+                        banner
+                        type="info"
+                        message={
+                            <Marquee pauseOnHover gradient={false}>
+                                {`Hướng dẫn: Thống kê doanh thu sản phẩm và khách hàng thân thiết theo từng khoảng thời gian.`}
+                            </Marquee>
+                        }
+                        style={{
+                            width: '100%',
+                            margin: '0 2%',
+                            borderRadius: '6px',
+                        }}
+                    />
+
+                    {/* <AddOptionModal /> */}
+                </div>
+            </div>
             <div className={cx('chart')}>
                 <div className={cx('left')}>
                     <ProgressChart />
@@ -873,10 +910,10 @@ function Statistics() {
                                                     index == 0
                                                         ? '#f44336'
                                                         : index == 1
-                                                            ? '#ff9800'
-                                                            : index == 2
-                                                                ? '#ffc107'
-                                                                : '#4caf50',
+                                                        ? '#ff9800'
+                                                        : index == 2
+                                                        ? '#ffc107'
+                                                        : '#4caf50',
                                             }}
                                         >
                                             {index + 1}
@@ -935,10 +972,10 @@ function Statistics() {
                                                         index == 0
                                                             ? '#f44336'
                                                             : index == 1
-                                                                ? '#ff9800'
-                                                                : index == 2
-                                                                    ? '#ffc107'
-                                                                    : '#4caf50',
+                                                            ? '#ff9800'
+                                                            : index == 2
+                                                            ? '#ffc107'
+                                                            : '#4caf50',
                                                 }}
                                             >
                                                 Top {widget.top}: {widget.phanthuong}
@@ -1051,10 +1088,10 @@ function Statistics() {
                                                         index == 0
                                                             ? '#f44336'
                                                             : index == 1
-                                                                ? '#ff9800'
-                                                                : index == 2
-                                                                    ? '#ffc107'
-                                                                    : '#4caf50',
+                                                            ? '#ff9800'
+                                                            : index == 2
+                                                            ? '#ffc107'
+                                                            : '#4caf50',
                                                 }}
                                             >
                                                 {index + 1}
@@ -1109,6 +1146,7 @@ function Statistics() {
                                     whiteSpace: 'nowrap',
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
+                                    color: '#f42f2f',
                                     lineHeight: '2rem',
                                 }}
                             >
@@ -1141,8 +1179,9 @@ function Statistics() {
                             // isStatus={{
                             //     isToggle: isToggle,
                             // }}
-                            height={200}
+                            height="40vh"
                             pageSize={2}
+                            type="statistics"
                         />
                     </div>
                 )}

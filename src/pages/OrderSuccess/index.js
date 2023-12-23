@@ -81,6 +81,8 @@ function OrderSuccess() {
         },
     ];
     localStorage.removeItem('item_order_checkout');
+    localStorage.removeItem('listFlash');
+    localStorage.removeItem('listCkeckOut');
     localStorage.removeItem(statusVNPayCheckout);
     const is_order_success_page = localStorage.getItem('is_order_success_page')
         ? JSON.parse(localStorage.getItem('is_order_success_page'))
@@ -104,6 +106,7 @@ function OrderSuccess() {
                             const product = result.data;
                             console.log('afhadbsfsh', product);
                             setProductNotEnough((productNotEnough) => [...productNotEnough, product]);
+                            localStorage.removeItem('dataNotQuanlity');
                         }
                     })
                     .catch((err) => console.log(err));

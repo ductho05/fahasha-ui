@@ -77,9 +77,9 @@ function FlashSaleForm({ props, hideFunc, style }) {
     // chuyển những item trong products sang data
     const products =
         style == 'custom'
-            ? props.products.map((item, index) => {
+            ? props?.products.map((item, index) => {
                   // Tìm kiếm sản phẩm trong mảng data dựa trên _id
-                  const foundProduct = data.products.find((item1) => item1._id === item);
+                  const foundProduct = data?.products?.find((item1) => item1._id === item);
 
                   // Nếu tìm thấy sản phẩm, thì gán nó vào newData
                   let newData = foundProduct ? foundProduct : null;
@@ -87,7 +87,7 @@ function FlashSaleForm({ props, hideFunc, style }) {
                   // newData sẽ chứa thông tin của sản phẩm từ data
                   return newData;
               })
-            : props.products;
+            : props?.products;
 
     //console.log('pro', products);
 
@@ -124,6 +124,8 @@ function FlashSaleForm({ props, hideFunc, style }) {
 
     const addFlashSale = (values, products) => {
         console.log('value121212s', values, products);
+        // xóa những sản phẩm có số lượng bằng 0
+        products = products.filter((item) => item.quantity > 0);
         let loop = 0,
             small_loop = 0;
         //console.log(values);
@@ -453,7 +455,7 @@ function FlashSaleForm({ props, hideFunc, style }) {
                 >
                     <Space>
                         <Button onClick={handleAutoSetting}>Tự động</Button>
-                        <Button type="primary" htmlType="submit" disabled={!products.length}>
+                        <Button type="primary" htmlType="submit" disabled={!products?.length}>
                             Áp dụng
                         </Button>
                     </Space>
@@ -526,7 +528,7 @@ function FlashSaleForm({ props, hideFunc, style }) {
                         onClick={() => {
                             addFlashSale(
                                 values,
-                                products.filter((item) => item.quantity >= values.num_sale),
+                                products?.filter((item) => item.quantity >= values.num_sale),
                             );
                             setOpenMaxProduct(false);
                         }}

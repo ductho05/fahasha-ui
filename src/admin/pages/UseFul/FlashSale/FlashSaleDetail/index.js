@@ -155,7 +155,7 @@ function FlashSaleDetail() {
             });
 
             setDone(true);
-        }, 30000); // 10 giây (10000 milliseconds)
+        }, 15000); // 10 giây (10000 milliseconds)
 
         // Trả về một hàm xử lý để huỷ bỏ sự kiện khi component bị unmounted.
         return () => {
@@ -522,13 +522,13 @@ function FlashSaleDetail() {
                                         // }}
                                         marks={{
                                             10: '10%',
-                                           
+
                                             30: '30%',
-                                         
+
                                             50: '50%',
-                                           
+
                                             70: '70%',
-                                         
+
                                             90: '90%',
                                         }}
                                     />
@@ -867,10 +867,11 @@ function FlashSaleDetail() {
                                     rowNumber: index + 1,
                                 }))}
                                 isRowCurrent={valueId}
-                                height={294}
+                                height="34vh"
                                 columns={colunmsUser}
                                 actions={{}}
                                 pageSize={6}
+                                type="detailFLashsale"
                             />
                         </>
                     ) : (

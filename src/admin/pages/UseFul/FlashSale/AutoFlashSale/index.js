@@ -34,29 +34,34 @@ function AutoFlashSale() {
     const [isLoading2, setIsLoading2] = useState(false); // loading cho sản phẩm để hiển thị skeleton
     const { data, setData } = useData();
 
-    console.log('123WQ', suggestFlash);
+    console.log('123WQ', data);
     useEffect(() => {
-        if (Object.keys(data).length !== 0) {
+        if (data?.products?.length > 0) {
             //var data1 = data.products;
+            console.log('adsfhj', data);
             setIsLoading2(true);
-            var data2 = [...data.products]; // Tạo bản sao của mảng
-
+            var data2 = [...data?.products]; // Tạo bản sao của mảng
             data2.sort((a, b) => b.quantity - a.quantity);
             setTimeout(() => {
                 setSuggestFlash(getRandomElementsWithBias(data2.slice(0, 500), 14));
                 setIsLoading2(false);
             }, 200); // 1000 milliseconds tương đương với 1 giây
-        } else {
-            setIsLoading2(true);
-            fetch(`${api}/products?filter=quantity&sort=desc`)
-                .then((response) => response.json())
-                .then((flashsales) => {
-                    setSuggestFlash(getRandomElementsWithBias(flashsales.data.slice(0, 500), 14));
+        } else {            
+            if (data.products?.length == 0) {
+                if (data?.tem_products?.length > 0) {
+                    setIsLoading2(true);
+                    let data3 = [...data?.tem_products]; // Tạo bản sao của mảng
+                    data3.sort((a, b) => b.quantity - a.quantity);
+                    console.log('12212sa3', data);
                     setIsLoading2(false);
-                })
-                .catch((err) => console.log(err));
+                    setTimeout(() => {
+                        setSuggestFlash(getRandomElementsWithBias(data3.slice(0, 500), 14));
+                        setIsLoading2(false);
+                    }, 200); // 1000 milliseconds tương đương với 1 giây
+                }
+            }
         }
-    }, [isLoading]);
+    }, [isLoading, data]);
 
     const handelLoading = () => {
         setIsLoading(!isLoading);

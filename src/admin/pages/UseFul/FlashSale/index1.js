@@ -1,274 +1,372 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import { api } from '../../../../../constants';
-import SimpleItem from '../../../../components/SimpleItem';
-import styles from './CostumFlashSale.module.scss';
-import { getAuthInstance } from '../../../../../utils/axiosConfig';
-import EnhancedTable from '../../../../components/Table/EnhancedTable';
-import StateFlashSale from '../../../../components/StateFlashSale';
+import { api } from '../../../../constants';
+import styles from './FlashSale.module.scss';
+
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+
+import EnhancedTable from '../../../components/Table/EnhancedTable';
+import StateFlashSale from '../../../components/StateFlashSale';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
-import FlashSaleModal from '../../../../components/FlashSaleModal';
-import { CloseOutlined, FilterOutlined, EditOutlined, LockOutlined, UnlockOutlined } from '@ant-design/icons';
+import AddOptionModal from '../../../components/AddOptionModal';
+import lottie from 'lottie-web';
+import { Divider, Form, Rate, Button, Checkbox, Radio, Skeleton, Space, Switch, Alert, Select, Input } from 'antd';
+import BarChartExample from '../../../components/charts/BarChar/BarChar';
+import CustomPopconfirm from '../../../components/CustomPopconfirm/CustomPopconfirm';
+import Marquee from 'react-fast-marquee';
 import Tippy from '@tippyjs/react/headless';
 import 'tippy.js/dist/tippy.css';
-import { Wrapper as PopperWrapper } from '../../../../../components/Popper';
-import {
-    Divider,
-    Form,
-    Radio,
-    Space,
-    Switch,
-    Alert,
-    Input,
-    DatePicker,
-    Button,
-    Skeleton,
-    Popconfirm,
-    Select,
-    Rate,
-    Checkbox,
-    Tooltip,
-} from 'antd';
-import Marquee from 'react-fast-marquee';
-import { useData } from '../../../../../stores/DataContext';
-import { set } from 'react-hook-form';
-const cx = classNames.bind(styles);
-
-const sortOptions = [
-    {
-        label: 'Mặc định',
-        value: 'default',
-    },
-    {
-        label: 'Giá cao nhất',
-        value: 'price_desc',
-    },
-    {
-        label: 'Giá thấp nhất',
-        value: 'price_asc',
-    },
-    {
-        label: 'Đánh giá cao nhất',
-        value: 'rate_desc',
-    },
-    {
-        label: 'Đánh giá thấp nhất',
-        value: 'rate_asc',
-    },
-];
-
-const priceOptions = [
-    {
-        label: '0đ - 150,000 đ',
-        valueMin: 0,
-        valueMax: 150000,
-    },
-    {
-        label: '150000 đ - 300,000 đ',
-        valueMin: 150000,
-        valueMax: 300000,
-    },
-    {
-        label: '300,000 đ - 500,000 đ',
-        valueMin: 300000,
-        valueMax: 500000,
-    },
-    {
-        label: '500,000 đ - 700,000 đ',
-        valueMin: 500000,
-        valueMax: 700000,
-    },
-    {
-        label: '700.000 đ - Trở lên',
-        valueMin: 700000,
-    },
-];
-
-const rateOptions = [1, 2, 3, 4, 5];
-
-const quantityOptions = [
-    {
-        label: 'Còn hàng',
-        value: true,
-    },
-    {
-        label: 'Hết hàng',
-        value: false,
-    },
-];
-
-const statusOptions = [
-    {
-        label: 'Hoạt động',
-        value: true,
-    },
-
-    {
-        label: 'Ngưng bán',
-        value: false,
-    },
-];
-function CostumFlashSale() {
-    const { data, setData } = useData();
+import { CloseOutlined, FilterOutlined, EditOutlined, LockOutlined, UnlockOutlined } from '@ant-design/icons';
+import { Wrapper as PopperWrapper } from '../../../../components/Popper';
+import { useData } from '../../../../stores/DataContext';
+import { getAuthInstance } from '../../../../utils/axiosConfig';
+function FlashSale() {
+    const container1 = useRef(null);
     const authInstance = getAuthInstance();
-    const [showDialog, setShowDialog] = useState(false);
-    const [published, setPublished] = useState();
-    const [avatar, setAvatar] = useState();
-    const [loading, setLoading] = useState(false);
-    const [isAction, setIsAction] = useState(false);
-    const [options, setOptions] = useState([]);
-    const [success, setSuccess] = useState(0);
-    const [errors, setErrors] = useState({});
-    const [price, setPrice] = useState(null);
-    const [rate, setRate] = useState(null);
-    const [suggestFlash, setSuggestFlash] = useState([]);
-    const [isToggle, setIsToggle] = useState(false); // khi bấm nút tiếp tục thì gọi hàm này để \tắt chọn những sản phẩm đã chọn
-
-    const [rows, setRows] = useState([]);
-    const [temporary_data, setTemporary_data] = useState([]); // lưu lại những sản phẩm đã chọn để gợi ý
-
+    const navigate = useNavigate();
+    const cx = classNames.bind(styles);
+    const { data, setData } = useData();
+    const moment = require('moment-timezone');
+    // Đặt múi giờ cho Việt Nam
+    const vietnamTimeZone = 'Asia/Ho_Chi_Minh';
+    const [keywords, setKeywords] = useState(null);
+    // Lấy thời gian hiện tại ở Việt Nam
+    const currentTimeInVietnam = moment().tz(vietnamTimeZone);
     const [selectCategory, setSelectCategory] = useState(null);
     const [selectSort, setSelectSort] = useState(null);
+    const [price, setPrice] = useState(null);
+    const [rate, setRate] = useState(null);
+    const [options, setOptions] = useState([]);
+
+    //const [selectCategory, setSelectCategory] = useState(null);
+    //const [selectSort, setSelectSort] = useState(null);
     const [showFilter, setShowFilter] = useState(false);
-    const [keywords, setKeywords] = useState(null);
+    //const [keywords, setKeywords] = useState(null);
     const [status, setStatus] = useState(null);
     const [quantity, setQuantity] = useState(null);
 
-    const [isSort, setIsSort] = useState(false);
-    const getCategoryName = (categoryId) => {
-        // categoryId là đối tượng danh mục
-        // Thực hiện logic để lấy tên danh mục từ categoryId
-        // Trả về tên danh mục
-        return categoryId ? categoryId.name : '[Khác]'; // Ví dụ: Lấy name từ đối tượng danh mục
-    };
+    // Lấy số giờ hiện tại
+    const currentHourInVietnam = currentTimeInVietnam.get('hours');
 
-    useEffect(() => {
-        fetch(`${api}/categories?filter=simple`)
-            .then((response) => response.json())
-            .then((result) => {
-                if (result.status == 'OK') {
-                    const newList = result.data.map((category) => {
-                        return {
-                            label: category.name,
-                            value: category._id,
-                        };
-                    });
-                    setOptions(newList);
-                }
-            })
-            .catch((err) => console.log(err.message));
-    }, []);
+    lottie.loadAnimation({
+        container: container1.current, // Thay container2.current bằng document.getElementById nếu bạn không sử dụng useRef.
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        animationData: require('../../../../assets/json/customAddFlashSale.json'),
+    });
 
-    const spaceSizeCol = [280, 120, 160, 90, 90, 90, 90, 70, 80, 80];
-    const columns = [
-        { field: 'title', headerName: 'Tên sách', sortable: false, width: spaceSizeCol[0] },
+    const priceOptions = [
         {
-            field: 'author',
-            headerName: 'Tác giả',
+            label: '0đ - 150,000 đ',
+            valueMin: 0,
+            valueMax: 150000,
+        },
+        {
+            label: '150000 đ - 300,000 đ',
+            valueMin: 150000,
+            valueMax: 300000,
+        },
+        {
+            label: '300,000 đ - 500,000 đ',
+            valueMin: 300000,
+            valueMax: 500000,
+        },
+        {
+            label: '500,000 đ - 700,000 đ',
+            valueMin: 500000,
+            valueMax: 700000,
+        },
+        {
+            label: '700.000 đ - Trở lên',
+            valueMin: 700000,
+        },
+    ];
 
+    const rateOptions = [1, 2, 3, 4, 5];
+    const quantityOptions = [
+        {
+            label: 'Còn hàng',
+            value: true,
+        },
+        {
+            label: 'Hết hàng',
+            value: false,
+        },
+    ];
+
+    const statusOptions = [
+        {
+            label: 'Hoạt động',
+            value: true,
+        },
+
+        {
+            label: 'Ngưng bán',
+            value: false,
+        },
+    ];
+    const spaceSizeCol = [30, 150, 80, 80, 70, 60, 80, 30, 80, 160];
+    const [isloadingdelete, setIsloadingdetele] = useState(null);
+    const columns = [
+        {
+            field: 'rowNumber',
+            headerName: 'STT',
+            width: spaceSizeCol[0],
             sortable: false,
             editable: false,
-            width: spaceSizeCol[1],
+            headerAlign: 'center',
             renderCell: (params) => {
-                return <p>{params.value ? params.value : '[Không có thông tin]'}</p>;
+                return (
+                    <>
+                        <p
+                            style={{
+                                padding: '0 0 0 10px',
+                            }}
+                        >
+                            {params.value}
+                        </p>
+                    </>
+                );
             },
         },
         {
-            field: 'categoryId',
-            headerName: 'Thể loại',
+            field: 'product',
+            headerName: 'Tên sách',
+            width: spaceSizeCol[1],
+            sortable: false,
+            editable: false,
+
+            renderCell: (params) => {
+                return (
+                    <>
+                        <p className={cx('text-container')}>
+                            {params?.value?.title ? params.value?.title : '[Không có thông tin]'}
+                        </p>
+                    </>
+                );
+            },
+        },
+
+        {
+            field: 'point_sale',
+            headerName: 'Khung giờ',
             sortable: true,
             editable: false,
             width: spaceSizeCol[2],
-            valueGetter: (params) => getCategoryName(params.row.categoryId),
+            renderCell: (params) => {
+                return (
+                    <p>{`${params.value * 3 < 10 ? `0${params.value * 3}` : params.value * 3}h - ${
+                        (params.value + 1) * 3 < 10 ? `0${(params.value + 1) * 3}` : (params.value + 1) * 3
+                    }h`}</p>
+                );
+            },
         },
         {
-            field: 'old_price',
-            headerName: 'Giá gốc',
+            field: 'date_sale',
+            headerName: 'Ngày sale',
             sortable: true,
             editable: false,
             width: spaceSizeCol[3],
-            valueFormatter: (params) => {
-                const price = params.value; // Giá gốc từ dữ liệu
-                if (typeof price === 'number') {
-                    // Kiểm tra nếu giá gốc là một số
-                    return price.toLocaleString('vi-VN', {
-                        style: 'currency',
-                        currency: 'VND',
-                    });
-                }
-                // Nếu không phải số, trả về giá trị ban đầu
-                return params.value;
+            renderCell: (params) => {
+                return <p>{params.value}</p>;
             },
         },
         {
-            field: 'published_date',
-            headerName: 'Đang giảm',
+            field: 'num_sale',
+            headerName: 'Số lượng',
+            sortable: true,
             editable: false,
             width: spaceSizeCol[4],
-            renderCell: (params) => {
-                return <p>{Math.ceil(((params.row.old_price - params.row.price) * 100) / params.row.old_price)} %</p>;
-            },
         },
         {
-            field: 'price',
-            headerName: 'Giá hiện tại',
-            sortable: true,
-            editable: false,
-            width: spaceSizeCol[5],
-            valueFormatter: (params) => {
-                const price = params.value; // Giá gốc từ dữ liệu
-                if (typeof price === 'number') {
-                    // Kiểm tra nếu giá gốc là một số
-                    return price.toLocaleString('vi-VN', {
-                        style: 'currency',
-                        currency: 'VND',
-                    });
-                }
-                // Nếu không phải số, trả về giá trị ban đầu
-                return params.value;
-            },
-        },
-        {
-            field: 'rate',
-            headerName: 'Đánh giá',
-            sortable: true,
-            editable: false,
-            width: spaceSizeCol[6],
-            renderCell: (params) => {
-                return <p>{params.value} sao</p>;
-            },
-        },
-        {
-            field: 'sold',
+            field: 'sold_sale',
             headerName: 'Đã bán',
             sortable: true,
             editable: false,
-            width: spaceSizeCol[7],
-        },
-        {
-            field: 'quantity',
-            headerName: 'Có sẵn',
-            sortable: true,
-            editable: false,
-            width: spaceSizeCol[8],
+            width: spaceSizeCol[5],
         },
 
         {
-            field: '_id',
+            field: 'current_sale',
+            headerName: 'Đang sale',
+            editable: false,
+            sortable: true,
+            width: spaceSizeCol[6],
+            renderCell: (params) => {
+                return <p>{params.value} %</p>;
+            },
+        },
+        {
+            field: 'is_loop',
+            headerName: 'Lặp',
+            editable: false,
+            sortable: true,
+            width: spaceSizeCol[7],
+            renderCell: (params) => {
+                return <p>{params.value === true ? 'Có' : 'Không'}</p>;
+            },
+        },
+        {
             headerName: 'Trạng thái',
             sortable: false,
             editable: false,
+            width: spaceSizeCol[8],
+            renderCell: (params) => {
+                const currentDate = new Date();
+                let current_point_sale = Math.floor(currentHourInVietnam / 3);
+                const year = currentDate.getUTCFullYear();
+                const month = (currentDate.getUTCMonth() + 1).toString().padStart(2, '0');
+                const day = currentDate.toString().slice(8, 10);
+                const utcTimeString = `${year}-${month}-${day}`;
+                let toDay = utcTimeString;
+
+                return (
+                    <p
+                        className={
+                            params.row.date_sale == toDay && params.row.point_sale == current_point_sale
+                                ? cx('flashSaleText')
+                                : params.row.date_sale > toDay ||
+                                  (params.row.date_sale == toDay && params.row.point_sale > current_point_sale)
+                                ? cx('noflashSaleText')
+                                : cx('')
+                        }
+                    >
+                        {params.row.date_sale == toDay && params.row.point_sale == current_point_sale
+                            ? 'FlashSale'
+                            : params.row.date_sale > toDay ||
+                              (params.row.date_sale == toDay && params.row.point_sale > current_point_sale)
+                            ? 'Đang đợi'
+                            : 'Hết hạn'}
+                    </p>
+                );
+            },
+        },
+        {
+            field: 'action',
+            headerName: 'Hành động',
+            sortable: true,
+            editable: false,
+            headerAlign: 'marginLeft',
             width: spaceSizeCol[9],
             renderCell: (params) => {
-                return <StateFlashSale params={params.value} isToggle={isToggle} />;
+                const currentDate = new Date();
+
+                let current_point_sale = Math.floor(currentHourInVietnam / 3);
+                const year = currentDate.getUTCFullYear();
+                const month = (currentDate.getUTCMonth() + 1).toString().padStart(2, '0');
+                const day = currentDate.toString().slice(8, 10);
+                const utcTimeString = `${year}-${month}-${day}`;
+                let toDay = utcTimeString;
+
+                return (
+                    <>
+                        <Button
+                            type="primary"
+                            ghost
+                            style={{
+                                margin: '0 10px 0 0',
+                            }}
+                            onClick={() => {
+                                navigate(`/admin/flashsale/${params.row._id}`);
+                            }}
+                        >
+                            Chi tiết
+                        </Button>
+
+                        <CustomPopconfirm
+                            title="Xóa flashsale?"
+                            description="Không hiển thị lại thông báo này"
+                            props={{
+                                disable:
+                                    params.row.date_sale == toDay && params.row.point_sale == current_point_sale
+                                        ? true
+                                        : params.row.date_sale > toDay ||
+                                          (params.row.date_sale == toDay && params.row.point_sale > current_point_sale)
+                                        ? false
+                                        : false,
+                                isloadingdelete: isloadingdelete,
+                            }}
+                            func={() => {
+                                setIsloadingdetele(true);
+                                console.log(params.row._id);
+                                authInstance(`/flashsales/delete/${params.row._id}`)
+                                    .then((result) => {
+                                        if (result.data.status == 'OK') {
+                                            //localStorage.setItem('isFlashsaleLoading', true);
+                                            setData({
+                                                data,
+                                                flashsales: data.flashsales.filter(
+                                                    (item) => item._id != params.row._id,
+                                                ),
+                                            });
+                                            setRows(data.flashsales.filter((item) => item._id != params.row._id));
+                                        }
+                                        setIsloadingdetele(false);
+                                    })
+                                    .catch((err) => console.log(err));
+                            }}
+                        />
+                    </>
+                );
             },
         },
     ];
 
-    console.log('sfyugasjh', rows, data);
+    const [suggestFlash, setSuggestFlash] = useState([]);
+
+    const [isToggle, setIsToggle] = useState(false); // khi bấm nút tiếp tục thì gọi hàm này để \tắt chọn những sản phẩm đã chọn
+
+    const [rows, setRows] = useState([]);
+    useEffect(() => {
+        if (Object.keys(data).length !== 0) {
+            var data1 = data.flashsales;
+            setRows(data1);
+            if (localStorage.getItem('isFlashsaleLoading')) {
+                //localStorage.removeItem('isFlashsaleLoading');
+                fetch(`${api}/flashsales?sort=reverse`)
+                    .then((response) => response.json())
+                    .then((result) => {
+                        setRows(result.data);
+                        setData({
+                            data,
+                            flashsales: result.data,
+                        });
+                        localStorage.removeItem('isFlashsaleLoading');
+                    })
+                    .catch((err) => console.log(err));
+            }
+        } else {
+            fetch(`${api}/flashsales?sort=reverse`)
+                .then((response) => response.json())
+                .then((result) => {
+                    setRows(result.data);
+                })
+                .catch((err) => console.log(err));
+        }
+    }, []);
 
     const filterOption = (input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
 
+    const sortOptions = [
+        {
+            label: 'Giá cao nhất',
+            value: 'price_desc',
+        },
+        {
+            label: 'Giá thấp nhất',
+            value: 'price_asc',
+        },
+        {
+            label: 'Đánh giá cao nhất',
+            value: 'rate_desc',
+        },
+        {
+            label: 'Đánh giá thấp nhất',
+            value: 'rate_asc',
+        },
+    ];
     const handleChangeCategory = (value, option) => {
         setSelectCategory(option);
     };
@@ -295,16 +393,7 @@ function CostumFlashSale() {
         setSelectCategory(null);
         setQuantity(null);
         setStatus(null);
-        //  setSelectSort(sortOptions[0]);
-        const productsToSort = [...(data?.products || temporary_data)];
-        const sortedProducts = productsToSort.sort((a, b) => a.title.localeCompare(b.title));
-
-        setRows(sortedProducts);
-
-        // setRows(
-        //     (data?.products).sort((a, b) => a.title.localeCompare(b.title)) ||
-        //         temporary_data.sort((a, b) => a.title.localeCompare(b.title)),
-        // );
+        setRows(data?.products);
     };
 
     const handleSearch = (value) => {
@@ -312,30 +401,24 @@ function CostumFlashSale() {
     };
 
     const sortProduct = (sort) => {
-        let newList2 = [...rows].sort((a, b) => {
+        const newList = [...data?.products].sort((a, b) => {
             if (sort.value == 'price_asc') {
                 return a.price - b.price;
             } else if (sort.value == 'price_desc') {
                 return b.price - a.price;
             } else if (sort.value == 'rate_asc') {
                 return a.rate - b.rate;
-            } else if (sort.value == 'rate_desc') {
-                return b.rate - a.rate;
             } else {
-                return a.title.localeCompare(b.title);
+                return b.rate - a.rate;
             }
         });
-        //  console.log('newList42222', newList);
-        //  setIsSort(false);
-        setRows(newList2);
+
+        setRows(newList);
     };
 
     const filterProduct = (rate, price, category, keywords, quantity, status) => {
-        let newList = data?.products?.length > 0 ? [...data.products] : [...temporary_data];
-        // console.log('dang filter', newList);
-        newList = newList.filter((product) => {
+        let newList = data?.products?.filter((product) => {
             if (keywords) {
-                // console.log('dang 123', product.title.toLowerCase().includes(keywords.toLowerCase()));
                 if (rate && price && selectCategory) {
                     if (price.valueMax) {
                         return (
@@ -448,59 +531,29 @@ function CostumFlashSale() {
             });
             newList = [...list3];
         }
-
-        newList !== undefined && setRows(newList); // : setRows(data.products);
+        setRows(newList);
     };
 
-    // console.log('dfyhasv', rows);
-
     useEffect(() => {
-        // console.log('dfyhsấasv', keywords, selectCategory, price, rate, quantity, status);
         filterProduct(rate, price, selectCategory, keywords, quantity, status);
-        setSelectSort(sortOptions[0]);
-        // setSelectSort
     }, [rate, price, selectCategory, keywords, quantity, status]);
 
     useEffect(() => {
         if (selectSort) {
             sortProduct(selectSort);
-            // setIsSort(false);
         }
     }, [selectSort]);
-
-    useEffect(() => {
-        if (data?.products?.length > 0) {
-            //var data1 = data.products;
-            // console.log('kdhas', data1);
-            handleClearFilter();
-            //setRows(data1.sort((a, b) => a.title.localeCompare(b.title)));
-        } else {
-            console.log('g321hádfb', data, temporary_data.length);
-            if (data.products?.length == 0) {
-                // ngăn load lại 2 lần data không cần thiết
-                // fetch(`${api}/products?perPage=50`)
-                //     .then((response) => response.json())
-                //     .then((result) => {
-                //         console.log('ghádfb2');
-                if (data?.tem_products?.length > 0) {
-                    // console.log('ghádfb3234', data.tem_products);
-                    setTemporary_data(data.tem_products);
-                    setRows([...data.tem_products].sort((a, b) => a.title.localeCompare(b.title)));
-                }
-            }
-        }
-    }, [data]);
 
     return (
         <div className={cx('wrapper')}>
             <div className={cx('top')}>
                 <p
                     style={{
-                        margin: '0 0 0 10px',
-                        flex: 2,
+                        margin: '0 0 0 15px',
+                        flex: 1.3,
                     }}
                 >
-                    THIẾT LẬP TÙY CHỈNH
+                    FLASH SALE
                 </p>
 
                 <div
@@ -521,55 +574,31 @@ function CostumFlashSale() {
                             </Marquee>
                         }
                         style={{
-                            width: '85%',
+                            width: '80%',
                             margin: '0 4% 0 0',
                             borderRadius: '6px',
                         }}
                     />
-                    {/* <p className={cx('btn_load')} onClick={handelLoading}>
-                        <AutorenewIcon className={cx('btn_icon_load')} />
-                    </p> */}
-                    <FlashSaleModal
-                        props={{ products: suggestFlash }}
-                        func={setIsToggle}
-                        isStatus={{
-                            isToggle: isToggle,
-                        }}
-                        style={'custom'}
-                    />
+
+                    <AddOptionModal container={container1} />
                 </div>
             </div>
-            <div className="flex items-center justify-between px[20px] py-[10px] shadow-sm border rounded-[6px] my-[10px]">
+            {/* a
+            <div className="flex items-center justify-between px[20px] py-[10px] shadow-sm border rounded-[6px] my-[20px]">
                 <div className="px-[20px] flex items-center">
                     <p className="text-[1.4rem] text-[#333] mr-[10px]">Sắp xếp theo: </p>
                     <Select
-                        disabled={data?.products?.length == 0 && temporary_data.length == 0}
                         className="w-[200px]"
                         placeholder="Chọn..."
                         options={sortOptions}
                         onChange={handleSortChange}
-                        value={
-                            selectSort
-                                ? {
-                                      label: selectSort.label,
-                                      value: selectSort.value,
-                                  }
-                                : null
-                        }
                     />
                 </div>
                 <div className="px-[20px] flex items-center">
-                    <Input.Search
-                        disabled={data?.products?.length == 0 && temporary_data.length == 0}
-                        onSearch={handleSearch}
-                        className="w-[400px]"
-                        placeholder="Tìm kiếm sản phẩm..."
-                        // value={keywords}
-                    />
+                    <Input.Search onSearch={handleSearch} className="w-[400px]" placeholder="Tìm kiếm sản phẩm..." />
                 </div>
                 <div className="px-[20px] flex items-center">
                     <Tippy
-                        disabled={data?.products?.length == 0 && temporary_data.length == 0}
                         interactive={true}
                         visible={showFilter}
                         placement="bottom"
@@ -744,22 +773,27 @@ function CostumFlashSale() {
                         </Button>
                     </Tippy>
                 </div>
-            </div>
-            <div className={cx('table')}>
-                <EnhancedTable
-                    columns={columns}
-                    rows={rows}
-                    func={setSuggestFlash}
-                    isStatus={{
-                        isToggle: isToggle,
-                    }}
-                    pageSize={12}
-                    type="customFlashsale"
-                    height="66vh"
-                />
+            </div> */}
+            <div className={cx('content')}>
+                <div className={cx('table')}>
+                    <EnhancedTable
+                        ischeckboxSelection={false}
+                        columns={columns}
+                        rows={rows.map((row, index) => ({
+                            ...row,
+                            rowNumber: index + 1,
+                        }))}
+                        func={setSuggestFlash}
+                        isStatus={{
+                            isToggle: isToggle,
+                        }}
+                        pageSize={12}
+                    />
+                </div>
+                <div className={cx('state')}>{rows && <BarChartExample data={rows} />}</div>
             </div>
         </div>
     );
 }
 
-export default CostumFlashSale;
+export default FlashSale;

@@ -4,21 +4,23 @@ import classNames from 'classnames/bind';
 import styles from './IncomeChart.module.scss';
 import { Point } from 'victory';
 
-const cx = classNames.bind(styles)
+const cx = classNames.bind(styles);
 
 const formatPrice = (price) => {
-    return price >= 1000000 ? `${(price / 1000000).toFixed(2)}M` : `${(price / 1000).toFixed(2)}K`
-}
+    return price >= 1000000 ? `${(price / 1000000).toFixed(2)}M` : `${(price / 1000).toFixed(2)}K`;
+};
 
 function IncomeChart({ data, size, setClick }) {
     const handleMouseMove = (e) => {
-        const xPos = e.activePayload[0]?.payload?.id;
+        console.log('daynee', e);
+        const xPos = e == null ? 0 : e?.activePayload[0]?.payload?.id;
         // Xác định dữ liệu tại vị trí đó
         const dataPoint = data.find((item) => item.id === xPos); // Giả sử bạn có dữ liệu có trường 'x'
-        setClick !== undefined && setClick(dataPoint.id);
+        console.log('dataPoint', dataPoint);
+        setClick !== undefined && setClick(dataPoint?.id);
     };
     return (
-        <div className='py-[20px]'>
+        <div className="py-[20px]">
             <ResponsiveContainer width="100%" aspect={size}>
                 <AreaChart
                     fontSize={'1.3rem'}
@@ -48,7 +50,6 @@ function IncomeChart({ data, size, setClick }) {
                         fillOpacity={1}
                         fill="url(#income)"
                     />
-
                 </AreaChart>
             </ResponsiveContainer>
         </div>
