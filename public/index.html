@@ -44,7 +44,8 @@
     chatbox.setAttribute("attribution", "biz_inbox");
 
     var pathName = window.location.pathname
-    if (pathName.startsWith("admin")) {
+    console.log(pathName)
+    if (pathName.startsWith("/admin")) {
       chatbox.hidden
     }
   </script>
