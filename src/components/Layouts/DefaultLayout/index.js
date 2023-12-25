@@ -36,8 +36,9 @@ function DefaultLayout(props) {
 
         if (isDeploy) {
             var chat_content = document.querySelector(".fb_dialog_content")
-            chat_content.style.display = 'block';
-        }
+            if (chat_content) {
+                chat_content.style.display = 'block';
+            }
     }, [])
 
     setInterval(() => {
