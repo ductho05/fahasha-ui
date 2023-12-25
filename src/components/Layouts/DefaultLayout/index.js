@@ -11,7 +11,7 @@ import { useStore } from '../../../stores/hooks';
 import Button from '../../Button';
 import { logout, noAction } from '../../../stores/actions';
 import localstorge from '../../../stores/localstorge';
-import { api } from '../../../constants';
+import { api, isDeploy } from '../../../constants';
 import { LOGOUT, LOGIN, REGISTER } from '../../../stores/constants';
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
@@ -31,6 +31,15 @@ function DefaultLayout(props) {
     useEffect(() => {
         props.setIsLogin(localstorage.get().length > 0);
     }, [state]);
+
+    useEffect(() => {
+
+        if (isDeploy) {
+            var chat_content = document.querySelector(".fb_dialog_content")
+            chat_content.style.display = 'block';
+        }
+    }, [])
+
     setInterval(() => {
         if (isLogin()) {
             axios
@@ -62,8 +71,12 @@ function DefaultLayout(props) {
             dispatch(noAction());
             setExpired(false);
         } else if (state.action == LOGIN) {
-            console.log('Login thanh cong');
-            navigate('/');
+            console.log(state.user)
+            if (state.user.isManager) {
+                navigate('/admin');
+            } else {
+                navigate('/');
+            }
             toast.success('Đăng nhập thành công');
             dispatch(noAction());
             setExpired(false);

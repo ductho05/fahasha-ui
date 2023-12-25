@@ -57,6 +57,7 @@ button {
 .MuiDialog-paperScrollPaper,
 .MuiDialog-paperWidthSm,
 .css-1t1j96h-MuiPaper-root-MuiDialog-paper,
+.mce-content-body,
 body {
     &::-webkit-scrollbar {
         width: 5px;
@@ -106,4 +107,8 @@ body {
 
 .ant-notification-notice-icon {
     top: 6px;
+}
+
+.tox-statusbar__branding {
+    display: none;
 }

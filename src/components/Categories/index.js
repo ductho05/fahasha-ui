@@ -1,6 +1,7 @@
 import classNames from 'classnames/bind'
 import styles from './Categories.module.scss'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
+import { Link } from 'react-router-dom'
 
 const cx = classNames.bind(styles)
 function Categories({ categoryList }) {
@@ -12,13 +13,13 @@ function Categories({ categoryList }) {
             </div>
             <ul className={cx('body')}>
                 {
-                    categoryList.map((category, index) => (
-                        <li key={index} className={cx('category_item')}>
-                            <a href='#' className={cx('category_link')}>
+                    categoryList.map((category) => (
+                        <Link to={`/seemore-product/${category.id}`} key={category.id} className={cx('category_item')}>
+                            <div className={cx('category_link')}>
                                 <LazyLoadImage src={category.image} />
                                 <p>{category.title}</p>
-                            </a>
-                        </li>
+                            </div>
+                        </Link>
                     ))
                 }
             </ul>

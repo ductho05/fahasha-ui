@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import styles from './AdminLayout.module.scss';
 import SideBar from './SideBar/Sidebar';
 import NavBar from './NavBar/NavBar';
-import { api } from '../../../constants';
+import { api, isDeploy } from '../../../constants';
 import { Progress } from 'antd';
 import { Scrollbar } from 'react-scrollbars-custom';
 import lottie from 'lottie-web';
@@ -89,77 +89,82 @@ function AdminLayout({ children }) {
               },
     );
 
-    console.log('afuhuadjnf', data, isLoaded.products);
+    if (isDeploy) {
+        var chat_content = document.querySelector(".fb_dialog_content")
+        chat_content.style.display = 'none';
+    }
 
-    // useEffect(() => {
-    //     // Hàm này sẽ được gọi khi component được mount và mỗi khi localStorage thay đổi.
-    //     const handleStorageChange = (e) => {
-    //         if (e.key === 'temporary_data') {
-    //             // Xử lý khi có thay đổi trong localStorage với key là 'yourLocalStorageKey'.
-    //             const updatedValue = e.newValue; // Giá trị mới từ localStorage.
-    //             console.log('LocalStorage has changed:', updatedValue);
-    //         }
-    //     };
+}, [])
 
-    //     // Đăng ký sự kiện lắng nghe thay đổi trong localStorage.
+// useEffect(() => {
+//     // Hàm này sẽ được gọi khi component được mount và mỗi khi localStorage thay đổi.
+//     const handleStorageChange = (e) => {
+//         if (e.key === 'temporary_data') {
+//             // Xử lý khi có thay đổi trong localStorage với key là 'yourLocalStorageKey'.
+//             const updatedValue = e.newValue; // Giá trị mới từ localStorage.
+//             console.log('LocalStorage has changed:', updatedValue);
+//         }
+//     };
 
-    //     // Trả về một hàm xử lý để huỷ bỏ sự kiện khi component bị unmounted.
-    //     return () => {
-    //         window.removeEventListener('storage', handleStorageChange);
-    //     };
-    // });
+//     // Đăng ký sự kiện lắng nghe thay đổi trong localStorage.
 
-    // window.addEventListener('storage', handleStorageChange);
+//     // Trả về một hàm xử lý để huỷ bỏ sự kiện khi component bị unmounted.
+//     return () => {
+//         window.removeEventListener('storage', handleStorageChange);
+//     };
+// });
 
-    // function handleStorageChange(e) {
-    //     //console.log('LocalStorage has changed:', e);
-    // }
+// window.addEventListener('storage', handleStorageChange);
 
-    // useEffect(() => {
-    //     setIsLoaded((prev) => ({ ...prev, flashsales: false }));
-    //     if (JSON.parse(localStorage.getItem('temporary_data')).flashsales.length == 0) {
-    //         fetch(`${api}/flashsales`)
-    //             .then((response) => response.json())
-    //             .then((result) => {
-    //                 setData2((prev) => ({ ...prev, flashsales: result.data }));
-    //                 setIsLoaded((prev) => ({ ...prev, flashsales: true }));
-    //             })
-    //             .catch((err) => console.log(err));
-    //     }
-    // }, [isLoaded.flashsales]);
+// function handleStorageChange(e) {
+//     //console.log('LocalStorage has changed:', e);
+// }
 
-    useEffect(() => {
-        lottie.loadAnimation({
-            container: container.current,
-            renderer: 'svg',
-            loop: true,
-            autoplay: true,
-            animationData: require('../../../assets/json/loadAdminPage.json'),
-        });
-        if (Object.keys(data).length === 0) {
-            // setIsLoaded([false, false]);
-            setIsLoaded((prev) => ({ ...prev, products: true }));
-            fetch(`${api}/products?perPage=${maxProducts}&page=1`)
-                .then((response) => {
-                    return response.json();
-                })
-                .then((flashsales) => {
-                    console.log('flashsales121', flashsales);
-                    setData({ ...data, products: flashsales.data.products });
-                    //setIsLoaded((prev) => ({ ...prev, products: true }));
-                })
-                .catch((err) => console.log(err));
+// useEffect(() => {
+//     setIsLoaded((prev) => ({ ...prev, flashsales: false }));
+//     if (JSON.parse(localStorage.getItem('temporary_data')).flashsales.length == 0) {
+//         fetch(`${api}/flashsales`)
+//             .then((response) => response.json())
+//             .then((result) => {
+//                 setData2((prev) => ({ ...prev, flashsales: result.data }));
+//                 setIsLoaded((prev) => ({ ...prev, flashsales: true }));
+//             })
+//             .catch((err) => console.log(err));
+//     }
+// }, [isLoaded.flashsales]);
 
-            fetch(`${api}/products?perPage=${perPage}&page=1`)
-                .then((response) => {
-                    return response.json();
-                })
-                .then((flashsales) => {
-                    console.log('flashsales121', flashsales);
-                    setData2((prev) => ({ ...prev, tem_products: flashsales.data.products }));
-                    setIsLoaded((prev) => ({ ...prev, tem_products: true }));
-                })
-                .catch((err) => console.log(err));
+useEffect(() => {
+    lottie.loadAnimation({
+        container: container.current,
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        animationData: require('../../../assets/json/loadAdminPage.json'),
+    });
+    if (Object.keys(data).length === 0) {
+        // setIsLoaded([false, false]);
+        setIsLoaded((prev) => ({ ...prev, products: true }));
+        fetch(`${api}/products?perPage=${maxProducts}&page=1`)
+            .then((response) => {
+                return response.json();
+            })
+            .then((flashsales) => {
+                console.log('flashsales121', flashsales);
+                setData({ ...data, products: flashsales.data.products });
+                //setIsLoaded((prev) => ({ ...prev, products: true }));
+            })
+            .catch((err) => console.log(err));
+
+        fetch(`${api}/products?perPage=${perPage}&page=1`)
+            .then((response) => {
+                return response.json();
+            })
+            .then((flashsales) => {
+                console.log('flashsales121', flashsales);
+                setData2((prev) => ({ ...prev, tem_products: flashsales.data.products }));
+                setIsLoaded((prev) => ({ ...prev, tem_products: true }));
+            })
+            .catch((err) => console.log(err));
 
             // fetch(`${api}/favorites`)
             //     .then((response) => response.json())
@@ -177,36 +182,36 @@ function AdminLayout({ children }) {
                 })
                 .catch((err) => console.log(err));
 
-            fetch(`${api}/evaluates/get`)
-                .then((response) => response.json())
-                .then((result) => {
-                    setData2((prev) => ({ ...prev, evaluates: result.data }));
-                    setIsLoaded((prev) => ({ ...prev, evaluates: true }));
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-            fetch(`${api}/categories?filter=simple`)
-                .then((response) => response.json())
-                .then((result) => {
-                    if (result.status == 'OK') {
-                        setData2((prev) => ({ ...prev, categories: result.data }));
-                        setIsLoaded((prev) => ({ ...prev, categories: true }));
-                    }
-                })
-                .catch((err) => console.log(err.message));
+        fetch(`${api}/evaluates/get`)
+            .then((response) => response.json())
+            .then((result) => {
+                setData2((prev) => ({ ...prev, evaluates: result.data }));
+                setIsLoaded((prev) => ({ ...prev, evaluates: true }));
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+        fetch(`${api}/categories?filter=simple`)
+            .then((response) => response.json())
+            .then((result) => {
+                if (result.status == 'OK') {
+                    setData2((prev) => ({ ...prev, categories: result.data }));
+                    setIsLoaded((prev) => ({ ...prev, categories: true }));
+                }
+            })
+            .catch((err) => console.log(err.message));
 
-            authInstance
-                .post('/orders/filter')
-                .then((result) => {
-                    if (result.data.status === 'OK') {
-                        setData2((prev) => ({ ...prev, orders: result.data.data }));
-                        setIsLoaded((prev) => ({ ...prev, orders: true }));
-                    }
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
+        authInstance
+            .post('/orders/filter')
+            .then((result) => {
+                if (result.data.status === 'OK') {
+                    setData2((prev) => ({ ...prev, orders: result.data.data }));
+                    setIsLoaded((prev) => ({ ...prev, orders: true }));
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+            });
 
             authInstance
                 .get('/favorites')
@@ -261,7 +266,7 @@ function AdminLayout({ children }) {
         }
     }, [isLoaded]);
 
-    //console.log('AA', !(isLoaded.flashsales && isLoaded.products) && !localStorage.getItem('temporary_data'));
+//console.log('AA', !(isLoaded.flashsales && isLoaded.products) && !localStorage.getItem('temporary_data'));
 
     return (
         <>
