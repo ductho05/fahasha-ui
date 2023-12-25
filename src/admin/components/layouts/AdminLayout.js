@@ -89,10 +89,10 @@ function AdminLayout({ children }) {
               },
     );
 
-    if (isDeploy) {
-        var chat_content = document.querySelector(".fb_dialog_content")
-        chat_content.style.display = 'none';
-    }
+    // if (isDeploy) {
+    //     var chat_content = document.querySelector(".fb_dialog_content")
+    //     chat_content.style.display = 'none';
+    // }
 
 // }, [])
 
