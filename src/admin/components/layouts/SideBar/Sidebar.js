@@ -14,11 +14,12 @@ import AccountBoxOutlinedIcon from '@mui/icons-material/AccountBoxOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { Scrollbar } from 'react-scrollbars-custom';
 import CategoryIcon from '@mui/icons-material/Category';
-
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import ReviewsIcon from '@mui/icons-material/Reviews';
 
 const cx = classNames.bind(styles);
-const tabList = [
+
+export const tabList = [
     {
         type: 'main',
         tabs: [
@@ -55,7 +56,7 @@ const tabList = [
                 id: 4,
                 icon: CategoryIcon,
                 name: 'Loại sản phẩm',
-                link: '/admin/categories'
+                link: '/admin/categories',
             },
             {
                 id: 5,
@@ -63,25 +64,31 @@ const tabList = [
                 name: 'Đánh giá',
                 link: '/admin/reviews',
             },
+            {
+                id: 6,
+                icon: FavoriteIcon,
+                name: 'Sản phẩm yêu thích',
+                link: '/admin/wishlists',
+            },
         ],
     },
     {
         type: 'useful',
         tabs: [
             {
-                id: 6,
+                id: 7,
                 icon: StackedLineChartOutlinedIcon,
                 name: 'Thống kê',
                 link: '/admin/statistics',
             },
             {
-                id: 7,
+                id: 8,
                 icon: NotificationsNoneOutlinedIcon,
                 name: 'Thông báo',
                 link: '/admin/notifications',
             },
             {
-                id: 8,
+                id: 9,
                 icon: LoyaltyIcon,
                 name: 'Flash Sale',
                 link: '/admin/flashsale',
@@ -92,13 +99,13 @@ const tabList = [
         type: 'users',
         tabs: [
             {
-                id: 9,
+                id: 10,
                 icon: AccountBoxOutlinedIcon,
-                name: 'Thông tin tài khoản',
-                link: '/account/0',
+                name: 'Thông tin nhân viên',
+                link: '/admin/account',
             },
             {
-                id: 10,
+                id: 11,
                 icon: LogoutOutlinedIcon,
                 name: 'Đăng xuất',
             },
