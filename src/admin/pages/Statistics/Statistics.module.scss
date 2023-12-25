@@ -110,6 +110,22 @@
     }
 }
 
+.top {
+    margin: 5px 0 0.8% 0;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
+    -webkit-box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
+    -moz-box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
+    font-size: 2.2rem;
+    // text-align: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 80px;
+}
+
 .bottom {
     background-color: #fff;
     box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);

@@ -180,7 +180,9 @@ function OrderDetail() {
                                 <ul className={cx('product_list')}>
                                     {
                                         orderItems.map((item, index) => (
-                                            <li key={index} className={cx('product_item')}>
+                                            <li key={index} className={cx('product_item')} onClick={()=>{
+                                                navigate(`/product-detail/${item.product._id}`)
+                                            }}>
                                                 <div className={cx('thumbnail')}>
                                                     <img src={item.product.images} />
                                                 </div>

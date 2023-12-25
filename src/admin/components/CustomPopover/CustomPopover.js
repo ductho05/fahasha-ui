@@ -181,7 +181,13 @@ const App = ({ maxProduct, func, props, type }) => {
             open={clicked}
             onOpenChange={handleClickChange}
         >
-            <p className={props}>
+            <p
+                className={props}
+                style={{
+                    margin: '0 0 0 0',
+                    color: clicked ? '#1890ff' : 'black',
+                }}
+            >
                 <TuneIcon fontSize="large" />
             </p>
         </Popover>
