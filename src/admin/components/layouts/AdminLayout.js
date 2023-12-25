@@ -94,7 +94,7 @@ function AdminLayout({ children }) {
         chat_content.style.display = 'none';
     }
 
-}, [])
+// }, [])
 
 // useEffect(() => {
 //     // Hàm này sẽ được gọi khi component được mount và mỗi khi localStorage thay đổi.
