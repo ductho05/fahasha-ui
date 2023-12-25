@@ -1,4 +1,4 @@
-export const isDeploy = true;
+export const isDeploy = false;
 export const api = isDeploy ? 'https://bookstore-ta-v3.onrender.com/bookstore/api/v1' : 'http://127.0.0.1:3000/bookstore/api/v1';
 // export const api = 'http://127.0.0.1:3000/bookstore/api/v1';
 export const apiProvinces = 'https://provinces.open-api.vn/api/?depth=3';
@@ -13,6 +13,9 @@ export const cancelOrderImage =
     'https://commercemarketplace.adobe.com/media/catalog/product/f/8/f80e_cancel-order-240x240_3.png';
 
 export const flashSaleImage = 'https://img.freepik.com/free-vector/special-flash-sale-modern-banner-design-vector-illustration_1017-38337.jpg'
+
+export const lockImage = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSg-9Ld8ptDN8JEy1oAwnE3etK_9Zn-xaAeEw&usqp=CAU'
+export const unLockImage = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWOKkU25svJ7cINb3fMH2Pxo_6KOGUm-A9JQ&usqp=CAU'
 
 export const listJustWatched = JSON.parse(localStorage.getItem('mycategory')) || [];
 

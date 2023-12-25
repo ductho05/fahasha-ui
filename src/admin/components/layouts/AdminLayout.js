@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import styles from './AdminLayout.module.scss';
 import SideBar from './SideBar/Sidebar';
 import NavBar from './NavBar/NavBar';
-import { api } from '../../../constants';
+import { api, isDeploy } from '../../../constants';
 import { Progress } from 'antd';
 import { Scrollbar } from 'react-scrollbars-custom';
 import lottie from 'lottie-web';
@@ -53,8 +53,11 @@ function AdminLayout({ children }) {
 
     useEffect(() => {
 
-        var chat_content = document.querySelector(".fb_dialog_content")
-        chat_content.style.display = 'none';
+        if (isDeploy) {
+            var chat_content = document.querySelector(".fb_dialog_content")
+            chat_content.style.display = 'none';
+        }
+
     }, [])
 
     // useEffect(() => {

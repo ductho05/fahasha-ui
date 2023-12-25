@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import classNames from "classnames/bind"
 import styles from './Users.module.scss'
 import EnhancedTable from "../../components/Table/EnhancedTable"
-import { api, superAdmin } from '../../../constants'
+import { api, appPath, lockImage, superAdmin, unLockImage } from '../../../constants'
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import { Delete, View } from '../../components/Button/Button';
 import { confirmAlert } from 'react-confirm-alert';
@@ -14,13 +14,13 @@ import LinearProgress from '@mui/material/LinearProgress';
 import { Dialog } from "@mui/material"
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import DropMenu from "../../../components/DropMenu"
-import Button from "../../../components/Button"
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { CircularProgress, Backdrop } from "@mui/material"
-import { Input, Form, Skeleton, DatePicker, Popconfirm, Modal, message } from 'antd';
+import { Input, Form, Skeleton, DatePicker, Popconfirm, Modal, message, Tooltip, Button } from 'antd';
 import { getAuthInstance } from "../../../utils/axiosConfig"
 import { useData } from "../../../stores/DataContext"
 import { useNavigate } from "react-router-dom"
+import { LockOutlined, SendOutlined, UnlockOutlined } from "@ant-design/icons"
 
 const cx = classNames.bind(styles)
 
@@ -46,13 +46,15 @@ function Users() {
     const [avatar, setAvatar] = useState()
     const [showDialog, setShowDialog] = useState(false)
     const [birth, setBirth] = useState()
-    const [loadingUsers, setLoadingUsers] = useState(false)
+    const [loading, setLoading] = useState(false)
     const [isAction, setIsAction] = useState(false)
     const [gender, setGender] = useState()
     const [isInsert, setIsInsert] = useState(false)
     const { data, setData } = useData()
     const [isSuperAdmin, setIsSuperAdmin] = useState(false)
-    const [superAdminCode, setSuperAdminCode] = useState("")
+    const [superAdminCode, setSuperAdminCode] = useState("superadmin1811")
+    const [showFormLockAccount, setShowFormLockAccount] = useState(false)
+    const [userLock, setUserLock] = useState({})
     const [role, setRole] = useState({
         title: '-- Chọn --',
         value: '',
@@ -94,6 +96,12 @@ function Users() {
             renderCell: (params) => <p className={params.value ? cx('ismanager', 'manager') : cx('ismanager', 'customer')}>{params.value ? "Quản lý" : "Khách hàng"}</p>
         },
         {
+            field: 'isLock',
+            headerName: 'Trạng thái',
+            width: 120,
+            renderCell: (params) => <p className={`${params ? params.value === true ? "text-red-500" : "text-green-500" : "text-green-500"}`}>{params ? params.value === true ? "Tạm khóa" : "Hoạt động" : "Hoạt động"}</p>
+        },
+        {
             field: '_id',
             headerName: 'Hành động',
             disableColumnMenu: true,
@@ -104,38 +112,36 @@ function Users() {
                     e.stopPropagation();
                 }
 
-                const handleDelete = () => {
-                    setIsInsert(true)
-                    authInstance.delete(`/users/delete/${params.value}`)
-                        .then(result => {
-                            if (result.data.status === 'OK') {
-                                setIsAction(prev => !prev)
-                                toast.success('Xóa thành công!')
-                                fetchUsers()
-                            } else {
-                                toast.error(result.message)
-                            }
-                            setIsInsert(false)
-                        })
-                        .catch(err => {
-                            toast.error(err.message)
-                            setIsInsert(false)
-                        })
+                const handleLockUnLock = () => {
+
+                    let isLock = true;
+                    if (params.row.hasOwnProperty('isLock') && params.row.isLock === true) {
+                        isLock = false;
+                    }
+                    setShowFormLockAccount(true)
+                    setUserLock({
+                        id: params.row._id,
+                        email: params.row.email,
+                        isLock
+                    })
                 }
 
                 return <div style={{ display: 'flex' }} onClick={handleOnCLick}>
-                    <Popconfirm
-                        title="Xác nhận?"
-                        description="Tài khoản sẽ bị xóa khỏi hệ thống"
-                        onConfirm={handleDelete}
-                        onCancel={() => { }}
-                        okText="Đồng ý"
-                        cancelText="Hủy"
-                    >
-                        <p>
-                            <Delete />
-                        </p>
-                    </Popconfirm>
+                    <Tooltip title={
+                        params.row.hasOwnProperty('isLock') ? params.row.isLock === true
+                            ? "Mở khóa"
+                            : "Khóa tài khoản"
+                            : "Khóa tài khoản"
+                    }>
+                        <Button onClick={handleLockUnLock} className="mr-[20px]" icon={
+                            params.row.hasOwnProperty('isLock') ? params.row.isLock === true
+                                ? <UnlockOutlined />
+                                : <LockOutlined />
+                                : <LockOutlined />
+
+                        } danger
+                        />
+                    </Tooltip>
                     <Link to={`/admin/user/${params.value}`}>
                         <View />
                     </Link>
@@ -260,6 +266,57 @@ function Users() {
     const handleCancelCheck = () => {
 
         navigate("/admin")
+    }
+
+    const handleUpdateData = (user) => {
+
+        console.log(user)
+        const newListUser = data.users?.map(u => {
+            if (u._id === user._id) {
+                return { ...user }
+            } else return u
+        })
+        console.log(newListUser)
+
+        setData({ ...data, users: newListUser })
+    }
+
+    const onLock = async (value) => {
+
+        setLoading(true)
+        await authInstance.put(`/users/update/${userLock.id}`, {
+            isLock: userLock.isLock
+        })
+            .then(async (result) => {
+                if (result.data.status === 'OK') {
+
+                    handleUpdateData(result.data.data)
+                    const image = userLock.isLock ? lockImage : unLockImage
+                    await authInstance.post(`/webpush/send`, {
+                        filter: "personal",
+                        notification: {
+                            ...value,
+                            user: userLock.id,
+                            url: `${appPath}/account/0`,
+                            image
+                        }
+                    })
+                        .then(result => {
+
+                        })
+                        .catch((err) => {
+                            console.log(err)
+                        })
+                    toast.success('Cập nhật thành công!')
+                    setShowFormLockAccount(false)
+                }
+                setLoading(false)
+            })
+            .catch((err) => {
+                toast.error(err.message);
+                setLoading(false)
+                console.log(err)
+            });
     }
 
     return (
@@ -463,10 +520,81 @@ function Users() {
             </Dialog>
             <Backdrop
                 sx={{ color: '#fff', zIndex: 10000 }}
-                open={isInsert}
+                open={loading}
             >
-                {isInsert && <CircularProgress color="error" />}
+                {<CircularProgress color="error" />}
             </Backdrop>
+            <Dialog
+                open={showFormLockAccount}
+                onClose={() => setShowFormLockAccount(false)}
+            >
+                <div className="px-[20px] pt-[30px] w-[35vw]">
+                    <Form
+                        labelCol={{
+                            span: 5,
+                        }}
+                        wrapperCol={{
+                            span: 20,
+                        }}
+                        style={{
+                            maxWidth: "100%",
+                        }}
+                        onFinish={onLock}
+                        autoComplete="off"
+                    >
+                        {
+                            <Form.Item
+                                initialValue={userLock.email}
+                                label="Gửi đến"
+                                name="user"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Nội dung này không được để trống!',
+                                    },
+                                ]}
+                            >
+                                <Input />
+                            </Form.Item>
+                        }
+                        <Form.Item
+                            initialValue={"Thông báo tài khoản"}
+                            label="Tiêu đề"
+                            name="title"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Nội dung này không được để trống!',
+                                },
+                            ]}
+                        >
+                            <Input />
+                        </Form.Item>
+
+                        <Form.Item
+                            initialValue={`${userLock.hasOwnProperty("isLock") ? userLock.isLock === false ? "Tài khoản của bạn đã được mở khóa. Quý khách có thể mua hàng trở lại!" : "Hệ thống xác nhận gần đây bạn hủy quá nhiều đơn hàng. Tài khoản của bạn sẽ bị tạm khóa cho đến khi được mở lại" : "Hệ thống xác nhận gần đây bạn hủy quá nhiều đơn hàng. Tài khoản của bạn sẽ bị tạm khóa cho đến khi được mở lại"}`}
+                            label="Mô tả"
+                            name="description"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Nội dung này không được để trống!',
+                                },
+                            ]}
+                        >
+                            <Input.TextArea rows={5} />
+                        </Form.Item>
+
+                        <Form.Item
+                        >
+                            <Button htmlType="submit" icon={<SendOutlined />}>
+                                Gửi
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                </div>
+            </Dialog>
+
             <div className={cx('heading')}>
                 <h3>Quản lý tài khoản</h3>
                 <p onClick={handleShowDialog} className={cx('btn_add_new')}>
@@ -475,20 +603,8 @@ function Users() {
                 </p>
             </div>
             {
-                loadingUsers === false ?
-                    <div className={cx('table')}>
-                        {
-                            isSuperAdmin && <EnhancedTable columns={columns} rows={rows} />
-                        }
-                    </div>
-                    : <div className="mt-[20px]">
-                        <Skeleton
-                            active
-                            paragraph={{
-                                rows: 8,
-                            }}
-                        />
-                    </div>
+                isSuperAdmin &&
+                <EnhancedTable columns={columns} rows={rows} />
             }
         </div>
     )

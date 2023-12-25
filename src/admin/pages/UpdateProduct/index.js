@@ -15,6 +15,8 @@ import { DatePicker, Select } from 'antd';
 import { Skeleton } from 'antd';
 import { getAuthInstance } from '../../../utils/axiosConfig'
 import { useData } from '../../../stores/DataContext'
+import { Editor } from '@tinymce/tinymce-react'
+import { replaceInvalidDateByNull } from '@mui/x-date-pickers/internals'
 
 const cx = classNames.bind(styles)
 
@@ -39,6 +41,7 @@ function UpdateProduct() {
     const [imageErrors, setImageError] = React.useState(null)
     const [priceErrors, setPriceError] = React.useState(null)
     const [publishedErrors, setPublishedError] = React.useState(null)
+    const [desciption, setDesciption] = React.useState(null)
 
     const {
         register,
@@ -180,7 +183,7 @@ function UpdateProduct() {
     }, [avatar]);
 
     const onSubmit = async (data) => {
-        console.log(data)
+
         const formData = new FormData()
         Object.keys(data).forEach(key => {
             formData.append(key, data[key])
@@ -190,6 +193,9 @@ function UpdateProduct() {
         }
         if (published != product.published_date) {
             formData.set('published_date', published)
+        }
+        if (desciption) {
+            formData.set("desciption", desciption)
         }
         formData.set("categoryId", categoryName.value)
         formData.set('rate', product.rate)
@@ -226,13 +232,19 @@ function UpdateProduct() {
     React.useEffect(() => {
 
         if (product.title != watch("title") || product.author != watch("author") || product.price != watch("price") || product.old_price != watch("old_price") ||
-            product.quantity != watch("quantity") || product.desciption != watch("desciption") || product.categoryId._id != categoryName.value || published != product.published_date || avatar) {
+            product.quantity != watch("quantity") || product.desciption != desciption || product.categoryId._id != categoryName.value || published != product.published_date || avatar) {
             setIsChanged(true)
         } else {
             setIsChanged(false)
         }
 
-    }, [watch(), avatar])
+    }, [watch(), avatar, desciption])
+
+    const handleEditorChange = (value) => {
+
+        setDesciption(value)
+
+    }
 
     return (
         <>
@@ -293,7 +305,7 @@ function UpdateProduct() {
                                     </div>
                                     {imageErrors && <p className='text-red-500 my-[10px] text-[1.4rem]'>{imageErrors}</p>}
                                     <p className={cx('label')}>Mô tả</p>
-                                    <TextField
+                                    {/* <TextField
                                         {...register('desciption', { required: true })}
                                         multiline
                                         fullWidth
@@ -308,6 +320,25 @@ function UpdateProduct() {
                                                 backgroundColor: "#fff"
                                             }
                                         }}
+                                    /> */}
+                                    <Editor
+
+                                        apiKey='d5t4u2d5qyjye0wlx6xiu3sznmxxu7p9ltiwar6n22xi56ln'
+                                        init={{
+                                            plugins: 'spellchecker tinycomments mentions anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker a11ychecker typography inlinecss',
+                                            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | align lineheight | tinycomments | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+                                            tinycomments_mode: 'embedded',
+                                            tinycomments_author: 'Author name',
+                                            spellchecker_language: 'vi_VN',
+                                            spellchecker_underline: false,
+                                            mergetags_list: [
+                                                { value: 'First.Name', title: 'First Name' },
+                                                { value: 'Email', title: 'Email' },
+                                            ]
+                                        }}
+                                        value={desciption}
+                                        initialValue={product.desciption}
+                                        onEditorChange={handleEditorChange}
                                     />
                                     {errors?.desciption && <p className='text-red-500 my-[10px] text-[1.4rem]'>Vui lòng nhập mô tả</p>}
                                 </div>
