@@ -5,7 +5,6 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import UserProvider from './stores/provider';
 import { DataProvider } from './stores/DataContext';
-import { CustomChat, FacebookProvider } from 'react-facebook'
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <UserProvider>

@@ -8,6 +8,7 @@ import { useStore } from './stores/hooks';
 import { Button, notification, Space } from 'antd';
 import AdminLayout from './admin/components/layouts/AdminLayout';
 import ServiceWorkerNotifi from './service/ServiceWorkerNotifi';
+import { CustomChat, FacebookProvider } from 'react-facebook'
 
 function DeniedPermission({ type }) {
     type == 'admin'
