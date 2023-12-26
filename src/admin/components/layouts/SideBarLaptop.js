@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import styles from './SideBar/SideBar.module.scss';
@@ -14,100 +14,100 @@ import AccountBoxOutlinedIcon from '@mui/icons-material/AccountBoxOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import ReviewsIcon from '@mui/icons-material/Reviews';
 import CategoryIcon from '@mui/icons-material/Category';
-import { Tooltip } from 'antd'
+import { Tooltip } from 'antd';
+import { tabList } from './SideBar/Sidebar';
 
-const tabList = [
-    {
-        type: 'main',
-        tabs: [
-            {
-                id: 0,
-                icon: DashboardIcon,
-                name: 'Dashboard',
-                link: '/admin',
-            },
-        ],
-    },
-    {
-        type: 'lists',
-        tabs: [
-            {
-                id: 1,
-                icon: PersonOutlineOutlinedIcon,
-                name: 'Người dùng',
-                link: '/admin/user',
-            },
-            {
-                id: 2,
-                icon: Inventory2OutlinedIcon,
-                name: 'Sản phẩm',
-                link: '/admin/products',
-            },
-            {
-                id: 3,
-                icon: ViewStreamOutlinedIcon,
-                name: 'Đơn hàng',
-                link: '/admin/orders',
-            },
-            {
-                id: 4,
-                icon: CategoryIcon,
-                name: 'Loại sản phẩm',
-                link: '/admin/categories'
-            },
-            {
-                id: 5,
-                icon: ReviewsIcon,
-                name: 'Đánh giá',
-                link: '/admin/reviews',
-            },
-        ],
-    },
-    {
-        type: 'useful',
-        tabs: [
-            {
-                id: 6,
-                icon: StackedLineChartOutlinedIcon,
-                name: 'Thống kê',
-                link: '/admin/statistics',
-            },
-            {
-                id: 7,
-                icon: NotificationsNoneOutlinedIcon,
-                name: 'Thông báo',
-                link: '/admin/notifications',
-            },
-            {
-                id: 8,
-                icon: LoyaltyIcon,
-                name: 'Flash Sale',
-                link: '/admin/flashsale',
-            },
-        ],
-    },
-    {
-        type: 'users',
-        tabs: [
-            {
-                id: 9,
-                icon: AccountBoxOutlinedIcon,
-                name: 'Thông tin tài khoản',
-                link: '/account/0',
-            },
-            {
-                id: 10,
-                icon: LogoutOutlinedIcon,
-                name: 'Đăng xuất',
-            },
-        ],
-    },
-];
+// const tabList = [
+//     {
+//         type: 'main',
+//         tabs: [
+//             {
+//                 id: 0,
+//                 icon: DashboardIcon,
+//                 name: 'Dashboard',
+//                 link: '/admin',
+//             },
+//         ],
+//     },
+//     {
+//         type: 'lists',
+//         tabs: [
+//             {
+//                 id: 1,
+//                 icon: PersonOutlineOutlinedIcon,
+//                 name: 'Người dùng',
+//                 link: '/admin/user',
+//             },
+//             {
+//                 id: 2,
+//                 icon: Inventory2OutlinedIcon,
+//                 name: 'Sản phẩm',
+//                 link: '/admin/products',
+//             },
+//             {
+//                 id: 3,
+//                 icon: ViewStreamOutlinedIcon,
+//                 name: 'Đơn hàng',
+//                 link: '/admin/orders',
+//             },
+//             {
+//                 id: 4,
+//                 icon: CategoryIcon,
+//                 name: 'Loại sản phẩm',
+//                 link: '/admin/categories'
+//             },
+//             {
+//                 id: 5,
+//                 icon: ReviewsIcon,
+//                 name: 'Đánh giá',
+//                 link: '/admin/reviews',
+//             },
+//         ],
+//     },
+//     {
+//         type: 'useful',
+//         tabs: [
+//             {
+//                 id: 6,
+//                 icon: StackedLineChartOutlinedIcon,
+//                 name: 'Thống kê',
+//                 link: '/admin/statistics',
+//             },
+//             {
+//                 id: 7,
+//                 icon: NotificationsNoneOutlinedIcon,
+//                 name: 'Thông báo',
+//                 link: '/admin/notifications',
+//             },
+//             {
+//                 id: 8,
+//                 icon: LoyaltyIcon,
+//                 name: 'Flash Sale',
+//                 link: '/admin/flashsale',
+//             },
+//         ],
+//     },
+//     {
+//         type: 'users',
+//         tabs: [
+//             {
+//                 id: 9,
+//                 icon: AccountBoxOutlinedIcon,
+//                 name: 'Thông tin tài khoản',
+//                 link: '/account/0',
+//             },
+//             {
+//                 id: 10,
+//                 icon: LogoutOutlinedIcon,
+//                 name: 'Đăng xuất',
+//             },
+//         ],
+//     },
+// ];
 
 const cx = classNames.bind(styles);
 function SideBarLaptop() {
-
-    const [isOpen, setIsOpen] = React.useState(false)
+    const [isOpen, setIsOpen] = React.useState(false);
     const [currentTab, setCurrentTab] = React.useState(0);
 
     const handleClickTab = (id) => {
@@ -122,17 +122,23 @@ function SideBarLaptop() {
                 onClick={() => setIsOpen(!isOpen)}
             >
                 <div
-                    className={`${genericHamburgerLine} bg-black ${isOpen
-                        ? "rotate-45 translate-y-3 opacity-50 group-hover:opacity-100"
-                        : "opacity-50 group-hover:opacity-100"
-                        }`}
+                    className={`${genericHamburgerLine} bg-black ${
+                        isOpen
+                            ? 'rotate-45 translate-y-3 opacity-50 group-hover:opacity-100'
+                            : 'opacity-50 group-hover:opacity-100'
+                    }`}
                 />
-                <div className={`${genericHamburgerLine} bg-black ${isOpen ? "opacity-0" : "opacity-50 group-hover:opacity-100"}`} />
                 <div
-                    className={`${genericHamburgerLine} bg-black ${isOpen
-                        ? "-rotate-45 -translate-y-3 opacity-50 group-hover:opacity-100"
-                        : "opacity-50 group-hover:opacity-100"
-                        }`}
+                    className={`${genericHamburgerLine} bg-black ${
+                        isOpen ? 'opacity-0' : 'opacity-50 group-hover:opacity-100'
+                    }`}
+                />
+                <div
+                    className={`${genericHamburgerLine} bg-black ${
+                        isOpen
+                            ? '-rotate-45 -translate-y-3 opacity-50 group-hover:opacity-100'
+                            : 'opacity-50 group-hover:opacity-100'
+                    }`}
                 />
             </button>
             <div className={cx('bottom')}>
@@ -146,7 +152,7 @@ function SideBarLaptop() {
                                     <Tooltip title={tab.name} placement="right">
                                         <Link
                                             style={{
-                                                padding: "10px"
+                                                padding: '10px',
                                             }}
                                             key={index}
                                             onClick={() => handleClickTab(tab.id)}
@@ -168,7 +174,7 @@ function SideBarLaptop() {
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
-export default SideBarLaptop
+export default SideBarLaptop;

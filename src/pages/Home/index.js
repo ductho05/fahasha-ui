@@ -318,20 +318,20 @@ function Home() {
                     <Categories categoryList={categories} />
                 </div>
                 <div className={cx('trending_product')}>
-                    <div className={cx('title')}>
+                    {/* {/* <div className={cx('title')}>
                         {isLoading ? (
                             <Skeleton animation="wave" variant="circular" width={24} height={24} />
                         ) : (
                             <LazyLoadImage src="https://cdn0.fahasa.com/skin/frontend/base/default/images/ico_dealhot.png" />
                         )}
-                        <h3 className="min-w-[170px]">
+                        {/* <h3 className="min-w-[170px]">
                             {isLoading ? (
                                 <Skeleton variant="text" sx={{ fontSize: '1.4rem' }} animation="wave" />
                             ) : (
                                 'DANH MỤC NỔI BẬT'
                             )}
-                        </h3>
-                    </div>
+                        </h3> 
+                    </div>  */}
                     <FlashSale />
 
                     <div
@@ -355,7 +355,12 @@ function Home() {
                             </h3>
                         </div>
 
-                        <ProductFrame isLoading={isLoading} productList={productsHots} isHomePage={true} Component={GridProduct} />
+                        <ProductFrame
+                            isLoading={isLoading}
+                            productList={productsHots}
+                            isHomePage={true}
+                            Component={GridProduct}
+                        />
                     </div>
 
                     <div
@@ -391,7 +396,11 @@ function Home() {
                             <h3>DỤNG CỤ HỌC TẬP</h3>
                         </div>
 
-                        <ProductFrame isLoading={isLoading} productList={learnBooks} Component={GridProduct}></ProductFrame>
+                        <ProductFrame
+                            isLoading={isLoading}
+                            productList={learnBooks}
+                            Component={GridProduct}
+                        ></ProductFrame>
                     </div>
                 </div>
             </div>

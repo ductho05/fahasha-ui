@@ -12,9 +12,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useStore } from '../../stores/hooks';
 import { LOGOUT } from '../../stores/constants';
 import FlashSale from '../../admin/pages/UseFul/FlashSale';
+import Favorite from '../Favorite';
 
 const cx = classNames.bind(styles);
-const listTabs = ['Thông tin tài khoản', 'Đơn hàng của tôi', 'Nhận xét của tôi', 'Thông báo'];
+const listTabs = ['Thông tin tài khoản', 'Đơn hàng của tôi', 'Nhận xét của tôi', 'Thông báo', 'Danh sách yêu thích'];
 function Account() {
     const { index } = useParams();
     const navigate = useNavigate();
@@ -60,7 +61,7 @@ function Account() {
                                     {tab}
                                 </li>
                             ))}
-                            {state.user.isManager && (
+                            {/* {state.user.isManager && (
                                 <li
                                     onClick={() => {
                                         navigate('/admin');
@@ -69,7 +70,7 @@ function Account() {
                                 >
                                     Quản lý hệ thống
                                 </li>
-                            )}
+                            )} */}
                             <li onClick={handleLogout} className={cx('feature_item')}>
                                 Đăng xuất
                             </li>
@@ -91,6 +92,9 @@ function Account() {
 
                         <div className={currentIndex == 3 ? cx('infomation') : cx('hide')}>
                             <Notifition />
+                        </div>
+                        <div className={currentIndex == 4 ? cx('infomation') : cx('hide')}>
+                            <Favorite />
                         </div>
                     </div>
                 </div>

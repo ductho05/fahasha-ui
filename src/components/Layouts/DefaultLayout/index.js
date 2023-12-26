@@ -33,13 +33,14 @@ function DefaultLayout(props) {
         props.setIsLogin(localstorage.get().length > 0);
     }, [state]);
 
-    useEffect(() => {
+    // useEffect(() => {
 
-        if (isDeploy) {
-            var chat_content = document.querySelector(".fb_dialog_content")
-            chat_content.style.display = 'block';
-        }
-    }, [])
+    //     if (isDeploy) {
+    //         var chat_content = document.querySelector(".fb_dialog_content")
+    //         if (chat_content) {
+    //             chat_content.style.display = 'block';
+    //         }
+    // }, [])
 
     setInterval(() => {
         if (isLogin()) {

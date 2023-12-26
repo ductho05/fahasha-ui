@@ -68,7 +68,7 @@ function FlashSale() {
                     // if (item.sold_sale === item.num_sale) {
                     //     console.log(item, 'đã hết hàng');
                     // } else {
-                        newData.push(item);
+                    newData.push(item);
                     // }
                 });
                 console.log('data ne: ', newData);

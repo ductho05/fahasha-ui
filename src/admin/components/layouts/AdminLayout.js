@@ -57,6 +57,7 @@ function AdminLayout({ children }) {
                 users: true,
                 products: true,
                 tem_products: true,
+                favorites: true,
                 flashsales: true,
                 categories: true,
             }
@@ -65,6 +66,7 @@ function AdminLayout({ children }) {
                 orders: false,
                 users: false,
                 products: false,
+                favorites: false,
                 tem_products: false,
                 flashsales: false,
                 categories: false,
@@ -80,16 +82,19 @@ function AdminLayout({ children }) {
                 orders: [],
                 users: [],
                 products: [],
+                favorites: [],
                 tem_products: [],
                 flashsales: [],
                 categories: [],
             },
     );
 
-    if (isDeploy) {
-        var chat_content = document.querySelector(".fb_dialog_content")
-        chat_content.style.display = 'none';
-    }
+    // if (isDeploy) {
+    //     var chat_content = document.querySelector(".fb_dialog_content")
+    //     chat_content.style.display = 'none';
+    // }
+
+    // }, [])
 
     // useEffect(() => {
     //     // Hàm này sẽ được gọi khi component được mount và mỗi khi localStorage thay đổi.
@@ -161,6 +166,14 @@ function AdminLayout({ children }) {
                 })
                 .catch((err) => console.log(err));
 
+            // fetch(`${api}/favorites`)
+            //     .then((response) => response.json())
+            //     .then((result) => {
+            //         setData2((prev) => ({ ...prev, flashsales: result.data }));
+            //         setIsLoaded((prev) => ({ ...prev, flashsales: true }));
+            //     })
+            //     .catch((err) => console.log(err));
+
             fetch(`${api}/flashsales?sort=reverse`)
                 .then((response) => response.json())
                 .then((result) => {
@@ -201,6 +214,18 @@ function AdminLayout({ children }) {
                 });
 
             authInstance
+                .get('/favorites')
+                .then((result) => {
+                    if (result.data.status === 'OK') {
+                        setData2((prev) => ({ ...prev, favorites: result.data.data }));
+                        setIsLoaded((prev) => ({ ...prev, favorites: true }));
+                    }
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+
+            authInstance
                 .get(`/users`)
                 .then((result) => {
                     setData2((prev) => ({ ...prev, users: result.data.data }));
@@ -215,6 +240,7 @@ function AdminLayout({ children }) {
                 orders: true,
                 users: true,
                 products: true,
+                favorites: true,
                 tem_products: true,
                 flashsales: true,
                 categories: true,
@@ -230,6 +256,7 @@ function AdminLayout({ children }) {
             isLoaded.users &&
             isLoaded.tem_products &&
             isLoaded.flashsales &&
+            isLoaded.favorites &&
             isLoaded.products &&
             Object.keys(data).length === 0
         ) {
@@ -249,6 +276,7 @@ function AdminLayout({ children }) {
                 isLoaded.orders &&
                 isLoaded.users &&
                 isLoaded.tem_products &&
+                isLoaded.favorites &&
                 isLoaded.flashsales &&
                 isLoaded.products
             ) &&
@@ -264,6 +292,7 @@ function AdminLayout({ children }) {
                     isLoaded.orders &&
                     isLoaded.users &&
                     isLoaded.tem_products &&
+                    isLoaded.favorites &&
                     isLoaded.flashsales &&
                     isLoaded.products
                 ) && Object.keys(data).length === 0

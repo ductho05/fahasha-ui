@@ -10,6 +10,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus, faShareNodes, faStar, faCartShopping, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import Button from '../../components/Button';
 import ProductFrame from '../../components/ProductFrame';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import ProductSlider from '../../components/ProductSlider';
 import Modal from '../../components/Modal';
 import RegisterLogin from '../../components/Forms/RegisterLogin';
@@ -28,7 +30,8 @@ import { CheckCircleFilled, CheckCircleOutlined, StopFilled } from '@ant-design/
 import { message } from 'antd';
 import axios from 'axios';
 import App from '../../components/CountDownCustom';
-
+import { getAuthInstance } from '../../utils/axiosConfig';
+import { set } from 'react-hook-form';
 const cx = classNames.bind(styles);
 const tabs = ['Mới nhất', 'Yêu thích nhất'];
 
@@ -55,8 +58,49 @@ function ProductDetail() {
     const [loading, setLoading] = useState(false);
     const [isFlashSale, setIsFlashSale] = useState(false);
     const [showNoProduct, setShowNoProduct] = useState(false);
-
+    const [isClick, setIsClick] = useState(false);
+    const [isFavorite, setIsFavorite] = useState(false);
+    const authInstance = getAuthInstance();
     var category = JSON.parse(localStorage.getItem('mycategory')) || [];
+
+    // them/ xoa yeu thích
+    useEffect(() => {
+        // thêm sản phẩm yếu thích
+        // console.log('isClick', isClick, isFavorite);
+        if (isClick == true) {
+            // setLoading(true);
+            authInstance
+                .post(`/favorites/${!isFavorite ? `add` : `delete`}`, {
+                    userid: state.user._id,
+                    productid: productId,
+                })
+                .then((result) => {
+                    console.log('result', result);
+                    if (result.data.status == 'OK') {
+                        if (!isFavorite) {
+                            console.log('da them');
+                            toast.success('Đã thêm sản phẩm vào danh sách yêu thích');
+                            setIsFavorite(true);
+                            // setIsClick(false);
+                            // console.log('state.user._id', state.user._id);
+                            // console.log('productId', productId);
+                        } else {
+                            console.log('da xoa');
+                            toast.success('Đã xóa sản phẩm khỏi danh sách yêu thích');
+                            setIsFavorite(false);
+                        }
+                        setIsClick(false);
+                        // setLoading(false);
+                    }
+                })
+                .catch((err) => {
+                    //console.log('11113', err);
+                    setIsClick(false);
+                    setIsFavorite(false);
+                    setShowNolginDialog(true);
+                });
+        }
+    }, [isClick]);
 
     useEffect(() => {
         axios
@@ -71,7 +115,7 @@ function ProductDetail() {
             .catch((err) => {
                 console.log(err);
             });
-        setCurrentQuantity(1)
+        setCurrentQuantity(1);
     }, [productId]);
 
     useEffect(() => {
@@ -166,17 +210,38 @@ function ProductDetail() {
         localStorage.setItem('mycategory', JSON.stringify(category));
     };
 
+    const fetchFavorite = () => {
+        setLoading(true);
+        authInstance
+            .get(`/favorites/check?userid=${state.user._id}&productid=${productId}`)
+            .then((result) => {
+                if (result.data.status == 'OK') {
+                    console.log('dang thich');
+                    setIsFavorite(true);
+                } else {
+                    console.log('chua thich');
+                    setIsFavorite(false);
+                }
+                setLoading(false);
+            })
+            .catch((err) => {
+                console.log('11113', err);
+                setLoading(false);
+                setIsFavorite(false);
+            });
+    };
+
     const fetchProduct = () => {
         setLoading(true);
         fetch(`${api}/products/id/${productId}`)
             .then((response) => response.json())
             .then((result) => {
-                if (result.status == "OK") {
+                if (result.status == 'OK') {
                     setProduct(result.data);
                     fetchProductRelated(result.data);
-                    setShowNoProduct(false)
+                    setShowNoProduct(false);
                 } else {
-                    setShowNoProduct(true)
+                    setShowNoProduct(true);
                 }
                 setLoading(false);
             })
@@ -205,6 +270,7 @@ function ProductDetail() {
         fetchProduct();
         fetchProductNew();
         fetchEvaluate(productId);
+        fetchFavorite();
     }, [productId]);
 
     useEffect(() => {
@@ -345,8 +411,11 @@ function ProductDetail() {
 
             <Dialog open={showNoProduct}>
                 <div className="p-[20px] w-[400px] flex flex-col items-center">
-                    <p className='p-[20px] leading-[1.5] text-center text-[18px] text-[#333] font-[600]'>{`Cửa hàng không có sản phẩm id ${productId}`}</p>
-                    <button onClick={() => navigate("/")} className="border-none px-[20px] py-[10px] rounded-[6px] bg-red-500 text-[#fff]">
+                    <p className="p-[20px] leading-[1.5] text-center text-[18px] text-[#333] font-[600]">{`Cửa hàng không có sản phẩm id ${productId}`}</p>
+                    <button
+                        onClick={() => navigate('/')}
+                        className="border-none px-[20px] py-[10px] rounded-[6px] bg-red-500 text-[#fff]"
+                    >
                         Quay lại trang chủ
                     </button>
                 </div>
@@ -354,7 +423,7 @@ function ProductDetail() {
 
             <Dialog open={showNolginDialog}>
                 <div className={cx('dialog_nologin')}>
-                    <h3 className={cx('dialog_nologin_message')}>Vui lòng đăng nhập để mua hàng</h3>
+                    <h3 className={cx('dialog_nologin_message')}>Vui lòng đăng nhập để tiếp tục</h3>
                     <div onClick={handleToLoginPage} className={cx('btn_to_login')}>
                         <p>Trang đăng nhập</p>
                         <p>
@@ -454,27 +523,33 @@ function ProductDetail() {
                                 <p className={cx('rate_number', 'px-[10px] border-l border-solid border-[#444]')}>
                                     Đã bán {product?.sold}
                                 </p>
-                                <p className={cx('btn_share', 'hide_on_pc')}>
-                                    <FontAwesomeIcon icon={faShareNodes} />
+                                <p
+                                    className={cx('btn_share', 'hide_on_pc')}
+                                    onClick={() => {
+                                        setIsClick(true);
+                                    }}
+                                >
+                                    {/* <FontAwesomeIcon icon={faShareNodes} /> */}
+                                    {!isFavorite ? <FavoriteBorderIcon /> : <FavoriteIcon />}
                                 </p>
                             </div>
-                            {
-                                isFlashSale &&
+                            {isFlashSale && (
                                 <div
                                     style={{
-                                        background: "transparent linear-gradient(180deg, #FF6D6D 0%, #FF5247 100%) 0% 0% no-repeat padding-box"
+                                        background:
+                                            'transparent linear-gradient(180deg, #FF6D6D 0%, #FF5247 100%) 0% 0% no-repeat padding-box',
                                     }}
-                                    className='flex items-center my-[20px] w-full px-[10px] py-[10px] rounded-[12px]'
+                                    className="flex items-center my-[20px] w-full px-[10px] py-[10px] rounded-[12px]"
                                 >
-                                    <div className='bg-[#fff] flex items-center px-[40px] rounded-[12px]'>
+                                    <div className="bg-[#fff] flex items-center px-[40px] rounded-[12px]">
                                         <img
-                                            className='w-[100px] h-[40px] object-contain'
+                                            className="w-[100px] h-[40px] object-contain"
                                             src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/flashsale/label-flashsale.svg"
                                         />
                                         <App />
                                     </div>
                                 </div>
-                            }
+                            )}
 
                             <div className={cx('mid_content')}>
                                 <div className={cx('price')}>
@@ -496,8 +571,17 @@ function ProductDetail() {
                                         -{(100 - (product?.price / product?.old_price) * 100).toFixed(1)}%
                                     </p>
                                 </div>
-                                <p className={cx('btn_share', 'hide_on_tablet_mobile')}>
+                                {/* <p className={cx('btn_share', 'hide_on_tablet_mobile')}>
                                     <FontAwesomeIcon icon={faShareNodes} />
+                                </p> */}
+                                <p
+                                    className={cx('btn_share', 'hide_on_tablet_mobile')}
+                                    onClick={() => {
+                                        setIsClick(true);
+                                    }}
+                                >
+                                    {/* <FontAwesomeIcon icon={faShareNodes} /> */}
+                                    {!isFavorite ? <FavoriteBorderIcon /> : <FavoriteIcon />}
                                 </p>
                             </div>
                             <div className={cx('shipping')}></div>
@@ -516,10 +600,11 @@ function ProductDetail() {
                             </div>
                             <div className="flex items-center mt-[20px]">
                                 <div
-                                    className={`flex items-center p-[10px] rounded-[6px] ${product?.sold == product?.quantity
-                                        ? 'bg-[#f2f4f5] text-[#7a7e7f]'
-                                        : 'bg-[rgba(201,33,39,0.06)] text-[#c92127]'
-                                        }`}
+                                    className={`flex items-center p-[10px] rounded-[6px] ${
+                                        product?.sold == product?.quantity
+                                            ? 'bg-[#f2f4f5] text-[#7a7e7f]'
+                                            : 'bg-[rgba(201,33,39,0.06)] text-[#c92127]'
+                                    }`}
                                 >
                                     {product?.quantity === 0 ? <StopFilled /> : <CheckCircleFilled />}
                                     <p className="font-[600] ml-[10px]">
@@ -647,7 +732,9 @@ function ProductDetail() {
                                         ></div>
                                     </div>
                                     <p>
-                                        {evaluate?.total ? Math.floor((evaluate.rate[index] / evaluate.total) * 100) : 0}{' '}
+                                        {evaluate?.total
+                                            ? Math.floor((evaluate.rate[index] / evaluate.total) * 100)
+                                            : 0}{' '}
                                         %
                                     </p>
                                 </div>
@@ -673,8 +760,7 @@ function ProductDetail() {
                         </ul>
 
                         <div className={cx('list_comment')}>
-                            {
-                                comments &&
+                            {comments &&
                                 tempArray.map((item, index) => (
                                     <div key={index} ref={commentRef} className={cx('comments_inner')}>
                                         <div className={cx('comments_left')}>
@@ -709,8 +795,7 @@ function ProductDetail() {
                                             <LikeDislike user={state.user} comment={comments[index]} />
                                         </div>
                                     </div>
-                                ))
-                            }
+                                ))}
                         </div>
                     </div>
                 </div>
