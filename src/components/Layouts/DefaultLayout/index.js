@@ -18,6 +18,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { authInstance } from '../../../utils/axiosConfig';
 import axios from 'axios';
+import FaceBookChatBox from '../../FaceBookChatBox/FaceBookChatBox';
 
 const cx = classNames.bind(styles);
 function DefaultLayout(props) {
@@ -123,6 +124,7 @@ function DefaultLayout(props) {
                 </div>
             </div>
             <Footer />
+            <FaceBookChatBox />
         </div>
     );
 }

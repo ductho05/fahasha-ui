@@ -43,6 +43,8 @@
         "react-circular-progressbar": "^2.1.0",
         "react-confirm-alert": "^3.0.6",
         "react-dom": "^18.2.0",
+        "react-facebook": "^9.0.12",
+        "react-facebook-login": "^4.1.1",
         "react-fast-marquee": "^1.6.1",
         "react-hook-form": "^7.45.1",
         "react-icons": "^4.11.0",

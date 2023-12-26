@@ -8,13 +8,14 @@ import Button from '../Button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFacebookF } from '@fortawesome/free-brands-svg-icons';
 
+
 const LoginWithFacebook = () => {
 
     const [state, dispatch] = useStore()
     const [progress, setProgress] = useState(false)
 
     const handleLogin = (response) => {
-    
+
         setProgress(true)
         fetch(`${api}/users/login/facebook`, {
             method: 'POST',
