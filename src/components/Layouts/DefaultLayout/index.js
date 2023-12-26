@@ -125,7 +125,7 @@ function DefaultLayout(props) {
                 </div>
             </div>
             <Footer />
-            {/* <FaceBookChatBox /> */}
+            <FaceBookChatBox />
         </div>
     );
 }
