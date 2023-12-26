@@ -43,6 +43,9 @@ function App() {
                                 element={
                                     <DefaultLayout setIsLogin={setIsLogin}>
                                         <Page />
+                                        <FacebookProvider appId="1325947341377754" chatSupport>
+                                            <CustomChat pageId="198008766726901" minimized={true} />
+                                        </FacebookProvider>
                                     </DefaultLayout>
                                 }
                             />
@@ -59,6 +62,9 @@ function App() {
                                     isLogin ? (
                                         <DefaultLayout setIsLogin={setIsLogin}>
                                             <Page />
+                                            <FacebookProvider appId="1325947341377754" chatSupport>
+                                                <CustomChat pageId="198008766726901" minimized={true} />
+                                            </FacebookProvider>
                                         </DefaultLayout>
                                     ) : (
                                         <DeniedPermission type={'user'} />

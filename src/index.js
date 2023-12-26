@@ -11,9 +11,6 @@ root.render(
     <UserProvider>
         <DataProvider>
             <GlobalStyle>
-                <FacebookProvider appId="1325947341377754" chatSupport>
-                    <CustomChat pageId="198008766726901" minimized={true} />
-                </FacebookProvider>
                 <App />
             </GlobalStyle>
         </DataProvider>
