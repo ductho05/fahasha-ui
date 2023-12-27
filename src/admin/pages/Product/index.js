@@ -27,6 +27,7 @@ import 'tippy.js/dist/tippy.css';
 import { Wrapper as PopperWrapper } from '../../../components/Popper';
 import { CloseOutlined, FilterOutlined, EditOutlined, LockOutlined, UnlockOutlined } from '@ant-design/icons';
 import BlockIcon from '@mui/icons-material/Block';
+import { Editor } from '@tinymce/tinymce-react';
 
 const cx = classNames.bind(styles);
 
@@ -126,6 +127,7 @@ function Product() {
     const [keywords, setKeywords] = useState(null);
     const [status, setStatus] = useState(null);
     const [quantity, setQuantity] = useState(null);
+    const [desciption, setDesciption] = React.useState(null)
 
     const updateProductData = (product) => {
         const newListProduct = data.products?.map((p) => {
@@ -294,7 +296,7 @@ function Product() {
                                     : 'Sản phẩm sẽ không bán trên hệ thống cho đến khi mở lại'
                             }
                             onConfirm={() => handleUpdateStatus(params.row.status_sell)}
-                            onCancel={() => {}}
+                            onCancel={() => { }}
                             okText="Đồng ý"
                             cancelText="Hủy"
                         >
@@ -361,7 +363,7 @@ function Product() {
     // }, [success]);
 
     useEffect(() => {
-        fetch(`${api}/categories?filter=simple`)
+        fetch(`${api}/categories?filter=simple&lock=true`)
             .then((response) => response.json())
             .then((result) => {
                 if (result.status == 'OK') {
@@ -379,6 +381,14 @@ function Product() {
 
     const onFinish = async (data) => {
         if (Object.keys(errors).length <= 0) {
+            if (!desciption) {
+                setErrors((prev) => {
+                    return {
+                        ...prev,
+                        desciption: 'Vui lòng nhập mô tả',
+                    };
+                });
+            }
             if (!avatar) {
                 setErrors((prev) => {
                     return {
@@ -393,7 +403,7 @@ function Product() {
                         published: 'Vui lòng chọn ngày xuất bản',
                     };
                 });
-            } else if (data.old_price < data.price) {
+            } else if (parseInt(data.old_price) < parseInt(data.price)) {
                 setErrors((prev) => {
                     return {
                         ...prev,
@@ -406,7 +416,8 @@ function Product() {
                     formData.append(key, data[key]);
                 });
                 formData.append('images', avatar);
-                formData.append('published_date', published);
+                formData.append('published_date', published)
+                formData.append('desciption', desciption)
 
                 setLoading(true);
                 await authInstance
@@ -415,7 +426,6 @@ function Product() {
                         if (result.data.status === 'OK') {
                             setSuccess((prev) => prev + 1);
                             insertProductData(result.data.data);
-                            toast.success('Thêm mới sản phẩm thành công');
                             const title = 'Thông báo sản phẩm';
                             const description = 'TA Book Store vừa ra mắt sản phẩm mới. Xem ngay';
                             const url = `${appPath}/product-detail/${result.data.data._id}`;
@@ -434,6 +444,7 @@ function Product() {
                                     console.error(err);
                                 });
                             setShowDialog(false);
+                            toast.success('Thêm mới sản phẩm thành công');
                         } else {
                             toast.error(result.data.message);
                         }
@@ -461,6 +472,17 @@ function Product() {
             });
         }
     }, [published]);
+
+    useEffect(() => {
+        if (desciption) {
+            setErrors((prev) => {
+                delete prev.desciption;
+                return {
+                    ...prev,
+                };
+            });
+        }
+    }, [desciption]);
 
     useEffect(() => {
         if (avatar) {
@@ -525,6 +547,12 @@ function Product() {
             });
         }
     };
+
+    const handleEditorChange = (value) => {
+
+        setDesciption(value)
+
+    }
 
     const handleShowDialog = () => {
         setShowDialog(true);
@@ -851,18 +879,34 @@ function Product() {
                             {errors.published && <p className="text-red-500 mt-[10px]">{errors.published}</p>}
                         </div>
                         <p className={cx('label')}></p>
-                        <Form.Item
-                            label="Mô tả"
-                            name="desciption"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Nội dung này không được để trống',
-                                },
-                            ]}
-                        >
-                            <Input.TextArea placeholder="Mô tả sản phẩm..." rows={5} />
-                        </Form.Item>
+                        <p className={cx('label')}>
+                            <span className="text-red-500 text-right mr-[5px]">*</span>
+                            Mô tả:
+                        </p>
+                        <div className="flex justify-start w-full">
+                            <Editor
+
+                                apiKey='d5t4u2d5qyjye0wlx6xiu3sznmxxu7p9ltiwar6n22xi56ln'
+                                init={{
+                                    plugins: 'spellchecker tinycomments mentions anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker a11ychecker typography inlinecss',
+                                    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | align lineheight | tinycomments | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+                                    tinycomments_mode: 'embedded',
+                                    tinycomments_author: 'Author name',
+                                    spellchecker_language: 'vi_VN',
+                                    spellchecker_underline: false,
+                                    mergetags_list: [
+                                        { value: 'First.Name', title: 'First Name' },
+                                        { value: 'Email', title: 'Email' },
+                                    ]
+                                }}
+                                value={desciption}
+                                onEditorChange={handleEditorChange}
+                            />
+                        </div>
+                        {errors?.desciption && <p className='text-red-500 my-[10px] text-[1.4rem]'>Vui lòng nhập mô tả</p>}
+
+
+
                         <div className="flex flex-col mb-[20px]">
                             <p className={cx('label')}>
                                 <span className="text-red-500 text-right mr-[5px]">*</span>
@@ -917,9 +961,9 @@ function Product() {
                         value={
                             selectSort
                                 ? {
-                                      label: selectSort.label,
-                                      value: selectSort.value,
-                                  }
+                                    label: selectSort.label,
+                                    value: selectSort.value,
+                                }
                                 : null
                         }
                     />

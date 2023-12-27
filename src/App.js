@@ -8,7 +8,6 @@ import { useStore } from './stores/hooks';
 import { Button, notification, Space } from 'antd';
 import AdminLayout from './admin/components/layouts/AdminLayout';
 import ServiceWorkerNotifi from './service/ServiceWorkerNotifi';
-import { CustomChat, FacebookProvider } from 'react-facebook'
 
 function DeniedPermission({ type }) {
     type == 'admin'
@@ -28,10 +27,9 @@ function App() {
     const Page404 = notFoundRoute.component;
     const [api, contextHolder] = notification.useNotification();
 
-    // ServiceWorkerNotifi()
-
     return (
         <BrowserRouter>
+
             <ScrollToTop />
             <div className="App">
                 <Routes>
@@ -44,9 +42,6 @@ function App() {
                                 element={
                                     <DefaultLayout setIsLogin={setIsLogin}>
                                         <Page />
-                                        <FacebookProvider appId="1325947341377754" chatSupport>
-                                            <CustomChat pageId="198008766726901" minimized={true} />
-                                        </FacebookProvider>
                                     </DefaultLayout>
                                 }
                             />
@@ -63,9 +58,6 @@ function App() {
                                     isLogin ? (
                                         <DefaultLayout setIsLogin={setIsLogin}>
                                             <Page />
-                                            <FacebookProvider appId="1325947341377754" chatSupport>
-                                                <CustomChat pageId="198008766726901" minimized={true} />
-                                            </FacebookProvider>
                                         </DefaultLayout>
                                     ) : (
                                         <DeniedPermission type={'user'} />
@@ -101,7 +93,11 @@ function App() {
                                 <Route
                                     key={index}
                                     path={route.path}
-                                    element={<Page />}
+                                    element={
+
+                                        <DefaultLayout auth={true} setIsLogin={setIsLogin}>
+                                            <Page />
+                                        </DefaultLayout>}
                                 />
                             );
                         })

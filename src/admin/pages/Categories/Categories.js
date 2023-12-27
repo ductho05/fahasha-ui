@@ -1,13 +1,14 @@
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import EnhancedTable from '../../components/Table/EnhancedTable';
 import { useData } from '../../../stores/DataContext';
-import { Button, Form, Input, Tooltip } from 'antd';
+import { Button, Form, Input, Modal, Tooltip } from 'antd';
 import { Backdrop, CircularProgress, Dialog } from '@mui/material';
 import { toast, ToastContainer } from 'react-toastify';
-import { api } from '../../../constants';
+import { api, appPath, lockImage, unLockImage } from '../../../constants';
 import { useNavigate } from "react-router-dom"
 import { getAuthInstance } from "../../../utils/axiosConfig"
 import React from 'react';
+import { LockOutlined, UnlockOutlined } from '@ant-design/icons';
 
 function Categories() {
 
@@ -18,6 +19,25 @@ function Categories() {
     const [success, setSuccess] = React.useState(0)
     const navigate = useNavigate()
     const authInstance = getAuthInstance()
+
+    const updateData = (category, products) => {
+        const newListCategories = data.categories?.map((c) => {
+            if (c._id === category._id) {
+                return { ...category };
+            } else return c;
+        })
+
+        const newProduct = data.products.map(product => {
+            const replacement = products.find(p => p._id === product._id);
+            if (replacement) {
+                return { ...replacement }
+            }
+            return { ...product }
+        })
+
+        setData({ ...data, categories: newListCategories, products: newProduct })
+    }
+
     const columns = [
         {
             field: 'rowNumber',
@@ -55,8 +75,8 @@ function Categories() {
             width: 180,
             renderCell: (params) => {
                 return (
-                    <p className={`font-[600] ${params.value == "Hoạt động" ? "text-green-600" : "text-red-600"}`}>
-                        {params.value}
+                    <p className={`font-[600] ${params.value ? "text-green-600" : "text-red-600"}`}>
+                        {params.value ? "Hoạt động" : "Ngưng"}
                     </p>
                 )
             }
@@ -68,23 +88,86 @@ function Categories() {
             editable: true,
             width: 240,
             renderCell: (params) => {
-                return (
-                    <Tooltip
-                        title="Xem danh sách sản phẩm"
-                        placement='right'
-                    >
-                        <Button
-                            type="primary"
-                            ghost
-                            style={{
-                                margin: '0 10px 0 0',
-                            }}
-                            onClick={() => navigate(`/admin/categories/${params.value}`)}
 
+                const handleLockCategory = async (category) => {
+
+                    const statusUpdate = category.status ? false : true
+                    const response = await authInstance.put(`/categories/${category._id}`, {
+                        status: statusUpdate
+                    })
+
+                    if (response.status === 200) {
+
+                        const responseProduct = await authInstance.put("/products/many", {
+                            status: response.data.data.status,
+                            id: response.data.data._id
+                        })
+
+                        if (responseProduct.status === 200) {
+
+                            updateData(response.data.data, responseProduct.data.data)
+                            const image = response.data.data.status ? unLockImage : lockImage
+                            await authInstance.post(`/webpush/send`, {
+                                filter: "admin",
+                                notification: {
+                                    title: "Thông báo",
+                                    description: `${response.data.data.status ? `Danh mục ${response.data.data.name} vừa được hoạt động trở lại` : `Danh mục ${response.data.data.name} tạm thời bị khóa`}`,
+                                    url: `${appPath}/admin/categories`,
+                                    image
+                                }
+                            })
+                            toast.success("Cập nhật thành công!")
+                        }
+                    }
+                }
+
+                return (
+                    <div>
+                        <Tooltip
+                            title={
+                                params.row.status === false
+                                    ? 'Mở lại trạng thái hoạt động'
+                                    : 'Ngưng hoạt động'
+                            }
                         >
-                            Chi tiết
-                        </Button>
-                    </Tooltip>
+                            <Button
+                                className="mr-[20px]"
+                                onClick={() => {
+                                    Modal.confirm({
+                                        title: "Lưu ý!",
+                                        content: params.row.status ?
+                                            `Khi danh mục ${params.row.name} bị khóa, tất cả sản phẩm thuộc danh mục này sẽ ngưng bán`
+                                            : `Khi danh mục ${params.row.name} được mở khóa, tất cả sản phẩm thuộc danh mục này sẽ được mở bán trở lại`,
+                                        onOk: () => handleLockCategory(params.row)
+                                    })
+                                }}
+                                icon={
+                                    params.row.status === false ? (
+                                        <UnlockOutlined />
+                                    ) : (
+                                        <LockOutlined />
+                                    )
+                                }
+                                danger
+                            />
+                        </Tooltip>
+                        <Tooltip
+                            title="Xem danh sách sản phẩm"
+                            placement='right'
+                        >
+                            <Button
+                                type="primary"
+                                ghost
+                                style={{
+                                    margin: '0 10px 0 0',
+                                }}
+                                onClick={() => navigate(`/admin/categories/${params.value}`)}
+
+                            >
+                                Chi tiết
+                            </Button>
+                        </Tooltip>
+                    </div>
                 )
             }
 
@@ -116,8 +199,9 @@ function Categories() {
         }
     }, [success])
 
-    React.useState(() => {
+    React.useEffect(() => {
 
+        console.log(data.categories)
         if (data.categories) {
             const newRows = data?.categories?.map((category, index) => {
                 return {
@@ -126,10 +210,8 @@ function Categories() {
                 }
             })
             setRows(newRows)
-        } else {
-            fetchCategory()
         }
-    }, [data])
+    }, [data.categories])
 
     const handleOk = (value) => {
 

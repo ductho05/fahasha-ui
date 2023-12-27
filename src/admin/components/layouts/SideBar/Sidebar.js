@@ -16,6 +16,8 @@ import { Scrollbar } from 'react-scrollbars-custom';
 import CategoryIcon from '@mui/icons-material/Category';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ReviewsIcon from '@mui/icons-material/Reviews';
+import { useStore } from '../../../../stores/hooks';
+import { logout } from '../../../../stores/actions';
 
 const cx = classNames.bind(styles);
 
@@ -108,6 +110,7 @@ export const tabList = [
                 id: 11,
                 icon: LogoutOutlinedIcon,
                 name: 'Đăng xuất',
+                logout: true,
             },
         ],
     },
@@ -115,10 +118,16 @@ export const tabList = [
 
 function SideBar() {
     const [currentTab, setCurrentTab] = useState(0);
+    const [state, dispatch] = useStore()
 
     const handleClickTab = (id) => {
         setCurrentTab(id);
-    };
+    }
+
+    const handleLogout = () => {
+
+        dispatch(logout())
+    }
 
     return (
         <div className={cx('wrapper')}>
@@ -134,15 +143,25 @@ function SideBar() {
                                 {tabItem.tabs.map((tab, index) => {
                                     const Icon = tab.icon;
                                     return (
-                                        <Link
-                                            key={index}
-                                            onClick={() => handleClickTab(tab.id)}
-                                            to={tab?.link}
-                                            className={tab.id == currentTab ? cx('item', 'active') : cx('item')}
-                                        >
-                                            <Icon className={cx('icon')} />
-                                            <p className={cx('title')}>{tab.name}</p>
-                                        </Link>
+                                        tab.logout ?
+                                            <div
+                                                key={index}
+                                                onClick={() => handleLogout()}
+                                                className={tab.id == currentTab ? cx('item', 'active') : cx('item')}
+                                            >
+                                                <Icon className={cx('icon')} />
+                                                <p className={cx('title')}>{tab.name}</p>
+                                            </div>
+                                            :
+                                            <Link
+                                                key={index}
+                                                onClick={() => handleClickTab(tab.id)}
+                                                to={tab?.link}
+                                                className={tab.id == currentTab ? cx('item', 'active') : cx('item')}
+                                            >
+                                                <Icon className={cx('icon')} />
+                                                <p className={cx('title')}>{tab.name}</p>
+                                            </Link>
                                     );
                                 })}
                             </div>

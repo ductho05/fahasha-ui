@@ -16,6 +16,8 @@ import ReviewsIcon from '@mui/icons-material/Reviews';
 import CategoryIcon from '@mui/icons-material/Category';
 import { Tooltip } from 'antd';
 import { tabList } from './SideBar/Sidebar';
+import { useStore } from '../../../stores/hooks';
+import { logout } from '../../../stores/actions';
 
 // const tabList = [
 //     {
@@ -109,10 +111,18 @@ const cx = classNames.bind(styles);
 function SideBarLaptop() {
     const [isOpen, setIsOpen] = React.useState(false);
     const [currentTab, setCurrentTab] = React.useState(0);
+    const [state, dispatch] = useStore()
 
     const handleClickTab = (id) => {
-        setCurrentTab(id);
-    };
+
+        setCurrentTab(id)
+    }
+
+    const handleLogout = () => {
+
+        dispatch(logout())
+    }
+
     const genericHamburgerLine = `h-1 w-full my-1 rounded-full transition ease transform duration-300`;
 
     return (
@@ -122,23 +132,20 @@ function SideBarLaptop() {
                 onClick={() => setIsOpen(!isOpen)}
             >
                 <div
-                    className={`${genericHamburgerLine} bg-black ${
-                        isOpen
-                            ? 'rotate-45 translate-y-3 opacity-50 group-hover:opacity-100'
-                            : 'opacity-50 group-hover:opacity-100'
-                    }`}
+                    className={`${genericHamburgerLine} bg-black ${isOpen
+                        ? 'rotate-45 translate-y-3 opacity-50 group-hover:opacity-100'
+                        : 'opacity-50 group-hover:opacity-100'
+                        }`}
                 />
                 <div
-                    className={`${genericHamburgerLine} bg-black ${
-                        isOpen ? 'opacity-0' : 'opacity-50 group-hover:opacity-100'
-                    }`}
+                    className={`${genericHamburgerLine} bg-black ${isOpen ? 'opacity-0' : 'opacity-50 group-hover:opacity-100'
+                        }`}
                 />
                 <div
-                    className={`${genericHamburgerLine} bg-black ${
-                        isOpen
-                            ? '-rotate-45 -translate-y-3 opacity-50 group-hover:opacity-100'
-                            : 'opacity-50 group-hover:opacity-100'
-                    }`}
+                    className={`${genericHamburgerLine} bg-black ${isOpen
+                        ? '-rotate-45 -translate-y-3 opacity-50 group-hover:opacity-100'
+                        : 'opacity-50 group-hover:opacity-100'
+                        }`}
                 />
             </button>
             <div className={cx('bottom')}>
@@ -150,17 +157,31 @@ function SideBarLaptop() {
                                 const Icon = tab.icon;
                                 return (
                                     <Tooltip title={tab.name} placement="right">
-                                        <Link
-                                            style={{
-                                                padding: '10px',
-                                            }}
-                                            key={index}
-                                            onClick={() => handleClickTab(tab.id)}
-                                            to={tab?.link}
-                                            className={tab.id == currentTab ? cx('item', 'active') : cx('item')}
-                                        >
-                                            <Icon className={cx('icon')} />
-                                        </Link>
+                                        {
+                                            tab.logout ?
+                                                <div
+                                                    onClick={() => handleLogout(tab.id)}
+                                                    style={{
+                                                        padding: '10px',
+                                                    }}
+                                                    key={index}
+                                                    className={tab.id == currentTab ? cx('item', 'active') : cx('item')}
+                                                >
+                                                    <Icon className={cx('icon')} />
+                                                </div>
+                                                :
+                                                <Link
+                                                    style={{
+                                                        padding: '10px',
+                                                    }}
+                                                    key={index}
+                                                    onClick={() => handleClickTab(tab.id)}
+                                                    to={tab?.link}
+                                                    className={tab.id == currentTab ? cx('item', 'active') : cx('item')}
+                                                >
+                                                    <Icon className={cx('icon')} />
+                                                </Link>
+                                        }
                                     </Tooltip>
                                 );
                             })}

@@ -12,7 +12,7 @@ import Button from '../../Button';
 import { useStore } from '../../../stores/hooks';
 import { api, appPath, registerImages } from '../../../constants';
 import { register, login, noAction } from '../../../stores/actions';
-import { LOGIN, REGISTER } from '../../../stores/constants';
+import { LOGIN, LOGOUT, REGISTER } from '../../../stores/constants';
 import { Dialog, Backdrop, CircularProgress } from '@mui/material';
 
 // Firebase
@@ -26,6 +26,7 @@ import ServiceWorkerNotifi from '../../../service/ServiceWorkerNotifi';
 import SendNotification from '../../../service/SendNotification'
 import { socket } from '../../../service/SocketIo';
 import { toast } from 'react-toastify';
+import { Modal } from 'antd';
 
 const cx = classNames.bind(styles);
 function RegisterLogin(props) {
@@ -179,9 +180,26 @@ function RegisterLogin(props) {
             .then((result) => {
 
                 if (result.status == 'OK') {
-                    dispatch(login(result))
-                    ServiceWorkerNotifi()
-                    state.socket.emit('save-socket', (result.data._id))
+                    if (result.data.hasOwnProperty('isLock') && result.data.isLock === true) {
+
+                        Modal.warning({
+                            title: "Thông báo",
+                            content: "Tài khoản của bạn hiện tạm khóa. Vui lòng đăng nhập sau!"
+                        })
+                    } else {
+                        toast.success('Đăng nhập thành công')
+                        dispatch(login(result))
+                        ServiceWorkerNotifi()
+                        state.socket.emit('save-socket', (result.data._id))
+                        setTimeout(() => {
+
+                            if (result.data.isManager) {
+                                navigate('/admin')
+                            } else {
+                                navigate('/')
+                            }
+                        }, 500)
+                    }
                 } else {
                     setShowDialog(true)
                 }
@@ -232,6 +250,7 @@ function RegisterLogin(props) {
             .then((result) => {
 
                 if (result.status == 'OK') {
+                    toast.success("Đăng ký tài khoản thành công!")
                     setShowProgress(false);
                     props.setShowForm(false);
                     dispatch(register(result));
@@ -249,6 +268,14 @@ function RegisterLogin(props) {
                     })
                     ServiceWorkerNotifi()
                     state.socket.emit('save-socket', (result.data._id))
+                    setTimeout(() => {
+
+                        if (result.data.isManager) {
+                            navigate('/admin')
+                        } else {
+                            navigate('/')
+                        }
+                    }, 500)
                 } else if (result.status == 'Failure' && result.message == 'Account is exists') {
                     setShowProgress(false);
                     setShowDialogRegister(true);
@@ -262,17 +289,26 @@ function RegisterLogin(props) {
             });
     };
 
-    useEffect(() => {
-        if (state.action == REGISTER) {
-            navigate(`/account/${0}`);
-            toast.success('Đăng ký tài khoản thành công')
-            dispatch(noAction());
-        } else if (state.action == LOGIN) {
-            navigate('/');
-            toast.success('Đăng nhập thành công')
-            dispatch(noAction());
-        }
-    }, [state]);
+    // useEffect(() => {
+    //     if (state.action == LOGOUT) {
+    //         navigate('/');
+    //         toast.success('Đăng xuất thành công');
+    //         dispatch(noAction());
+    //     } else if (state.action == LOGIN) {
+
+    //         if (state.user.isManager === true) {
+    //             navigate('/admin');
+    //         } else {
+    //             navigate('/');
+    //         }
+    //         toast.success('Đăng nhập thành công');
+    //         dispatch(noAction());
+    //     } else if (state.action == REGISTER) {
+    //         navigate('/account/0');
+    //         toast.success('Đăng ký tài khoản thành công');
+    //         dispatch(noAction());
+    //     }
+    // }, [state]);
 
     const handleCancel = () => {
         setValue('email', '');
@@ -285,43 +321,29 @@ function RegisterLogin(props) {
         const email = watch('email');
         const password = watch('password');
         setShowProgress(true);
-        await fetch(`${api}/users?email=${email}`, {
+        await fetch(`${api}/users/forgetpassword`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password, email })
         })
             .then((response) => response.json())
             .then((result) => {
                 if (result.status == 'OK') {
-                    fetch(`${api}/users/update/${result.data._id}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ password: password }),
-                    })
-                        .then((response) => response.json())
-                        .then((result) => {
-                            if (result.status == 'OK') {
-                                fetch(`${api}/users/login`, {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                    },
-                                    body: JSON.stringify({ email: email, password: password }),
-                                })
-                                    .then((response) => response.json())
-                                    .then((result) => {
-                                        if (result.status == 'OK') {
-                                            setShowProgress(false);
-                                            props.setShowForm(false);
-                                            dispatch(login(result));
-                                        }
-                                    })
-                                    .catch((error) => console.log(error));
-                            }
-                        })
-                        .catch((err) => console.log(err));
+                    toast.success("Lấy mật khẩu thành công!")
+                    props.setShowForm(false);
+                    dispatch(login(result))
+                    setTimeout(() => {
+
+                        if (result.data.isManager) {
+                            navigate('/admin')
+                        } else {
+                            navigate('/')
+                        }
+                    }, 500)
                 }
+                setShowProgress(false);
             })
-            .catch((err) => console.log(err));
+            .catch((err) => setShowProgress(false));
     };
 
     const handleLoginFacebook = (event) => {
