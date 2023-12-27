@@ -18,6 +18,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { authInstance } from '../../../utils/axiosConfig';
 import axios from 'axios';
+import FaceBookChatBox from '../../FaceBookChatBox/FaceBookChatBox';
 
 const cx = classNames.bind(styles);
 function DefaultLayout(props) {
@@ -32,13 +33,14 @@ function DefaultLayout(props) {
         props.setIsLogin(localstorage.get().length > 0);
     }, [state]);
 
-    useEffect(() => {
+    // useEffect(() => {
 
-        if (isDeploy) {
-            var chat_content = document.querySelector(".fb_dialog_content")
-            chat_content.style.display = 'block';
-        }
-    }, [])
+    //     if (isDeploy) {
+    //         var chat_content = document.querySelector(".fb_dialog_content")
+    //         if (chat_content) {
+    //             chat_content.style.display = 'block';
+    //         }
+    // }, [])
 
     setInterval(() => {
         if (isLogin()) {
@@ -64,46 +66,49 @@ function DefaultLayout(props) {
         setExpired(false);
     };
 
-    useEffect(() => {
-        if (state.action == LOGOUT) {
-            navigate('/');
-            toast.success('Đăng xuất thành công');
-            dispatch(noAction());
-            setExpired(false);
-        } else if (state.action == LOGIN) {
-            console.log(state.user)
-            if (state.user.isManager) {
-                navigate('/admin');
-            } else {
-                navigate('/');
-            }
-            toast.success('Đăng nhập thành công');
-            dispatch(noAction());
-            setExpired(false);
-        } else if (state.action == REGISTER) {
-            navigate('/account/0');
-            toast.success('Đăng ký tài khoản thành công');
-            dispatch(noAction());
-            setExpired(false);
-        }
-    }, [state]);
+    // useEffect(() => {
+    //     if (state.action == LOGOUT) {
+    //         navigate('/');
+    //         toast.success('Đăng xuất thành công');
+    //         dispatch(noAction());
+    //         setExpired(false);
+    //     } else if (state.action == LOGIN) {
+    //         console.log(state.user)
+    //         if (state.user.isManager) {
+    //             navigate('/admin');
+    //         } else {
+    //             navigate('/');
+    //         }
+    //         toast.success('Đăng nhập thành công');
+    //         dispatch(noAction());
+    //         setExpired(false);
+    //     } else if (state.action == REGISTER) {
+    //         navigate('/account/0');
+    //         toast.success('Đăng ký tài khoản thành công');
+    //         dispatch(noAction());
+    //         setExpired(false);
+    //     }
+    // }, [state]);
+
 
     return (
         <div className={cx('wrapper')}>
-            <Header />
+            <ToastContainer
+                position="top-right"
+                autoClose={2000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
+            {
+                props.auth ? "" : <Header />
+            }
             <div className={cx('container')}>
-                <ToastContainer
-                    position="top-right"
-                    autoClose={2000}
-                    hideProgressBar={false}
-                    newestOnTop={false}
-                    closeOnClick
-                    rtl={false}
-                    pauseOnFocusLoss
-                    draggable
-                    pauseOnHover
-                    theme="light"
-                />
                 <div className={cx('content')}>
                     <Dialog open={expired && isInteractive === false}>
                         <div className={cx('dialog_end_session_login')}>
@@ -122,7 +127,11 @@ function DefaultLayout(props) {
                     {props.children}
                 </div>
             </div>
-            <Footer />
+            {
+                props.auth ? "" : <Footer />
+            }
+
+            {/* <FaceBookChatBox /> */}
         </div>
     );
 }

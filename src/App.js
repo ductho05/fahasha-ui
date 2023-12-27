@@ -27,10 +27,9 @@ function App() {
     const Page404 = notFoundRoute.component;
     const [api, contextHolder] = notification.useNotification();
 
-    // ServiceWorkerNotifi()
-
     return (
         <BrowserRouter>
+
             <ScrollToTop />
             <div className="App">
                 <Routes>
@@ -88,9 +87,16 @@ function App() {
                     })}
 
                     {authRoutes.map((route, index) => {
-                        const Page = route.component;
-                        return <Route key={index} path={route.path} element={<Page />} />;
-                    })}
+                            const Page = route.component;
+                            return (
+                                <Route
+                                    key={index}
+                                    path={route.path}
+                                    element={<Page />}
+                                />
+                            );
+                        })
+                    }
 
                     <Route path={notFoundRoute.path} element={<Page404 />} />
                 </Routes>

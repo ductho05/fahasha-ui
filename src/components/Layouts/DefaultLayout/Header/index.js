@@ -35,6 +35,8 @@ import { notification } from 'antd';
 
 const cx = classNames.bind(styles);
 
+const listTabCate = ["Sách trong nước", "Sách ngoài nước"]
+
 function Header() {
     const [suggestSearch, setSuggestSearch] = useState(false);
     const [isShowForm, setIsShowForm] = useState(false);
@@ -84,6 +86,10 @@ function Header() {
             },
         });
     };
+
+    const handleChooseTab = (index) => {
+        setTabKey(index)
+    }
 
     useEffect(() => {
         state.socket.on('response-notification', (response) => {
@@ -156,10 +162,16 @@ function Header() {
             })
             .catch((err) => console.log(err));
 
-        fetch(`${api}/categories?filter=simple`)
+        fetch(`${api}/categories`)
             .then((response) => response.json())
             .then((result) => {
-                setListCategories(result.data);
+                const newList = result.data.map(cate => {
+                    return {
+                        ...cate,
+                        categories: cate.categories?.slice(0, 4)
+                    }
+                })
+                setListCategories(newList)
             })
             .catch((err) => console.log(err));
     }, []);
@@ -351,18 +363,62 @@ function Header() {
                                 <div className={cx('menu_popper', 'hide-on-tablet-mobile')} tabIndex="-1" {...attrs}>
                                     <PopperWrapper>
                                         <div className={cx('categories')}>
-                                            <h2 className="p-[20px] text-[26px] uppercase">Danh mục sản phẩm</h2>
-                                            <ul className="grid grid-cols-5">
-                                                {listCategories.map((category, index) => (
-                                                    <li
-                                                        onClick={() => handleOnClickCategory(category._id)}
-                                                        key={category._id}
-                                                        className={cx('categories_child_item')}
-                                                    >
-                                                        {category.name}
-                                                    </li>
-                                                ))}
-                                            </ul>
+                                            <div className='border-r p-[20px]'>
+                                                <h2 className="text-[16px] uppercase">Danh mục sản phẩm</h2>
+                                                {
+                                                    listTabCate.map((item, index) => (
+                                                        <div className={tabKey === index ? cx('left_item', 'active') : cx('left_item')} onClick={() => handleChooseTab(index)} key={item}>
+                                                            <p>
+                                                                {item}
+                                                            </p>
+                                                        </div>
+                                                    ))
+                                                }
+                                            </div>
+                                            <div className={`p-[20px] ${tabKey == 0 ? "visible" : "hidden"}`}>
+                                                <div className='flex mb-[20px] items-center'>
+                                                    <img className='w-[24px] h-[24px]' src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/category/ico_sachtrongnuoc.svg" />
+                                                    <h1 className='ml-[10px]  text-[#111] text-[24px] font-[500]'>
+                                                        Sách trong nước
+                                                    </h1>
+                                                </div>
+                                                <ul className="grid gap-[20px] grid-cols-4">
+                                                    {listCategories?.map((category, index) => (
+                                                        <div key={category?._id}>
+                                                            <h1 className='text-[#111] uppercase font-[600] text-[14px]'>
+                                                                {category?._id}
+                                                            </h1>
+                                                            <ul className={cx('categories_list_child')}>
+                                                                {
+
+                                                                    category?.categories?.map(item => (
+                                                                        <li
+                                                                            onClick={() => handleOnClickCategory(item?._id)}
+                                                                            key={item?._id}
+                                                                            className={cx('categories_child_item')}
+                                                                        >
+                                                                            {item?.name}
+                                                                        </li>
+                                                                    ))
+                                                                }
+                                                                <Link to={`/categories/${category._id}`}>
+                                                                    <p>Xem tất cả</p>
+                                                                </Link>
+                                                            </ul>
+
+                                                        </div>
+
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                            <div className={`p-[20px] ${tabKey == 1 ? "visible" : "hidden"}`}>
+                                                <div className='flex mb-[20px]  items-center'>
+                                                    <img className='w-[24px] h-[24px]' src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/category/ico_foreignbooks.svg" />
+                                                    <h1 className='ml-[10px] text-[#111] text-[24px] font-[500]'>
+                                                        Sách ngoài nước
+                                                    </h1>
+                                                </div>
+                                            </div>
                                         </div>
                                     </PopperWrapper>
                                 </div>

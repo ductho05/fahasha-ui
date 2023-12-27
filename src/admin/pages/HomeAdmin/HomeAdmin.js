@@ -71,7 +71,7 @@ function HomeAdmin() {
         for (let i = num + 1; i >= 0; i--) {
             const customday = new Date();
             customday.setDate(customday.getDate() - i);
-            const orderscustom = data?.orders?.filter((order) => {
+            const orderscustom = listOrderComplete?.filter((order) => {
                 return formatDateToString(new Date(order.date)) == formatDateToString(customday);
             });
             let totalToday = 0;

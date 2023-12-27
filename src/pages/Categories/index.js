@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import className from 'classnames/bind'
 import { useParams } from 'react-router-dom'
-import styles from './SearchProduct.module.scss'
+import styles from '../SeeMoreProduct/SeeMoreProduct.module.scss'
 import DropMenu from '../../components/DropMenu'
 import Paging from '../../components/Paging'
 import GridProduct from '../../components/GridProduct'
@@ -40,8 +40,14 @@ const priceOptions = [
 ]
 
 const rateOptions = [1, 2, 3, 4, 5]
-function SearchProduct() {
-    const { title } = useParams()
+function CategoriesProduct() {
+
+    let { categoryId, name } = useParams()
+
+    console.log(name)
+    if (categoryId == 0) {
+        categoryId = ''
+    }
     const [showProgress, setShowProgress] = useState(false)
     const [products, setProducts] = useState([])
     const [pages, setPages] = useState([])
@@ -76,7 +82,7 @@ function SearchProduct() {
     }
 
     useEffect(() => {
-        fetch(`${api}/categories?filter=simple&lock=true`)
+        fetch(`${api}/categories?filter=simple?lock=true`)
             .then(response => response.json())
             .then(result => {
                 if (result.status == "OK") {
@@ -105,13 +111,8 @@ function SearchProduct() {
     }
 
     const fetchProduct = () => {
-
-        let query = `${api}/products/?title=${title}&perPage=${optionSelected.value}&page=${currentPage}`
-
-        if (selectCategory) {
-            query += `&category=${selectCategory.value}`
-        }
-
+        const category = selectCategory ? selectCategory.value : categoryId
+        let query = `${api}/products/?category=${category}&perPage=${optionSelected.value}&page=${currentPage}`
         if (optionSelectedFilter.value) {
             query += `&filter=${optionSelectedFilter.value}&sort=${optionSelectedFilter.type}`
         }
@@ -172,11 +173,11 @@ function SearchProduct() {
         setCurrentPage(1)
         setProducts([])
         fetchProduct()
-    }, [rate, price, selectCategory])
+    }, [categoryId, rate, price, selectCategory])
 
     return (
         <div className={cx('wrapper')}>
-            <div className='flex items-center p-[20px] shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px]'>
+            <div className={cx('fillter', 'p-[20px] shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px]')}>
                 <div className={cx('fillter_arange')}>
                     <p>Sắp xếp theo:</p>
                     <DropMenu
@@ -294,14 +295,14 @@ function SearchProduct() {
 
                     </div>
                     {
-                        products.length <= 0 ?
+                        products?.length <= 0 ?
                             <div className="w-full p-[20px] border border-[#fcd344] bg-[#fafaec]">
                                 <p className="text-[#333] text-[1.6rem] font-[500]">Không có sản phẩm phù hợp với từ khóa tìm kiếm</p>
                             </div> : ""
                     }
 
                     {
-                        products.length > 0 ? <div className={numPages > 1 || !showProgress ? cx('bottom') : cx('hidden')}>
+                        products?.length > 0 ? <div className={numPages > 1 || !showProgress ? cx('bottom') : cx('hidden')}>
                             <Paging
                                 numPages={numPages}
                                 pages={pages}
@@ -319,4 +320,4 @@ function SearchProduct() {
     )
 }
 
-export default SearchProduct
+export default CategoriesProduct

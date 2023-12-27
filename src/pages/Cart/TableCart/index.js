@@ -28,7 +28,7 @@ function TableCart() {
     const [code, setCode] = useState('');
     const [discount, setDiscount] = useState(0);
     const product = localStorage.getItem(namecart) ? JSON.parse(localStorage.getItem(namecart)).items : [];
-    const [data, setDataCart] = useState([]);
+    const [dataCart, setDataCart] = useState([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState(GetLocalCart);
     const info = (coupon) => {
         message.info({

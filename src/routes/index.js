@@ -30,6 +30,7 @@ import Categories from '../admin/pages/Categories/Categories';
 import CategoriesDetail from '../admin/pages/CategoriesDetail/CategoriesDetail';
 import OrderAdminDetail from '../admin/pages/OrderDetail/OrderAdminDetail';
 import Favorite from '../pages/Account/components/Favorite';
+import CategoriesProduct from '../pages/Categories';
 
 // Public Routes
 const publicRoutes = [
@@ -40,6 +41,7 @@ const publicRoutes = [
     { path: '/flashsale', component: FlashSaleForGuest },
     { path: '/search/:title', component: SearchProduct },
     { path: '/terms-of-service', component: TermsServices },
+    { path: '/categories/:name', component: CategoriesProduct }
 ];
 
 // Private Routes
@@ -72,7 +74,8 @@ const adminRoutes = [
     { path: '/admin/notifications', component: Notifications },
     { path: '/admin/categories', component: Categories },
     { path: '/admin/categories/:cid', component: CategoriesDetail },
-    { path: '/admin/account', component: AccountInfo },
+    { path: '/admin/account', component: AccountInfo},
+   
 ];
 
 // Auth routes

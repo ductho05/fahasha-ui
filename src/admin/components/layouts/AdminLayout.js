@@ -97,10 +97,10 @@ function AdminLayout({ children }) {
               },
     );
 
-    if (isDeploy) {
-        var chat_content = document.querySelector('.fb_dialog_content');
-        chat_content.style.display = 'none';
-    }
+    // if (isDeploy) {
+    //     var chat_content = document.querySelector(".fb_dialog_content")
+    //     chat_content.style.display = 'none';
+    // }
 
     // }, [])
 
@@ -190,38 +190,37 @@ function AdminLayout({ children }) {
                 })
                 .catch((err) => console.log(err));
 
-            fetch(`${api}/evaluates/get`)
-                .then((response) => response.json())
-                .then((result) => {
-                    setData2((prev) => ({ ...prev, evaluates: result.data }));
-                    setIsLoaded((prev) => ({ ...prev, evaluates: true }));
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
+        fetch(`${api}/evaluates/get`)
+            .then((response) => response.json())
+            .then((result) => {
+                setData2((prev) => ({ ...prev, evaluates: result.data }));
+                setIsLoaded((prev) => ({ ...prev, evaluates: true }));
+            })
+            .catch((err) => {
+                console.log(err);
+            });
 
             authInstance
-                .get(`/webpush/get-all`)
-                .then((result) => {
-                    // console.log(result);
-                    if (result.data.status === 'OK') {
-                        setData2((prev) => ({ ...prev, noties: result.data.data }));
-                        setIsLoaded((prev) => ({ ...prev, noties: true }));
-                    }
-                })
-                .catch((err) => {
-                    console.error(err);
-                });
-
-            fetch(`${api}/categories?filter=simple`)
-                .then((response) => response.json())
-                .then((result) => {
-                    if (result.status == 'OK') {
-                        setData2((prev) => ({ ...prev, categories: result.data }));
-                        setIsLoaded((prev) => ({ ...prev, categories: true }));
-                    }
-                })
-                .catch((err) => console.log(err.message));
+            .get(`/webpush/get-all`)
+            .then((result) => {
+                // console.log(result);
+                if (result.data.status === 'OK') {
+                    setData2((prev) => ({ ...prev, noties: result.data.data }));
+                    setIsLoaded((prev) => ({ ...prev, noties: true }));
+                }
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+        fetch(`${api}/categories?filter=simple`)
+            .then((response) => response.json())
+            .then((result) => {
+                if (result.status == 'OK') {
+                    setData2((prev) => ({ ...prev, categories: result.data }));
+                    setIsLoaded((prev) => ({ ...prev, categories: true }));
+                }
+            })
+            .catch((err) => console.log(err.message));
 
             authInstance
                 .post('/orders/filter')
@@ -331,7 +330,7 @@ function AdminLayout({ children }) {
                     <div
                         className={cx('navbar')}
                         style={{
-                            height: '80vh',
+                            maxHeight: '100vh',
                             position: 'fixed',
                             top: 0,
                             backgroundColor: 'yourNavbarBackgroundColor', // Thay thế bằng màu nền mong muốn
@@ -343,14 +342,14 @@ function AdminLayout({ children }) {
                     <div
                         className={cx('navbarlap')}
                         style={{
-                            height: '80vh',
+                            maxHeight: '100vh',
                             position: 'fixed',
                             top: 0,
                             backgroundColor: 'yourNavbarBackgroundColor', // Thay thế bằng màu nền mong muốn
                             zIndex: 1000, // Tăng giá trị nếu cần
                         }}
                     >
-                        <SideBarLaptop url={url} />
+                        <SideBarLaptop  url={url}/>
                     </div>
                     <div style={{ width: 250, height: '100vh' }} className={cx('container')}>
                         <NavBar

@@ -67,11 +67,11 @@ function UpdateProduct() {
         console.log(data);
     }, [data]);
     React.useEffect(() => {
-        fetch(`${api}/categories?filter=simple`)
-            .then((response) => response.json())
-            .then((result) => {
-                if (result.status == 'OK') {
-                    const newList = result.data.map((category) => {
+        fetch(`${api}/categories?filter=simple&lock=true`)
+            .then(response => response.json())
+            .then(result => {
+                if (result.status == "OK") {
+                    const newList = result.data.map(category => {
                         return {
                             label: category.name,
                             value: category._id,
