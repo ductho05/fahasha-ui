@@ -8,15 +8,17 @@ import { Backdrop, CircularProgress, Dialog } from '@mui/material';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { useForm, useController } from 'react-hook-form';
 import { Link, useParams } from 'react-router-dom';
-import { api } from '../../../constants';
+import { api, superAdmin } from '../../../constants';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getAuthInstance } from '../../../utils/axiosConfig';
+
+// import { api, appPath, lockImage, superAdmin, unLockImage } from '../../../constants';
 import { useData } from '../../../stores/DataContext';
 import EnhancedTable from '../../components/Table/EnhancedTable';
 import numeral from 'numeral';
-import { Button } from 'antd';
-const moment = require('moment-timezone')
+import { Button, Input, message, Modal } from 'antd';
+const moment = require('moment-timezone');
 
 const cx = classNames.bind(styles);
 
@@ -42,7 +44,7 @@ const options = [
         title: '6 năm gần nhất',
         value: 5,
     },
-]
+];
 
 function chuyenDoiThang(tenVietTat) {
     const thangDict = {
@@ -77,23 +79,44 @@ const formatDateToString = (date) => {
         // return date.toISOString().slice(0, 10); // Lấy YYYY-MM-DD
     }
     return ''; // Trả về chuỗi rỗng nếu date là null
-}
+};
 
 function UserDetail() {
-
-    const authInstance = getAuthInstance()
-
+    const authInstance = getAuthInstance();
+    // const { data, setData } = useData();
     const { userId } = useParams();
     const [user, setUser] = useState({});
     const [optionSelected, setOptionSelected] = useState(options[0]);
     const [showDialog, setShowDialog] = useState(false);
     const [avatar, setAvatar] = useState({});
     const [orders, setOrders] = useState([]);
-    const [ischanged, setIsChanged] = useState(false)
-    const [loading, setLoading] = useState(false)
-    const { data, setData } = useData()
-    const [dataIncomes, setDataIncomes] = useState([])
-    const num = 5
+    const [show, setShow] = useState(false);
+    const [ischanged, setIsChanged] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [superAdminCode, setSuperAdminCode] = useState('superadmin1811');
+    const { data, setData } = useData();
+    const [dataIncomes, setDataIncomes] = useState([]);
+    const num = 5;
+
+    const handleCancelCheck = () => {
+        setShow(false);
+    };
+
+    const handleCheckCode = () => {
+        if (superAdminCode === superAdmin) {
+            //  setIsSuperAdmin(true);
+            setData({ ...data, isSuperAdmin: true });
+            setShow(false);
+            //localStorage.setItem('spc', true);
+            message.success('Xác nhận thành công!');
+        } else {
+            message.error(`Mã super admin sai!`);
+        }
+    };
+
+    const handleChangeCode = (e) => {
+        setSuperAdminCode(e.target.value);
+    };
 
     const columns = [
         {
@@ -102,7 +125,9 @@ function UserDetail() {
             sortable: false,
             editable: true,
             width: 160,
-            renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : "Trống"}</p>
+            renderCell: (params) => (
+                <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : 'Trống'}</p>
+            ),
         },
         {
             field: 'user',
@@ -110,35 +135,47 @@ function UserDetail() {
             sortable: false,
             editable: true,
             width: 160,
-            renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value?.fullName : "Trống"}</p>
+            renderCell: (params) => (
+                <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value?.fullName : 'Trống'}</p>
+            ),
         },
         {
             field: 'address',
             headerName: 'Địa chỉ',
             width: 300,
             sortable: false,
-            renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : "Trống"}</p>
+            renderCell: (params) => (
+                <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : 'Trống'}</p>
+            ),
         },
         {
             field: 'phone',
             headerName: 'Điện thoại',
             width: 160,
             sortable: false,
-            renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : "Trống"}</p>
+            renderCell: (params) => (
+                <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : 'Trống'}</p>
+            ),
         },
         {
             field: 'quantity',
             headerName: 'Số lượng',
             width: 100,
             sortable: false,
-            renderCell: (params) => <p className={params.value ? cx('text-center') : cx('null')}>{params.value ? params.value : "Trống"}</p>
+            renderCell: (params) => (
+                <p className={params.value ? cx('text-center') : cx('null')}>{params.value ? params.value : 'Trống'}</p>
+            ),
         },
         {
             field: 'price',
             headerName: 'Thành tiền(đ)',
             width: 120,
             sortable: false,
-            renderCell: (params) => <p className={params.value ? cx('') : cx('null')}>{params.value ? numeral(params.value).format('0,0[.]00 VNĐ') : "Trống"}</p>
+            renderCell: (params) => (
+                <p className={params.value ? cx('') : cx('null')}>
+                    {params.value ? numeral(params.value).format('0,0[.]00 VNĐ') : 'Trống'}
+                </p>
+            ),
         },
         {
             field: '_id',
@@ -149,13 +186,16 @@ function UserDetail() {
             renderCell: (params) => {
                 const handleOnCLick = (e) => {
                     e.stopPropagation();
-                }
+                };
 
-                return <Link to={`/admin/order/detail/${params.value}`}>
-                    <Button type='primary' ghost>Chi tiết</Button>
-                </Link>
-
-            }
+                return (
+                    <Link to={`/admin/orders/detail/${params.value}`}>
+                        <Button type="primary" ghost>
+                            Chi tiết
+                        </Button>
+                    </Link>
+                );
+            },
         },
     ];
 
@@ -165,28 +205,28 @@ function UserDetail() {
         setValue('email', user.email);
         setValue('phoneNumber', user.phoneNumber);
         setValue('address', user.address);
-    }
+    };
 
     const handleCloseEdit = () => {
         clearErrors();
         setAvatar({});
         setShowDialog(false);
-    }
+    };
 
     const fetchUsers = () => {
-
-        authInstance.get(`/users`)
-            .then(result => {
-                setData({ ...data, users: result.data.data })
+        authInstance
+            .get(`/users`)
+            .then((result) => {
+                setData({ ...data, users: result.data.data });
             })
-            .catch(err => {
-
-                console.log(err)
-            })
-    }
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
     useEffect(() => {
-        authInstance.get(`/users/${userId}`)
+        authInstance
+            .get(`/users/${userId}`)
             .then((result) => {
                 if (result.data.status === 'OK') {
                     setUser(result.data.data);
@@ -196,7 +236,8 @@ function UserDetail() {
     }, [user]);
 
     useEffect(() => {
-        authInstance.post(`/orders/filter?user=${userId}`)
+        authInstance
+            .post(`/orders/filter?user=${userId}`)
             .then((result) => {
                 if (result.data.status === 'OK') {
                     setOrders(result.data.data);
@@ -216,7 +257,7 @@ function UserDetail() {
         file.preview = URL.createObjectURL(file);
 
         setAvatar(file);
-    }
+    };
     // Validate
     const {
         clearErrors,
@@ -244,17 +285,19 @@ function UserDetail() {
         control,
     });
 
-
     useEffect(() => {
-
-        if (watch("fullName") != user.fullName || watch("email") != user.email ||
-            watch("phoneNumber") != user.phoneNumber || watch("address") != user.address || Object.keys(avatar).length > 0) {
-            setIsChanged(true)
+        if (
+            watch('fullName') != user.fullName ||
+            watch('email') != user.email ||
+            watch('phoneNumber') != user.phoneNumber ||
+            watch('address') != user.address ||
+            Object.keys(avatar).length > 0
+        ) {
+            setIsChanged(true);
         } else {
-            setIsChanged(false)
+            setIsChanged(false);
         }
-
-    }, [watch(), avatar])
+    }, [watch(), avatar]);
 
     const handleSave = async (data) => {
         const formData = new FormData();
@@ -265,30 +308,30 @@ function UserDetail() {
             formData.append('images', avatar);
         }
 
-        setLoading(true)
-        await authInstance.put(`/users/update/${userId}`, formData)
+        setLoading(true);
+        await authInstance
+            .put(`/users/update/${userId}`, formData)
             .then((result) => {
                 if (result.data.status === 'OK') {
-                    setUser(result.data.data)
+                    setUser(result.data.data);
                     toast.success('Cập nhật thành công!');
-                    fetchUsers()
+                    fetchUsers();
                 } else {
                     toast.error('Thất bại! Có lỗi xảy ra');
                 }
                 setShowDialog(false);
-                setLoading(false)
+                setLoading(false);
             })
             .catch((err) => {
                 setShowDialog(false);
-                setLoading(false)
+                setLoading(false);
                 toast.error(err.message);
-                console.error(err)
+                console.error(err);
             });
-    }
+    };
 
     useEffect(() => {
-
-        const today = new Date()
+        const today = new Date();
         if (optionSelected.title == '6 ngày gần nhất') {
             const incomeData = [];
 
@@ -496,7 +539,7 @@ function UserDetail() {
             console.log('incomeData', incomeData);
             setDataIncomes(incomeData);
         }
-    }, [optionSelected])
+    }, [optionSelected]);
 
     return (
         <div className={cx('wrapper')}>
@@ -512,10 +555,15 @@ function UserDetail() {
                 pauseOnHover
                 theme="light"
             />
-            <Backdrop
-                sx={{ color: '#fff', zIndex: 10000 }}
-                open={loading}
+            <Modal
+                title="Vui lòng nhập mã SupperAdmin để quản lý người dùng!"
+                open={show}
+                onOk={handleCheckCode}
+                onCancel={handleCancelCheck}
             >
+                <Input value={superAdminCode} type="text" onChange={(e) => handleChangeCode(e)} />
+            </Modal>
+            <Backdrop sx={{ color: '#fff', zIndex: 10000 }} open={loading}>
                 <CircularProgress color="error" />
             </Backdrop>
             <Dialog open={showDialog}>
@@ -523,7 +571,7 @@ function UserDetail() {
                     <p className={cx('btn_close')} onClick={handleCloseEdit}>
                         <CloseOutlinedIcon className={cx('btn_icon')} />
                     </p>
-                    <h3 className={cx('dialog_title', "font-[500]")}>Chỉnh sửa thông tin tài khoản</h3>
+                    <h3 className={cx('dialog_title', 'font-[500]')}>Chỉnh sửa thông tin tài khoản</h3>
                     <form onSubmit={handleSubmit(handleSave)} className={cx('dialog_content')}>
                         <div className={cx('left')}>
                             <div className={cx('images')}>
@@ -540,8 +588,8 @@ function UserDetail() {
                                     errors.fullName
                                         ? cx('form_group', 'error')
                                         : errors.fullName
-                                            ? cx('form_group', 'error')
-                                            : cx('form_group')
+                                        ? cx('form_group', 'error')
+                                        : cx('form_group')
                                 }
                             >
                                 <p className={cx('label')}>Tên</p>
@@ -577,7 +625,9 @@ function UserDetail() {
                             </div>
 
                             <p className={cx('btn_edit')}>
-                                <Button disabled={!ischanged} type="primary">Lưu thay đổi</Button>
+                                <Button disabled={!ischanged} type="primary">
+                                    Lưu thay đổi
+                                </Button>
                             </p>
                         </div>
                     </form>
@@ -585,7 +635,12 @@ function UserDetail() {
             </Dialog>
             <div className={cx('top')}>
                 <div className={cx('infomation')}>
-                    <p className={cx('btnEdit')} onClick={handleClickEdit}>
+                    <p
+                        className={cx('btnEdit')}
+                        onClick={() => {
+                            data?.isSuperAdmin ? handleClickEdit() : setShow(true);
+                        }}
+                    >
                         Chỉnh sửa
                     </p>
                     <h3 className={cx('title')}>Thông tin người dùng</h3>

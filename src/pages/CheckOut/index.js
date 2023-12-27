@@ -14,13 +14,14 @@ import { useStore } from '../../stores/hooks';
 import localstorage from '../../localstorage';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
-import { Modal, Button } from 'antd';
+import { Modal, Button, Input, message } from 'antd';
 import Page404 from '../Page404';
 import SendNotification from '../../service/SendNotification';
 import { getAuthInstance } from '../../utils/axiosConfig';
 import localstorge from '../../stores/localstorge';
+// import { useData, useAdmin } from '../../../';
 import axios from 'axios';
-
+// import { useData } from '../../hooks/useData';
 const cx = classNames.bind(styles);
 function CheckOut() {
     const authInstance = getAuthInstance();
@@ -51,6 +52,15 @@ function CheckOut() {
     const [product, setProduct] = useState(
         localStorage.getItem(namecart) ? JSON.parse(localStorage.getItem(namecart)).items : [],
     );
+
+    // const { data, setData } = useData();
+    const [code, setCode] = useState('');
+    const info = (coupon) => {
+        message.info({
+            content: coupon,
+            duration: 1.5,
+        });
+    };
     const [isUpdateSold, setIsUpdateSold] = useState(false);
     //const product = localStorage.getItem(namecart) ? JSON.parse(localStorage.getItem(namecart)).items : [];
     //const [mycheckout, setmycheckout] = useState([]);
@@ -61,6 +71,16 @@ function CheckOut() {
     const price = listCheckouts.reduce((total, curr) => total + curr.quantity * curr.product.price, 0);
     const quantity = listCheckouts.reduce((total, curr) => total + curr.quantity, 0);
 
+    // lấy tất cả chữ số có trong token trên localstored
+    const token = () => {
+        let token = localStorage.getItem('token') ? localStorage.getItem('token').match(/\d+/g) : null;
+        // lấy 5 chữ số cuối cùng
+        token = token ? token.slice(-5).join('') : null;
+        // chuyển sang số
+        token = token ? parseInt(token) : null;
+        return token;
+    };
+    //console.log('token', token());
     useEffect(() => {
         setProduct(localStorage.getItem(namecart) ? JSON.parse(localStorage.getItem(namecart)).items : []);
     }, [isLoading]);
@@ -102,7 +122,7 @@ function CheckOut() {
     useEffect(() => {
         if (order) {
             localstorage.set('curent_checkoutid', order._id);
-            console.log('da den day roi ne');            
+            console.log('da den day roi ne');
             navigate(`/order-success/${order._id}`);
         }
     }, [order]);
@@ -382,7 +402,7 @@ function CheckOut() {
     const addCheckout = async (data, type) => {
         console.log('data21423', data, listCheckouts);
         setShowProgress(true);
-        // await authInstance
+
         //     .post(`/orders/insert`, {
         //         ...data,
         //         flashsales: productFlash,
@@ -527,7 +547,7 @@ function CheckOut() {
         const signed = urlParams.get('signed');
         const status = urlParams.get('status');
         // kiểm tra trùng khớp thì pass
-        if (JSON.stringify(dataCheckout) !== '{}' && dataCheckout.signed === signed) {
+        if (JSON.stringify(dataCheckout) !== '{}' && parseInt(dataCheckout.signed) - token() == signed) {
             setIsAllowOpen(false);
             delete dataCheckout.signed;
             localStorage.removeItem('is_order_success_page');
@@ -588,7 +608,8 @@ function CheckOut() {
                     .post(`/orders/create_payment_url?amount=${data.price}`)
                     .then((result) => {
                         console.log('sdda33sdas', result.data.data);
-                        data.signed = result.data.data.signed;
+                        data.signed = parseInt(result.data.data.signed) + token();
+
                         localstorage.set(statusVNPayCheckout, data);
                         window.location.href = result.data.data.data;
                     })
@@ -1233,6 +1254,8 @@ function CheckOut() {
                     </div>
                     <p className={cx('form_error', 'error_radio')}>{errors.payment_method?.message}</p>
                 </div>
+
+               
 
                 <div className={cx('payment_method')}>
                     <h3 className={cx('heading')}>Thông tin khác</h3>

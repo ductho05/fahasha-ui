@@ -6,13 +6,12 @@ import ProgressChart from '../../components/charts/ProgressChart/ProgressChart';
 import IncomeChart from '../../components/charts/IncomeChart/IncomeChart';
 import DropMenu from '../../../components/DropMenu';
 import OrdersLatesTable from '../../components/OrdersLatesTable/OrdersLatesTable';
-import { useData } from '../../../stores/DataContext'
+import { useData } from '../../../stores/DataContext';
 import { Button } from 'antd';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
-
-const cx = classNames.bind(styles)
+const cx = classNames.bind(styles);
 
 function chuyenDoiThang(tenVietTat) {
     const thangDict = {
@@ -45,31 +44,29 @@ const formatDateToString = (date) => {
         return utcTimeString;
     }
     return '';
-}
+};
 
 function HomeAdmin() {
+    const [dataWidgets, setDataWidgets] = useState([]);
+    const { data, setData } = useData();
+    const [rows, setRows] = useState([]);
+    const [dataIncomes, setDataIncomes] = useState([]);
+    const navigate = useNavigate();
 
-    const [dataWidgets, setDataWidgets] = useState([])
-    const { data, setData } = useData()
-    const [rows, setRows] = useState([])
-    const [dataIncomes, setDataIncomes] = useState([])
-    const navigate = useNavigate()
-
-    const num = 5
+    const num = 5;
 
     useEffect(() => {
-        const countUsers = data?.users?.length
-        const countOrders = data?.orders?.filter(order => order.status !== "DAHUY")?.length
-        const listOrderComplete = data?.orders?.filter(order => order.status == "HOANTHANH")
-        let incomes = 0
+        const countUsers = data?.users?.length;
+        const countOrders = data?.orders?.length;
+        const listOrderComplete = data?.orders?.filter((order) => order.status == 'HOANTHANH');
+        let incomes = 0;
         if (listOrderComplete) {
-            incomes = listOrderComplete?.reduce((acc, order) => acc + order.price, 0)
+            incomes = listOrderComplete?.reduce((acc, order) => acc + order.price, 0);
         }
-        const countEvaluate = data?.evaluates?.length
-        const listNewOrderComplete = data?.orders?.filter((order) => order.status == "HOANTHANH")?.slice(0, 10)
+        const countEvaluate = data?.evaluates?.length;
+        const listNewOrderComplete = data?.orders?.filter((order) => order.status == 'HOANTHANH')?.slice(0, 10);
 
-        const incomeData = []
-
+        const incomeData = [];
 
         for (let i = num + 1; i >= 0; i--) {
             const customday = new Date();
@@ -77,7 +74,7 @@ function HomeAdmin() {
             const orderscustom = data?.orders?.filter((order) => {
                 return formatDateToString(new Date(order.date)) == formatDateToString(customday);
             });
-            let totalToday = 0
+            let totalToday = 0;
             if (orderscustom) {
                 totalToday = orderscustom.reduce((total, order) => {
                     return total + order.price;
@@ -95,36 +92,34 @@ function HomeAdmin() {
                 title: 'Người dùng',
                 type: 'users',
                 value: countUsers,
-                url: '/admin/user'
+                url: '/admin/user',
             },
             {
                 title: 'Đơn hàng',
                 type: 'orders',
                 value: countOrders,
-                url: '/admin/orders'
+                url: '/admin/orders',
             },
             {
                 title: 'Thu nhập',
                 type: 'earnings',
                 value: incomes,
-                url: '/admin/statistics'
+                url: '/admin/statistics',
             },
             {
                 title: 'Đánh giá',
                 type: 'reviews',
                 value: countEvaluate,
-                url: '/admin/reviews'
+                url: '/admin/reviews',
             },
-        ])
+        ]);
 
-        setRows(listNewOrderComplete)
-
-    }, [data])
+        setRows(listNewOrderComplete);
+    }, [data]);
 
     const handleToStatistic = () => {
-
-        navigate("/admin/statistics")
-    }
+        navigate('/admin/statistics');
+    };
 
     return (
         <div className={cx('wrapper')}>
@@ -135,13 +130,15 @@ function HomeAdmin() {
             </div>
             <div className={cx('chart')}>
                 <div className={cx('right')}>
-                    <div className={cx('heading p-[20px]')}>
-                        <Button onClick={handleToStatistic} icon={<ArrowRightOutlined />} danger>Xem tất cả</Button>
-                    </div>
-                    <div>
-                        <h3 className="mb-[20px] text-[2rem] uppercase text-[#333] font-[600] text-center">
+                    <div className={cx('heading p-[10px]')}>
+                        <Button onClick={handleToStatistic} icon={<ArrowRightOutlined />} danger>
+                            Xem tất cả
+                        </Button>
+                        <h3 className="mb-[0px] text-[2rem] uppercase text-[#333] font-[600] text-center">
                             Thu nhập 6 ngày gần nhất
                         </h3>
+                    </div>
+                    <div>
                         <IncomeChart data={dataIncomes} size={3 / 1} />
                     </div>
                 </div>

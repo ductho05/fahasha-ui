@@ -12,10 +12,18 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useStore } from '../../stores/hooks';
 import { LOGOUT } from '../../stores/constants';
 import FlashSale from '../../admin/pages/UseFul/FlashSale';
-import Favorite from '../Favorite';
+import Favorite from './components/Favorite';
+import Voucher from './components/Voucher';
 
 const cx = classNames.bind(styles);
-const listTabs = ['Thông tin tài khoản', 'Đơn hàng của tôi', 'Nhận xét của tôi', 'Thông báo', 'Danh sách yêu thích'];
+const listTabs = [
+    'Thông tin tài khoản',
+    'Đơn hàng của tôi',
+    'Nhận xét của tôi',
+    'Thông báo',
+    'Danh sách yêu thích',
+    'Ví voucher',
+];
 function Account() {
     const { index } = useParams();
     const navigate = useNavigate();
@@ -43,6 +51,8 @@ function Account() {
     const handleTabClick = (index) => {
         setCurrentIndex(index);
     };
+
+    console.log('currentIndex', currentIndex);
 
     return (
         <>
@@ -95,6 +105,9 @@ function Account() {
                         </div>
                         <div className={currentIndex == 4 ? cx('infomation') : cx('hide')}>
                             <Favorite />
+                        </div>
+                        <div className={currentIndex == 5 ? cx('infomation') : cx('hide')}>
+                            <Voucher />
                         </div>
                     </div>
                 </div>

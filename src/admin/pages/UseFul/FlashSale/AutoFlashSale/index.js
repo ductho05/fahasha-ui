@@ -123,7 +123,7 @@ function AutoFlashSale() {
                           return (
                               <SimpleItem
                                   onClick={() => {
-                                      navigate(`/admin/update-product/${item._id}`);
+                                      navigate(`/admin/products/${item._id}`);
                                   }}
                                   key={index}
                                   props={{

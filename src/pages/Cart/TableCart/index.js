@@ -9,22 +9,26 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useStore } from '../../../stores/hooks';
 
+import { getAuthInstance } from '../../../utils/axiosConfig';
 import { api } from '../../../constants';
 import { useEffect } from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import { Skeleton } from 'antd';
 import Item from 'antd/es/list/Item';
+import { auth } from '../../../FirebaseConfig';
 function TableCart() {
+    const authInstance = getAuthInstance();
     const navigate = useNavigate();
     const numeral = require('numeral');
+    const [loading, setLoading] = useState(false);
     const [state, dispatch] = useStore();
     const cx = classname.bind(styles);
     const namecart = `myCart_${state.user._id}`;
     const [code, setCode] = useState('');
     const [discount, setDiscount] = useState(0);
     const product = localStorage.getItem(namecart) ? JSON.parse(localStorage.getItem(namecart)).items : [];
-    const [data, setData] = useState([]);
+    const [data, setDataCart] = useState([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState(GetLocalCart);
     const info = (coupon) => {
         message.info({
@@ -33,27 +37,29 @@ function TableCart() {
         });
     };
 
-    const coupon = [
-        {
-            code: '30thang4',
-            discount: 10,
-        },
-        {
-            code: 'khuyenmaiT4',
-            discount: 20,
-        },
-        {
-            code: 'DUCANH',
-            discount: 30,
-        },
-    ];
+    const [coupon, setCoupon] = useState([]);
+
+    // const coupon = [
+    //     {
+    //         code: '30thang4',
+    //         discount: 10,
+    //     },
+    //     {
+    //         code: 'khuyenmaiT4',
+    //         discount: 20,
+    //     },
+    //     {
+    //         code: 'DUCANH',
+    //         discount: 30,
+    //     },
+    // ];
 
     useEffect(() => {
         product.forEach((item) => {
             fetch(`${api}/products/id/${item.id}`)
                 .then((response) => response.json())
                 .then((products) => {
-                    setData((prev) => {
+                    setDataCart((prev) => {
                         return [
                             ...prev,
                             {
@@ -63,7 +69,7 @@ function TableCart() {
                                 price: products.data.price,
                                 count: item.count,
                                 total: item.count * products.data.price,
-                                quantity: products.data.quantity
+                                quantity: products.data.quantity,
                             },
                         ];
                     });
@@ -72,6 +78,20 @@ function TableCart() {
         });
     }, []);
 
+    // lấy mã giảm giá từ api
+    useEffect(() => {
+        setLoading(true);
+        authInstance
+            .get(`/vouchers?user=${state.user._id}`)
+            .then((result) => {
+                if (result.data.status == 'OK') {
+                    setCoupon(result.data.data);
+                    console.log('resulta', result.data.data, state.user._id);
+                }
+                setLoading(false);
+            })
+            .catch((err) => setLoading(false));
+    }, []);
     // Lấy trạng thái chọn mua từ local
     function GetLocalCart() {
         var initIscheckout = [];
@@ -107,10 +127,10 @@ function TableCart() {
 
     const handleDelete = (key) => {
         // Xóa trên UI
-        const newData = [...data];
+        const newData = [...dataCart];
         const index = newData.findIndex((item) => key === item.key);
         newData.splice(index, 1);
-        setData(newData);
+        setDataCart(newData);
 
         // Xóa trên localStorage
         const myCart = JSON.parse(localStorage.getItem(namecart));
@@ -127,7 +147,7 @@ function TableCart() {
     function TongThanhToan() {
         let tong = 0;
         selectedRowKeys.map((item, index) => {
-            data.map((item2, index2) => {
+            dataCart.map((item2, index2) => {
                 if (item === item2.key) {
                     tong += item2.total;
                 }
@@ -248,14 +268,14 @@ function TableCart() {
                                 }}
                                 disabled={record.count === 1 || rowSelection.selectedRowKeys.includes(record.key)}
                                 onClick={() => {
-                                    const newData = [...data];
+                                    const newData = [...dataCart];
                                     newData.map((item, index) => {
                                         if (item.key === record.key) {
                                             item.count -= 1;
                                             item.total = item.count * item.price;
                                         }
                                     });
-                                    setData(newData);
+                                    setDataCart(newData);
 
                                     const myCart = JSON.parse(localStorage.getItem(namecart));
                                     product.map((item, index) => {
@@ -291,18 +311,18 @@ function TableCart() {
                                 }}
                                 disabled={rowSelection.selectedRowKeys.includes(record.key)}
                                 onClick={() => {
-                                    const newData = [...data];
+                                    const newData = [...dataCart];
                                     newData.map((item, index) => {
                                         if (item.key === record.key) {
                                             if (item.quantity - item.count == 0) {
-                                                message.warning("Vui lòng không đặt quá số lượng trong kho")
+                                                message.warning('Vui lòng không đặt quá số lượng trong kho');
                                             } else {
                                                 item.count += 1;
                                                 item.total = item.count * item.price;
                                             }
                                         }
                                     });
-                                    setData(newData);
+                                    setDataCart(newData);
 
                                     const myCart = JSON.parse(localStorage.getItem(namecart));
                                     product.map((item, index) => {
@@ -366,7 +386,7 @@ function TableCart() {
                 pagination={false}
                 rowSelection={rowSelection}
                 columns={columns}
-                dataSource={data}
+                dataSource={dataCart}
             />
             <div className={cx('right')}>
                 <div
@@ -443,7 +463,7 @@ function TableCart() {
                             <div className={cx('total-price-total')}>
                                 <div className={cx('total-price-contain-title')}>Giảm giá</div>
                                 <div className={cx('total-price-contain-value')}>
-                                    -{numeral(TongThanhToan() * discount).format('0,0')}đ
+                                    {numeral(TongThanhToan() * discount).format('0,0')}đ
                                 </div>
                             </div>
                             <span></span>

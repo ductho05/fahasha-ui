@@ -10,7 +10,7 @@ function Tabs({ indexs, components }) {
     }
 
     return (
-        <div className="mt-[20px]">
+        <div className="mt-[10px]">
             <div className="my-[10px]">
                 {
                     indexs?.map((item, index) => (

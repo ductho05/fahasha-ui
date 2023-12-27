@@ -279,7 +279,7 @@ function CostumFlashSale() {
                 return (
                     <div
                         onClick={() => {
-                            navigate(`/admin/update-product/${params?.row?.idProduct}`);
+                            navigate(`/admin/products/${params?.row?.idProduct}`);
                         }}
                         style={{
                             display: 'flex',
@@ -471,14 +471,14 @@ function CostumFlashSale() {
     return (
         <div className={cx('wrapper')}>
             <div className={cx('top')}>
-                <p
+                <h3
                     style={{
                         margin: '0 0 0 10px',
                         flex: 2,
                     }}
                 >
-                    SẢN PHẨM YÊU THÍCH
-                </p>
+                    QUẢN LÝ SẢN PHẨM YÊU THÍCH
+                </h3>
             </div>
             <div className="flex items-center justify-between px[20px] py-[10px] shadow-sm border rounded-[6px] my-[10px]">
                 <div className="px-[20px] flex items-center">
@@ -634,7 +634,7 @@ function CostumFlashSale() {
                         }}
                         pageSize={12}
                         type="customFlashsale"
-                        height="66vh"
+                        height="70vh"
                     />
                 </div>
                 <div className={cx('left')}>
@@ -679,7 +679,7 @@ function CostumFlashSale() {
                                             cursor: 'pointer',
                                         }}
                                         onClick={() => {
-                                            navigate(`/admin/update-product/${user.id}`);
+                                            navigate(`/admin/products/${user.id}`);
                                         }}
                                     >
                                         <div className={cx('img')}>
@@ -698,7 +698,7 @@ function CostumFlashSale() {
                                             cursor: 'pointer',
                                         }}
                                         onClick={() => {
-                                            navigate(`/admin/update-product/${user.id}`);
+                                            navigate(`/admin/products/${user.id}`);
                                         }}
                                     >
                                         {user.name}

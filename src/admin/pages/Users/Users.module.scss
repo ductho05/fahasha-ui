@@ -1,13 +1,15 @@
 .wrapper {
-    padding: 20px;
+    padding: 10px 20px;
     position: relative;
 }
 
 .heading {
+    
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 20px 10px;
+    margin-bottom: 10px;
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
@@ -17,7 +19,7 @@
     h3 {
         text-transform: uppercase;
         font-size: 2rem;
-        color: #333;
+        color: var(--primary-color);
         font-weight: 400;
         margin-left: 10px;
     }

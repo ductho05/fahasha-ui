@@ -17,9 +17,7 @@ function ForYou({ limit }) {
     useEffect(() => {
         category.forEach((item) => {
             axios
-                .post(
-                    `${api}/products/category?category=${item}&limit=${limit}`,
-                )
+                .post(`${api}/products/category?category=${item}&limit=${limit}`)
                 .then((res) => {
                     newArr.push(...res.data.data);
                 })
@@ -68,7 +66,7 @@ function ForYou({ limit }) {
                     style={{
                         width: '200px',
                         height: '200px',
-                        objectFit: 'contain'
+                        objectFit: 'contain',
                     }}
                     src={item.images}
                 />
@@ -81,14 +79,24 @@ function ForYou({ limit }) {
                             <span>đ</span>
                         </div>
                         <div className={cx('price__old')}>
-                            <div style={{
-                                fontSize: '1.2rem',
-                                fontWeight: '400'
-                            }} className={cx('price')}>{numeral(item.old_price).format('0,0') + 'đ'}</div>
-                            <div style={{
-                                fontSize: '1.2rem',
-                                fontWeight: '400'
-                            }} className={cx('sale')}>{GetCoupon(item.price, item.old_price)}</div>
+                            <div
+                                style={{
+                                    fontSize: '1.2rem',
+                                    fontWeight: '400',
+                                }}
+                                className={cx('price')}
+                            >
+                                {numeral(item.old_price).format('0,0') + 'đ'}
+                            </div>
+                            <div
+                                style={{
+                                    fontSize: '1.2rem',
+                                    fontWeight: '400',
+                                }}
+                                className={cx('sale')}
+                            >
+                                {GetCoupon(item.price, item.old_price)}
+                            </div>
                         </div>
                     </div>
                     <div style={{ position: 'relative' }}>
@@ -104,7 +112,7 @@ function ForYou({ limit }) {
                             }}
                             strokeColor={{
                                 '0%': '#f6d365',
-                                '100%': '#fda085'
+                                '100%': '#fda085',
                             }}
                             trailColor="#dddddd"
                         />
@@ -121,7 +129,7 @@ function ForYou({ limit }) {
                                 textAlign: 'center',
                             }}
                         >
-                            {`Đã bán ${item.sold}`}
+                            {`Đã bán ${item.sold}/${item.quantity}`}
                         </div>
                     </div>
                 </div>
@@ -148,8 +156,8 @@ function ForYou({ limit }) {
 
         var listforyou = [];
         var listforyouTemp = [];
-        getRandomElementsFromArray(foryous, 8).map((item, index) => {
-            if (index % 4 === 0 && index !== 0) {
+        getRandomElementsFromArray(foryous, 10).map((item, index) => {
+            if (index % 5 === 0 && index !== 0) {
                 listforyou.push(listforyouTemp);
                 listforyouTemp = [];
             }
@@ -162,14 +170,14 @@ function ForYou({ limit }) {
     return (
         <>
             <div className={cx('foryou-current')}>
-                <div className={cx('foryou-current__title')}>
+                {/* <div className={cx('foryou-current__title')}>
                     <h2 className={cx('foryou-current__text_1')}>GỢI Ý HÔM NAY</h2>
                     <h2 className={cx('foryou-current__text_2')}>DÀNH CHO BẠN</h2>
-                </div>
+                </div> */}
                 <div className={cx('foryou-current__content')}>
                     {GetListforyou().map((item, index) => {
                         return (
-                            <div key={index} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+                            <div key={index} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5">
                                 {item.map((item, index) => {
                                     return <Itemforyou key={index} item={item} />;
                                 })}

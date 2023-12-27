@@ -7,16 +7,21 @@ import { api, isDeploy } from '../../../constants';
 import { Progress } from 'antd';
 import { Scrollbar } from 'react-scrollbars-custom';
 import lottie from 'lottie-web';
-import { useData } from '../../../stores/DataContext';
+import { useData, useAdmin } from '../../../stores/DataContext';
 import SideBarLaptop from './SideBarLaptop';
+import { useSuperAdmin } from '../../../stores/hooks';
 import { getAuthInstance } from '../../../utils/axiosConfig';
+import { useParams } from 'react-router-dom';
 const cx = classNames.bind(styles);
 const maxProducts = 1189;
 const perPage = 50;
 function AdminLayout({ children }) {
     const authInstance = getAuthInstance();
+    // const {data1, setData1} = useAdmin();
+    const url = window.location.pathname;
     const container = useRef(null);
     const { data, setData } = useData();
+
     // const [isComplete, setIsComplete] = useState(false);
 
     // async function fetchData() {
@@ -57,6 +62,7 @@ function AdminLayout({ children }) {
                   users: true,
                   products: true,
                   tem_products: true,
+                  noties: true,
                   favorites: true,
                   flashsales: true,
                   categories: true,
@@ -67,6 +73,7 @@ function AdminLayout({ children }) {
                   users: false,
                   products: false,
                   favorites: false,
+                  noties: false,
                   tem_products: false,
                   flashsales: false,
                   categories: false,
@@ -82,6 +89,7 @@ function AdminLayout({ children }) {
                   orders: [],
                   users: [],
                   products: [],
+                  noties: [],
                   favorites: [],
                   tem_products: [],
                   flashsales: [],
@@ -90,81 +98,81 @@ function AdminLayout({ children }) {
     );
 
     if (isDeploy) {
-        var chat_content = document.querySelector(".fb_dialog_content")
+        var chat_content = document.querySelector('.fb_dialog_content');
         chat_content.style.display = 'none';
     }
 
-// }, [])
+    // }, [])
 
-// useEffect(() => {
-//     // Hàm này sẽ được gọi khi component được mount và mỗi khi localStorage thay đổi.
-//     const handleStorageChange = (e) => {
-//         if (e.key === 'temporary_data') {
-//             // Xử lý khi có thay đổi trong localStorage với key là 'yourLocalStorageKey'.
-//             const updatedValue = e.newValue; // Giá trị mới từ localStorage.
-//             console.log('LocalStorage has changed:', updatedValue);
-//         }
-//     };
+    // useEffect(() => {
+    //     // Hàm này sẽ được gọi khi component được mount và mỗi khi localStorage thay đổi.
+    //     const handleStorageChange = (e) => {
+    //         if (e.key === 'temporary_data') {
+    //             // Xử lý khi có thay đổi trong localStorage với key là 'yourLocalStorageKey'.
+    //             const updatedValue = e.newValue; // Giá trị mới từ localStorage.
+    //             console.log('LocalStorage has changed:', updatedValue);
+    //         }
+    //     };
 
-//     // Đăng ký sự kiện lắng nghe thay đổi trong localStorage.
+    //     // Đăng ký sự kiện lắng nghe thay đổi trong localStorage.
 
-//     // Trả về một hàm xử lý để huỷ bỏ sự kiện khi component bị unmounted.
-//     return () => {
-//         window.removeEventListener('storage', handleStorageChange);
-//     };
-// });
+    //     // Trả về một hàm xử lý để huỷ bỏ sự kiện khi component bị unmounted.
+    //     return () => {
+    //         window.removeEventListener('storage', handleStorageChange);
+    //     };
+    // });
 
-// window.addEventListener('storage', handleStorageChange);
+    // window.addEventListener('storage', handleStorageChange);
 
-// function handleStorageChange(e) {
-//     //console.log('LocalStorage has changed:', e);
-// }
+    // function handleStorageChange(e) {
+    //     //console.log('LocalStorage has changed:', e);
+    // }
 
-// useEffect(() => {
-//     setIsLoaded((prev) => ({ ...prev, flashsales: false }));
-//     if (JSON.parse(localStorage.getItem('temporary_data')).flashsales.length == 0) {
-//         fetch(`${api}/flashsales`)
-//             .then((response) => response.json())
-//             .then((result) => {
-//                 setData2((prev) => ({ ...prev, flashsales: result.data }));
-//                 setIsLoaded((prev) => ({ ...prev, flashsales: true }));
-//             })
-//             .catch((err) => console.log(err));
-//     }
-// }, [isLoaded.flashsales]);
+    // useEffect(() => {
+    //     setIsLoaded((prev) => ({ ...prev, flashsales: false }));
+    //     if (JSON.parse(localStorage.getItem('temporary_data')).flashsales.length == 0) {
+    //         fetch(`${api}/flashsales`)
+    //             .then((response) => response.json())
+    //             .then((result) => {
+    //                 setData2((prev) => ({ ...prev, flashsales: result.data }));
+    //                 setIsLoaded((prev) => ({ ...prev, flashsales: true }));
+    //             })
+    //             .catch((err) => console.log(err));
+    //     }
+    // }, [isLoaded.flashsales]);
 
-useEffect(() => {
-    lottie.loadAnimation({
-        container: container.current,
-        renderer: 'svg',
-        loop: true,
-        autoplay: true,
-        animationData: require('../../../assets/json/loadAdminPage.json'),
-    });
-    if (Object.keys(data).length === 0) {
-        // setIsLoaded([false, false]);
-        setIsLoaded((prev) => ({ ...prev, products: true }));
-        fetch(`${api}/products?perPage=${maxProducts}&page=1`)
-            .then((response) => {
-                return response.json();
-            })
-            .then((flashsales) => {
-                console.log('flashsales121', flashsales);
-                setData({ ...data, products: flashsales.data.products });
-                //setIsLoaded((prev) => ({ ...prev, products: true }));
-            })
-            .catch((err) => console.log(err));
+    useEffect(() => {
+        lottie.loadAnimation({
+            container: container.current,
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            animationData: require('../../../assets/json/loadAdminPage.json'),
+        });
+        if (Object.keys(data).length === 0) {
+            // setIsLoaded([false, false]);
+            setIsLoaded((prev) => ({ ...prev, products: true }));
+            fetch(`${api}/products?perPage=${maxProducts}&page=1`)
+                .then((response) => {
+                    return response.json();
+                })
+                .then((flashsales) => {
+                    console.log('flashsales121', flashsales);
+                    setData({ ...data, products: flashsales.data.products });
+                    //setIsLoaded((prev) => ({ ...prev, products: true }));
+                })
+                .catch((err) => console.log(err));
 
-        fetch(`${api}/products?perPage=${perPage}&page=1`)
-            .then((response) => {
-                return response.json();
-            })
-            .then((flashsales) => {
-                console.log('flashsales121', flashsales);
-                setData2((prev) => ({ ...prev, tem_products: flashsales.data.products }));
-                setIsLoaded((prev) => ({ ...prev, tem_products: true }));
-            })
-            .catch((err) => console.log(err));
+            fetch(`${api}/products?perPage=${perPage}&page=1`)
+                .then((response) => {
+                    return response.json();
+                })
+                .then((flashsales) => {
+                    console.log('flashsales121', flashsales);
+                    setData2((prev) => ({ ...prev, tem_products: flashsales.data.products }));
+                    setIsLoaded((prev) => ({ ...prev, tem_products: true }));
+                })
+                .catch((err) => console.log(err));
 
             // fetch(`${api}/favorites`)
             //     .then((response) => response.json())
@@ -182,36 +190,50 @@ useEffect(() => {
                 })
                 .catch((err) => console.log(err));
 
-        fetch(`${api}/evaluates/get`)
-            .then((response) => response.json())
-            .then((result) => {
-                setData2((prev) => ({ ...prev, evaluates: result.data }));
-                setIsLoaded((prev) => ({ ...prev, evaluates: true }));
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-        fetch(`${api}/categories?filter=simple`)
-            .then((response) => response.json())
-            .then((result) => {
-                if (result.status == 'OK') {
-                    setData2((prev) => ({ ...prev, categories: result.data }));
-                    setIsLoaded((prev) => ({ ...prev, categories: true }));
-                }
-            })
-            .catch((err) => console.log(err.message));
+            fetch(`${api}/evaluates/get`)
+                .then((response) => response.json())
+                .then((result) => {
+                    setData2((prev) => ({ ...prev, evaluates: result.data }));
+                    setIsLoaded((prev) => ({ ...prev, evaluates: true }));
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
 
-        authInstance
-            .post('/orders/filter')
-            .then((result) => {
-                if (result.data.status === 'OK') {
-                    setData2((prev) => ({ ...prev, orders: result.data.data }));
-                    setIsLoaded((prev) => ({ ...prev, orders: true }));
-                }
-            })
-            .catch((error) => {
-                console.log(error);
-            });
+            authInstance
+                .get(`/webpush/get-all`)
+                .then((result) => {
+                    // console.log(result);
+                    if (result.data.status === 'OK') {
+                        setData2((prev) => ({ ...prev, noties: result.data.data }));
+                        setIsLoaded((prev) => ({ ...prev, noties: true }));
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+
+            fetch(`${api}/categories?filter=simple`)
+                .then((response) => response.json())
+                .then((result) => {
+                    if (result.status == 'OK') {
+                        setData2((prev) => ({ ...prev, categories: result.data }));
+                        setIsLoaded((prev) => ({ ...prev, categories: true }));
+                    }
+                })
+                .catch((err) => console.log(err.message));
+
+            authInstance
+                .post('/orders/filter')
+                .then((result) => {
+                    if (result.data.status === 'OK') {
+                        setData2((prev) => ({ ...prev, orders: result.data.data }));
+                        setIsLoaded((prev) => ({ ...prev, orders: true }));
+                    }
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
 
             authInstance
                 .get('/favorites')
@@ -239,6 +261,7 @@ useEffect(() => {
                 evaluates: true,
                 orders: true,
                 users: true,
+                noties: true,
                 products: true,
                 favorites: true,
                 tem_products: true,
@@ -255,18 +278,23 @@ useEffect(() => {
             isLoaded.orders &&
             isLoaded.users &&
             isLoaded.tem_products &&
+            isLoaded.noties &&
             isLoaded.flashsales &&
             isLoaded.favorites &&
             isLoaded.products &&
             Object.keys(data).length === 0
         ) {
             //localStorage.setItem('temporary_data', JSON.stringify(data));
-            setData(data2);
+            setData({
+                ...data2,
+                isSuperAdmin: false,
+            });
+            //setData1(false);
             // setIsComplete(true);
         }
     }, [isLoaded]);
 
-//console.log('AA', !(isLoaded.flashsales && isLoaded.products) && !localStorage.getItem('temporary_data'));
+    //console.log('AA', !(isLoaded.flashsales && isLoaded.products) && !localStorage.getItem('temporary_data'));
 
     return (
         <>
@@ -275,6 +303,7 @@ useEffect(() => {
                 isLoaded.categories &&
                 isLoaded.orders &&
                 isLoaded.users &&
+                isLoaded.noties &&
                 isLoaded.tem_products &&
                 isLoaded.favorites &&
                 isLoaded.flashsales &&
@@ -290,6 +319,7 @@ useEffect(() => {
                     isLoaded.evaluates &&
                     isLoaded.categories &&
                     isLoaded.orders &&
+                    isLoaded.noties &&
                     isLoaded.users &&
                     isLoaded.tem_products &&
                     isLoaded.favorites &&
@@ -301,26 +331,26 @@ useEffect(() => {
                     <div
                         className={cx('navbar')}
                         style={{
-                            maxHeight: '100vh',
+                            height: '80vh',
                             position: 'fixed',
                             top: 0,
                             backgroundColor: 'yourNavbarBackgroundColor', // Thay thế bằng màu nền mong muốn
                             zIndex: 1000, // Tăng giá trị nếu cần
                         }}
                     >
-                        <SideBar />
+                        <SideBar url={url} />
                     </div>
                     <div
                         className={cx('navbarlap')}
                         style={{
-                            maxHeight: '100vh',
+                            height: '80vh',
                             position: 'fixed',
                             top: 0,
                             backgroundColor: 'yourNavbarBackgroundColor', // Thay thế bằng màu nền mong muốn
                             zIndex: 1000, // Tăng giá trị nếu cần
                         }}
                     >
-                        <SideBarLaptop />
+                        <SideBarLaptop url={url} />
                     </div>
                     <div style={{ width: 250, height: '100vh' }} className={cx('container')}>
                         <NavBar

@@ -56,6 +56,13 @@ export default function EnhancedTable({
                         ? type !== undefined &&
                           (type == 'customFlashsale' ||
                               type == 'statistics' ||
+                              type == 'review' ||
+                              type == 'order' ||
+                              type == 'notification' ||
+                              type == 'product' ||
+                              type == 'categoryDetail' ||
+                              type == 'user' ||
+                              type == 'category' ||
                               type == 'flashsale' ||
                               type == 'detailFLashsale') && {
                               height: height,

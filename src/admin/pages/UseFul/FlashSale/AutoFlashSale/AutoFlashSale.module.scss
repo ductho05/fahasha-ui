@@ -1,10 +1,10 @@
 .wrapper {
-    padding: 20px;
+    padding: 10px 20px;
     position: relative;
 }
 
 .top {
-    margin-top: 5px;
+    // margin-top: 5px;
     padding: 10px;
     border-radius: 8px;
     box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
@@ -38,11 +38,12 @@
 
 .content {
     padding: 2% 1%;
-    margin: 20px 0;
-    min-height: 510px;
+    margin: 10px 0 0 0;
+    height: 78vh;
     display: flex;
     flex-direction: row;
     justify-content: center;
+    align-items: center;
     flex-wrap: wrap;
     border-radius: 8px;
     box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);

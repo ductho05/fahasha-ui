@@ -16,12 +16,12 @@ import { Scrollbar } from 'react-scrollbars-custom';
 import CategoryIcon from '@mui/icons-material/Category';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ReviewsIcon from '@mui/icons-material/Reviews';
-
+import { useNavigate } from 'react-router-dom';
 const cx = classNames.bind(styles);
 
 export const tabList = [
     {
-        type: 'main',
+        type: 'Trang chủ',
         tabs: [
             {
                 id: 0,
@@ -32,7 +32,7 @@ export const tabList = [
         ],
     },
     {
-        type: 'lists',
+        type: 'Quản lý',
         tabs: [
             {
                 id: 1,
@@ -55,7 +55,7 @@ export const tabList = [
             {
                 id: 4,
                 icon: CategoryIcon,
-                name: 'Loại sản phẩm',
+                name: 'Danh mục sản phẩm',
                 link: '/admin/categories',
             },
             {
@@ -73,7 +73,7 @@ export const tabList = [
         ],
     },
     {
-        type: 'useful',
+        type: 'Chức năng',
         tabs: [
             {
                 id: 7,
@@ -96,7 +96,7 @@ export const tabList = [
         ],
     },
     {
-        type: 'users',
+        type: 'Cá nhân',
         tabs: [
             {
                 id: 10,
@@ -113,9 +113,33 @@ export const tabList = [
     },
 ];
 
-function SideBar() {
-    const [currentTab, setCurrentTab] = useState(0);
-
+function SideBar({ url }) {
+    const [currentTab, setCurrentTab] = useState(
+        url == '/admin'
+            ? 0
+            : url.includes(`/admin/user`)
+            ? 1
+            : url.includes(`/admin/products`)
+            ? 2
+            : url.includes(`/admin/orders`)
+            ? 3
+            : url.includes(`/admin/reviews`)
+            ? 4
+            : url.includes(`/admin/categories`)
+            ? 5
+            : url == '/admin/wishlists'
+            ? 6
+            : url == '/admin/statistics'
+            ? 7
+            : url == '/admin/notifications'
+            ? 8
+            : url.includes(`/admin/flashsale`)
+            ? 9
+            : url == '/admin/account'
+            ? 10
+            : 11,
+    );
+    const navigate = useNavigate();
     const handleClickTab = (id) => {
         setCurrentTab(id);
     };
@@ -123,38 +147,39 @@ function SideBar() {
     return (
         <div className={cx('wrapper')}>
             <div className={cx('top')}>
-                <h2>TA BookStore Admin</h2>
+                <h2
+                    onClick={() => {
+                        navigate('/admin');
+                    }}
+                >
+                    TA BookStore Admin
+                </h2>
             </div>
-            <Scrollbar removeTrackYWhenNotUsed style={{ width: 250, height: '100vh' }}>
-                <div className={cx('bottom')}>
-                    <ul className={cx('items')}>
-                        {tabList.map((tabItem, typeindex) => (
-                            <div key={typeindex}>
-                                <p className={cx('name')}>{tabItem.type}</p>
-                                {tabItem.tabs.map((tab, index) => {
-                                    const Icon = tab.icon;
-                                    return (
-                                        <Link
-                                            key={index}
-                                            onClick={() => handleClickTab(tab.id)}
-                                            to={tab?.link}
-                                            className={tab.id == currentTab ? cx('item', 'active') : cx('item')}
-                                        >
-                                            <Icon className={cx('icon')} />
-                                            <p className={cx('title')}>{tab.name}</p>
-                                        </Link>
-                                    );
-                                })}
-                            </div>
-                        ))}
-                    </ul>
-                    <p className={cx('name')}>Theme</p>
-                    <div className={cx('theme')}>
-                        <p className={cx('box')}></p>
-                        <p className={cx('box')}></p>
-                    </div>
-                </div>
-            </Scrollbar>
+            {/* <Scrollbar removeTrackYWhenNotUsed style={{ width: 250, height: '100vh' }}> */}
+            <div className={cx('bottom')} style={{ width: 250, height: '100vh' }}>
+                <ul className={cx('items')}>
+                    {tabList.map((tabItem, typeindex) => (
+                        <div key={typeindex}>
+                            <p className={cx('name')}>{tabItem.type}</p>
+                            {tabItem.tabs.map((tab, index) => {
+                                const Icon = tab.icon;
+                                return (
+                                    <Link
+                                        key={index}
+                                        onClick={() => handleClickTab(tab.id)}
+                                        to={tab?.link}
+                                        className={tab.id == currentTab ? cx('item', 'active') : cx('item')}
+                                    >
+                                        <Icon className={cx('icon')} />
+                                        <p className={cx('title')}>{tab.name}</p>
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    ))}
+                </ul>
+            </div>
+            {/* </Scrollbar> */}
         </div>
     );
 }

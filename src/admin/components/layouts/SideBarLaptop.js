@@ -106,9 +106,33 @@ import { tabList } from './SideBar/Sidebar';
 // ];
 
 const cx = classNames.bind(styles);
-function SideBarLaptop() {
+function SideBarLaptop({ url }) {
     const [isOpen, setIsOpen] = React.useState(false);
-    const [currentTab, setCurrentTab] = React.useState(0);
+    const [currentTab, setCurrentTab] = React.useState(
+        url == '/admin'
+            ? 0
+            : url.includes(`/admin/user`)
+            ? 1
+            : url.includes(`/admin/products`)
+            ? 2
+            : url.includes(`/admin/orders`)
+            ? 3
+            : url.includes(`/admin/reviews`)
+            ? 4
+            : url.includes(`/admin/categories`)
+            ? 5
+            : url == '/admin/wishlists'
+            ? 6
+            : url == '/admin/statistics'
+            ? 7
+            : url == '/admin/notifications'
+            ? 8
+            : url.includes(`/admin/flashsale`)
+            ? 9
+            : url == '/admin/account'
+            ? 10
+            : -1,
+    );
 
     const handleClickTab = (id) => {
         setCurrentTab(id);
@@ -167,11 +191,11 @@ function SideBarLaptop() {
                         </div>
                     ))}
                 </ul>
-                <p className={cx('name')}>Theme</p>
+                {/* <p className={cx('name')}>Theme</p>
                 <div className={cx('theme')}>
                     <p className={cx('box')}></p>
                     <p className={cx('box')}></p>
-                </div>
+                </div> */}
             </div>
         </div>
     );

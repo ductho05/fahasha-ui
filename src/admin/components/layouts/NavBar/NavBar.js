@@ -1,55 +1,54 @@
-import React from "react";
-import classNames from "classnames/bind"
-import styles from './NavBar.module.scss'
+import React from 'react';
+import classNames from 'classnames/bind';
+import styles from './NavBar.module.scss';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
-import { useStore } from '../../../../stores/hooks'
-import { api } from '../../../../constants'
-import { Link } from "react-router-dom";
+import { useStore } from '../../../../stores/hooks';
+import { api } from '../../../../constants';
+import { Link } from 'react-router-dom';
 import { Dialog } from '@mui/material';
 import RegisterLogin from '../../../../components/Forms/RegisterLogin';
 import { logout } from '../../../../stores/actions';
-import Button from "../../../../components/Button";
-import axios from "axios";
+import Button from '../../../../components/Button';
+import axios from 'axios';
 
-const cx = classNames.bind(styles)
+const cx = classNames.bind(styles);
 function NavBar() {
-
-    const [state, dispatch] = useStore()
-    const [numNewNotice, setNumNewNotice] = React.useState(0)
-    const [notices, setNotices] = React.useState([])
+    const [state, dispatch] = useStore();
+    const [numNewNotice, setNumNewNotice] = React.useState(0);
+    const [notices, setNotices] = React.useState([]);
     const [expired, setExpired] = React.useState(false);
     const [indexForm, setIndexForm] = React.useState(0);
     const [isShowForm, setIsShowForm] = React.useState(false);
 
-    const authInstance = state.authInstance
+    const authInstance = state.authInstance;
 
     React.useEffect(() => {
-        authInstance.post(`/webpush/get`)
-            .then(result => {
-                if (result.data.status == "OK") {
-                    setNotices(result.data.data)
+        authInstance
+            .post(`/webpush/get`)
+            .then((result) => {
+                if (result.data.status == 'OK') {
+                    setNotices(result.data.data);
                 }
                 //console.log(result)
             })
-            .catch(err => console.error(err))
-    }, [state])
+            .catch((err) => console.error(err));
+    }, [state]);
 
     setInterval(() => {
-
         if (state.isLoggedIn) {
-
-            authInstance.get(`/users/get/profile`).then(result => {
-
-                if (result.data.message == "Jwt expired") {
-                    setExpired(true)
-                }
-            }).catch(() => {
-                setExpired(true)
-            })
-
+            authInstance
+                .get(`/users/get/profile`)
+                .then((result) => {
+                    if (result.data.message == 'Jwt expired') {
+                        setExpired(true);
+                    }
+                })
+                .catch(() => {
+                    setExpired(true);
+                });
         }
     }, 6000);
 
@@ -61,10 +60,10 @@ function NavBar() {
     React.useEffect(() => {
         const num = notices.reduce((acc, item) => {
             return item.isAccess === false ? acc + 1 : acc;
-        }, 0)
+        }, 0);
 
-        setNumNewNotice(num)
-    }, [notices])
+        setNumNewNotice(num);
+    }, [notices]);
 
     return (
         <div className={cx('wrapper')}>
@@ -89,23 +88,23 @@ function NavBar() {
                 </p>
             </div>
             <ul className={cx('features')}>
-                <li className={cx('item')}>
+                {/* <li className={cx('item')}>
                     <DarkModeOutlinedIcon className={cx('icon')} />
-                </li>
+                </li> */}
                 <Link to="/admin/notifications" className={cx('item')}>
                     <NotificationsOutlinedIcon className={cx('icon')} />
-                    <p className={cx('message_text')}>{numNewNotice}</p>
+                    <p className={cx('message_text')}>{numNewNotice > 9 ? '9+' : numNewNotice}</p>
                 </Link>
-                <li className={cx('item')}>
+                <Link to="/admin/reviews" className={cx('item')}>
                     <MessageOutlinedIcon className={cx('icon')} />
-                    <p className={cx('message_text')}>2</p>
-                </li>
-                <li className={cx('item')}>
+                    {/* <p className={cx('message_text')}>2</p> */}
+                </Link>
+                <Link to="/admin/account" className={cx('item')}>
                     <img className={cx('account_img')} src={state?.user?.images} />
-                </li>
+                </Link>
             </ul>
         </div>
-    )
+    );
 }
 
-export default NavBar
+export default NavBar;

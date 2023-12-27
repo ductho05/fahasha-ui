@@ -777,14 +777,17 @@ function Statistics() {
                 ))}
             </div> */}
             <div className={cx('top')}>
-                <p
+                <h3
                     style={{
-                        margin: '0 0 0 15px',
+                        fontSize: '2rem',
+                        margin: '0 0 0 10px',
                         flex: 1,
+                        color: '#c92127',
+                        fontWeight: 400,
                     }}
                 >
                     THỐNG KÊ
-                </p>
+                </h3>
 
                 <div
                     style={{
@@ -799,7 +802,7 @@ function Statistics() {
                         type="info"
                         message={
                             <Marquee pauseOnHover gradient={false}>
-                                {`Hướng dẫn: Thống kê doanh thu sản phẩm và khách hàng thân thiết theo từng khoảng thời gian.`}
+                                {`Hướng dẫn: Thống kê doanh thu sản phẩm và khách hàng thân thiết theo từng khoảng thời gian. `}
                             </Marquee>
                         }
                         style={{
@@ -1103,7 +1106,7 @@ function Statistics() {
                                                 cursor: 'pointer',
                                             }}
                                             onClick={() => {
-                                                navigate(`/admin/update-product/${user.id}`);
+                                                navigate(`/admin/products/${user.id}`);
                                             }}
                                         >
                                             <div className={cx('img')}>
@@ -1122,7 +1125,7 @@ function Statistics() {
                                                 cursor: 'pointer',
                                             }}
                                             onClick={() => {
-                                                navigate(`/admin/update-product/${user.id}`);
+                                                navigate(`/admin/products/${user.id}`);
                                             }}
                                         >
                                             {user.name}

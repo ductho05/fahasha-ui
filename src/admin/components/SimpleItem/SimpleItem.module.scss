@@ -2,7 +2,7 @@
     display: -webkit-box;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    -webkit-line-clamp: 2; /* Hiển thị tối đa 2 dòng chữ */
+    -webkit-line-clamp: 3; /* Hiển thị tối đa 2 dòng chữ */
     line-height: 1.4; /* Điều này có thể cần điều chỉnh tùy thuộc vào font chữ */
-    max-height: 2.8em; /* 2 dòng chữ với line-height là 1.2 */
+    max-height: 4.2em; /* 2 dòng chữ với line-height là 1.2 */
 }

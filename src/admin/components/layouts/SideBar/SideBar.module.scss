@@ -1,6 +1,6 @@
 .wrapper {
     padding: 0;
-    height: 100vh;
+    height: 80vh;
 }
 
 .top {
@@ -12,6 +12,7 @@
     border-bottom: 1px solid #eee;
 
     h2 {
+        cursor: pointer;
         font-size: 2rem;
         color: var(--primary-color);
         font-weight: bold;

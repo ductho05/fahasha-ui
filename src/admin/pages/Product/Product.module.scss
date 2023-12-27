@@ -1,5 +1,5 @@
 .wrapper {
-    padding: 20px;
+    padding: 10px 20px;
     position: relative;
 }
 
@@ -17,7 +17,7 @@
     h3 {
         text-transform: uppercase;
         font-size: 2rem;
-        color: #333;
+        color: var(--primary-color);
         font-weight: 400;
         margin-left: 10px;
     }

@@ -30,11 +30,7 @@ import 'react-loading-skeleton/dist/skeleton.css';
 import { seeNotice } from '../../../../stores/actions';
 import WidgetsIcon from '@mui/icons-material/Widgets';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import {
-    BellOutlined,
-    ShoppingCartOutlined,
-    UserOutlined
-} from '@ant-design/icons';
+import { BellOutlined, ShoppingCartOutlined, UserOutlined } from '@ant-design/icons';
 import { notification } from 'antd';
 
 const cx = classNames.bind(styles);
@@ -60,61 +56,57 @@ function Header() {
     const [notice, setNotice] = useState([]);
     const [numNoticeNoAccess, setNumNoticeNoAccess] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
-    const [toNotice, setToNotice] = useState(false)
+    const [toNotice, setToNotice] = useState(false);
     const [apiNotice, contextHolder] = notification.useNotification();
-    const [notificationData, setNotificationData] = useState(null)
+    const [notificationData, setNotificationData] = useState(null);
     const productQuality = 7;
 
-    const authInstance = state.authInstance
+    const authInstance = state.authInstance;
 
     const showNotification = (notification) => {
-
         apiNotice.open({
             message: notification.title,
             description: notification.description,
             duration: 3,
-            placement: "bottomRight",
+            placement: 'bottomRight',
             icon: (
-                <img src={notification.image} style={{
-                    width: "80px",
-                    height: "80px",
-                    objectFit: "contain"
-                }} />
+                <img
+                    src={notification.image}
+                    style={{
+                        width: '80px',
+                        height: '80px',
+                        objectFit: 'contain',
+                    }}
+                />
             ),
-            onClick: () => { window.open(notification.url) }
-        })
-    }
+            onClick: () => {
+                window.open(notification.url);
+            },
+        });
+    };
 
     useEffect(() => {
         state.socket.on('response-notification', (response) => {
-
-            if (!(state.user.sw_id)) {
-
-                if (response.type === "all") {
-
-                    setNotificationData(response.notification)
-                }
-                else if (response.type === "admin") {
-
-                    setNotificationData(response.notification)
+            if (!state.user.sw_id) {
+                if (response.type === 'all') {
+                    setNotificationData(response.notification);
+                } else if (response.type === 'admin') {
+                    setNotificationData(response.notification);
                 } else {
-
                     if (state.user._id === response.user_id) {
-
-                        setNotificationData(response.notification)
+                        setNotificationData(response.notification);
                     }
                 }
             }
-            setToNotice(prev => !prev)
-        })
-    }, [])
+            setToNotice((prev) => !prev);
+        });
+    }, []);
 
     useEffect(() => {
-
         if (notificationData) {
-            showNotification(notificationData)
+            showNotification(notificationData);
         }
-    }, [notificationData])
+    }, [notificationData]);
 
     useEffect(() => {
         if (state.user) {
@@ -179,7 +171,7 @@ function Header() {
             axios
                 .get(`${api}/products?title=${keyTextSearch}&num=${productQuality}`)
                 .then((res) => {
-                    setProducts(res.data.data.products)
+                    setProducts(res.data.data.products);
                 })
                 .catch((err) => {
                     console.log(err);
@@ -607,7 +599,7 @@ function Header() {
                                     Thông báo
                                 </label>
                                 <p className={Object.keys(user).length > 0 ? cx('num_carts') : cx('hide')}>
-                                    {numNoticeNoAccess}
+                                    {numNoticeNoAccess > 9 ? '9+' : numNoticeNoAccess}
                                 </p>
                             </div>
                         </Tippy>

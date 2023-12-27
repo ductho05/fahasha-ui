@@ -411,7 +411,7 @@ function FlashSaleDetail() {
                                 <div className={cx('btn_channge')}>
                                     <label
                                         onClick={() => {
-                                            navigate(`/admin/update-product/${flash?.product?._id}`);
+                                            navigate(`/admin/products/${flash?.product?._id}`);
                                         }}
                                     >
                                         Sửa
@@ -754,7 +754,7 @@ function FlashSaleDetail() {
                                         <span
                                             style={{ fontSize: '1.5rem', cursor: 'pointer' }}
                                             onClick={() => {
-                                                navigate(`/product-detail/${flash?.product?._id}`);
+                                                navigate(`/admin/products/${flash?.product?._id}`);
                                             }}
                                         >
                                             {flash?.product?._id}

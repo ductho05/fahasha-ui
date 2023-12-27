@@ -632,14 +632,14 @@ function FlashSale() {
     return (
         <div className={cx('wrapper')}>
             <div className={cx('top')}>
-                <p
+                <h3
                     style={{
                         margin: '0 0 0 15px',
-                        flex: 1.3,
+                        flex: 1,
                     }}
                 >
                     FLASH SALE
-                </p>
+                </h3>
 
                 <div
                     style={{
@@ -660,7 +660,7 @@ function FlashSale() {
                         }
                         style={{
                             width: '80%',
-                            margin: '0 4% 0 0',
+                            margin: '0 2% 0 0',
                             borderRadius: '6px',
                         }}
                     />
@@ -904,11 +904,11 @@ function FlashSale() {
                             isToggle: isToggle,
                         }}
                         pageSize={12}
-                        height="67vh"
+                        height="69.3vh"
                         type="flashsale"
                     />
                 </div>
-                <div className={cx('state')}>
+                <div className={cx('state')} >
                     {rows && <BarChartExample data={rows} func={setRows} setIsTime={[isTime, setIsTime]} />}{' '}
                 </div>
             </div>

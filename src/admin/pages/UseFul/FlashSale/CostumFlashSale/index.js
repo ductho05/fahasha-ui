@@ -116,25 +116,25 @@ function CostumFlashSale() {
     const [avatar, setAvatar] = useState();
     const [loading, setLoading] = useState(false);
     const [isAction, setIsAction] = useState(false);
-    const [options, setOptions] = useState([]);
     const [success, setSuccess] = useState(0);
     const [errors, setErrors] = useState({});
+    const [options, setOptions] = useState([]);
     const [price, setPrice] = useState(null);
     const [rate, setRate] = useState(null);
     const [suggestFlash, setSuggestFlash] = useState([]);
     const [isToggle, setIsToggle] = useState(false); // khi bấm nút tiếp tục thì gọi hàm này để \tắt chọn những sản phẩm đã chọn
-
     const [rows, setRows] = useState([]);
     const [temporary_data, setTemporary_data] = useState([]); // lưu lại những sản phẩm đã chọn để gợi ý
-
     const [selectCategory, setSelectCategory] = useState(null);
+    const [status, setStatus] = useState(null);
+    const [quantity, setQuantity] = useState(null);
     const [selectSort, setSelectSort] = useState(null);
     const [showFilter, setShowFilter] = useState(false);
     const [keywords, setKeywords] = useState(null);
-    const [status, setStatus] = useState(null);
-    const [quantity, setQuantity] = useState(null);
-
     const [isSort, setIsSort] = useState(false);
+
+
+
     const getCategoryName = (categoryId) => {
         // categoryId là đối tượng danh mục
         // Thực hiện logic để lấy tên danh mục từ categoryId
@@ -561,10 +561,11 @@ function CostumFlashSale() {
                 <div className="px-[20px] flex items-center">
                     <Input.Search
                         disabled={data?.products?.length == 0 && temporary_data.length == 0}
-                        onSearch={handleSearch}
+                        //onSearch={handleSearch}
                         className="w-[400px]"
                         placeholder="Tìm kiếm sản phẩm..."
-                        // value={keywords}
+                        onChange={(e) => handleSearch(e.target.value)}
+                        // value={keywords}                        
                     />
                 </div>
                 <div className="px-[20px] flex items-center">
@@ -755,7 +756,7 @@ function CostumFlashSale() {
                     }}
                     pageSize={12}
                     type="customFlashsale"
-                    height="66vh"
+                    height="69.3vh"
                 />
             </div>
         </div>

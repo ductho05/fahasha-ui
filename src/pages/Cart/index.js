@@ -192,7 +192,7 @@ function Cart() {
                     </div>
                     <div className={cx('right', 'hide-on-mobile-tablet')}>
                         <div className={cx('total')}>
-                            <p>Thành tiền</p>
+                            <p>Thành tiền {`(tạm tính)`}</p>
                             <p className={cx('value_price')}>{numeral(totalPrice).format('0,0[.]00 VNĐ')} đ</p>
                         </div>
 

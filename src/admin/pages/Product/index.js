@@ -145,6 +145,27 @@ function Product() {
 
     const columns = [
         {
+            field: 'rowNumber',
+            headerName: 'STT',
+            width: 30,
+            sortable: false,
+            editable: false,
+            headerAlign: 'center',
+            renderCell: (params) => {
+                return (
+                    <>
+                        <p
+                            style={{
+                                padding: '0 0 0 10px',
+                            }}
+                        >
+                            {params.value}
+                        </p>
+                    </>
+                );
+            },
+        },
+        {
             field: 'title',
             headerName: 'Sản phẩm',
             sortable: false,
@@ -166,7 +187,7 @@ function Product() {
             headerName: 'Tác giả',
             sortable: false,
             editable: true,
-            width: 180,
+            width: 160,
             renderCell: (params) => (
                 <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : 'Trống'}</p>
             ),
@@ -246,13 +267,13 @@ function Product() {
                         })
                         .then(async (result) => {
                             if (result.data.status === 'OK') {
-                                updateProductData(result.data.data)
+                                updateProductData(result.data.data);
                                 const title = 'Thông báo sản phẩm';
                                 let description = `${result.data.data.title} vừa được mở bán trở lại`;
                                 if (!result.data.data.status_sell) {
                                     description = `${result.data.data.title} tạm thời ngưng bán`;
                                 }
-                                const url = `${appPath}/admin/update-product/${result.data.data._id}`;
+                                const url = `${appPath}/admin/products/${result.data.data._id}`;
                                 const image = result.data.data.images;
                                 await authInstance
                                     .post('/webpush/send', {
@@ -324,7 +345,7 @@ function Product() {
                                 />
                             </Tooltip>
                         </Popconfirm>
-                        <Link to={`/admin/update-product/${params.row._id}`}>
+                        <Link to={`/admin/products/${params.row._id}`}>
                             <Tooltip title="Chỉnh sửa">
                                 <Button type="primary" ghost icon={<EditOutlined />} />
                             </Tooltip>
@@ -376,6 +397,8 @@ function Product() {
             })
             .catch((err) => console.log(err.message));
     }, []);
+
+    console.log('dat322123a', temporary_data);
 
     const onFinish = async (data) => {
         if (Object.keys(errors).length <= 0) {
@@ -572,25 +595,6 @@ function Product() {
 
     console.log('sfyugasjh', rows, data);
 
-    const sortProduct = (sort) => {
-        let newList2 = [...rows].sort((a, b) => {
-            if (sort.value == 'price_asc') {
-                return a.price - b.price;
-            } else if (sort.value == 'price_desc') {
-                return b.price - a.price;
-            } else if (sort.value == 'rate_asc') {
-                return a.rate - b.rate;
-            } else if (sort.value == 'rate_desc') {
-                return b.rate - a.rate;
-            } else {
-                return a.title.localeCompare(b.title);
-            }
-        });
-        //  console.log('newList42222', newList);
-        //  setIsSort(false);
-        setRows(newList2);
-    };
-
     const filterProduct = (rate, price, category, keywords, quantity, status) => {
         let newList = data?.products?.length > 0 ? [...data.products] : [...temporary_data];
         // console.log('dang filter', newList);
@@ -729,6 +733,48 @@ function Product() {
         }
     }, [selectSort]);
 
+    const sortProduct = (sort) => {
+        let newList2 = [...rows].sort((a, b) => {
+            if (sort.value == 'price_asc') {
+                return a.price - b.price;
+            } else if (sort.value == 'price_desc') {
+                return b.price - a.price;
+            } else if (sort.value == 'rate_asc') {
+                return a.rate - b.rate;
+            } else if (sort.value == 'rate_desc') {
+                return b.rate - a.rate;
+            } else {
+                return a.title.localeCompare(b.title);
+            }
+        });
+        //  console.log('newList42222', newList);
+        //  setIsSort(false);
+        setRows(newList2);
+    };
+
+    useEffect(() => {
+        if (data?.products?.length > 0) {
+            //var data1 = data.products;
+            // console.log('kdhas', data1);
+            handleClearFilter();
+            //setRows(data1.sort((a, b) => a.title.localeCompare(b.title)));
+        } else {
+            console.log('g321hádfb', data, temporary_data.length);
+            if (data.products?.length == 0) {
+                // ngăn load lại 2 lần data không cần thiết
+                // fetch(`${api}/products?perPage=50`)
+                //     .then((response) => response.json())
+                //     .then((result) => {
+                //         console.log('ghádfb2');
+                if (data?.tem_products?.length > 0) {
+                    // console.log('ghádfb3234', data.tem_products);
+                    setTemporary_data(data.tem_products);
+                    setRows([...data.tem_products].sort((a, b) => a.title.localeCompare(b.title)));
+                }
+            }
+        }
+    }, [data]);
+
     return (
         <div className={cx('wrapper')}>
             <ToastContainer
@@ -810,7 +856,7 @@ function Product() {
                         {errors.old_price && <p className="text-red-500 mt-[10px]">{errors.old_price}</p>}
 
                         <Form.Item
-                            label="Loại sản phẩm"
+                            label="Danh mục sản phẩm"
                             name="categoryId"
                             rules={[
                                 {
@@ -821,7 +867,7 @@ function Product() {
                         >
                             <Select
                                 showSearch
-                                placeholder="Chọn loại sản phẩm"
+                                placeholder="Chọn danh mục sản phẩm"
                                 optionFilterProp="children"
                                 filterOption={filterOption}
                                 options={options}
@@ -905,7 +951,7 @@ function Product() {
                 </p>
             </div>
 
-            <div className="flex items-center justify-between px[20px] py-[10px] shadow-sm border rounded-[6px] my-[20px]">
+            <div className="flex items-center justify-between px[20px] py-[10px] shadow-sm border rounded-[6px] my-[10px]">
                 <div className="px-[20px] flex items-center">
                     <p className="text-[1.4rem] text-[#333] mr-[10px]">Sắp xếp theo: </p>
                     <Select
@@ -927,7 +973,8 @@ function Product() {
                 <div className="px-[20px] flex items-center">
                     <Input.Search
                         disabled={data?.products?.length == 0 && temporary_data.length == 0}
-                        onSearch={handleSearch}
+                        // onSearch={handleSearch}
+                        onChange={(e) => handleSearch(e.target.value)}
                         className="w-[400px]"
                         placeholder="Tìm kiếm sản phẩm..."
                     />
@@ -1110,7 +1157,19 @@ function Product() {
                     </Tippy>
                 </div>
             </div>
-            {rows && <EnhancedTable ischeckboxSelection={false} columns={columns} rows={rows} />}
+            {rows && (
+                <EnhancedTable
+                    ischeckboxSelection={false}
+                    pageSize={12}
+                    type="product"
+                    height="70vh"
+                    columns={columns}
+                    rows={rows?.map((row, index) => ({
+                        ...row,
+                        rowNumber: index + 1,
+                    }))}
+                />
+            )}
         </div>
     );
 }

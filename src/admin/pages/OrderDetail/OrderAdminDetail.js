@@ -193,7 +193,7 @@ function OrderAdminDetail() {
                                 <ul className={cx('product_list')}>
                                     {
                                         orderItems.map((item, index) => (
-                                            <Link to={`/admin/update-product/${item.product._id}`} key={item._id} className={cx('product_item')}>
+                                            <Link to={`/admin/products/${item.product._id}`} key={item._id} className={cx('product_item')}>
                                                 <div className={cx('thumbnail')}>
                                                     <img src={item.product.images} />
                                                 </div>

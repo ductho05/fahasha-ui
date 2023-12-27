@@ -25,12 +25,12 @@ function SimpleItem({ onClick, props, type }) {
                 justifyContent: 'center',
                 alignItems: 'center',
                 width: '150px',
-                height: '220px',
+                height: '250px',
             }}
             cover={<LazyLoadImage effect="blur" alt="example" src={image} style={{ height: '130px', width: 'auto' }} />}
         >
             <div className={cx('text-container')}>{`[${type}: ${sold}] ${title}`}</div>
-            <div className={cx('text-container')}></div>
+            {/* <div className={cx('text-container')}></div> */}
         </Card>
     ) : (
         <Card
@@ -41,14 +41,14 @@ function SimpleItem({ onClick, props, type }) {
                 justifyContent: 'center',
                 alignItems: 'center',
                 width: '150px',
-                height: '220px',
+                height: '250px',
             }}
         >
             <Skeleton.Image active={true} />
             <Skeleton
                 active={true}
                 paragraph={{
-                    rows: 1,
+                    rows: 2,
                     width: 100,
                     style: {
                         margin: '8px 0 0 0',

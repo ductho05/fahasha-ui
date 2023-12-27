@@ -14,6 +14,7 @@ export default function ScrollToTop() {
         if (!currentPath.includes('admin')) {
             // Nếu không có, xóa dữ liệu trong Local Storage
             //localStorage.removeItem('temporary_data');
+           // localStorage.removeItem();
         }
         if (!currentPath.includes('admin/flashsale')) localStorage.removeItem('isCheckboxDeleteFS');
     }, [location.pathname]);

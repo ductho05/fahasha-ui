@@ -5,19 +5,19 @@ import numeral from 'numeral';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleLeft } from '@fortawesome/free-solid-svg-icons';
 import styles from './Favorite.module.scss';
-import { api, appPath, cancelOrderImage, CHOXACNHAN, DAHUY } from '../../constants';
+import { api, appPath, cancelOrderImage, CHOXACNHAN, DAHUY } from '../../../../constants';
 import { Button, Popconfirm, message } from 'antd';
 import { faMinus, faPlus, faShareNodes, faStar, faCartShopping, faArrowRight } from '@fortawesome/free-solid-svg-icons';
-import SendNotification from '../../service/SendNotification';
-import { useStore } from '../../stores/hooks';
+import SendNotification from '../../../../service/SendNotification';
+import { useStore } from '../../../../stores/hooks';
 import Skeleton from '@mui/material/Skeleton';
 import { Backdrop, CircularProgress } from '@mui/material';
 
 import { toast, ToastContainer } from 'react-toastify';
-import { getAuthInstance } from '../../utils/axiosConfig';
+import { getAuthInstance } from '../../../../utils/axiosConfig';
 import axios from 'axios';
 import ClearIcon from '@mui/icons-material/Clear';
-import localstorge from '../../stores/localstorge';
+import localstorge from '../../../../stores/localstorge';
 
 const cx = classNames.bind(styles);
 function Favorite() {
@@ -181,7 +181,7 @@ function Favorite() {
                     </p>
                     <div
                         style={{
-                            backgroundColor: '#ff9f00',
+                            backgroundColor: product?.quantity == 0 ? 'gray' : '#ff9f00',
                             color: 'white',
                             padding: '10px 20px',
                             borderRadius: '5px',
@@ -193,7 +193,7 @@ function Favorite() {
                         }}
                         // disabled={product?.quantity == 0}
                         onClick={() => {
-                            handleAddToCart(product?._id);
+                            product?.quantity > 0 && handleAddToCart(product?._id);
                         }}
                     >
                         <FontAwesomeIcon

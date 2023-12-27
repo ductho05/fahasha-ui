@@ -22,6 +22,16 @@ export const useData = () => {
     return context;
 };
 
+
+// Tạo một custom hook để sử dụng context
+// export const useAdmin = () => {
+//     const context = useContext(DataContext);
+//     if (!context) {
+//         throw new Error('useData must be used within a DataProvider');
+//     }
+//     return context;
+// };
+
 // Tạo một Provider để bao bọc ứng dụng của bạn
 export const DataProvider = ({ children }) => {
     const [data, dispatch] = useReducer(dataReducer, {});
