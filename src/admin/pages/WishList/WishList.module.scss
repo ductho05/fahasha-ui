@@ -40,7 +40,7 @@
     }
 
     .left {
-        flex: 2;
+        flex: 1;
         border-radius: 2px;
         border: #b9b9b9c2 1px solid;
         display: flex;
@@ -48,7 +48,7 @@
         justify-content: center;
         align-items: center;
         margin: 0 0 0 10px;
-        width: 800px;
+        // width: 800px;
     }
 
     .title {

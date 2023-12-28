@@ -32,7 +32,7 @@ function OrderSuccess() {
         },
         {
             code: 'E08',
-            content: `Chúng tôi xin lỗi vì đơn hàng của bạn tồn tại sản phẩm có số lượng vượt quá kho hàng. Có lẽ 1 người nào đó đã nhanh tay hơn, xin quý khách vui lòng thực hiện lại giao dịch sau khi chúng tôi nhập hàng.`,
+            content: `Chúng tôi xin lỗi vì đơn hàng của bạn tồn tại sản phẩm có số lượng vượt quá kho hàng. Có lẽ 1 người nào đó đã nhanh tay hơn, xin quý khách vui lòng thực hiện lại giao dịch với số lượng còn lại trong kho.`,
         },
 
         {

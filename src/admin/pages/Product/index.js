@@ -127,7 +127,7 @@ function Product() {
     const [keywords, setKeywords] = useState(null);
     const [status, setStatus] = useState(null);
     const [quantity, setQuantity] = useState(null);
-    const [desciption, setDesciption] = React.useState(null)
+    const [desciption, setDesciption] = React.useState(null);
 
     const updateProductData = (product) => {
         const newListProduct = data.products?.map((p) => {
@@ -317,7 +317,7 @@ function Product() {
                                     : 'Sản phẩm sẽ không bán trên hệ thống cho đến khi mở lại'
                             }
                             onConfirm={() => handleUpdateStatus(params.row.status_sell)}
-                            onCancel={() => { }}
+                            onCancel={() => {}}
                             okText="Đồng ý"
                             cancelText="Hủy"
                         >
@@ -439,8 +439,8 @@ function Product() {
                     formData.append(key, data[key]);
                 });
                 formData.append('images', avatar);
-                formData.append('published_date', published)
-                formData.append('desciption', desciption)
+                formData.append('published_date', published);
+                formData.append('desciption', desciption);
 
                 setLoading(true);
                 await authInstance
@@ -572,10 +572,8 @@ function Product() {
     };
 
     const handleEditorChange = (value) => {
-
-        setDesciption(value)
-
-    }
+        setDesciption(value);
+    };
 
     const handleShowDialog = () => {
         setShowDialog(true);
@@ -931,11 +929,12 @@ function Product() {
                         </p>
                         <div className="flex justify-start w-full">
                             <Editor
-
-                                apiKey='d5t4u2d5qyjye0wlx6xiu3sznmxxu7p9ltiwar6n22xi56ln'
+                                apiKey="d5t4u2d5qyjye0wlx6xiu3sznmxxu7p9ltiwar6n22xi56ln"
                                 init={{
-                                    plugins: 'spellchecker tinycomments mentions anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker a11ychecker typography inlinecss',
-                                    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | align lineheight | tinycomments | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+                                    plugins:
+                                        'spellchecker tinycomments mentions anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker a11ychecker typography inlinecss',
+                                    toolbar:
+                                        'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | align lineheight | tinycomments | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
                                     tinycomments_mode: 'embedded',
                                     tinycomments_author: 'Author name',
                                     spellchecker_language: 'vi_VN',
@@ -943,15 +942,15 @@ function Product() {
                                     mergetags_list: [
                                         { value: 'First.Name', title: 'First Name' },
                                         { value: 'Email', title: 'Email' },
-                                    ]
+                                    ],
                                 }}
                                 value={desciption}
                                 onEditorChange={handleEditorChange}
                             />
                         </div>
-                        {errors?.desciption && <p className='text-red-500 my-[10px] text-[1.4rem]'>Vui lòng nhập mô tả</p>}
-
-
+                        {errors?.desciption && (
+                            <p className="text-red-500 my-[10px] text-[1.4rem]">Vui lòng nhập mô tả</p>
+                        )}
 
                         <div className="flex flex-col mb-[20px]">
                             <p className={cx('label')}>
@@ -1007,9 +1006,9 @@ function Product() {
                         value={
                             selectSort
                                 ? {
-                                    label: selectSort.label,
-                                    value: selectSort.value,
-                                }
+                                      label: selectSort.label,
+                                      value: selectSort.value,
+                                  }
                                 : null
                         }
                     />

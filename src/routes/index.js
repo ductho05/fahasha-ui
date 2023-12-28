@@ -31,7 +31,7 @@ import CategoriesDetail from '../admin/pages/CategoriesDetail/CategoriesDetail';
 import OrderAdminDetail from '../admin/pages/OrderDetail/OrderAdminDetail';
 import Favorite from '../pages/Account/components/Favorite';
 import CategoriesProduct from '../pages/Categories';
-
+import Voucher from '../admin/pages/Voucher/Voucher';
 // Public Routes
 const publicRoutes = [
     { path: '/', component: Home },
@@ -75,7 +75,7 @@ const adminRoutes = [
     { path: '/admin/categories', component: Categories },
     { path: '/admin/categories/:cid', component: CategoriesDetail },
     { path: '/admin/account', component: AccountInfo},
-   
+    { path: '/admin/vouchers', component: Voucher},
 ];
 
 // Auth routes

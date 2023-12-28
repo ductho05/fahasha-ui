@@ -101,7 +101,7 @@ function ForYou({ limit }) {
                     </div>
                     <div style={{ position: 'relative' }}>
                         <Progress
-                            percent={Math.floor((item.sold / item.quantity) * 100)}
+                            percent={Math.floor((item.sold / (item.quantity + item.sold)) * 100)}
                             status="active"
                             showInfo={false}
                             strokeWidth={25}
@@ -129,7 +129,7 @@ function ForYou({ limit }) {
                                 textAlign: 'center',
                             }}
                         >
-                            {`Đã bán ${item.sold}/${item.quantity}`}
+                            {`Đã bán ${item.sold}/${item.quantity + item.sold}`}
                         </div>
                     </div>
                 </div>

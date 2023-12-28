@@ -20,6 +20,8 @@ import SendNotification from '../../service/SendNotification';
 import { getAuthInstance } from '../../utils/axiosConfig';
 import localstorge from '../../stores/localstorge';
 // import { useData, useAdmin } from '../../../';
+
+import { useData, useAdmin } from '../../stores/DataContext';
 import axios from 'axios';
 // import { useData } from '../../hooks/useData';
 const cx = classNames.bind(styles);
@@ -53,14 +55,14 @@ function CheckOut() {
         localStorage.getItem(namecart) ? JSON.parse(localStorage.getItem(namecart)).items : [],
     );
 
-    // const { data, setData } = useData();
-    const [code, setCode] = useState('');
-    const info = (coupon) => {
-        message.info({
-            content: coupon,
-            duration: 1.5,
-        });
-    };
+    const { data, setData } = useData();
+    // const [code, setCode] = useState('');
+    // const info = (coupon) => {
+    //     message.info({
+    //         content: coupon,
+    //         duration: 1.5,
+    //     });
+    // };
     const [isUpdateSold, setIsUpdateSold] = useState(false);
     //const product = localStorage.getItem(namecart) ? JSON.parse(localStorage.getItem(namecart)).items : [];
     //const [mycheckout, setmycheckout] = useState([]);
@@ -248,7 +250,7 @@ function CheckOut() {
         }
     }, [isUpdateSold]);
 
-    const placeOrder = async (data, type) => {
+    const placeOrder = async (data1, type) => {
         try {
             console.log('day ne ban', JSON.parse(localStorage.getItem('listFlash')), productFlash, listCheckouts);
             const listFlash = localStorage.getItem('listFlash')
@@ -264,7 +266,7 @@ function CheckOut() {
                 listCheckouts,
             );
             const orderResult = await authInstance.post(`/orders/insert`, {
-                ...data,
+                ...data1,
                 flashsales: listFlash,
                 items: listNewCheckout,
             });
@@ -326,6 +328,30 @@ function CheckOut() {
                         setIsUpdateSold(true);
                         // Sau khi hoàn thành tất cả, gọi addUserFlash
                         await addUserFlash();
+                        // update lại status của mã giảm giá
+                        console.log('update thanh cong111', data);
+                        if (data?.item) {
+                            fetch(`${api}/vouchers/update/${data?.item._id}`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    status: false,
+                                }),
+                            })
+                                .then((response) => response.json())
+                                .then((result) => {
+                                    setData({
+                                        ...data,
+                                        item: {
+                                            ...data?.item,
+                                            status: false,
+                                        },
+                                    });
+                                })
+                                .catch((err) => console.log(err));
+                        }
                         setOrder(order);
                         setShowProgress(false);
                     }
@@ -829,7 +855,9 @@ function CheckOut() {
         );
         setValue(
             'price',
-            listCheckouts.reduce((total, curr) => total + curr.quantity * curr.product.price, 0) + shippingCost,
+            listCheckouts.reduce((total, curr) => total + curr.quantity * curr.product.price, 0) *
+                (data?.item ? (100 - data?.item.discount) / 100 : 1) +
+                shippingCost,
         );
         setValue('shippingCost', shippingCost);
     }, [isSubmit]);
@@ -1255,8 +1283,6 @@ function CheckOut() {
                     <p className={cx('form_error', 'error_radio')}>{errors.payment_method?.message}</p>
                 </div>
 
-               
-
                 <div className={cx('payment_method')}>
                     <h3 className={cx('heading')}>Thông tin khác</h3>
                     <div className={cx('payment_content')}>
@@ -1295,8 +1321,13 @@ function CheckOut() {
                             <p className={cx('top_label', 'label_top_total')}>Tổng số tiền</p>
                             <p className={cx('top_price', 'price_top_total')}>
                                 {watch('shipping_method')
-                                    ? numeral(price + shippingCost).format('0,0[.]00 VNĐ')
-                                    : numeral(price).format('0,0[.]00 VNĐ')}{' '}
+                                    ? numeral(
+                                          Math.floor(price * (data?.item ? (100 - data?.item.discount) / 100 : 1)) +
+                                              shippingCost,
+                                      ).format('0,0[.]00 VNĐ')
+                                    : numeral(
+                                          Math.floor(price * (data?.item ? (100 - data?.item.discount) / 100 : 1)),
+                                      ).format('0,0[.]00 VNĐ')}{' '}
                                 đ
                             </p>
                         </div>
@@ -1362,13 +1393,22 @@ function CheckOut() {
                         <p className={cx('top_price')}>{numeral(price).format('0,0[.]00 VNĐ')} đ</p>
                     </div>
                     <div className={cx('shipping_cost')}>
+                        <p className={cx('top_label')}>Giảm giá</p>
+
+                        <p className={cx('top_price')}>
+                            {data?.item ? numeral((price * data?.item.discount) / 100).format('0,0[.]00 VNĐ') : 0} đ
+                        </p>
+                    </div>
+                    <div className={cx('shipping_cost')}>
                         <p className={cx('top_label')}>
                             Phí vận chuyển {watch('shipping_method') ? `(${watch('shipping_method')})` : ''}
                         </p>
+
                         <p className={cx('top_price')}>
                             {watch('shipping_method') ? numeral(shippingCost).format('0,0[.]00 VNĐ') : 0} đ
                         </p>
                     </div>
+
                     <div className={cx('shipping_cost')}>
                         <p className={cx('top_label')}>Thời gian dự kiến nhận hàng</p>
                         <p className={cx('top_price', 'hide_on_mobile')}>{deliveryTime}</p>

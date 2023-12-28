@@ -11,15 +11,64 @@
     margin: 0 1% 0 0.5%;
 }
 
+// .voucher {
+//     display: flex;
+//     flex-direction: row;
+//     align-items: center;
+//     justify-content: space-between;
+//     width: 100%;
+//     margin: 2% 0;
+//     background-color: #b3f1cf;
+// }
 .total {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 100%;
-    padding: 8% 5%;
+    padding: 4% 5%;
     border-radius: 5px;
     background-color: #fff;
+}
+
+.product_item {
+    flex: 3;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 15px;
+    // height: 15vh;
+    background-color: #fff;
+    // padding: 2% 0;
+
+    .content_voucher {
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+        justify-content: space-between;
+        width: 100%;
+        height: 60px;
+        padding: 4% 2%;
+        border-right: 1px solid #f2f2f2;
+    }
+
+    .thumbnail {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        width: 30%;
+        height: 60px;
+        padding: 0 2%;
+        border-right: 1px solid #f2f2f2;
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+    }
 }
 
 .total-price {

@@ -17,6 +17,8 @@ import 'react-lazy-load-image-component/src/effects/blur.css';
 import { Skeleton } from 'antd';
 import Item from 'antd/es/list/Item';
 import { auth } from '../../../FirebaseConfig';
+
+import { useData, useAdmin } from '../../../stores/DataContext';
 function TableCart() {
     const authInstance = getAuthInstance();
     const navigate = useNavigate();
@@ -36,8 +38,10 @@ function TableCart() {
             duration: 1.5,
         });
     };
-
+    const { data, setData } = useData();
     const [coupon, setCoupon] = useState([]);
+
+    console.log('data mãu giảm giá', data);
 
     // const coupon = [
     //     {
@@ -53,6 +57,16 @@ function TableCart() {
     //         discount: 30,
     //     },
     // ];
+
+    useEffect(() => {
+        if (data?.item && code == '' && data.item.status == true && dataCart.length > 0) {
+            setDiscount(data.item.discount / 100);
+            info(`Hệ thống tự động áp dụng mã giảm giá [${data.item.code}] giảm ${data.item.discount}% cho bạn`);
+        }
+        // else if (data?.item && code == '' && data.item.status == true && dataCart.length == 0) {
+        //     info(`Vui lòng mua hàng trước khi chọn phiếu giảm giá`);
+        // }
+    }, [data, dataCart.length]);
 
     useEffect(() => {
         product.forEach((item) => {
@@ -82,7 +96,7 @@ function TableCart() {
     useEffect(() => {
         setLoading(true);
         authInstance
-            .get(`/vouchers?user=${state.user._id}`)
+            .get(`/vouchers?user=${state.user._id}&status=true`)
             .then((result) => {
                 if (result.data.status == 'OK') {
                     setCoupon(result.data.data);
@@ -391,65 +405,118 @@ function TableCart() {
             <div className={cx('right')}>
                 <div
                     style={{
-                        width: '100%',
                         display: 'flex',
-                        flexDirection: 'row',
-                        marginBottom: '5%',
-                        backgroundColor: '#fff',
-                        padding: '8% 5%',
-                        borderRadius: '5px',
+                        flexDirection: 'column',
                     }}
                 >
-                    <Input
-                        value={code}
-                        onChange={(e) => {
-                            setCode(e.target.value);
-                        }}
+                    <div
                         style={{
-                            marginRight: '1.5%',
-                            flex: 8,
-                            fontSize: '1.5rem',
-                        }}
-                        placeholder="Nhập mã giảm giá"
-                    />
-                    <Button
-                        onClick={() => {
-                            let flag = false;
-                            if (TongThanhToan() <= 0) {
-                                info(`Vui lòng chọn sản phẩm trước`);
-                                return;
-                            } else {
-                                if (code === '') {
-                                    info(`Vui lòng nhập mã giảm giá`);
-                                    return;
-                                }
-
-                                coupon.map((item, index) => {
-                                    if (item.code === code) {
-                                        setDiscount(item.discount / 100);
-                                        info(`Áp dụng mã giảm giá ${item.discount}% thành công`);
-                                        setCode('');
-                                        flag = true;
-                                    }
-                                });
-                                if (!flag) {
-                                    info(`Mã giảm giá không tồn tại`);
-                                }
-                            }
-                        }}
-                        style={{
-                            marginLeft: '1.5%',
-                            fontSize: '1.5rem',
-                            textAlign: 'center',
-                            flex: 2,
-                            display: 'flex', // Canh giữa theo chiều ngang và dọc
-                            alignItems: 'center', // Canh giữa theo chiều dọc
+                            width: '100%',
+                            display: 'flex',
+                            flexDirection: 'row',
+                            // marginBottom: '',
+                            backgroundColor: '#fff',
+                            padding: '1% 5%',
+                            borderRadius: '5px',
                         }}
                     >
-                        Áp dụng
-                    </Button>
+                        <Input
+                            value={code}
+                            onChange={(e) => {
+                                setCode(e.target.value);
+                            }}
+                            style={{
+                                marginRight: '1.5%',
+                                flex: 8,
+                                fontSize: '1.5rem',
+                            }}
+                            placeholder="Nhập mã giảm giá"
+                        />
+                        <Button
+                            onClick={() => {
+                                let flag = false;
+                                if (TongThanhToan() <= 0) {
+                                    info(`Vui lòng chọn sản phẩm trước`);
+                                    return;
+                                } else {
+                                    if (code === '') {
+                                        info(`Vui lòng nhập mã giảm giá`);
+                                        return;
+                                    }
+
+                                    coupon.map((item, index) => {
+                                        if (item.code === code) {
+                                            setDiscount(item.discount / 100);
+                                            info(`Áp dụng mã giảm giá ${item.discount}% thành công`);
+
+                                            //setCode('');
+                                            setData({ ...data, item });
+                                            flag = true;
+                                        }
+                                    });
+                                    if (!flag) {
+                                        info(`Mã giảm giá không tồn tại hoặc đã được sử dụng`);
+                                    }
+                                }
+                            }}
+                            style={{
+                                marginLeft: '1.5%',
+                                fontSize: '1.5rem',
+                                textAlign: 'center',
+                                flex: 2,
+                                display: 'flex', // Canh giữa theo chiều ngang và dọc
+                                alignItems: 'center', // Canh giữa theo chiều dọc
+                            }}
+                        >
+                            Áp dụng
+                        </Button>
+                    </div>
+                    <p
+                        onClick={() => {
+                            navigate('/account/5');
+                        }}
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'flex-end',
+                            marginRight: '7%',
+                            marginTop: '1%',
+                            fontSize: '1.5rem',
+                            cursor: 'pointer',
+                            color: '#1890ff',
+                        }}
+                    >
+                        Xem thêm
+                    </p>
                 </div>
+
                 <div className={cx('total')}>
+                    {data?.item?.status == true && dataCart.length > 0 && (
+                        <div className={cx('product_item')}>
+                            <div
+                                className={cx('thumbnail')}
+                                style={{
+                                    backgroundColor: '#17a42c',
+                                }}
+                                onClick={() => {
+                                    //navigate(`/product-detail/${product._id}`);
+                                }}
+                            >
+                                <img
+                                    src="https://cdn0.fahasa.com/skin/frontend/ma_vanese/fahasa/images/ico_coupongreen.svg?q=10402"
+                                    alt="Lỗi load ảnh"
+                                />
+                            </div>
+                            <div
+                                className={cx('content_voucher')}
+                                style={{
+                                    backgroundColor: '#e1ffe5',
+                                }}
+                            >
+                                <p className={cx('author')}>Mã: {data?.item?.code}</p>
+                                <p className={cx('author')}>Giảm giá: {data?.item?.discount}%</p>
+                            </div>
+                        </div>
+                    )}
                     <div className={cx('total-price')}>
                         <div className={cx('total-price-title')}>Thành tiền</div>
                         <span></span>

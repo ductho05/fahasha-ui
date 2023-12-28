@@ -66,6 +66,7 @@ function AdminLayout({ children }) {
                   favorites: true,
                   flashsales: true,
                   categories: true,
+                  vouchers: true,
               }
             : {
                   evaluates: false,
@@ -77,6 +78,7 @@ function AdminLayout({ children }) {
                   tem_products: false,
                   flashsales: false,
                   categories: false,
+                  vouchers: false,
               },
     );
     const [percent, setPercent] = useState(0);
@@ -94,6 +96,7 @@ function AdminLayout({ children }) {
                   tem_products: [],
                   flashsales: [],
                   categories: [],
+                  vouchers: [],
               },
     );
 
@@ -212,6 +215,19 @@ function AdminLayout({ children }) {
             .catch((err) => {
                 console.error(err);
             });
+
+            authInstance
+            .get(`/vouchers`)
+            .then((result) => {
+                // console.log(result);
+                if (result.data.status === 'OK') {
+                    setData2((prev) => ({ ...prev, vouchers: result.data.data }));
+                    setIsLoaded((prev) => ({ ...prev, vouchers: true }));
+                }
+            })
+            .catch((err) => {
+                console.error(err);
+            });
         fetch(`${api}/categories?filter=simple`)
             .then((response) => response.json())
             .then((result) => {
@@ -266,6 +282,7 @@ function AdminLayout({ children }) {
                 tem_products: true,
                 flashsales: true,
                 categories: true,
+                vouchers: true,
             });
         }
     }, []);
@@ -281,6 +298,7 @@ function AdminLayout({ children }) {
             isLoaded.flashsales &&
             isLoaded.favorites &&
             isLoaded.products &&
+            isLoaded.vouchers &&
             Object.keys(data).length === 0
         ) {
             //localStorage.setItem('temporary_data', JSON.stringify(data));
@@ -306,6 +324,7 @@ function AdminLayout({ children }) {
                 isLoaded.tem_products &&
                 isLoaded.favorites &&
                 isLoaded.flashsales &&
+                isLoaded.vouchers &&
                 isLoaded.products
             ) &&
                 Object.keys(data).length === 0 && (
@@ -323,6 +342,7 @@ function AdminLayout({ children }) {
                     isLoaded.tem_products &&
                     isLoaded.favorites &&
                     isLoaded.flashsales &&
+                    isLoaded.vouchers &&
                     isLoaded.products
                 ) && Object.keys(data).length === 0
             ) && (

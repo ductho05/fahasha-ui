@@ -18,6 +18,7 @@ import { getAuthInstance } from '../../../../utils/axiosConfig';
 import axios from 'axios';
 import ClearIcon from '@mui/icons-material/Clear';
 import localstorge from '../../../../stores/localstorge';
+import { useData } from '../../../../stores/DataContext';
 
 const cx = classNames.bind(styles);
 function Voucher() {
@@ -31,7 +32,7 @@ function Voucher() {
     const [loading, setLoading] = useState(false);
     const [loadingUpdate, setLoadingUpdate] = useState(false);
     const [updateSuccess, setUpdateSuccess] = useState(false);
-
+    const { data, setData } = useData();
     const [favoriteList, setFavoriteList] = useState([]);
 
     // console.log('da vao day');
@@ -136,6 +137,9 @@ function Voucher() {
             <div className={cx('product_item')}>
                 <div
                     className={cx('thumbnail')}
+                    style={{
+                        backgroundColor: !product?.status ? '#646464' : '#17a42c',
+                    }}
                     onClick={() => {
                         //navigate(`/product-detail/${product._id}`);
                     }}
@@ -145,9 +149,15 @@ function Voucher() {
                         alt="Lỗi load ảnh"
                     />
                 </div>
-                <div className={cx('content_voucher')}>
+                <div
+                    className={cx('content_voucher')}
+                    style={{
+                        backgroundColor: !product?.status ? '#d0d0d0' : '#e1ffe5',
+                    }}
+                >
                     <div className={cx('product_body')}>
                         <p className={cx('product_name')}>Mã giảm giá: {product?.code}</p>
+                        <p className={cx('author')}>Trạng thái: {!product?.status ? 'Đã sử dụng' : 'Chưa sử dụng'}</p>
                         <p className={cx('author')}>
                             Ưu đãi giảm: {product?.discount ? product?.discount + '%' : '[Không có thông tin]'} cho đơn
                             hàng bất kỳ
@@ -157,23 +167,32 @@ function Voucher() {
                         </p>
                         <p className={cx('quantity')}>HSD đến hết ngày: {product?.expried}</p>
                     </div>
-                    <div className={cx('get_voucher')}>
-                        <div
-                            className={cx('btn_get_voucher')}
-                            onClick={() => {
-                                //handleAddToCart(product._id);
-                                // copy mã giảm giá
-                                navigator.clipboard.writeText(product?.code);
-                                toast.success('Đã copy mã giảm giá');
-                            }}
-                        >
-                            Nhận ngay
+                    {product?.status && (
+                        <div className={cx('get_voucher')}>
+                            <div
+                                className={cx('btn_get_voucher')}
+                                onClick={() => {
+                                    //handleAddToCart(product._id);
+                                    // copy mã giảm giá
+                                    navigator.clipboard.writeText(product?.code);
+                                    //toast.success('Đã copy mã giảm giá');
+                                    setData({
+                                        ...data,
+                                        item: product,
+                                    });
+                                    navigate(`/cart`);
+                                }}
+                            >
+                                Sử dụng ngay
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
         );
     };
+
+    console.log('favoriteList1111', data);
 
     return (
         <div className="p-[10px] md:p-[20px] lg:p-[40px]">

@@ -19,8 +19,7 @@ import ReviewsIcon from '@mui/icons-material/Reviews';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../../../stores/hooks';
 import { logout } from '../../../../stores/actions';
-
-
+import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
 const cx = classNames.bind(styles);
 
 export const tabList = [
@@ -74,25 +73,31 @@ export const tabList = [
                 name: 'Sản phẩm yêu thích',
                 link: '/admin/wishlists',
             },
+            {
+                id: 7,
+                icon: ConfirmationNumberIcon,
+                name: 'Mã giảm giá',
+                link: '/admin/vouchers',
+            },
         ],
     },
     {
-        type: 'Chức năng',
+        type: 'Tính năng',
         tabs: [
             {
-                id: 7,
+                id: 8,
                 icon: StackedLineChartOutlinedIcon,
                 name: 'Thống kê',
                 link: '/admin/statistics',
             },
             {
-                id: 8,
+                id: 9,
                 icon: NotificationsNoneOutlinedIcon,
                 name: 'Thông báo',
                 link: '/admin/notifications',
             },
             {
-                id: 9,
+                id: 10,
                 icon: LoyaltyIcon,
                 name: 'Flash Sale',
                 link: '/admin/flashsale',
@@ -103,13 +108,13 @@ export const tabList = [
         type: 'Cá nhân',
         tabs: [
             {
-                id: 10,
+                id: 11,
                 icon: AccountBoxOutlinedIcon,
                 name: 'Thông tin nhân viên',
                 link: '/admin/account',
             },
             {
-                id: 11,
+                id: 12,
                 icon: LogoutOutlinedIcon,
                 name: 'Đăng xuất',
                 logout: true,
@@ -118,7 +123,7 @@ export const tabList = [
     },
 ];
 
-function SideBar({url}) {
+function SideBar({ url }) {
     const [currentTab, setCurrentTab] = useState(
         url == '/admin'
             ? 0
@@ -134,28 +139,28 @@ function SideBar({url}) {
             ? 5
             : url == '/admin/wishlists'
             ? 6
+            : url == '/admin/vouchers'
+            ? 7 
             : url == '/admin/statistics'
-            ? 7
-            : url == '/admin/notifications'
             ? 8
-            : url.includes(`/admin/flashsale`)
+            : url == '/admin/notifications'
             ? 9
-            : url == '/admin/account'
+            : url.includes(`/admin/flashsale`)
             ? 10
-            : 11,
+            : url == '/admin/account'
+            ? 11
+            : -1,
     );
-    const [state, dispatch] = useStore()
+    const [state, dispatch] = useStore();
     const handleClickTab = (id) => {
         setCurrentTab(id);
-    }
+    };
 
-   
     const navigate = useNavigate();
 
     const handleLogout = () => {
-
-        dispatch(logout())
-    }
+        dispatch(logout());
+    };
 
     return (
         <div className={cx('wrapper')}>
@@ -169,34 +174,34 @@ function SideBar({url}) {
                 </h2>
             </div>
             {/* <Scrollbar removeTrackYWhenNotUsed style={{ width: 250, height: '100vh' }}> */}
-                <div className={cx('bottom')}  style={{ width: 250, height: '100vh' }}>
-                    <ul className={cx('items')}>
-                        {tabList.map((tabItem, typeindex) => (
-                            <div key={typeindex}>
-                                <p className={cx('name')}>{tabItem.type}</p>
-                                {tabItem.tabs.map((tab, index) => {
-                                    const Icon = tab.icon;
-                                    return (
-                                        <Link
-                                            key={index}
-                                            onClick={() => handleClickTab(tab.id)}
-                                            to={tab?.link}
-                                            className={tab.id == currentTab ? cx('item', 'active') : cx('item')}
-                                        >
-                                            <Icon className={cx('icon')} />
-                                            <p className={cx('title')}>{tab.name}</p>
-                                        </Link>
-                                    );
-                                })}
-                            </div>
-                        ))}
-                    </ul>
-                    <p className={cx('name')}>Theme</p>
+            <div className={cx('bottom')} style={{ width: 250, height: '100vh' }}>
+                <ul className={cx('items')}>
+                    {tabList.map((tabItem, typeindex) => (
+                        <div key={typeindex}>
+                            <p className={cx('name')}>{tabItem.type}</p>
+                            {tabItem.tabs.map((tab, index) => {
+                                const Icon = tab.icon;
+                                return (
+                                    <Link
+                                        key={index}
+                                        onClick={() => handleClickTab(tab.id)}
+                                        to={tab?.link}
+                                        className={tab.id == currentTab ? cx('item', 'active') : cx('item')}
+                                    >
+                                        <Icon className={cx('icon')} />
+                                        <p className={cx('title')}>{tab.name}</p>
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    ))}
+                </ul>
+                {/* <p className={cx('name')}>Theme</p>
                     <div className={cx('theme')}>
                         <p className={cx('box')}></p>
                         <p className={cx('box')}></p>
-                    </div>
-                </div>
+                    </div> */}
+            </div>
             {/* </Scrollbar> */}
         </div>
     );

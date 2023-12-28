@@ -11,6 +11,8 @@ import { useEffect } from 'react';
 import { Alert, Space, Spin, Popover, Tag } from 'antd';
 import AlarmOnIcon from '@mui/icons-material/AlarmOn';
 import classNames from 'classnames/bind';
+
+import { InfoCircleFilled } from '@ant-design/icons';
 import styles from './BarChar.module.scss';
 import CustomPopover from '../../CustomPopover/CustomPopover';
 
@@ -282,6 +284,23 @@ function BarChartExample(func) {
                     height: '40px',
                 }}
             >
+                <Popover
+                    content={
+                        'Dữ liệu được phân tích từ các đơn hàng đã từng đặt mua (không tính những đơn bị hủy)'
+                    }
+                    trigger="hover"
+                    // className={cx('kpi')}
+                >
+                    <span
+                        style={{
+                            margin: '1px 5px 0 0',
+                            // cursor: 'pointer',
+                            fontSize: '1.6rem',
+                        }}
+                    >
+                        <InfoCircleFilled />
+                    </span>
+                </Popover>{' '}
                 Biểu đồ flashsale đã đặt trong khung giờ
             </text>
         </div>

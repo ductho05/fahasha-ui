@@ -689,10 +689,11 @@ function FlashSale() {
                 </div>
                 <div className="px-[20px] flex items-center">
                     <Input.Search
-                        onSearch={handleSearch}
+                        // onSearch={handleSearch}
                         disabled={data?.flashsales?.length == 0}
                         className="w-[400px]"
                         placeholder="Tìm kiếm sản phẩm..."
+                        onChange={(e) => handleSearch(e.target.value)}
                     />
                 </div>
                 <div className="px-[20px] flex items-center">
@@ -908,7 +909,7 @@ function FlashSale() {
                         type="flashsale"
                     />
                 </div>
-                <div className={cx('state')} >
+                <div className={cx('state')}>
                     {rows && <BarChartExample data={rows} func={setRows} setIsTime={[isTime, setIsTime]} />}{' '}
                 </div>
             </div>
