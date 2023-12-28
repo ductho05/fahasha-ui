@@ -324,15 +324,13 @@ function ProductDetail() {
     }
 
     const checkQuantity = (cart, num) => {
-
-        const findProduct = cart.find(p => p.id === productId)
+        const findProduct = cart.find((p) => p.id === productId);
 
         if (findProduct) {
-
-            return (findProduct.count + num) <= product.quantity ? true : false
+            return findProduct.count + num <= product.quantity ? true : false;
         }
-        return num <= product.quantity ? true : false
-    }
+        return num <= product.quantity ? true : false;
+    };
 
     function addCart(num) {
         const user = JSON.parse(localStorage.getItem('user'));
@@ -345,7 +343,6 @@ function ProductDetail() {
         };
 
         if (checkQuantity(cart.items, num)) {
-
             var item = {
                 id: productId,
                 count: num,
@@ -364,7 +361,7 @@ function ProductDetail() {
             localStorage.setItem(namecart, JSON.stringify(myCart));
             toast.success('Đã thêm sản phẩm vào giỏ hàng');
         } else {
-            message.warning('Vui lòng không đặt quá số lượng trong kho')
+            message.warning('Vui lòng không đặt quá số lượng trong kho');
         }
     }
 
@@ -570,14 +567,14 @@ function ProductDetail() {
                             <div className={cx('mid_content')}>
                                 <div className={cx('price')}>
                                     <p className={cx('current_price')}>
-                                        {numeral(product?.price).format('0,0[.]00 VNĐ')} đ
+                                        {numeral(Math.floor(product?.price)).format('0,0[.]00 VNĐ')} đ
                                     </p>
                                     <p
                                         className={
                                             product?.price === product?.old_price ? cx('hidden') : cx('old_price')
                                         }
                                     >
-                                        {numeral(product?.old_price).format('0,0[.]00 VNĐ')} đ
+                                        {numeral(Math.floor(product?.old_price)).format('0,0[.]00 VNĐ')} đ
                                     </p>
                                     <p
                                         className={
@@ -616,10 +613,11 @@ function ProductDetail() {
                             </div>
                             <div className="flex items-center mt-[20px]">
                                 <div
-                                    className={`flex items-center p-[10px] rounded-[6px] ${product?.sold == product?.quantity
-                                        ? 'bg-[#f2f4f5] text-[#7a7e7f]'
-                                        : 'bg-[rgba(201,33,39,0.06)] text-[#c92127]'
-                                        }`}
+                                    className={`flex items-center p-[10px] rounded-[6px] ${
+                                        product?.sold == product?.quantity
+                                            ? 'bg-[#f2f4f5] text-[#7a7e7f]'
+                                            : 'bg-[rgba(201,33,39,0.06)] text-[#c92127]'
+                                    }`}
                                 >
                                     {product?.quantity === 0 ? <StopFilled /> : <CheckCircleFilled />}
                                     <p className="font-[600] ml-[10px]">
@@ -689,13 +687,13 @@ function ProductDetail() {
                             </tbody>
                         </table>
                         <p>
-                            Giá sản phẩm trên Fahasa.com đã bao gồm thuế theo luật hiện hành. Bên cạnh đó, tuỳ vào loại
-                            sản phẩm, hình thức và địa chỉ giao hàng mà có thể phát sinh thêm chi phí khác như Phụ phí
-                            đóng gói, phí vận chuyển, phụ phí hàng cồng kềnh,...
+                            Giá sản phẩm trên TA BookStore đã bao gồm thuế theo luật hiện hành. Bên cạnh đó, tuỳ vào
+                            loại sản phẩm, hình thức và địa chỉ giao hàng mà có thể phát sinh thêm chi phí khác như Phụ
+                            phí đóng gói, phí vận chuyển, phụ phí hàng cồng kềnh,...
                         </p>
                         <span>
-                            Chính sách khuyến mãi trên Fahasa.com không áp dụng cho Hệ thống Nhà sách Fahasa trên toàn
-                            quốc
+                            Chính sách khuyến mãi trên TA BookStore không áp dụng cho Hệ thống Nhà sách TA BookStore
+                            trên toàn quốc
                         </span>
                     </div>
 

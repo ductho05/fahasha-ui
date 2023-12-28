@@ -546,13 +546,13 @@ function AccountInfo() {
                                 </div>
                             </div>
 
-                            <div className={cx('form_group')}>
-                                <label className={cx('label')}>Ngày sinh*</label>
+                            {/* <div className={cx('form_group')}>
+                                <label className={cx('label')}>Ngày sinh*</label> { user.birth &&
                                 <div>
                                     <DatePicker onChange={handleChangeBirth} value={user.birth ? dayjs(user.birth) : ""} />
                                     {birthError && <p className='mt-[10px] text-[13px] text-red-500'>{birthError}</p>}
-                                </div>
-                            </div>
+                                </div> }
+                            </div> */}
 
 
                             <div className={cx('form_group')}>

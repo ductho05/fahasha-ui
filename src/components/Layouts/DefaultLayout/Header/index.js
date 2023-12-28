@@ -401,9 +401,9 @@ function Header() {
                                                                         </li>
                                                                     ))
                                                                 }
-                                                                <Link to={`/categories/${category._id}`}>
-                                                                    <p>Xem tất cả</p>
-                                                                </Link>
+                                                                {/* <Link to={`/categories/${category._id}`}>
+                                                                    <p>Xem tất cả1</p>
+                                                                </Link> */}
                                                             </ul>
 
                                                         </div>

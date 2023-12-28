@@ -22,7 +22,7 @@ export const lockImage =
 export const unLockImage =
     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWOKkU25svJ7cINb3fMH2Pxo_6KOGUm-A9JQ&usqp=CAU';
 
-export const voucherImage = "https://cdn-www.vinid.net/483a744d-cach-san-voucher.jpg"
+export const voucherImage = 'https://cdn-www.vinid.net/483a744d-cach-san-voucher.jpg';
 
 export const listJustWatched = JSON.parse(localStorage.getItem('mycategory')) || [];
 

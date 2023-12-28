@@ -137,20 +137,51 @@ function SideBar({ url }) {
             ? 4
             : url.includes(`/admin/categories`)
             ? 5
-            : url == '/admin/wishlists'
+            : url.includes('/admin/wishlists')
             ? 6
-            : url == '/admin/vouchers'
-            ? 7 
-            : url == '/admin/statistics'
+            : url.includes('/admin/vouchers')
+            ? 7
+            : url.includes('/admin/statistics')
             ? 8
-            : url == '/admin/notifications'
+            : url.includes('/admin/notifications')
             ? 9
             : url.includes(`/admin/flashsale`)
             ? 10
-            : url == '/admin/account'
+            : url.includes('/admin/account')
             ? 11
             : -1,
     );
+
+    useEffect(() => {
+        setCurrentTab(
+            url == '/admin'
+                ? 0
+                : url.includes(`/admin/user`)
+                ? 1
+                : url.includes(`/admin/products`)
+                ? 2
+                : url.includes(`/admin/orders`)
+                ? 3
+                : url.includes(`/admin/reviews`)
+                ? 4
+                : url.includes(`/admin/categories`)
+                ? 5
+                : url.includes('/admin/wishlists')
+                ? 6
+                : url.includes('/admin/vouchers')
+                ? 7
+                : url.includes('/admin/statistics')
+                ? 8
+                : url.includes('/admin/notifications')
+                ? 9
+                : url.includes(`/admin/flashsale`)
+                ? 10
+                : url.includes('/admin/account')
+                ? 11
+                : -1,
+        );
+    }, [url]);
+
     const [state, dispatch] = useStore();
     const handleClickTab = (id) => {
         setCurrentTab(id);
@@ -181,8 +212,23 @@ function SideBar({ url }) {
                             <p className={cx('name')}>{tabItem.type}</p>
                             {tabItem.tabs.map((tab, index) => {
                                 const Icon = tab.icon;
-                                return (
+                                return tab.logout ? (
+                                    <div
+                                        onClick={() => handleLogout(tab.id)}
+                                        style={{
+                                            padding: '10px',
+                                        }}
+                                        key={index}
+                                        className={tab.id == currentTab ? cx('item', 'active') : cx('item')}
+                                    >
+                                        <Icon className={cx('icon')} />
+                                        <p className={cx('title')}>{tab.name}</p>
+                                    </div>
+                                ) : (
                                     <Link
+                                        style={{
+                                            padding: '10px',
+                                        }}
                                         key={index}
                                         onClick={() => handleClickTab(tab.id)}
                                         to={tab?.link}

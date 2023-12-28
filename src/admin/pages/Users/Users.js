@@ -87,11 +87,11 @@ const priceOptions = [
 
 const roleOption = [
     {
-        label: 'Quản lý',
+        title: 'Quản lý',
         value: true,
     },
     {
-        label: 'Khách hàng',
+        title: 'Khách hàng',
         value: false,
     },
 ];
@@ -371,6 +371,10 @@ function Users() {
         setGender(gender);
     };
 
+    const insertData = (user) => {
+        setData({ ...data, users: [...data.users, user] });
+    };
+
     const onFinish = async (data) => {
         const formData = new FormData();
         Object.keys(data).forEach((key) => {
@@ -388,24 +392,25 @@ function Users() {
         if (gender) {
             formData.append('gender', gender);
         }
-        setIsInsert(true);
+        setLoading(true);
         await authInstance
             .post(`/users/insert`, formData)
             .then((result) => {
                 if (result.data.status === 'OK') {
                     setIsAction((prev) => !prev);
                     toast.success('Thêm mới tài khoản thành công!');
-                    setData({ ...data, users: [...data.users, result.data.data] });
+                    // setData({ ...data, users: [...data.users, result.data.data] });
+                    insertData(result.data.data);
                     //fetchUsers();
                 } else {
                     toast.error(`${result.data.message}`);
                 }
                 setShowDialog(false);
-                setIsInsert(false);
+                setLoading(false);
             })
             .catch((err) => {
                 setShowDialog(false);
-                setIsInsert(false);
+                setLoading(false);
                 toast.error(`${err?.response?.data?.message}`);
             });
     };
@@ -814,7 +819,7 @@ function Users() {
                             <p className={cx('label')}>Chức vụ: </p>
                             <div className="flex flex-[20] justify-start ml-[6px]">
                                 <DropMenu
-                                    options={options}
+                                    options={roleOption}
                                     size="big"
                                     optionSelected={role}
                                     setOptionSelected={setRole}
@@ -841,11 +846,17 @@ function Users() {
                                 </div>
                             </div>
                         </div>
-                        <div className={cx('buttons')}>
-                            <p htmlType="submit">
-                                <Button primary>Thêm</Button>
-                            </p>
-                        </div>
+                        <Form.Item
+                            style={{
+                                width: '100%',
+                                display: 'flex',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <Button type="primary" htmlType="submit">
+                                Thêm
+                            </Button>
+                        </Form.Item>
                     </Form>
                 </div>
             </Dialog>

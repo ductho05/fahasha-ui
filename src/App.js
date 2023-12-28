@@ -15,11 +15,11 @@ import { api } from './constants';
 function DeniedPermission({ type }) {
     type == 'admin'
         ? localStorage.setItem(
-            'denied-permission-notify',
+              'denied-permission-notify',
 
-            `Bạn không có quyền truy cập vào trang này.
+              `Bạn không có quyền truy cập vào trang này.
     Vui lòng đăng nhập với quyền Admin`,
-        )
+          )
         : localStorage.setItem('denied-permission-notify', `Vui lòng đăng nhập để sử dụng tính năng này`);
     return <Navigate to="/login-register" />;
 }
@@ -30,36 +30,35 @@ function App() {
     const Page404 = notFoundRoute.component;
 
     setTimeout(async () => {
-
-        console.log("alo")
+        // console.log("alo")
         if (Object.keys(state.token).length > 0) {
-
-            await axios.get(`${api}/users/get/profile`, {
-                headers: {
-                    'Authorization': `Bearer ${state.token}`
-                }
-            }).then(result => {
-
-            }).catch((err) => {
-                if (err.response.data.message == "Jwt expired") {
-                    Modal.error({
-                        title: "Lỗi",
-                        content: "Đã hết phiên đăng nhập. Vui lòng đăng nhập lại!",
-                        onOk: () => {
-                            dispatch(logout())
-                            setTimeout(() => {
-                                Navigate("/login-register")
-                            }, 500)
-                        }
-                    })
-                }
-            })
+            await axios
+                .get(`${api}/users/get/profile`, {
+                    headers: {
+                        Authorization: `Bearer ${state.token}`,
+                    },
+                })
+                .then((result) => {})
+                .catch((err) => {
+                    if (err.response.data.message == 'Jwt expired') {
+                        Modal.error({
+                            title: 'Lỗi',
+                            content: 'Đã hết phiên đăng nhập. Vui lòng đăng nhập lại!',
+                            onOk: () => {
+                                dispatch(logout());
+                                setTimeout(() => {
+                                    // Navigate("/login-register")
+                                    window.location.reload();
+                                }, 500);
+                            },
+                        });
+                    }
+                });
         }
-    }, 1000)
+    }, 1000);
 
     return (
         <BrowserRouter>
-
             <ScrollToTop />
             <div className="App">
                 <Routes>
@@ -118,15 +117,8 @@ function App() {
 
                     {authRoutes.map((route, index) => {
                         const Page = route.component;
-                        return (
-                            <Route
-                                key={index}
-                                path={route.path}
-                                element={<Page />}
-                            />
-                        );
-                    })
-                    }
+                        return <Route key={index} path={route.path} element={<Page />} />;
+                    })}
 
                     <Route path={notFoundRoute.path} element={<Page404 />} />
                 </Routes>

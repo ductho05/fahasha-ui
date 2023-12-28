@@ -140,6 +140,36 @@ function SideBarLaptop({ url }) {
             : -1,
     );
 
+    useEffect(() => {
+        setCurrentTab(
+            url == '/admin'
+                ? 0
+                : url.includes(`/admin/user`)
+                ? 1
+                : url.includes(`/admin/products`)
+                ? 2
+                : url.includes(`/admin/orders`)
+                ? 3
+                : url.includes(`/admin/reviews`)
+                ? 4
+                : url.includes(`/admin/categories`)
+                ? 5
+                : url.includes('/admin/wishlists')
+                ? 6
+                : url.includes('/admin/vouchers')
+                ? 7
+                : url.includes('/admin/statistics')
+                ? 8
+                : url.includes('/admin/notifications')
+                ? 9
+                : url.includes(`/admin/flashsale`)
+                ? 10
+                : url.includes('/admin/account')
+                ? 11
+                : -1,
+        );
+    }, [url]);
+
     const handleClickTab = (id) => {
         setCurrentTab(id);
     };
