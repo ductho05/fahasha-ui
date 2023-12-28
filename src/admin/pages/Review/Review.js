@@ -173,7 +173,7 @@ function Review() {
         {
             field: 'user',
             headerName: 'Tên tài khoản',
-            width: 100,
+            width: 90,
             sortable: false,
             editable: true,
             renderCell: (params) => (
@@ -182,16 +182,16 @@ function Review() {
                     onClick={() => {
                         navigate(`/admin/user/${params.value?._id}`);
                     }}
-                    className={params.value ? cx('') : cx('null')}
+                    className={params.value?.fullName ? cx('') : cx('null')}
                 >
-                    {params.value ? params.value?.fullName : 'Trống'}
+                    {params.value?.fullName ? params.value?.fullName : 'Trống'}
                 </p>
             ),
         },
         {
             field: 'product',
             headerName: 'Sản phẩm',
-            width: 90,
+            width: 80,
             renderCell: (params) => (
                 <img
                     onClick={() => {
@@ -570,7 +570,7 @@ function Review() {
                 )}
 
                 <div className={cx('left')}>
-                    <h3 className={cx('title')}>TOP {numProduct} SẢN PHẨM CÓ LƯỢT ĐÁNH GIÁ CAO NHẤT</h3>
+                    <h3 className={cx('title')}>TOP {numProduct} SẢN PHẨM CÓ TỈ LỆ ĐÁNH GIÁ CAO NHẤT</h3>
                     <div className={cx('content_user')}>
                         {top_products.length == 0 ? (
                             <div
@@ -630,7 +630,7 @@ function Review() {
                                             cursor: 'pointer',
                                         }}
                                         onClick={() => {
-                                            navigate(`/admin/s/${user.id}`);
+                                            navigate(`/admin/products/${user.id}`);
                                         }}
                                     >
                                         {user.name}

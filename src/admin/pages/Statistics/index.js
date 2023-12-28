@@ -945,12 +945,13 @@ function Statistics() {
                                         className={cx('name')}
                                         style={{
                                             cursor: 'pointer',
+                                            color: user?.name ? '#000' : '#ccc',
                                         }}
                                         onClick={() => {
                                             navigate(`/admin/user/${user.id}`);
                                         }}
                                     >
-                                        {user.name}
+                                        {user?.name ? user.name : '[Không có tên]'}
                                     </div>
                                     <div className={cx('value')}>
                                         {addCommasToNumber(Math.round(user.value / 1000))}K

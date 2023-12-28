@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 // import { getAuthInstance } from '../../../utils/axiosConfig';
 // import { api, appPath, lockImage, unLockImage } from '../../../constants';
 // import { useNavigate } from "react-router-dom"
-import { getAuthInstance } from "../../../utils/axiosConfig"
+import { getAuthInstance } from '../../../utils/axiosConfig';
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { api, appPath, lockImage, superAdmin, unLockImage } from '../../../constants';
@@ -45,13 +45,13 @@ import { Wrapper as PopperWrapper } from '../../../components/Popper';
 
 function Categories() {
     const navigate = useNavigate();
-    const [rows, setRows] = React.useState([])
-    const { data, setData } = useData()
-    const [displayForm, setDisplayForm] = React.useState(false)
-    const [loading, setLoading] = React.useState(false)
-    const [success, setSuccess] = React.useState(0)
+    const [rows, setRows] = React.useState([]);
+    const { data, setData } = useData();
+    const [displayForm, setDisplayForm] = React.useState(false);
+    const [loading, setLoading] = React.useState(false);
+    const [success, setSuccess] = React.useState(0);
     // const navigate = useNavigate()
-    const authInstance = getAuthInstance()
+    const authInstance = getAuthInstance();
 
     const [options, setOptions] = useState([]);
     const [price, setPrice] = useState(null);
@@ -84,18 +84,18 @@ function Categories() {
             if (c._id === category._id) {
                 return { ...category };
             } else return c;
-        })
+        });
 
-        const newProduct = data.products.map(product => {
-            const replacement = products.find(p => p._id === product._id);
+        const newProduct = data.products.map((product) => {
+            const replacement = products.find((p) => p._id === product._id);
             if (replacement) {
-                return { ...replacement }
+                return { ...replacement };
             }
-            return { ...product }
-        })
+            return { ...product };
+        });
 
-        setData({ ...data, categories: newListCategories, products: newProduct })
-    }
+        setData({ ...data, categories: newListCategories, products: newProduct });
+    };
 
     const handleSearch = (value) => {
         setKeywords(value);
@@ -169,8 +169,8 @@ function Categories() {
             width: 200,
             renderCell: (params) => {
                 return (
-                    <p className={`font-[600] ${params.value ? "text-green-600" : "text-red-600"}`}>
-                        {params.value ? "Hoạt động" : "Ngưng"}
+                    <p className={`font-[600] ${params.value ? 'text-green-600' : 'text-red-600'}`}>
+                        {params.value ? 'Hoạt động' : 'Ngưng'}
                     </p>
                 );
             },
@@ -183,73 +183,60 @@ function Categories() {
             width: 200,
 
             renderCell: (params) => {
-
                 const handleLockCategory = async (category) => {
-
-                    const statusUpdate = category.status ? false : true
+                    const statusUpdate = category.status ? false : true;
                     const response = await authInstance.put(`/categories/${category._id}`, {
-                        status: statusUpdate
-                    })
+                        status: statusUpdate,
+                    });
 
                     if (response.status === 200) {
-
-                        const responseProduct = await authInstance.put("/products/many", {
+                        const responseProduct = await authInstance.put('/products/many', {
                             status: response.data.data.status,
-                            id: response.data.data._id
-                        })
+                            id: response.data.data._id,
+                        });
 
                         if (responseProduct.status === 200) {
-
-                            updateData(response.data.data, responseProduct.data.data)
-                            const image = response.data.data.status ? unLockImage : lockImage
+                            updateData(response.data.data, responseProduct.data.data);
+                            const image = response.data.data.status ? unLockImage : lockImage;
                             await authInstance.post(`/webpush/send`, {
-                                filter: "admin",
+                                filter: 'admin',
                                 notification: {
-                                    title: "Thông báo",
-                                    description: `${response.data.data.status ? `Danh mục ${response.data.data.name} vừa được hoạt động trở lại` : `Danh mục ${response.data.data.name} tạm thời bị khóa`}`,
+                                    title: 'Thông báo',
+                                    description: `${
+                                        response.data.data.status
+                                            ? `Danh mục ${response.data.data.name} vừa được hoạt động trở lại`
+                                            : `Danh mục ${response.data.data.name} tạm thời bị khóa`
+                                    }`,
                                     url: `${appPath}/admin/categories`,
-                                    image
-                                }
-                            })
-                            toast.success("Cập nhật thành công!")
+                                    image,
+                                },
+                            });
+                            toast.success('Cập nhật thành công!');
                         }
                     }
-                }
+                };
 
                 return (
                     <div>
                         <Tooltip
-                            title={
-                                params.row.status === false
-                                    ? 'Mở lại trạng thái hoạt động'
-                                    : 'Ngưng hoạt động'
-                            }
+                            title={params.row.status === false ? 'Mở lại trạng thái hoạt động' : 'Ngưng hoạt động'}
                         >
                             <Button
                                 className="mr-[20px]"
                                 onClick={() => {
                                     Modal.confirm({
-                                        title: "Lưu ý!",
-                                        content: params.row.status ?
-                                            `Khi danh mục ${params.row.name} bị khóa, tất cả sản phẩm thuộc danh mục này sẽ ngưng bán`
+                                        title: 'Lưu ý!',
+                                        content: params.row.status
+                                            ? `Khi danh mục ${params.row.name} bị khóa, tất cả sản phẩm thuộc danh mục này sẽ ngưng bán`
                                             : `Khi danh mục ${params.row.name} được mở khóa, tất cả sản phẩm thuộc danh mục này sẽ được mở bán trở lại`,
-                                        onOk: () => handleLockCategory(params.row)
-                                    })
+                                        onOk: () => handleLockCategory(params.row),
+                                    });
                                 }}
-                                icon={
-                                    params.row.status === false ? (
-                                        <UnlockOutlined />
-                                    ) : (
-                                        <LockOutlined />
-                                    )
-                                }
+                                icon={params.row.status === false ? <UnlockOutlined /> : <LockOutlined />}
                                 danger
                             />
                         </Tooltip>
-                        <Tooltip
-                            title="Xem danh sách sản phẩm"
-                            placement='right'
-                        >
+                        <Tooltip title="Xem danh sách sản phẩm" placement="right">
                             <Button
                                 type="primary"
                                 ghost
@@ -257,17 +244,15 @@ function Categories() {
                                     margin: '0 10px 0 0',
                                 }}
                                 onClick={() => navigate(`/admin/categories/${params.value}`)}
-
                             >
                                 Chi tiết
                             </Button>
                         </Tooltip>
                     </div>
-                )
-            }
-
-        }
-    ]
+                );
+            },
+        },
+    ];
 
     const handleDisplayForm = () => {
         setDisplayForm(true);
@@ -342,15 +327,10 @@ function Categories() {
 
         if (status) {
             const list3 = newList.filter((product) => {
-                if (product.hasOwnProperty('status_sell')) {
-                    return product.status_sell === status.value;
-                } else {
-                    if (status.value) {
-                        return product;
-                    } else {
-                        return null;
-                    }
+                if (status.value) {
+                    return product.status === true;
                 }
+                return product.status === false;
             });
             newList = [...list3];
         }
@@ -643,7 +623,7 @@ function Categories() {
                                     color: '#696969',
                                 }}
                             >
-                                {rows?.length}
+                                {data?.categories?.length}
                             </p>
                         </div>
                         <div

@@ -9,6 +9,7 @@ import AutorenewIcon from '@mui/icons-material/Autorenew';
 import CountDownCustom from '../../../../components/CountDownCustom';
 import EnhancedTable from '../../../../components/Table/EnhancedTable';
 import lottie from 'lottie-web';
+import { InfoCircleFilled } from '@ant-design/icons';
 import {
     Divider,
     Radio,
@@ -20,6 +21,7 @@ import {
     InputNumber,
     DatePicker,
     Rate,
+    Popover,
     Row,
     Select,
     Slider,
@@ -840,7 +842,27 @@ function FlashSaleDetail() {
 
                 <div className={cx('pending')}>
                     <div className={cx('heading')}>
-                        <h3 className={cx('title')}>Phân tích số liệu</h3>
+                        <h3 className={cx('title')}>
+                            {' '}
+                            Phân tích số liệu
+                            <Popover
+                                content={
+                                    'Dữ liệu được phân tích từ các đơn hàng đã từng đặt mua (bao gồm cả những đơn bị hủy)'
+                                }
+                                trigger="hover"
+                                // className={cx('kpi')}
+                            >
+                                <span
+                                    style={{
+                                        margin: '0 0 5px 10px',
+                                        // cursor: 'pointer',
+                                        fontSize: '2rem',
+                                    }}
+                                >
+                                    <InfoCircleFilled />
+                                </span>
+                            </Popover>{' '}
+                        </h3>
                         {/* <p
                             style={{
                                 fontSize: '2rem',

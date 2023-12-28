@@ -74,7 +74,7 @@ function App() {
                                 key={index}
                                 path={route.path}
                                 element={
-                                    isLogin && state.user.isManager ? (
+                                    state.user.isManager ? (
                                         <AdminLayout>
                                             <Page />
                                         </AdminLayout>

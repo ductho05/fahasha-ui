@@ -18,6 +18,7 @@ import { Tooltip } from 'antd';
 import { tabList } from './SideBar/Sidebar';
 import { useStore } from '../../../stores/hooks';
 import { logout } from '../../../stores/actions';
+import { useState, useEffect } from 'react';
 
 // const tabList = [
 //     {
@@ -110,8 +111,8 @@ import { logout } from '../../../stores/actions';
 const cx = classNames.bind(styles);
 function SideBarLaptop({ url }) {
     const [isOpen, setIsOpen] = React.useState(false);
-    const [state, dispatch] = useStore()
-    const [currentTab, setCurrentTab] = React.useState(
+    const [state, dispatch] = useStore();
+    const [currentTab, setCurrentTab] = useState(
         url == '/admin'
             ? 0
             : url.includes(`/admin/user`)
@@ -126,26 +127,26 @@ function SideBarLaptop({ url }) {
             ? 5
             : url == '/admin/wishlists'
             ? 6
-            : url == '/admin/statistics'
+            : url == '/admin/vouchers'
             ? 7
-            : url == '/admin/notifications'
+            : url == '/admin/statistics'
             ? 8
-            : url.includes(`/admin/flashsale`)
+            : url == '/admin/notifications'
             ? 9
-            : url == '/admin/account'
+            : url.includes(`/admin/flashsale`)
             ? 10
+            : url == '/admin/account'
+            ? 11
             : -1,
     );
 
     const handleClickTab = (id) => {
-
-        setCurrentTab(id)
-    }
+        setCurrentTab(id);
+    };
 
     const handleLogout = () => {
-
-        dispatch(logout())
-    }
+        dispatch(logout());
+    };
 
     const genericHamburgerLine = `h-1 w-full my-1 rounded-full transition ease transform duration-300`;
 
@@ -156,20 +157,23 @@ function SideBarLaptop({ url }) {
                 onClick={() => setIsOpen(!isOpen)}
             >
                 <div
-                    className={`${genericHamburgerLine} bg-black ${isOpen
-                        ? 'rotate-45 translate-y-3 opacity-50 group-hover:opacity-100'
-                        : 'opacity-50 group-hover:opacity-100'
-                        }`}
+                    className={`${genericHamburgerLine} bg-black ${
+                        isOpen
+                            ? 'rotate-45 translate-y-3 opacity-50 group-hover:opacity-100'
+                            : 'opacity-50 group-hover:opacity-100'
+                    }`}
                 />
                 <div
-                    className={`${genericHamburgerLine} bg-black ${isOpen ? 'opacity-0' : 'opacity-50 group-hover:opacity-100'
-                        }`}
+                    className={`${genericHamburgerLine} bg-black ${
+                        isOpen ? 'opacity-0' : 'opacity-50 group-hover:opacity-100'
+                    }`}
                 />
                 <div
-                    className={`${genericHamburgerLine} bg-black ${isOpen
-                        ? '-rotate-45 -translate-y-3 opacity-50 group-hover:opacity-100'
-                        : 'opacity-50 group-hover:opacity-100'
-                        }`}
+                    className={`${genericHamburgerLine} bg-black ${
+                        isOpen
+                            ? '-rotate-45 -translate-y-3 opacity-50 group-hover:opacity-100'
+                            : 'opacity-50 group-hover:opacity-100'
+                    }`}
                 />
             </button>
             <div className={cx('bottom')}>
@@ -181,31 +185,30 @@ function SideBarLaptop({ url }) {
                                 const Icon = tab.icon;
                                 return (
                                     <Tooltip title={tab.name} placement="right">
-                                        {
-                                            tab.logout ?
-                                                <div
-                                                    onClick={() => handleLogout(tab.id)}
-                                                    style={{
-                                                        padding: '10px',
-                                                    }}
-                                                    key={index}
-                                                    className={tab.id == currentTab ? cx('item', 'active') : cx('item')}
-                                                >
-                                                    <Icon className={cx('icon')} />
-                                                </div>
-                                                :
-                                                <Link
-                                                    style={{
-                                                        padding: '10px',
-                                                    }}
-                                                    key={index}
-                                                    onClick={() => handleClickTab(tab.id)}
-                                                    to={tab?.link}
-                                                    className={tab.id == currentTab ? cx('item', 'active') : cx('item')}
-                                                >
-                                                    <Icon className={cx('icon')} />
-                                                </Link>
-                                        }
+                                        {tab.logout ? (
+                                            <div
+                                                onClick={() => handleLogout(tab.id)}
+                                                style={{
+                                                    padding: '10px',
+                                                }}
+                                                key={index}
+                                                className={tab.id == currentTab ? cx('item', 'active') : cx('item')}
+                                            >
+                                                <Icon className={cx('icon')} />
+                                            </div>
+                                        ) : (
+                                            <Link
+                                                style={{
+                                                    padding: '10px',
+                                                }}
+                                                key={index}
+                                                onClick={() => handleClickTab(tab.id)}
+                                                to={tab?.link}
+                                                className={tab.id == currentTab ? cx('item', 'active') : cx('item')}
+                                            >
+                                                <Icon className={cx('icon')} />
+                                            </Link>
+                                        )}
                                     </Tooltip>
                                 );
                             })}
