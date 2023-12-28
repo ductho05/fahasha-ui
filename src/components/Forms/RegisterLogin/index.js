@@ -190,15 +190,15 @@ function RegisterLogin(props) {
                         toast.success('Đăng nhập thành công')
                         dispatch(login(result))
                         ServiceWorkerNotifi()
-                        state.socket.emit('save-socket', (result.data._id))
-                        setTimeout(() => {
+                        if (result.data.isManager) {
+                            setTimeout(() => {
 
-                            if (result.data.isManager) {
                                 navigate('/admin')
-                            } else {
-                                navigate('/')
-                            }
-                        }, 500)
+                            }, 1000)
+                        } else {
+                            navigate('/')
+                        }
+
                     }
                 } else {
                     setShowDialog(true)
@@ -249,7 +249,7 @@ function RegisterLogin(props) {
             .then((response) => response.json())
             .then((result) => {
 
-                if (result.status == 'OK') {
+                if (result.status === "OK") {
                     toast.success("Đăng ký tài khoản thành công!")
                     setShowProgress(false);
                     props.setShowForm(false);
@@ -260,14 +260,13 @@ function RegisterLogin(props) {
                     const image = registerImages
                     const url = `${appPath}/admin/user`
 
-                    SendNotification("admin", {
-                        title,
-                        description,
-                        image,
-                        url
-                    })
+                    // SendNotification("admin", {
+                    //     title,
+                    //     description,
+                    //     image,
+                    //     url
+                    // })
                     ServiceWorkerNotifi()
-                    state.socket.emit('save-socket', (result.data._id))
                     setTimeout(() => {
 
                         if (result.data.isManager) {
@@ -285,7 +284,6 @@ function RegisterLogin(props) {
             })
             .catch(() => {
                 setShowProgress(false);
-                setShowDialogRegister(true);
             });
     };
 
@@ -339,7 +337,7 @@ function RegisterLogin(props) {
                         } else {
                             navigate('/')
                         }
-                    }, 500)
+                    }, 1000)
                 }
                 setShowProgress(false);
             })

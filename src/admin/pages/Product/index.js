@@ -384,7 +384,7 @@ function Product() {
     // }, [success]);
 
     useEffect(() => {
-        fetch(`${api}/categories?filter=simple&lock=true`)
+        fetch(`${api}/categories?filter=simple`)
             .then((response) => response.json())
             .then((result) => {
                 if (result.status == 'OK') {

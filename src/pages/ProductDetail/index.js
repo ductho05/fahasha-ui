@@ -323,6 +323,17 @@ function ProductDetail() {
         return false;
     }
 
+    const checkQuantity = (cart, num) => {
+
+        const findProduct = cart.find(p => p.id === productId)
+
+        if (findProduct) {
+
+            return (findProduct.count + num) <= product.quantity ? true : false
+        }
+        return num <= product.quantity ? true : false
+    }
+
     function addCart(num) {
         const user = JSON.parse(localStorage.getItem('user'));
         const namecart = `myCart_${state.user._id}`;
@@ -333,28 +344,33 @@ function ProductDetail() {
             items: myCart ? myCart.items : [],
         };
 
-        var item = {
-            id: productId,
-            count: num,
-            isGetcheckout: 0,
-        };
-        if (checkCart({ cart, item })) {
-            for (const element of cart.items) {
-                if (element.id === item.id) {
-                    element.count += num;
+        if (checkQuantity(cart.items, num)) {
+
+            var item = {
+                id: productId,
+                count: num,
+                isGetcheckout: 0,
+            };
+            if (checkCart({ cart, item })) {
+                for (const element of cart.items) {
+                    if (element.id === item.id) {
+                        element.count += num;
+                    }
                 }
+            } else {
+                cart.items.push(item);
             }
+            myCart = cart;
+            localStorage.setItem(namecart, JSON.stringify(myCart));
+            toast.success('Đã thêm sản phẩm vào giỏ hàng');
         } else {
-            cart.items.push(item);
+            message.warning('Vui lòng không đặt quá số lượng trong kho')
         }
-        myCart = cart;
-        localStorage.setItem(namecart, JSON.stringify(myCart));
     }
 
     const handleAddToCart = () => {
         if (Object.keys(state.user).length > 0) {
             addCart(currentQuantity);
-            toast.success('Đã thêm sản phẩm vào giỏ hàng');
             //setIsShowDialog(!isShowDialog);
         } else {
             setShowNolginDialog(true);
@@ -600,11 +616,10 @@ function ProductDetail() {
                             </div>
                             <div className="flex items-center mt-[20px]">
                                 <div
-                                    className={`flex items-center p-[10px] rounded-[6px] ${
-                                        product?.sold == product?.quantity
-                                            ? 'bg-[#f2f4f5] text-[#7a7e7f]'
-                                            : 'bg-[rgba(201,33,39,0.06)] text-[#c92127]'
-                                    }`}
+                                    className={`flex items-center p-[10px] rounded-[6px] ${product?.sold == product?.quantity
+                                        ? 'bg-[#f2f4f5] text-[#7a7e7f]'
+                                        : 'bg-[rgba(201,33,39,0.06)] text-[#c92127]'
+                                        }`}
                                 >
                                     {product?.quantity === 0 ? <StopFilled /> : <CheckCircleFilled />}
                                     <p className="font-[600] ml-[10px]">
@@ -625,7 +640,7 @@ function ProductDetail() {
                         'shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px] mb-[20px] rounded-[12px] overflow-hidden',
                     )}
                 >
-                    <h3>Fahasa giới thiệu</h3>
+                    <h3>TA BookStore giới thiệu</h3>
                     <ProductFrame productList={productNews} Component={ProductSlider}></ProductFrame>
                 </div>
 

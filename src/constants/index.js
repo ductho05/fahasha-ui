@@ -1,4 +1,4 @@
-export const isDeploy = true;
+export const isDeploy = false;
 export const api = isDeploy
     ? 'https://bookstore-ta-v3.onrender.com/bookstore/api/v1'
     : 'http://127.0.0.1:3000/bookstore/api/v1';
@@ -21,6 +21,8 @@ export const lockImage =
     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSg-9Ld8ptDN8JEy1oAwnE3etK_9Zn-xaAeEw&usqp=CAU';
 export const unLockImage =
     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWOKkU25svJ7cINb3fMH2Pxo_6KOGUm-A9JQ&usqp=CAU';
+
+export const voucherImage = "https://cdn-www.vinid.net/483a744d-cach-san-voucher.jpg"
 
 export const listJustWatched = JSON.parse(localStorage.getItem('mycategory')) || [];
 

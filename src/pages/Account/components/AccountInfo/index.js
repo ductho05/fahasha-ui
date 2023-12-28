@@ -15,9 +15,10 @@ import Backdrop from '@mui/material/Backdrop'
 import CircularProgress from '@mui/material/CircularProgress'
 import { toast, ToastContainer } from 'react-toastify'
 import "react-toastify/dist/ReactToastify.css";
-import { Skeleton } from 'antd';
+import { DatePicker, Modal, Skeleton } from 'antd';
 import { getAuthInstance } from '../../../../utils/axiosConfig'
-import { update } from '../../../../stores/actions';
+import { logout, update } from '../../../../stores/actions';
+import dayjs from 'dayjs'
 
 const cx = classnames.bind(styles)
 
@@ -36,13 +37,15 @@ function AccountInfo() {
     const [avatar, setAvatar] = useState()
     const [email, setEmail] = useState('')
     const [isShowDiallog, setIsShowDiallog] = useState(false)
-    const [otp, setOtp] = useState()
+    const [otp, setOtp] = useState(null)
     const [inputOTP, setInputOtp] = useState()
     const [showError, setShowError] = useState(false)
     const [showProgressUpdate, setShowProgressUpdate] = useState(false)
     const [checked, setChecked] = useState(false)
     const [loading, setLoading] = useState(false)
     const [isChanged, setIsChanged] = useState(false)
+    const [birthError, setBirthError] = useState(null)
+
 
     useEffect(() => {
         setIsChanged(user !== state.user || avatar)
@@ -57,6 +60,15 @@ function AccountInfo() {
         })
     }
 
+    const handleChangePhone = (e) => {
+        setUser(prev => {
+            return {
+                ...prev,
+                phoneNumber: e.target.value
+            }
+        })
+    }
+
     const handleChangeGender = (gender) => {
         setUser(prev => {
             return {
@@ -66,15 +78,22 @@ function AccountInfo() {
         })
     }
 
-    const handleChangeBirth = (e) => {
-        const date = e.target.value
+    const handleChangeBirth = (value, date) => {
 
-        setUser(prev => {
-            return {
-                ...prev,
-                birth: date
-            }
-        })
+        const currentDate = new Date();
+        const datePublish = new Date(date);
+
+        if (currentDate < datePublish) {
+            setBirthError('Vui lòng không chọn ngày sinh trong tương lai');
+        } else {
+            setBirthError(null)
+            setUser(prev => {
+                return {
+                    ...prev,
+                    birth: date
+                }
+            })
+        }
     }
 
     const handleChangeAddress = (e) => {
@@ -232,8 +251,9 @@ function AccountInfo() {
                     setShowProgressUpdate(false)
                 })
                 .catch(err => {
+                    console.log(err)
                     setShowProgressUpdate(false)
-                    toast.error('Lỗi! Vui lòng liên hệ Admin')
+                    toast.error(err.response.data.message)
                     console.log(err)
                 })
         }
@@ -274,7 +294,7 @@ function AccountInfo() {
 
     const handleSendEmail = () => {
         setShowProgressUpdate(true)
-        fetch(`${api}/users/sendotp`, {
+        fetch(`${api}/users/verify`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: email })
@@ -296,65 +316,54 @@ function AccountInfo() {
     }
 
     useEffect(() => {
-        if (inputOTP != otp) {
-            setErrors(prev => {
-                return {
-                    ...prev,
-                    otp: {
-                        message: 'Mã OTP không đúng'
+        if (otp) {
+            if (inputOTP != otp) {
+                setErrors(prev => {
+                    return {
+                        ...prev,
+                        otp: {
+                            message: 'Mã OTP không đúng'
+                        }
                     }
-                }
-            })
-        } else {
-            setErrors(prev => {
-                delete prev.otp
-                return {
-                    ...prev
-                }
-            })
+                })
+            } else {
+                setErrors(prev => {
+                    delete prev.otp
+                    return {
+                        ...prev
+                    }
+                })
+            }
         }
     }, [inputOTP])
 
     const handleUpdateEmail = () => {
 
         setShowProgressUpdate(true)
-        fetch(`${api}/users?email=${email}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        })
-            .then(response => response.json())
+        authInstance.put("/users/email", { email })
             .then(result => {
-                if (result.status == 'OK' && result.message == 'Found user successfully') {
-                    setShowProgressUpdate(false)
-                    setErrors(prev => {
-                        return {
-                            ...prev,
-                            email: {
-                                message: 'Email đã được sử dụng'
-                            }
+                setShowProgressUpdate(false)
+                setIsShowDiallog(false)
+                if (result.data.status == 'OK') {
+                    Modal.success({
+                        title: "Thay đổi email thành công!",
+                        content: "Vui lòng đăng nhập lại tài khoản",
+                        onOk: () => {
+                            dispatch(logout())
                         }
                     })
-                } else {
-                    fetch(`${api}/users/update/${user._id}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email: email })
-                    })
-                        .then(response => response.json())
-                        .then(result => {
-                            if (result.status == 'OK') {
-                                setShowProgressUpdate(false)
-                                setIsShowDiallog(false)
-                                toast.success('Thay đổi tài khoản email thành công')
-                            }
-                        })
-                        .catch(err => {
-                            setShowProgressUpdate(false)
-                        })
                 }
             })
             .catch(err => {
                 setShowProgressUpdate(false)
+                setErrors(prev => {
+                    return {
+                        ...prev,
+                        email: {
+                            message: err.response.data.message
+                        }
+                    }
+                })
             })
     }
 
@@ -364,12 +373,14 @@ function AccountInfo() {
         setConfirmPassword('')
     }, [checked])
 
+    const url = window.location.pathname
+
     return (
-        <div className={cx('wrapper')}>
+        <div className={cx(`wrapper`)}>
 
             <ToastContainer
                 position="top-right"
-                autoClose={5000}
+                autoClose={2000}
                 hideProgressBar={false}
                 newestOnTop={false}
                 closeOnClick
@@ -432,7 +443,7 @@ function AccountInfo() {
                         </div>
 
                         <p onClick={handleUpdateEmail} className={cx('btn_dialog')}>
-                            <Button primary disabled={errors.otp || !otp}>Xác nhận</Button>
+                            <Button primary disabled={errors.otp || !otp || !inputOTP}>Xác nhận</Button>
                         </p>
 
                         <p onClick={handleCancelChange} className={cx('btn_dialog')}>
@@ -491,9 +502,10 @@ function AccountInfo() {
                                         value={user.phoneNumber}
                                         type="text"
                                         placeholder='Chưa có số điện thoại'
-                                        spellCheck={false} disabled
+                                        spellCheck={false}
+                                        onChange={(e) => handleChangePhone(e)}
                                     />
-                                    <p className={cx('btn')}>{user.phoneNumber != '' ? 'Thay đổi' : 'Thêm mới'}</p>
+
                                 </div>
                             </div>
 
@@ -536,16 +548,12 @@ function AccountInfo() {
 
                             <div className={cx('form_group')}>
                                 <label className={cx('label')}>Ngày sinh*</label>
-                                <div className={cx('form_input')}>
-                                    <input
-                                        value={user.birth}
-                                        type="text"
-                                        placeholder='ngày/tháng/năm'
-                                        spellCheck={false}
-                                        onChange={(e) => handleChangeBirth(e)}
-                                    />
+                                <div>
+                                    <DatePicker onChange={handleChangeBirth} value={user.birth ? dayjs(user.birth) : ""} />
+                                    {birthError && <p className='mt-[10px] text-[13px] text-red-500'>{birthError}</p>}
                                 </div>
                             </div>
+
 
                             <div className={cx('form_group')}>
                                 <label className={cx('label')}>Địa chỉ*</label>

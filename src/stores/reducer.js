@@ -3,6 +3,7 @@ import localstorge from './localstorge';
 import { socket } from '../service/SocketIo';
 import { api } from "../constants"
 import axios from "axios"
+import { Modal } from 'antd';
 
 var user = {};
 var token = localstorge.get();
@@ -19,7 +20,7 @@ if (Object.keys(token).length > 0) {
             user = { ...result.data.data };
         }
     }).catch((err) => {
-        console.log('get user', err);
+
     })
 }
 const initialState = {
@@ -83,11 +84,21 @@ function Reducer(state, action) {
             };
 
         case UPDATE:
-            return {
-                ...state,
-                user: action.payload.data,
-                action: UPDATE,
-            };
+            if (action.payload.token) {
+                return {
+                    ...state,
+                    user: action.payload.data,
+                    action: UPDATE,
+                    token: action.payload.token
+                };
+            } else {
+
+                return {
+                    ...state,
+                    user: action.payload.data,
+                    action: UPDATE,
+                }
+            }
 
         case NOACTION:
             return {

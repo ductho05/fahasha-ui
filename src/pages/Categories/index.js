@@ -82,7 +82,7 @@ function CategoriesProduct() {
     }
 
     useEffect(() => {
-        fetch(`${api}/categories?filter=simple?lock=true`)
+        fetch(`${api}/categories?filter=simple&lock=true`)
             .then(response => response.json())
             .then(result => {
                 if (result.status == "OK") {

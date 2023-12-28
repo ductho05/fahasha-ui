@@ -42,24 +42,24 @@ function DefaultLayout(props) {
     //         }
     // }, [])
 
-    setInterval(() => {
-        if (isLogin()) {
-            axios
-                .get(`${api}/users/get/profile`, {
-                    headers: {
-                        Authorization: `Bearer ${localstorge.get()}`,
-                    },
-                })
-                .then((result) => {
-                    if (result.data.message == 'Jwt expired') {
-                        setExpired(true);
-                    }
-                })
-                .catch(() => {
-                    setExpired(true);
-                });
-        }
-    }, 6000);
+    // setInterval(() => {
+    //     if (isLogin()) {
+    //         axios
+    //             .get(`${api}/users/get/profile`, {
+    //                 headers: {
+    //                     Authorization: `Bearer ${localstorge.get()}`,
+    //                 },
+    //             })
+    //             .then((result) => {
+    //                 if (result.data.message == 'Jwt expired') {
+    //                     setExpired(true);
+    //                 }
+    //             })
+    //             .catch(() => {
+    //                 setExpired(true);
+    //             });
+    //     }
+    // }, 6000);
 
     const handlePass = () => {
         dispatch(logout({}));

@@ -116,3 +116,16 @@ body {
 .tox-tinymce {
     width: 100%;
 }
+
+.ant-switch-checked {
+    background-color: rgba(255, 152, 0, 0.5) !important;
+    border: 1px solid #ff9800;
+}
+
+.ant-switch-checked:hover {
+    background-color: #ff9800;
+}
+
+.ant-switch-handle::before {
+    background-color: #ff9800 !important;
+}

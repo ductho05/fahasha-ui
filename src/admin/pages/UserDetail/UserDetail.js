@@ -12,6 +12,7 @@ import { api, superAdmin } from '../../../constants';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getAuthInstance } from '../../../utils/axiosConfig';
+import CustomButton from '../../../components/Button';
 
 // import { api, appPath, lockImage, superAdmin, unLockImage } from '../../../constants';
 import { useData } from '../../../stores/DataContext';
@@ -93,7 +94,7 @@ function UserDetail() {
     const [show, setShow] = useState(false);
     const [ischanged, setIsChanged] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [superAdminCode, setSuperAdminCode] = useState('superadmin1811');
+    const [superAdminCode, setSuperAdminCode] = useState();
     const { data, setData } = useData();
     const [dataIncomes, setDataIncomes] = useState([]);
     const num = 5;
@@ -202,7 +203,6 @@ function UserDetail() {
     const handleClickEdit = () => {
         setShowDialog(true);
         setValue('fullName', user.fullName);
-        setValue('email', user.email);
         setValue('phoneNumber', user.phoneNumber);
         setValue('address', user.address);
     };
@@ -273,22 +273,35 @@ function UserDetail() {
     const nameController = useController({
         name: 'fullName',
         control,
+        rules: {
+            required: 'Thông tin này không được để trống'
+        }
     });
 
     const phoneController = useController({
         name: 'phoneNumber',
         control,
-    });
+        rules: {
+            required: 'Thông tin này không được để trống',
+            pattern:
+            {
+                value: /(84|0[3|5|7|8|9])+([0-9]{8})\b/g,
+                message: 'Vui lòng nhập đúng định dạng số điện thoại'
+            }
+        }
+    })
 
     const addressController = useController({
         name: 'address',
         control,
+        rules: {
+            required: 'Thông tin này không được để trống'
+        }
     });
 
     useEffect(() => {
         if (
             watch('fullName') != user.fullName ||
-            watch('email') != user.email ||
             watch('phoneNumber') != user.phoneNumber ||
             watch('address') != user.address ||
             Object.keys(avatar).length > 0
@@ -300,6 +313,7 @@ function UserDetail() {
     }, [watch(), avatar]);
 
     const handleSave = async (data) => {
+
         const formData = new FormData();
         Object.keys(data).forEach((key) => {
             formData.append(key, data[key]);
@@ -588,8 +602,8 @@ function UserDetail() {
                                     errors.fullName
                                         ? cx('form_group', 'error')
                                         : errors.fullName
-                                        ? cx('form_group', 'error')
-                                        : cx('form_group')
+                                            ? cx('form_group', 'error')
+                                            : cx('form_group')
                                 }
                             >
                                 <p className={cx('label')}>Tên</p>
@@ -602,7 +616,7 @@ function UserDetail() {
                                 <p className={cx('error_message')}>{errors?.fullName?.message}</p>
                             </div>
 
-                            <div className={errors.phone ? cx('form_group', 'error') : cx('form_group')}>
+                            <div className={errors.phoneNumber ? cx('form_group', 'error') : cx('form_group')}>
                                 <p className={cx('label')}>Số điện thoại</p>
                                 <input
                                     {...phoneController.field}
@@ -610,7 +624,7 @@ function UserDetail() {
                                     type="text"
                                     placeholder="Gồm 10 số"
                                 />
-                                <p className={cx('error_message')}>{errors?.phone?.message}</p>
+                                <p className={cx('error_message')}>{errors?.phoneNumber?.message}</p>
                             </div>
 
                             <div className={errors.address ? cx('form_group', 'error') : cx('form_group')}>
@@ -625,9 +639,9 @@ function UserDetail() {
                             </div>
 
                             <p className={cx('btn_edit')}>
-                                <Button disabled={!ischanged} type="primary">
+                                <CustomButton primary disabled={!ischanged} type="submit">
                                     Lưu thay đổi
-                                </Button>
+                                </CustomButton>
                             </p>
                         </div>
                     </form>

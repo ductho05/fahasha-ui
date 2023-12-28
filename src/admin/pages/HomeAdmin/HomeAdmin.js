@@ -10,6 +10,7 @@ import { useData } from '../../../stores/DataContext';
 import { Button } from 'antd';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 
 const cx = classNames.bind(styles);
 
@@ -123,6 +124,18 @@ function HomeAdmin() {
 
     return (
         <div className={cx('wrapper')}>
+            <ToastContainer
+                position="top-right"
+                autoClose={2000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
             <div className={cx('widgits')}>
                 {dataWidgets.map((widget, index) => (
                     <Widget key={index} widget={widget} />

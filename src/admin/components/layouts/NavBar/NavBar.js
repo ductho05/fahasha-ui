@@ -37,20 +37,20 @@ function NavBar() {
             .catch((err) => console.error(err));
     }, [state]);
 
-    setInterval(() => {
-        if (state.isLoggedIn) {
-            authInstance
-                .get(`/users/get/profile`)
-                .then((result) => {
-                    if (result.data.message == 'Jwt expired') {
-                        setExpired(true);
-                    }
-                })
-                .catch(() => {
-                    setExpired(true);
-                });
-        }
-    }, 6000);
+    // setInterval(() => {
+    //     if (state.isLoggedIn) {
+    //         authInstance
+    //             .get(`/users/get/profile`)
+    //             .then((result) => {
+    //                 if (result.data.message == 'Jwt expired') {
+    //                     setExpired(true);
+    //                 }
+    //             })
+    //             .catch(() => {
+    //                 setExpired(true);
+    //             });
+    //     }
+    // }, 6000);
 
     const handlePass = () => {
         dispatch(logout({}));

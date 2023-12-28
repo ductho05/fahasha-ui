@@ -82,21 +82,21 @@ function Footer() {
                                 <p className={cx('contact_icon')}>
                                     <FontAwesomeIcon icon={faMapMarkerAlt} />
                                 </p>
-                                60-62 Lê Lợi, Q.1, TP. HCM
+                                Số 1 Võ Văn Ngân, Linh Chiểu, TP. Thủ Đức, TP. HCM
                             </li>
 
                             <li className={cx('col l-4 m-4 c-12', 'contact_item')}>
                                 <p className={cx('contact_icon')}>
                                     <FontAwesomeIcon icon={faEnvelope} />
                                 </p>
-                                cskh@fahasa.com.vn
+                                bookstore.ta.group@gmail.com
                             </li>
 
                             <li className={cx('col l-4 m-4 c-12', 'contact_item')}>
                                 <p className={cx('contact_icon')}>
                                     <FontAwesomeIcon icon={faPhone} />
                                 </p>
-                                1900636467
+                                0877404581
                             </li>
                         </ul>
                     </div>
