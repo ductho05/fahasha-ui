@@ -82,7 +82,7 @@ function OrderAdminDetail() {
                         if (result.data.status === DANGGIAO) {
                             description = "Đơn hàng của bạn đã được giao thành công!"
                         }
-                        const url = `${appPath}/account/order/detail/${result.data._id}`
+                        const url = `${appPath}/account/order/detail/${result.data.data._id}`
                         const title = "Thông báo đơn hàng"
                         const user = result.data.data.user
 

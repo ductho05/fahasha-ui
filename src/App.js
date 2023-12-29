@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { publicRoutes, privateRoutes, notFoundRoute, adminRoutes, authRoutes } from './routes/index';
 import DefaultLayout from './components/Layouts/DefaultLayout';
 import ScrollToTop from './components/ScrollToTop';
@@ -28,10 +28,9 @@ function App() {
     const [isLogin, setIsLogin] = useState(localstorge.get().length > 0);
     const [state, dispatch] = useStore();
     const Page404 = notFoundRoute.component;
+    // const navigate = useNavigate()
 
     setTimeout(async () => {
-
-        console.log("alo")
         if (Object.keys(state.token).length > 0) {
 
             await axios.get(`${api}/users/get/profile`, {
@@ -47,9 +46,7 @@ function App() {
                         content: "Đã hết phiên đăng nhập. Vui lòng đăng nhập lại!",
                         onOk: () => {
                             dispatch(logout())
-                            setTimeout(() => {
-                                Navigate("/login-register")
-                            }, 500)
+
                         }
                     })
                 }

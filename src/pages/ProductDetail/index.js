@@ -570,14 +570,14 @@ function ProductDetail() {
                             <div className={cx('mid_content')}>
                                 <div className={cx('price')}>
                                     <p className={cx('current_price')}>
-                                        {numeral(product?.price).format('0,0[.]00 VNĐ')} đ
+                                        {numeral(Math.floor(product?.price)).format('0,0[.]00 VNĐ')} đ
                                     </p>
                                     <p
                                         className={
                                             product?.price === product?.old_price ? cx('hidden') : cx('old_price')
                                         }
                                     >
-                                        {numeral(product?.old_price).format('0,0[.]00 VNĐ')} đ
+                                        {numeral(Math.floor(product?.old_price)).format('0,0[.]00 VNĐ')} đ
                                     </p>
                                     <p
                                         className={
