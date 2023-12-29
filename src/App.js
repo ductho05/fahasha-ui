@@ -32,31 +32,33 @@ function App() {
 
     setTimeout(async () => {
         if (Object.keys(state.token).length > 0) {
-
-            await axios.get(`${api}/users/get/profile`, {
-                headers: {
-                    'Authorization': `Bearer ${state.token}`
-                }
-            }).then(result => {
-
-            }).catch((err) => {
-                if (err.response.data.message == "Jwt expired") {
-                    Modal.error({
-                        title: "Lỗi",
-                        content: "Đã hết phiên đăng nhập. Vui lòng đăng nhập lại!",
-                        onOk: () => {
-                            dispatch(logout())
-
-                        }
-                    })
-                }
-            })
+            await axios
+                .get(`${api}/users/get/profile`, {
+                    headers: {
+                        Authorization: `Bearer ${state.token}`,
+                    },
+                })
+                .then((result) => { })
+                .catch((err) => {
+                    if (err.response.data.message == 'Jwt expired') {
+                        Modal.error({
+                            title: 'Lỗi',
+                            content: 'Đã hết phiên đăng nhập. Vui lòng đăng nhập lại!',
+                            onOk: () => {
+                                dispatch(logout());
+                                setTimeout(() => {
+                                    // Navigate("/login-register")
+                                    window.location.reload();
+                                }, 500);
+                            },
+                        });
+                    }
+                });
         }
-    }, 1000)
+    }, 1000);
 
     return (
         <BrowserRouter>
-
             <ScrollToTop />
             <div className="App">
                 <Routes>
@@ -115,15 +117,8 @@ function App() {
 
                     {authRoutes.map((route, index) => {
                         const Page = route.component;
-                        return (
-                            <Route
-                                key={index}
-                                path={route.path}
-                                element={<Page />}
-                            />
-                        );
-                    })
-                    }
+                        return <Route key={index} path={route.path} element={<Page />} />;
+                    })}
 
                     <Route path={notFoundRoute.path} element={<Page404 />} />
                 </Routes>

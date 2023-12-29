@@ -48,7 +48,7 @@ function Footer() {
                                         Chính sách quyền riêng tư
                                     </li>
                                     <li className={cx('footer_item_child')}>Chính sách bảo mật thanh toán</li>
-
+                                    <li className={cx('footer_item_child')}>Giới thiệu TA BookStore</li>
                                 </ul>
                             </li>
 

@@ -74,7 +74,7 @@ function OrderDetail() {
                         // kiểm tra xem sản phẩm có trong flashsale không
                         const res = await fetch(`${api}/flashsales?productId=${item.product._id}&filter=expired`);
                         const data = await res.json();
-                      //  console.log('flashsale1111', data.data);
+                        //  console.log('flashsale1111', data.data);
                         const jsonData = data.data;
                         // tìm flashuser có flashsaleId trùng với flashsaleId của sản phẩm
                         if (Array.isArray(jsonData) && jsonData.length !== 0) {
@@ -217,8 +217,10 @@ function OrderDetail() {
                             </ul>
                             <ul className={cx('summary_list')}>
                                 <li className={cx('summary_item')}>
-                                    <p className={cx('label')}>Tổng tiền hàng</p>
-                                    <p className={cx('value')}>{numeral(order.price).format('0,0[.]00 VNĐ')} đ</p>
+                                    <p className={cx('label')}>Tổng tiền hàng {`(giảm giá, nếu có)`}</p>
+                                    <p className={cx('value')}>
+                                        {numeral(order.price - order.shippingCost).format('0,0[.]00 VNĐ')} đ
+                                    </p>
                                 </li>
 
                                 <li className={cx('summary_item')}>

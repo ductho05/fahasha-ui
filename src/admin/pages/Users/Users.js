@@ -372,7 +372,7 @@ function Users() {
 
     const insertData = (user) => {
         setData({ ...data, users: [...data.users, user] });
-    }
+    };
 
     const onFinish = async (data) => {
 
@@ -399,13 +399,14 @@ function Users() {
                 if (result.data.status === 'OK') {
                     setIsAction((prev) => !prev);
                     toast.success('Thêm mới tài khoản thành công!');
-                    insertData(result.data.data)
+                    // setData({ ...data, users: [...data.users, result.data.data] });
+                    insertData(result.data.data);
                     //fetchUsers();
                 } else {
                     toast.error(`${result.data.message}`);
                 }
                 setShowDialog(false);
-                setLoading(false);
+                setIsInsert(false);
             })
             .catch((err) => {
                 console.log(err)

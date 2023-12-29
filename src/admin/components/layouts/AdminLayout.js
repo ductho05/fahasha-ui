@@ -18,10 +18,14 @@ const perPage = 50;
 function AdminLayout({ children }) {
     const authInstance = getAuthInstance();
     // const {data1, setData1} = useAdmin();
-    const url = window.location.pathname;
+   const url = window.location.pathname;
     const container = useRef(null);
     const { data, setData } = useData();
+    // Lấy địa chỉ URL hiện tại
+   //  const url = window.location.href;
 
+    // Hiển thị địa chỉ URL trong console
+   // console.log('currentURL', currentURL);
     // const [isComplete, setIsComplete] = useState(false);
 
     // async function fetchData() {
@@ -193,50 +197,50 @@ function AdminLayout({ children }) {
                 })
                 .catch((err) => console.log(err));
 
-        fetch(`${api}/evaluates/get`)
-            .then((response) => response.json())
-            .then((result) => {
-                setData2((prev) => ({ ...prev, evaluates: result.data }));
-                setIsLoaded((prev) => ({ ...prev, evaluates: true }));
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+            fetch(`${api}/evaluates/get`)
+                .then((response) => response.json())
+                .then((result) => {
+                    setData2((prev) => ({ ...prev, evaluates: result.data }));
+                    setIsLoaded((prev) => ({ ...prev, evaluates: true }));
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
 
             authInstance
-            .get(`/webpush/get-all`)
-            .then((result) => {
-                // console.log(result);
-                if (result.data.status === 'OK') {
-                    setData2((prev) => ({ ...prev, noties: result.data.data }));
-                    setIsLoaded((prev) => ({ ...prev, noties: true }));
-                }
-            })
-            .catch((err) => {
-                console.error(err);
-            });
+                .get(`/webpush/get-all`)
+                .then((result) => {
+                    // console.log(result);
+                    if (result.data.status === 'OK') {
+                        setData2((prev) => ({ ...prev, noties: result.data.data }));
+                        setIsLoaded((prev) => ({ ...prev, noties: true }));
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
 
             authInstance
-            .get(`/vouchers`)
-            .then((result) => {
-                // console.log(result);
-                if (result.data.status === 'OK') {
-                    setData2((prev) => ({ ...prev, vouchers: result.data.data }));
-                    setIsLoaded((prev) => ({ ...prev, vouchers: true }));
-                }
-            })
-            .catch((err) => {
-                console.error(err);
-            });
-        fetch(`${api}/categories?filter=simple`)
-            .then((response) => response.json())
-            .then((result) => {
-                if (result.status == 'OK') {
-                    setData2((prev) => ({ ...prev, categories: result.data }));
-                    setIsLoaded((prev) => ({ ...prev, categories: true }));
-                }
-            })
-            .catch((err) => console.log(err.message));
+                .get(`/vouchers`)
+                .then((result) => {
+                    // console.log(result);
+                    if (result.data.status === 'OK') {
+                        setData2((prev) => ({ ...prev, vouchers: result.data.data }));
+                        setIsLoaded((prev) => ({ ...prev, vouchers: true }));
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+            fetch(`${api}/categories?filter=simple`)
+                .then((response) => response.json())
+                .then((result) => {
+                    if (result.status == 'OK') {
+                        setData2((prev) => ({ ...prev, categories: result.data }));
+                        setIsLoaded((prev) => ({ ...prev, categories: true }));
+                    }
+                })
+                .catch((err) => console.log(err.message));
 
             authInstance
                 .post('/orders/filter')
@@ -369,7 +373,7 @@ function AdminLayout({ children }) {
                             zIndex: 1000, // Tăng giá trị nếu cần
                         }}
                     >
-                        <SideBarLaptop  url={url}/>
+                        <SideBarLaptop url={url} />
                     </div>
                     <div style={{ width: 250, height: '100vh' }} className={cx('container')}>
                         <NavBar

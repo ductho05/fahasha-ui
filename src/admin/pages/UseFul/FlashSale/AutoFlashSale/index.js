@@ -46,7 +46,7 @@ function AutoFlashSale() {
                 setSuggestFlash(getRandomElementsWithBias(data2.slice(0, 500), 14));
                 setIsLoading2(false);
             }, 200); // 1000 milliseconds tương đương với 1 giây
-        } else {            
+        } else {
             if (data.products?.length == 0) {
                 if (data?.tem_products?.length > 0) {
                     setIsLoading2(true);
@@ -74,6 +74,7 @@ function AutoFlashSale() {
                     style={{
                         margin: '0 0 0 0px',
                         flex: 2,
+                        color: '#f43030',
                     }}
                 >
                     THIẾT LẬP TỰ ĐỘNG

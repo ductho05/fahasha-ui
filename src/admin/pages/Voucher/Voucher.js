@@ -33,6 +33,7 @@ import {
     Tooltip,
     Select,
     Checkbox,
+    InputNumber,
 } from 'antd';
 import { getAuthInstance } from '../../../utils/axiosConfig';
 import { useData } from '../../../stores/DataContext';
@@ -172,7 +173,7 @@ function Voucher() {
         value: '',
         type: '',
     });
-    const [newList2, setNewList2] = useState([]);
+    // const [newList2, setNewList2] = useState([]);
     const [options, setOptions] = useState([]);
     const [price, setPrice] = useState(null);
     const [rate, setRate] = useState(null);
@@ -187,7 +188,7 @@ function Voucher() {
     const [selectSort, setSelectSort] = useState(null);
     const [showFilter, setShowFilter] = useState(false);
     const [keywords, setKeywords] = useState(null);
-    console.log('newLis2t21', newList2);
+    // console.log('newLis2t21', newList2);
     const [openDialog, setOpenDialog] = useState(false);
     const [optionUser, setOptionUser] = useState([]);
     // const [isse]
@@ -271,7 +272,7 @@ function Voucher() {
             headerName: 'Mã giảm giá',
             sortable: false,
             width: 250,
-            editable: true,
+            editable: false,
             renderCell: (params) => (
                 <p className={params.value ? cx('') : cx('null')}>
                     {params.value ? (data?.isSuperAdmin ? params.value : hideString(params.value, 1, 3)) : 'Trống'}
@@ -293,7 +294,15 @@ function Voucher() {
             width: 220,
             sortable: false,
             renderCell: (params) => (
-                <p className={params.value?.fullName ? cx('') : cx('null')}>
+                <p
+                    style={{
+                        cursor: 'pointer',
+                    }}
+                    onClick={() => {
+                        navigate(`/admin/user/${params.value?._id}`);
+                    }}
+                    className={params.value?.fullName ? cx('') : cx('null')}
+                >
                     {params.value?.fullName ? params.value?.fullName : 'Trống'}
                 </p>
             ),
@@ -311,11 +320,7 @@ function Voucher() {
             field: 'status',
             headerName: 'Trạng thái',
             width: 200,
-            renderCell: (params) => (
-                <p className={params.value ? cx('') : cx('null')}>
-                    {params.value ? (!params.value ? 'Đã sử dụng' : 'Chưa sử dụng') : 'Trống'}
-                </p>
-            ),
+            renderCell: (params) => <p>{!params.value ? 'Đã sử dụng' : 'Chưa sử dụng'}</p>,
         },
     ];
 
@@ -422,11 +427,11 @@ function Voucher() {
         setStatus(option);
     };
 
-    const handleClearFilter = (newList2) => {
+    const handleClearFilter = () => {
         setStatus(null);
 
-        const productsToSort = [...newList2];
-        const sortedProducts = productsToSort.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+        const productsToSort = [...data?.vouchers];
+        const sortedProducts = productsToSort.sort((a, b) => b?.createdAt - a?.createdAt);
 
         setRows(sortedProducts);
     };
@@ -446,7 +451,7 @@ function Voucher() {
             } else if (sort.value == 'discountAZ') {
                 return a.discount - b.discount;
             } else {
-                return b.createdAt.localeCompare(a.createdAt);
+                return b?.createdAt - a?.createdAt;
             }
         });
         //  console.log('newList42222', newList);
@@ -455,11 +460,11 @@ function Voucher() {
     };
 
     const filterProduct = (keywords, status) => {
-        let newList = [...newList2];
+        let newList = data?.vouchers || [];
         // console.log('dang filter', newList);
         newList = newList.filter((product) => {
             if (keywords) {
-                return product.user?.fullName.toLowerCase().includes(keywords.toLowerCase());
+                return product.code.toLowerCase().includes(keywords.toLowerCase());
             } else {
                 return product;
             }
@@ -497,7 +502,7 @@ function Voucher() {
     useEffect(() => {
         // console.log('newList2111', newList2);
         if (data?.vouchers?.length > 0) {
-            let newList = [...data?.vouchers];
+            //let newList = [...data?.vouchers];
             // newList = newList.map((product) => {
             //     if (product.birth) {
             //         return {
@@ -508,8 +513,8 @@ function Voucher() {
             //         return product;
             //     }
             // });
-            setNewList2(newList);
-            handleClearFilter(newList);
+            //setNewList2(newList);
+            handleClearFilter();
         }
     }, [data]);
 
@@ -547,7 +552,7 @@ function Voucher() {
                 maxWidth="md" // Chọn maxWidth theo nhu cầu của bạn (xs, sm, md, lg, xl)
                 PaperProps={{
                     style: {
-                        width: '25%', // Chiều rộng của Paper (nếu không sử dụng fullWidth)
+                        width: '27%', // Chiều rộng của Paper (nếu không sử dụng fullWidth)
                         height: '200px', // Chiều cao của Paper (auto hoặc giá trị cụ thể)
                     },
                 }}
@@ -569,7 +574,7 @@ function Voucher() {
                     <Form
                         name="basic"
                         labelCol={{
-                            span: 5,
+                            span: 7,
                         }}
                         wrapperCol={{
                             span: 10,
@@ -588,7 +593,7 @@ function Voucher() {
                                 rules={[
                                     {
                                         required: true,
-                                        message: 'Nội dung này không được để trống!',
+                                        message: 'Không được trống!',
                                     },
                                 ]}
                             >
@@ -602,16 +607,28 @@ function Voucher() {
                             </Form.Item>
                         }
                         <Form.Item
-                            label="Mức giảm giá"
+                            label="Mức giảm giá (%)"
                             name="discount"
                             rules={[
                                 {
                                     required: true,
-                                    message: 'Nội dung này không được để trống!',
+                                    message: 'Không được trống!',
+                                },
+                                {
+                                    // required: true,
+                                    type: 'number',
+                                    min: 10,
+                                    max: 90,
+                                    message: 'Mức giảm giá từ 10% đến 90%',
                                 },
                             ]}
                         >
-                            <Input />
+                            <InputNumber
+                                style={{
+                                    width: '100%',
+                                }}
+                                placeholder="Nhập mức giảm giá"
+                            />
                         </Form.Item>
 
                         <Form.Item
@@ -643,7 +660,7 @@ function Voucher() {
                 <div className="px-[20px] flex items-center">
                     <p className="text-[1.4rem] text-[#333] mr-[10px]">Sắp xếp theo: </p>
                     <Select
-                        disabled={newList2.length == 0}
+                        disabled={data?.vouchers?.length == 0}
                         className="w-[200px]"
                         placeholder="Chọn..."
                         options={sortOptions}
@@ -660,17 +677,17 @@ function Voucher() {
                 </div>
                 <div className="px-[20px] flex items-center">
                     <Input.Search
-                        disabled={newList2.length == 0}
+                        disabled={data?.vouchers?.length == 0}
                         //onSearch={handleSearch}
                         className="w-[400px]"
-                        placeholder="Tìm kiếm người dùng ..."
+                        placeholder="Tìm kiếm mã giảm giá ..."
                         onChange={(e) => handleSearch(e.target.value)}
                         // value={keywords}
                     />
                 </div>
                 <div className="px-[20px] flex items-center">
                     <Tippy
-                        disabled={newList2.length == 0}
+                        disabled={data?.vouchers?.length == 0}
                         interactive={true}
                         visible={showFilter}
                         placement="bottom"
@@ -698,7 +715,7 @@ function Voucher() {
 
                                                 <div
                                                     onClick={() => {
-                                                        handleClearFilter(newList2);
+                                                        handleClearFilter();
                                                     }}
                                                     className="mb-[10px] cursor-pointer w-max px-[10px] py-[4px] rounded-[12px] flex items-center justify-center text-orange-500 border border-orange-500"
                                                 >

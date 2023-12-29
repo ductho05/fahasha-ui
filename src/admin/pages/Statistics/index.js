@@ -550,8 +550,8 @@ function Statistics() {
                 return b.value - a.value;
             });
 
-            // lấy 10 người đầu tiên
-            user.splice(10, user.length - 10);
+            // lấy 4 người đầu tiên
+            user.splice(4, user.length - 4);
             setTopUser(user);
 
             const ordersToday = orders.filter((order) => {

@@ -498,6 +498,7 @@ function CostumFlashSale() {
                     style={{
                         margin: '0 0 0 10px',
                         flex: 2,
+                        color: '#f43030',
                     }}
                 >
                     THIẾT LẬP TÙY CHỈNH
