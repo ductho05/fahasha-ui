@@ -183,7 +183,7 @@ function OrderAdminDetail() {
                                         title="Xác nhận?"
                                         description="Đơn hàng sẽ được cập nhật trạng thái"
                                         onConfirm={handleUpdate}
-                                        onCancel={() => {}}
+                                        onCancel={() => { }}
                                         okText="Đồng ý"
                                         cancelText="Hủy"
                                     >

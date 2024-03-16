@@ -129,6 +129,7 @@ function SearchProduct() {
         fetch(query)
             .then(response => response.json())
             .then(result => {
+                console.log(result)
                 setShowProgress(false)
                 setProducts(result.data.products)
                 fetchPages(result.data.quantity)

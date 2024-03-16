@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { publicRoutes, privateRoutes, notFoundRoute, adminRoutes, authRoutes } from './routes/index';
 import DefaultLayout from './components/Layouts/DefaultLayout';
 import ScrollToTop from './components/ScrollToTop';
@@ -15,11 +15,11 @@ import { api } from './constants';
 function DeniedPermission({ type }) {
     type == 'admin'
         ? localStorage.setItem(
-              'denied-permission-notify',
+            'denied-permission-notify',
 
-              `Bạn không có quyền truy cập vào trang này.
+            `Bạn không có quyền truy cập vào trang này.
     Vui lòng đăng nhập với quyền Admin`,
-          )
+        )
         : localStorage.setItem('denied-permission-notify', `Vui lòng đăng nhập để sử dụng tính năng này`);
     return <Navigate to="/login-register" />;
 }
@@ -28,9 +28,9 @@ function App() {
     const [isLogin, setIsLogin] = useState(localstorge.get().length > 0);
     const [state, dispatch] = useStore();
     const Page404 = notFoundRoute.component;
+    // const navigate = useNavigate()
 
     setTimeout(async () => {
-        // console.log("alo")
         if (Object.keys(state.token).length > 0) {
             await axios
                 .get(`${api}/users/get/profile`, {
@@ -38,7 +38,7 @@ function App() {
                         Authorization: `Bearer ${state.token}`,
                     },
                 })
-                .then((result) => {})
+                .then((result) => { })
                 .catch((err) => {
                     if (err.response.data.message == 'Jwt expired') {
                         Modal.error({

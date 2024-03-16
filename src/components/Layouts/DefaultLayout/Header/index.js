@@ -61,6 +61,7 @@ function Header() {
     const [toNotice, setToNotice] = useState(false);
     const [apiNotice, contextHolder] = notification.useNotification();
     const [notificationData, setNotificationData] = useState(null);
+    const [keywords, setKeywords] = useState()
     const productQuality = 7;
 
     const authInstance = state.authInstance;
@@ -228,30 +229,29 @@ function Header() {
     function handleChangeValue(event) {
         const inputValue = event.target?.value;
         debounceFn(inputValue);
+        setKeywords(inputValue)
     }
 
     const handleKeyDown = (e) => {
         if (e.keyCode === 13) {
-            navigate(`/search/${keyTextSearch}`);
+            navigate(`/search/${keywords}`);
             let oldHistoty = localstorage.get('historys');
-            const findHistory = oldHistoty.find((h) => h === keyTextSearch);
+            const findHistory = oldHistoty.find((h) => h === keywords);
             if (!findHistory) {
-                localstorage.set('historys', [...oldHistoty, keyTextSearch]);
+                localstorage.set('historys', [...oldHistoty, keywords]);
             }
             setSuggestSearch(false);
-            setKeyTextSearch('');
         }
     };
 
     const handleSearch = () => {
-        navigate(`/search/${keyTextSearch}`);
+        navigate(`/search/${keywords}`);
         let oldHistoty = localstorage.get('historys');
-        const findHistory = oldHistoty.find((h) => h === keyTextSearch);
+        const findHistory = oldHistoty.find((h) => h === keywords);
         if (!findHistory) {
-            localstorage.set('historys', [...oldHistoty, keyTextSearch]);
+            localstorage.set('historys', [...oldHistoty, keywords]);
         }
         setSuggestSearch(false);
-        setKeyTextSearch('');
     };
 
     const handleClickItemSuggest = (id) => {

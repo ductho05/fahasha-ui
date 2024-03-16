@@ -229,7 +229,7 @@ function Users() {
             width: 80,
             renderCell: (params) => (
                 <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : 'Trống'}</p>
-            ),
+            )
         },
         {
             field: 'email',
@@ -266,9 +266,8 @@ function Users() {
             width: 110,
             renderCell: (params) => (
                 <p
-                    className={`${
-                        params ? (params.value === true ? 'text-red-500' : 'text-green-500') : 'text-green-500'
-                    }`}
+                    className={`${params ? (params.value === true ? 'text-red-500' : 'text-green-500') : 'text-green-500'
+                        }`}
                 >
                     {params ? (params.value === true ? 'Tạm khóa' : 'Hoạt động') : 'Hoạt động'}
                 </p>
@@ -376,6 +375,7 @@ function Users() {
     };
 
     const onFinish = async (data) => {
+
         const formData = new FormData();
         Object.keys(data).forEach((key) => {
             formData.append(key, data[key]);
@@ -406,9 +406,10 @@ function Users() {
                     toast.error(`${result.data.message}`);
                 }
                 setShowDialog(false);
-                setLoading(false);
+                setIsInsert(false);
             })
             .catch((err) => {
+                console.log(err)
                 setShowDialog(false);
                 setLoading(false);
                 toast.error(`${err?.response?.data?.message}`);
@@ -420,6 +421,7 @@ function Users() {
     };
 
     const changeDate = (date, dateString) => {
+        console.log(dateString)
         setBirth(dateString);
     };
 
@@ -489,7 +491,7 @@ function Users() {
                                 image,
                             },
                         })
-                        .then((result) => {})
+                        .then((result) => { })
                         .catch((err) => {
                             console.log(err);
                         });
@@ -908,13 +910,12 @@ function Users() {
                         </Form.Item>
 
                         <Form.Item
-                            initialValue={`${
-                                userLock.hasOwnProperty('isLock')
-                                    ? userLock.isLock === false
-                                        ? 'Tài khoản của bạn đã được mở khóa. Quý khách có thể mua hàng trở lại!'
-                                        : 'Hệ thống xác nhận gần đây bạn hủy quá nhiều đơn hàng. Tài khoản của bạn sẽ bị tạm khóa cho đến khi được mở lại'
+                            initialValue={`${userLock.hasOwnProperty('isLock')
+                                ? userLock.isLock === false
+                                    ? 'Tài khoản của bạn đã được mở khóa. Quý khách có thể mua hàng trở lại!'
                                     : 'Hệ thống xác nhận gần đây bạn hủy quá nhiều đơn hàng. Tài khoản của bạn sẽ bị tạm khóa cho đến khi được mở lại'
-                            }`}
+                                : 'Hệ thống xác nhận gần đây bạn hủy quá nhiều đơn hàng. Tài khoản của bạn sẽ bị tạm khóa cho đến khi được mở lại'
+                                }`}
                             label="Mô tả"
                             name="description"
                             rules={[
@@ -959,9 +960,9 @@ function Users() {
                         value={
                             selectSort
                                 ? {
-                                      label: selectSort.label,
-                                      value: selectSort.value,
-                                  }
+                                    label: selectSort.label,
+                                    value: selectSort.value,
+                                }
                                 : null
                         }
                     />
@@ -973,7 +974,7 @@ function Users() {
                         className="w-[400px]"
                         placeholder="Tìm kiếm người dùng ..."
                         onChange={(e) => handleSearch(e.target.value)}
-                        // value={keywords}
+                    // value={keywords}
                     />
                 </div>
                 <div className="px-[20px] flex items-center">
