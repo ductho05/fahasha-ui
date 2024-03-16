@@ -53,22 +53,22 @@ const dataWidgets = [
     {
         top: '1',
         phanthuong: 'mã giảm giá 50% cho đơn hàng bất kỳ',
-        value: 50
+        value: 50,
     },
     {
         top: '2',
         phanthuong: 'mã giảm giá 30% cho đơn hàng bất kỳ',
-        value: 30
+        value: 30,
     },
     {
         top: '3',
         phanthuong: 'mã giảm giá 20% cho đơn hàng bất kỳ',
-        value: 20
+        value: 20,
     },
     {
         top: '4',
         phanthuong: 'mã giảm giá 10% cho đơn hàng bất kỳ',
-        value: 10
+        value: 10,
     },
 ];
 
@@ -162,8 +162,8 @@ function Statistics() {
     const spaceSizeCol = [30, 180, 120, 240, 150, 80, 100, 70, 70, 140];
     const navigate = useNavigate();
     const [detail, setDetail] = useState([]);
-    const [isSendNow, setIsSendNow] = useState(false)
-    const [state, dispatch] = useStore()
+    const [isSendNow, setIsSendNow] = useState(false);
+    const [state, dispatch] = useStore();
 
     console.log('top_products212', top_usert);
     const columns = [
@@ -438,11 +438,11 @@ function Statistics() {
                 if (order.order != null) {
                     return (
                         formatDateToString(new Date(order.order.date)) <=
-                        formatDateToString(
-                            new Date(today.getFullYear(), month ? month + 1 : today.getMonth() + 1, 0),
-                        ) &&
+                            formatDateToString(
+                                new Date(today.getFullYear(), month ? month + 1 : today.getMonth() + 1, 0),
+                            ) &&
                         formatDateToString(new Date(order.order.date)) >=
-                        formatDateToString(new Date(today.getFullYear(), month ? month : today.getMonth(), 1))
+                            formatDateToString(new Date(today.getFullYear(), month ? month : today.getMonth(), 1))
                     );
                 }
             });
@@ -517,7 +517,7 @@ function Statistics() {
                 return (
                     formatDateToString(new Date(order.date)) <= formatDateToString(today) &&
                     formatDateToString(new Date(order.date)) >=
-                    formatDateToString(new Date(today.getFullYear(), today.getMonth(), 1))
+                        formatDateToString(new Date(today.getFullYear(), today.getMonth(), 1))
                 );
             });
 
@@ -780,86 +780,73 @@ function Statistics() {
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         const randomArray = Array.from({ length: 6 }, () => characters[Math.floor(Math.random() * characters.length)]);
         const randomString = randomArray.join('');
-        return randomString
+        return randomString;
     }
 
     const sendVoucher = async (index, value, today) => {
+        const startCode = `T${index + 1}${today.getMonth() + 1}${today.getFullYear()}`;
 
-        const startCode = `T${index + 1}${today.getMonth() + 1}${today.getFullYear()}`
-
-        const responseCode = await authInstance.post("/vouchers/get/name", { code: startCode })
+        const responseCode = await authInstance.post('/vouchers/get/name', { code: startCode });
 
         if (responseCode.status === 200 && responseCode.data.data.length > 0) {
-
-            info("warning", `Voucher top ${index + 1} tháng này đã được trao!`)
+            info('warning', `Voucher top ${index + 1} tháng này đã được trao!`);
         } else {
-
-            const user = top_usert[index]
-            const voucherCode = `${startCode}${generateRandomString()}`
+            const user = top_usert[index];
+            const voucherCode = `${startCode}${generateRandomString()}`;
             var nextMonthDay = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
 
-            var expried = nextMonthDay.toISOString().split('T')[0]
+            var expried = nextMonthDay.toISOString().split('T')[0];
 
             const response = await authInstance.post('/vouchers/add', {
                 user: user.id,
                 code: voucherCode,
                 expried: expried,
-                discount: value
-            })
+                discount: value,
+            });
 
             if (response.status === 200) {
-                await authInstance
-                    .post(`/webpush/send`, {
-                        filter: 'personal',
-                        notification: {
-                            title: "Thông báo voucher giảm giá",
-                            description: `Bạn được tặng voucher giảm giá ${value}% cho bất kì đơn hàng nào. Xem ngay!`,
-                            user: user.id,
-                            url: `${appPath}/account/5`,
-                            image: voucherImage,
-                        },
-                    })
-
-                state.socket.emit('send-notification', {
-                    type: 'personal',
-                    userId: user.id,
+                await authInstance.post(`/webpush/send`, {
+                    filter: 'personal',
                     notification: {
-                        title: "Thông báo voucher giảm giá",
+                        title: 'Thông báo voucher giảm giá',
                         description: `Bạn được tặng voucher giảm giá ${value}% cho bất kì đơn hàng nào. Xem ngay!`,
                         user: user.id,
                         url: `${appPath}/account/5`,
                         image: voucherImage,
                     },
-                })
-                info('success', 'Trao quà thành công')
+                });
+
+                state.socket.emit('send-notification', {
+                    type: 'personal',
+                    userId: user.id,
+                    notification: {
+                        title: 'Thông báo voucher giảm giá',
+                        description: `Bạn được tặng voucher giảm giá ${value}% cho bất kì đơn hàng nào. Xem ngay!`,
+                        user: user.id,
+                        url: `${appPath}/account/5`,
+                        image: voucherImage,
+                    },
+                });
+                info('success', 'Trao quà thành công');
             } else {
-                info('error', response.data.message)
+                info('error', response.data.message);
             }
         }
-
-    }
+    };
 
     const handleSendVoucher = async (index, value) => {
-        const today = new Date()
+        const today = new Date();
 
         if (isSendNow) {
-
-            await sendVoucher(index, value, today)
+            await sendVoucher(index, value, today);
         } else {
-
             const newDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
             if (formatDateToString(today) != formatDateToString(newDate)) {
-                info(
-                    'warning',
-                    `Chỉ được trao quà vào ngày ${formatDateToString(newDate)}`,
-                );
-            }
-            else await sendVoucher(index, value, today)
+                info('warning', `Chỉ được trao quà vào ngày ${formatDateToString(newDate)}`);
+            } else await sendVoucher(index, value, today);
         }
-
-
-    }
+    };
 
     return (
         <div className={cx('wrapper')}>
@@ -981,7 +968,7 @@ function Statistics() {
                             <Popover
                                 content={'Doanh thu từ người dùng đã bao gồm phí vận chuyển từ các đơn hàng'}
                                 trigger="hover"
-                            // className={cx('kpi')}
+                                // className={cx('kpi')}
                             >
                                 <span
                                     style={{
@@ -996,69 +983,88 @@ function Statistics() {
                             KHÁCH HÀNG THÂN THIẾT THÁNG {new Date().getMonth() + 1}
                         </h3>
                         <div className={cx('content_user')}>
-                            {top_usert.map((user, index) => (
-                                <div className={cx('user')} key={index}>
-                                    <div className={cx('index')}>
-                                        <div
-                                            className={cx('frame')}
-                                            style={{
-                                                backgroundColor:
-                                                    index == 0
-                                                        ? '#f44336'
-                                                        : index == 1
+                            {top_usert.length > 0 ? (
+                                top_usert.map((user, index) => (
+                                    <div className={cx('user')} key={index}>
+                                        <div className={cx('index')}>
+                                            <div
+                                                className={cx('frame')}
+                                                style={{
+                                                    backgroundColor:
+                                                        index == 0
+                                                            ? '#f44336'
+                                                            : index == 1
                                                             ? '#ff9800'
                                                             : index == 2
-                                                                ? '#ffc107'
-                                                                : '#4caf50',
+                                                            ? '#ffc107'
+                                                            : '#4caf50',
+                                                }}
+                                            >
+                                                {index + 1}
+                                            </div>
+                                        </div>
+                                        <div
+                                            className={cx('avatar')}
+                                            style={{
+                                                cursor: 'pointer',
+                                            }}
+                                            onClick={() => {
+                                                navigate(`/admin/user/${user.id}`);
                                             }}
                                         >
-                                            {index + 1}
+                                            <div className={cx('img')}>
+                                                <Image
+                                                    src={user.avatar}
+                                                    preview={false}
+                                                    style={{
+                                                        margin: 'auto',
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div
+                                            className={cx('name')}
+                                            style={{
+                                                cursor: 'pointer',
+                                                color: user?.name ? '#000' : '#ccc',
+                                            }}
+                                            onClick={() => {
+                                                navigate(`/admin/user/${user.id}`);
+                                            }}
+                                        >
+                                            {user?.name ? user.name : '[Không có tên]'}
+                                        </div>
+                                        <div className={cx('value')}>
+                                            {addCommasToNumber(Math.round(user.value / 1000))}K
                                         </div>
                                     </div>
-                                    <div
-                                        className={cx('avatar')}
-                                        style={{
-                                            cursor: 'pointer',
-                                        }}
-                                        onClick={() => {
-                                            navigate(`/admin/user/${user.id}`);
-                                        }}
-                                    >
-                                        <div className={cx('img')}>
-                                            <Image
-                                                src={user.avatar}
-                                                preview={false}
-                                                style={{
-                                                    margin: 'auto',
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div
-                                        className={cx('name')}
-                                        style={{
-                                            cursor: 'pointer',
-                                            color: user?.name ? '#000' : '#ccc',
-                                        }}
-                                        onClick={() => {
-                                            navigate(`/admin/user/${user.id}`);
-                                        }}
-                                    >
-                                        {user?.name ? user.name : '[Không có tên]'}
-                                    </div>
-                                    <div className={cx('value')}>
-                                        {addCommasToNumber(Math.round(user.value / 1000))}K
-                                    </div>
+                                ))
+                            ) : (
+                                <div
+                                    style={{
+                                        width: '350px',
+                                        height: '400px',
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        margin: 'auto',
+                                    }}
+                                >
+                                    <Alert message="Không có dữ liệu" type="warning" showIcon />
                                 </div>
-                            ))}
+                            )}
                         </div>
                     </div>
                     <div className={cx('right')}>
                         <div className={cx('title', 'flex items-center justify-between px-[40px]')}>
                             <h3 className="">TRI ÂN KHÁCH HÀNG</h3>
-                            <div className='flex items-center'>
-                                <p className='mr-[10px] text-[16px] text-[#fff]'>Trao ngay</p>
-                                <Switch className='bg-[#fff]' checked={isSendNow} onChange={() => setIsSendNow(prev => !prev)} />
+                            <div className="flex items-center">
+                                <p className="mr-[10px] text-[16px] text-[#fff]">Trao ngay</p>
+                                <Switch
+                                    className="bg-[#fff]"
+                                    checked={isSendNow}
+                                    onChange={() => setIsSendNow((prev) => !prev)}
+                                />
                             </div>
                         </div>
 
@@ -1076,10 +1082,10 @@ function Statistics() {
                                                         index == 0
                                                             ? '#f44336'
                                                             : index == 1
-                                                                ? '#ff9800'
-                                                                : index == 2
-                                                                    ? '#ffc107'
-                                                                    : '#4caf50',
+                                                            ? '#ff9800'
+                                                            : index == 2
+                                                            ? '#ffc107'
+                                                            : '#4caf50',
                                                 }}
                                             >
                                                 Top {widget.top}: {widget.phanthuong}
@@ -1179,10 +1185,10 @@ function Statistics() {
                                                         index == 0
                                                             ? '#f44336'
                                                             : index == 1
-                                                                ? '#ff9800'
-                                                                : index == 2
-                                                                    ? '#ffc107'
-                                                                    : '#4caf50',
+                                                            ? '#ff9800'
+                                                            : index == 2
+                                                            ? '#ffc107'
+                                                            : '#4caf50',
                                                 }}
                                             >
                                                 {index + 1}
