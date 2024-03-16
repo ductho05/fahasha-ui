@@ -128,6 +128,7 @@ function Review() {
     const [rows, setRows] = useState([]);
     const [loading, setLoading] = useState(false);
     const { data, setData } = useData();
+    console.log('data122', data);
     const [newList2, setNewList2] = useState([]);
     const [options, setOptions] = useState([]);
     const [price, setPrice] = useState(null);

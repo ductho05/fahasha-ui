@@ -21,42 +21,6 @@ function AdminLayout({ children }) {
    const url = window.location.pathname;
     const container = useRef(null);
     const { data, setData } = useData();
-    // Lấy địa chỉ URL hiện tại
-   //  const url = window.location.href;
-
-    // Hiển thị địa chỉ URL trong console
-   // console.log('currentURL', currentURL);
-    // const [isComplete, setIsComplete] = useState(false);
-
-    // async function fetchData() {
-    //     let i = 2;
-    //     let shouldContinue = true;
-    //     let newData = [];
-    //     //  console.log('dang chay ne...', shouldContinue, data?.products?.length, Math.ceil(maxProducts / perPage));
-    //     while (i < Math.floor(maxProducts / perPage) - 15 && shouldContinue) {
-    //         try {
-    //             console.log('chay ne...', i, data);
-    //             const response = await fetch(`${api}/products?perPage=${perPage}&page=${i}`);
-    //             const flashsales = await response.json();
-    //             newData = [...newData, ...flashsales.data.products];
-
-    //             // setData({
-    //             //     ...data,
-    //             //     products: newData,
-    //             // });
-
-    //             i++;
-    //         } catch (err) {
-    //             console.log('asghd', err);
-    //             shouldContinue = false; // Dừng vòng lặp nếu có lỗi
-    //         }
-    //     }
-    //     // setData({
-    //     //     ...data,
-    //     //     products: newData,
-    //     // });
-    //     return newData;
-    // }
 
     const [isLoaded, setIsLoaded] = useState(
         Object.keys(data).length !== 0
