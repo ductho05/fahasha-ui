@@ -8,6 +8,28 @@
     background-color: #fff;
 }
 
+.get_location {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: small;
+    margin-left: 1rem;
+    color: #0657ad;
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 4px 8px;
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    // hiệu ứng khi click
+    transition: all 0.3s ease;
+
+
+}
+
+.get_location:hover {
+    background-color: #e9ecef;
+}
+
 .heading {
     font-size: 1.54rem;
     color: #333;

@@ -100,42 +100,42 @@ function OrderDetail() {
                     const url = `${appPath}/admin/orders`;
                     message.success('Đã hủy đơn hàng');
 
-                    axios
-                        .post(
-                            `${api}/webpush/send`,
-                            {
-                                filter: 'admin',
-                                notification: {
-                                    title,
-                                    description,
-                                    image,
-                                    url,
-                                },
-                            },
-                            {
-                                headers: {
-                                    Authorization: `Bearer ${localstorge.get()}`,
-                                },
-                            },
-                        )
-                        .then((result) => {
-                            if (result.data.status === 'OK') {
-                                state.socket.emit('send-notification', {
-                                    type: 'admin',
-                                    userId: null,
-                                    notification: {
-                                        title,
-                                        description,
-                                        image: cancelOrderImage,
-                                        url,
-                                        user: null,
-                                    },
-                                });
-                            }
-                        })
-                        .catch((err) => {
-                            console.error(err);
-                        });
+                    // axios
+                    //     .post(
+                    //         `${api}/webpush/send`,
+                    //         {
+                    //             filter: 'admin',
+                    //             notification: {
+                    //                 title,
+                    //                 description,
+                    //                 image,
+                    //                 url,
+                    //             },
+                    //         },
+                    //         {
+                    //             headers: {
+                    //                 Authorization: `Bearer ${localstorge.get()}`,
+                    //             },
+                    //         },
+                    //     )
+                    //     .then((result) => {
+                    //         if (result.data.status === 'OK') {
+                    //             state.socket.emit('send-notification', {
+                    //                 type: 'admin',
+                    //                 userId: null,
+                    //                 notification: {
+                    //                     title,
+                    //                     description,
+                    //                     image: cancelOrderImage,
+                    //                     url,
+                    //                     user: null,
+                    //                 },
+                    //             });
+                    //         }
+                    //     })
+                    //     .catch((err) => {
+                    //         console.error(err);
+                    //     });
                     setUpdateSuccess((prev) => !prev);
                 } else {
                     message.error('Lỗi hủy đơn hàng');

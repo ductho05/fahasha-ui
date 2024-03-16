@@ -29,6 +29,8 @@ function CheckOut() {
     const authInstance = getAuthInstance();
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
+    const [auto, setAuto] = useState(false);
+    const [isReload, setIsReload] = useState(false);
     //  const { orderId } = useParams();
     const [listCheckouts, setListCheckouts] = useState([]);
     const [isChecked, setIsChecked] = useState(false);
@@ -46,9 +48,13 @@ function CheckOut() {
     const [productNotQuanlity, setProductNotQuanlity] = useState([]);
     const [productFlash, setProductFlash] = useState([]);
     const [showProgress, setShowProgress] = useState(false);
-    const location = useLocation();
+    // const location = useLocation();
     const [isAllowOpen, setIsAllowOpen] = useState(true);
     const namecart = `myCart_${state.user._id}`;
+    // const [city, setCity] = useState('');
+    // const [districs, setDistrics] = useState('');
+    // const [wards, setWards] = useState('');
+    // const [address, setAddress] = useState('');
     const statusVNPayCheckout = `statusVNPayCheckout_${state.user._id}`;
     const [isLoading, setIsLoading] = useState(false);
     const [product, setProduct] = useState(
@@ -98,7 +104,6 @@ function CheckOut() {
         const listFlash = localStorage.getItem('listFlash')
             ? JSON.parse(localStorage.getItem('listFlash'))
             : productFlash;
-        console.log('listFlash', listFlash, productFlash);
 
         if (listFlash) {
             const flashArray = listFlash;
@@ -252,26 +257,18 @@ function CheckOut() {
 
     const placeOrder = async (data1, type) => {
         try {
-            console.log('day ne ban', JSON.parse(localStorage.getItem('listFlash')), productFlash, listCheckouts);
             const listFlash = localStorage.getItem('listFlash')
                 ? JSON.parse(localStorage.getItem('listFlash'))
                 : productFlash;
             const listNewCheckout = localStorage.getItem('listCkeckOut')
                 ? JSON.parse(localStorage.getItem('listCkeckOut'))
                 : listCheckouts;
-            console.log(
-                'DAY1NENENENE',
-                productFlash.length > 0 ? productFlash : listFlash,
-                listNewCheckout,
-                listCheckouts,
-            );
+            
             const orderResult = await authInstance.post(`/orders/insert`, {
                 ...data1,
                 flashsales: listFlash,
                 items: listNewCheckout,
             });
-
-            console.log('result12233312', orderResult);
 
             if (orderResult.data.status === 'OK') {
                 const order = orderResult.data.data;
@@ -365,42 +362,42 @@ function CheckOut() {
                 const image = orderImages;
                 const url = `${appPath}/admin/orders`;
 
-                axios
-                    .post(
-                        `${api}/webpush/send`,
-                        {
-                            filter: 'admin',
-                            notification: {
-                                title,
-                                description,
-                                image,
-                                url,
-                            },
-                        },
-                        {
-                            headers: {
-                                Authorization: `Bearer ${localstorge.get()}`,
-                            },
-                        },
-                    )
-                    .then((result) => {
-                        if (result.data.status === 'OK') {
-                            state.socket.emit('send-notification', {
-                                type: 'admin',
-                                userId: null,
-                                notification: {
-                                    title,
-                                    description,
-                                    image,
-                                    url,
-                                    user: null,
-                                },
-                            });
-                        }
-                    })
-                    .catch((err) => {
-                        console.error(err);
-                    });
+                // axios
+                //     .post(
+                //         `${api}/webpush/send`,
+                //         {
+                //             filter: 'admin',
+                //             notification: {
+                //                 title,
+                //                 description,
+                //                 image,
+                //                 url,
+                //             },
+                //         },
+                //         {
+                //             headers: {
+                //                 Authorization: `Bearer ${localstorge.get()}`,
+                //             },
+                //         },
+                //     )
+                //     .then((result) => {
+                //         if (result.data.status === 'OK') {
+                //             state.socket.emit('send-notification', {
+                //                 type: 'admin',
+                //                 userId: null,
+                //                 notification: {
+                //                     title,
+                //                     description,
+                //                     image,
+                //                     url,
+                //                     user: null,
+                //                 },
+                //             });
+                //         }
+                //     })
+                //     .catch((err) => {
+                //         console.error(err);
+                //     });
 
                 // Các dòng mã khác ở đây
             } else if (orderResult.data.status === 'Not enough quantity in flash sale') {
@@ -428,138 +425,7 @@ function CheckOut() {
     const addCheckout = async (data, type) => {
         console.log('data21423', data, listCheckouts);
         setShowProgress(true);
-
-        //     .post(`/orders/insert`, {
-        //         ...data,
-        //         flashsales: productFlash,
-        //         items: listCheckouts, // gửi xuống kiểm tra sl có đủ để giao không
-        //     })
-        //     .then((result) => {
-        //         console.log('result12233312', result);
-        //         if (result.data.status == 'OK') {
-        //             const order = result.data.data;
-        //             let item_order_checkout = [];
-        //             if (type == 'vnp') {
-        //                 item_order_checkout = localStorage.getItem('item_order_checkout')
-        //                     ? JSON.parse(localStorage.getItem('item_order_checkout'))
-        //                     : [];
-        //             } else if (type == 'cash') {
-        //                 item_order_checkout = listCheckouts;
-        //             }
-        //             const orderItems = item_order_checkout.map((item) => {
-        //                 return {
-        //                     quantity: item.quantity,
-        //                     price: item.product.price * item.quantity,
-        //                     order: result.data.data._id,
-        //                     product: item.product._id,
-        //                 };
-        //             });
-        //             if (item_order_checkout.length) {
-        //                 console.log('orderItems2121242', orderItems);
-        //                 orderItems.forEach((orderItem) => {
-        //                     authInstance
-        //                         .post(`/orderitems/insert`, {
-        //                             ...orderItem,
-        //                         })
-        //                         .then((result) => {
-        //                             if (result.data.status == 'OK') {
-        //                                 const carts = localStorage.getItem(namecart)
-        //                                     ? JSON.parse(localStorage.getItem(namecart))
-        //                                     : [];
-        //                                 const newCarts = {
-        //                                     id: state.user._id,
-        //                                     items: carts.items.filter((cart) => cart.id !== orderItem.product),
-        //                                 };
-        //                                 // authInstance
-        //                                 //     .put(`/products/update-sold/${orderItem.product}`, {
-        //                                 //         sold: orderItem.quantity,
-        //                                 //     })
-        //                                 //     .then((result) => {
-        //                                 //         console.log('update thanh cong', orderItem.product, orderItem.quantity);
-        //                                 //         console.log('result1212', result);
-        //                                 //     })
-        //                                 //     .catch((err) => {
-        //                                 //         console.error('err21', err);
-        //                                 //     });
-        //                                 console.log('đang chờ...');
-        //                                 updateSold(orderItem.product, orderItem.quantity);
-        //                                 console.log('xong roi');
-        //                                 localstorage.set(namecart, newCarts);
-        //                                 setShowProgress(false);
-        //                                 setOrder(order);
-        //                             }
-        //                         })
-        //                         .catch((err) => {
-        //                             console.log(err);
-        //                         });
-        //                 });
-        //             } else {
-        //                 setShowProgress(false);
-        //                 setOrder(order);
-        //             }
-        //             const title = 'Thông báo đơn hàng';
-        //             const description = `${state.user.fullName} vừa đặt đơn hàng mới. Chuẩn bị hàng thôi!`;
-        //             const image = orderImages;
-        //             const url = `${appPath}/admin/orders`;
-
-        //             axios
-        //                 .post(
-        //                     `${api}/webpush/send`,
-        //                     {
-        //                         filter: 'admin',
-        //                         notification: {
-        //                             title,
-        //                             description,
-        //                             image,
-        //                             url,
-        //                         },
-        //                     },
-        //                     {
-        //                         headers: {
-        //                             Authorization: `Bearer ${localstorge.get()}`,
-        //                         },
-        //                     },
-        //                 )
-        //                 .then((result) => {
-        //                     if (result.data.status === 'OK') {
-        //                         state.socket.emit('send-notification', {
-        //                             type: 'admin',
-        //                             userId: null,
-        //                             notification: {
-        //                                 title,
-        //                                 description,
-        //                                 image,
-        //                                 url,
-        //                                 user: null,
-        //                             },
-        //                         });
-        //                     }
-        //                 })
-        //                 .catch((err) => {
-        //                     console.error(err);
-        //                 });
-        //         } else if (result.data.status == 'Not enough quantity in flash sale') {
-        //             // không đủ sl trong chương trình FLashSale
-        //             console.log('result.data.data1213', result.data.data);
-        //             setShowProgress(false);
-        //             localStorage.setItem('dataNotQuanlity', JSON.stringify(result.data.data));
-        //             navigate(`/order-success/err-E14`);
-        //         } else if (result.data.status == 'Not enough quantity') {
-        //             // không đủ sl trong kho
-        //             setShowProgress(false);
-        //             localStorage.setItem('dataNotQuanlity', JSON.stringify(result.data.data));
-        //             navigate(`/order-success/err-E08`);
-        //         } else {
-        //             setShowProgress(false);
-        //             navigate(`/order-success/err-E99`);
-        //         }
-        //     })
-        //     .catch((err) => {
-        //         console.log(err);
-        //         setShowProgress(false);
-        //     });
-        // await addUserFlash();
-        // Gọi hàm placeOrder
+      
         placeOrder(data, type);
     };
 
@@ -588,13 +454,69 @@ function CheckOut() {
             }
         }
     }, []);
+
+    async function getCurrentLocationDetails(latitude, longitude) {
+        try {
+            const response = await axios.get(
+                `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
+            );
+
+            if (response.status === 200) {
+                const data = response.data;
+
+                console.log('data142', data);
+
+                // Trích xuất thông tin về tỉnh, huyện, xã từ dữ liệu trả về
+                const address = data.display_name.split(',');
+                console.log('Thông tin chi tiết về vị trí hiện tại:');
+                console.log('Xã/Phường:', address);
+                // setAddress(address[0]);
+                // setWards(address[1]);
+                // setDistrics(address[2]);
+                // setCity(address[3]);
+                cityController.field.onChange(address[3]);
+                districsController.field.onChange(address[2]);
+                wardsController.field.onChange(address[1]);
+                addressController.field.onChange(address[0]);
+            } else {
+                console.error('Failed to fetch data from the API');
+            }
+            setShowProgress(false);
+        } catch (error) {
+            console.error('Error:', error.message);
+            setShowProgress(false);
+        }
+    }
     // Get list product to checkout
+
+    useEffect(() => {
+        if (auto) {
+            setShowProgress(true);
+            if ('geolocation' in navigator) {
+                // Lấy vị trí hiện tại của người dùng
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+
+                    // console.log('Vị trí hiện tại của bạn:');
+                    // console.log('Latitude:', latitude);
+                    // console.log('Longitude:', longitude);
+                    getCurrentLocationDetails(latitude, longitude);
+                });
+            } else {
+                console.log('Trình duyệt không hỗ trợ Geolocation.');
+            }
+        }
+    }, [auto, isReload]);
 
     useEffect(() => {
         fetch(apiProvinces)
             .then((response) => response.json())
             .then((result) => {
                 setListProvinces(result);
+            })
+            .catch((error) => {
+                console.error('There was a problem with the fetch operation:', error);
             });
     }, []);
 
@@ -1149,6 +1071,21 @@ function CheckOut() {
                             <select {...countryController.field} className={cx('select')}>
                                 <option value="Việt Nam">Việt Nam</option>
                             </select>
+                            <p
+                                onClick={() => {
+                                    setAuto(true);
+                                    setIsReload(!isReload);
+                                    console.log(
+                                        'click',
+                                        addressController.field,
+                                        cityController.field,
+                                        countryController.field,
+                                    );
+                                }}
+                                className={cx('get_location')}
+                            >
+                                Vị trí hiện tại
+                            </p>
                         </div>
                         <p className={cx('form_error')}>{errors.country?.message}</p>
                     </div>
@@ -1157,14 +1094,15 @@ function CheckOut() {
                         <div className={cx('form_content')}>
                             <p className={cx('label')}>Tỉnh/Thành Phố</p>
                             <select {...cityController.field} className={cx('select')}>
-                                <option value="" selected disabled hidden>
-                                    Chọn
+                                <option value={``} selected disabled hidden>
+                                    {!auto ? `Chọn` : cityController.field.value}
                                 </option>
-                                {listProvinces.map((province, index) => (
-                                    <option key={index} value={province.name}>
-                                        {province.name}
-                                    </option>
-                                ))}
+                                {!auto &&
+                                    listProvinces.map((province, index) => (
+                                        <option key={index} value={province.name}>
+                                            {province.name}
+                                        </option>
+                                    ))}
                             </select>
                         </div>
                         <p className={cx('form_error')}>{errors.city?.message}</p>
@@ -1180,7 +1118,7 @@ function CheckOut() {
                                     </option>
                                 ) : (
                                     <option value="" selected disabled hidden>
-                                        Chọn
+                                        {!auto ? `Chọn` : districsController.field.value}
                                     </option>
                                 )}
                                 {listDistrics.map((distric, index) => (
@@ -1203,7 +1141,7 @@ function CheckOut() {
                                     </option>
                                 ) : (
                                     <option value="" selected disabled hidden>
-                                        Chọn
+                                        {!auto ? `Chọn` : wardsController.field.value}
                                     </option>
                                 )}
                                 {listWards.map((ward, index) => (
