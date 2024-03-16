@@ -68,10 +68,10 @@ function UpdateProduct() {
     }, [data]);
     React.useEffect(() => {
         fetch(`${api}/categories?filter=simple&lock=true`)
-            .then(response => response.json())
-            .then(result => {
-                if (result.status == "OK") {
-                    const newList = result.data.map(category => {
+            .then((response) => response.json())
+            .then((result) => {
+                if (result.status == 'OK') {
+                    const newList = result.data.map((category) => {
                         return {
                             label: category.name,
                             value: category._id,
@@ -333,7 +333,7 @@ function UpdateProduct() {
                                         }}
                                     /> */}
                                 <Editor
-                                    apiKey="d5t4u2d5qyjye0wlx6xiu3sznmxxu7p9ltiwar6n22xi56ln"
+                                    apiKey="gbwat2ln7mhrr8jmkya2k16et8hy7c6bink00da56014cse4"
                                     init={{
                                         plugins:
                                             'spellchecker tinycomments mentions anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker a11ychecker typography inlinecss',
