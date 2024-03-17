@@ -198,19 +198,19 @@ function Categories() {
                         if (responseProduct.status === 200) {
                             updateData(response.data.data, responseProduct.data.data);
                             const image = response.data.data.status ? unLockImage : lockImage;
-                            await authInstance.post(`/webpush/send`, {
-                                filter: 'admin',
-                                notification: {
-                                    title: 'Thông báo',
-                                    description: `${
-                                        response.data.data.status
-                                            ? `Danh mục ${response.data.data.name} vừa được hoạt động trở lại`
-                                            : `Danh mục ${response.data.data.name} tạm thời bị khóa`
-                                    }`,
-                                    url: `${appPath}/admin/categories`,
-                                    image,
-                                },
-                            });
+                            // await authInstance.post(`/webpush/send`, {
+                            //     filter: 'admin',
+                            //     notification: {
+                            //         title: 'Thông báo',
+                            //         description: `${
+                            //             response.data.data.status
+                            //                 ? `Danh mục ${response.data.data.name} vừa được hoạt động trở lại`
+                            //                 : `Danh mục ${response.data.data.name} tạm thời bị khóa`
+                            //         }`,
+                            //         url: `${appPath}/admin/categories`,
+                            //         image,
+                            //     },
+                            // });
                             toast.success('Cập nhật thành công!');
                         }
                     }

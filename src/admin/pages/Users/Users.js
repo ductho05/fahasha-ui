@@ -407,6 +407,7 @@ function Users() {
                 }
                 setShowDialog(false);
                 setIsInsert(false);
+                setLoading(false);
             })
             .catch((err) => {
                 console.log(err)
@@ -481,20 +482,20 @@ function Users() {
                 if (result.data.status === 'OK') {
                     handleUpdateData(result.data.data);
                     const image = userLock.isLock ? lockImage : unLockImage;
-                    await authInstance
-                        .post(`/webpush/send`, {
-                            filter: 'personal',
-                            notification: {
-                                ...value,
-                                user: userLock.id,
-                                url: `${appPath}/account/0`,
-                                image,
-                            },
-                        })
-                        .then((result) => { })
-                        .catch((err) => {
-                            console.log(err);
-                        });
+                    // await authInstance
+                    //     .post(`/webpush/send`, {
+                    //         filter: 'personal',
+                    //         notification: {
+                    //             ...value,
+                    //             user: userLock.id,
+                    //             url: `${appPath}/account/0`,
+                    //             image,
+                    //         },
+                    //     })
+                    //     .then((result) => { })
+                    //     .catch((err) => {
+                    //         console.log(err);
+                    //     });
                     toast.success('Cập nhật thành công!');
                     setShowFormLockAccount(false);
                 }

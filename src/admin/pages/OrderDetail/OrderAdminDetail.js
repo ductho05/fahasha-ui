@@ -94,36 +94,36 @@ function OrderAdminDetail() {
                         const title = 'Thông báo đơn hàng';
                         const user = result.data.data.user;
 
-                        await authInstance
-                            .post(`/webpush/send`, {
-                                filter: 'personal',
-                                notification: {
-                                    title,
-                                    description,
-                                    image: orderImages,
-                                    url,
-                                    user,
-                                },
-                            })
-                            .then((result) => {
-                                if (result.data.status == 'OK') {
-                                    state.socket.emit('send-notification', {
-                                        type: 'personal',
-                                        userId: null,
-                                        notification: {
-                                            title,
-                                            description,
-                                            image: orderImages,
-                                            url,
-                                            user,
-                                        },
-                                    });
-                                    toast.success('Cập nhật thành công!');
-                                }
-                            })
-                            .catch((err) => {
-                                console.error(err);
-                            });
+                        // await authInstance
+                        //     .post(`/webpush/send`, {
+                        //         filter: 'personal',
+                        //         notification: {
+                        //             title,
+                        //             description,
+                        //             image: orderImages,
+                        //             url,
+                        //             user,
+                        //         },
+                        //     })
+                        //     .then((result) => {
+                        //         if (result.data.status == 'OK') {
+                        //             state.socket.emit('send-notification', {
+                        //                 type: 'personal',
+                        //                 userId: null,
+                        //                 notification: {
+                        //                     title,
+                        //                     description,
+                        //                     image: orderImages,
+                        //                     url,
+                        //                     user,
+                        //                 },
+                        //             });
+                        //             toast.success('Cập nhật thành công!');
+                        //         }
+                        //     })
+                        //     .catch((err) => {
+                        //         console.error(err);
+                        //     });
                     } else {
                         toast.error(result.data.message);
                     }
@@ -183,7 +183,7 @@ function OrderAdminDetail() {
                                         title="Xác nhận?"
                                         description="Đơn hàng sẽ được cập nhật trạng thái"
                                         onConfirm={handleUpdate}
-                                        onCancel={() => { }}
+                                        onCancel={() => {}}
                                         okText="Đồng ý"
                                         cancelText="Hủy"
                                     >

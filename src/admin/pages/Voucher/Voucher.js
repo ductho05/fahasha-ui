@@ -64,11 +64,11 @@ const sortOptions = [
         value: 'default',
     },
     {
-        label: 'Thời hạn gần nhất',
+        label: 'Thời hạn xa nhất',
         value: 'oldest',
     },
     {
-        label: 'Thời hạn xa nhất',
+        label: 'Thời hạn gần nhất',
         value: 'newest',
     },
     {
@@ -355,16 +355,16 @@ function Voucher() {
 
         if (response.status === 200) {
             setData({ ...data, vouchers: [...data?.vouchers, response.data.data] });
-            await authInstance.post(`/webpush/send`, {
-                filter: 'personal',
-                notification: {
-                    title: 'Thông báo voucher giảm giá',
-                    description: `Bạn được tặng voucher giảm giá ${value}% cho bất kì đơn hàng nào. Xem ngay!`,
-                    user: user,
-                    url: `${appPath}/account/5`,
-                    image: voucherImage,
-                },
-            });
+            // await authInstance.post(`/webpush/send`, {
+            //     filter: 'personal',
+            //     notification: {
+            //         title: 'Thông báo voucher giảm giá',
+            //         description: `Bạn được tặng voucher giảm giá ${value}% cho bất kì đơn hàng nào. Xem ngay!`,
+            //         user: user,
+            //         url: `${appPath}/account/5`,
+            //         image: voucherImage,
+            //     },
+            // });
             handleClose();
             info('success', 'Trao quà thành công');
         } else {

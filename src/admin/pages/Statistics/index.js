@@ -805,16 +805,16 @@ function Statistics() {
             });
 
             if (response.status === 200) {
-                await authInstance.post(`/webpush/send`, {
-                    filter: 'personal',
-                    notification: {
-                        title: 'Thông báo voucher giảm giá',
-                        description: `Bạn được tặng voucher giảm giá ${value}% cho bất kì đơn hàng nào. Xem ngay!`,
-                        user: user.id,
-                        url: `${appPath}/account/5`,
-                        image: voucherImage,
-                    },
-                });
+                // await authInstance.post(`/webpush/send`, {
+                //     filter: 'personal',
+                //     notification: {
+                //         title: 'Thông báo voucher giảm giá',
+                //         description: `Bạn được tặng voucher giảm giá ${value}% cho bất kì đơn hàng nào. Xem ngay!`,
+                //         user: user.id,
+                //         url: `${appPath}/account/5`,
+                //         image: voucherImage,
+                //     },
+                // });
 
                 state.socket.emit('send-notification', {
                     type: 'personal',

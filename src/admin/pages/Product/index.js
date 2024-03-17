@@ -277,19 +277,19 @@ function Product() {
                                 }
                                 const url = `${appPath}/admin/products/${result.data.data._id}`;
                                 const image = result.data.data.images;
-                                await authInstance
-                                    .post('/webpush/send', {
-                                        filter: 'admin',
-                                        notification: {
-                                            title,
-                                            description,
-                                            image: image,
-                                            url,
-                                        },
-                                    })
-                                    .catch((err) => {
-                                        console.error(err);
-                                    });
+                                // await authInstance
+                                //     .post('/webpush/send', {
+                                //         filter: 'admin',
+                                //         notification: {
+                                //             title,
+                                //             description,
+                                //             image: image,
+                                //             url,
+                                //         },
+                                //     })
+                                //     .catch((err) => {
+                                //         console.error(err);
+                                //     });
                                 toast.success('Cập nhật thành công!');
                                 setSuccess((prev) => prev + 1);
                             } else {
@@ -453,19 +453,19 @@ function Product() {
                             const description = 'TA Book Store vừa ra mắt sản phẩm mới. Xem ngay';
                             const url = `${appPath}/product-detail/${result.data.data._id}`;
                             const image = result.data.data.images;
-                            await authInstance
-                                .post('/webpush/send', {
-                                    filter: 'all',
-                                    notification: {
-                                        title,
-                                        description,
-                                        image: image,
-                                        url,
-                                    },
-                                })
-                                .catch((err) => {
-                                    console.error(err);
-                                });
+                            // await authInstance
+                            //     .post('/webpush/send', {
+                            //         filter: 'all',
+                            //         notification: {
+                            //             title,
+                            //             description,
+                            //             image: image,
+                            //             url,
+                            //         },
+                            //     })
+                            //     .catch((err) => {
+                            //         console.error(err);
+                            //     });
                             setShowDialog(false);
                             toast.success('Thêm mới sản phẩm thành công');
                         } else {
