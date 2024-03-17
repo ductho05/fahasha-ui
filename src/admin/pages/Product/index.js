@@ -1200,7 +1200,7 @@ function Product() {
                     </Tippy>
                 </div>
             </div>
-            <p> {data?.products?.length}</p>
+        
             {rows && (
                 <EnhancedTable
                     ischeckboxSelection={false}
