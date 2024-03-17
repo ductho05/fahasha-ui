@@ -784,8 +784,8 @@ function Product() {
             // console.log('kdhas', data1);
             handleClearFilter();
             //setRows(data1.sort((a, b) => a.title.localeCompare(b.title)));
+            console.log('g321hádfb', data?.products?.length, temporary_data.length);
         } else {
-            console.log('g321hádfb', data, temporary_data.length);
             if (data.products?.length == 0) {
                 // ngăn load lại 2 lần data không cần thiết
                 // fetch(`${api}/products?perPage=50`)
@@ -1200,6 +1200,7 @@ function Product() {
                     </Tippy>
                 </div>
             </div>
+            <p> {data?.products?.length}</p>
             {rows && (
                 <EnhancedTable
                     ischeckboxSelection={false}
