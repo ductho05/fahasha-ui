@@ -12,6 +12,8 @@ import axios from 'axios';
 import { DatePicker, Space, Image, Button, Typography, message, Alert, Spin, Popover, Switch } from 'antd';
 import { getAuthInstance } from '../../../utils/axiosConfig';
 import dayjs from 'dayjs';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 import { useNavigate } from 'react-router-dom';
 import Marquee from 'react-fast-marquee';
 import { set } from 'react-hook-form';
@@ -72,32 +74,6 @@ const dataWidgets = [
     },
 ];
 
-// const dataIncomes = [
-//     {
-//         date: '31/7/2023',
-//         value: 340,
-//     },
-//     {
-//         date: '1/8/2023',
-//         value: 500,
-//     },
-//     {
-//         date: '2/8/2023',
-//         value: 400,
-//     },
-//     {
-//         date: '3/8/2023',
-//         value: 900,
-//     },
-//     {
-//         date: '4/8/2023',
-//         value: 700,
-//     },
-//     {
-//         date: '5/8/2023',
-//         value: 990,
-//     },
-// ];
 function chuyenDoiThang(tenVietTat) {
     const thangDict = {
         Jan: '01',
@@ -133,6 +109,7 @@ const formatDateToString = (date) => {
     return ''; // Trả về chuỗi rỗng nếu date là null
 };
 function Statistics() {
+    const [showProgress, setShowProgress] = useState(false);
     const authInstance = getAuthInstance();
     const [optionSelected, setOptionSelected] = useState(options[0]);
     const { RangePicker } = DatePicker;
@@ -165,7 +142,6 @@ function Statistics() {
     const [isSendNow, setIsSendNow] = useState(false);
     const [state, dispatch] = useStore();
 
-    console.log('top_products212', top_usert);
     const columns = [
         {
             field: 'rowNumber',
@@ -432,17 +408,16 @@ function Statistics() {
             const today = new Date();
             // lấy tất cả những đơn hàng trong tháng này
             const orderitems = res.data.data;
-            console.log('rfugasbjfsa', orderitems);
 
             const ordersThisMonth = orderitems.filter((order) => {
                 if (order.order != null) {
                     return (
                         formatDateToString(new Date(order.order.date)) <=
                             formatDateToString(
-                                new Date(today.getFullYear(), month ? month + 1 : today.getMonth() + 1, 0),
+                                new Date(today.getFullYear(), month ? month : today.getMonth() + 1, 0),
                             ) &&
                         formatDateToString(new Date(order.order.date)) >=
-                            formatDateToString(new Date(today.getFullYear(), month ? month : today.getMonth(), 1))
+                            formatDateToString(new Date(today.getFullYear(), month ? month - 1 : today.getMonth(), 1))
                     );
                 }
             });
@@ -695,7 +670,9 @@ function Statistics() {
                         return total + order.price;
                     }, 0);
                     incomeData.push({
-                        date: 'T' + (date.getMonth() - i + 1),
+                        date:
+                            'Tháng ' +
+                            (date.getMonth() - i + 1 > 0 ? date.getMonth() - i + 1 : date.getMonth() - i + 1 + 12),
                         value: totalToday,
                     });
                 }
@@ -716,13 +693,13 @@ function Statistics() {
                     return total + order.price;
                 }, 0);
                 incomeData.push({
-                    date: 'T' + (date.getMonth() + 1),
+                    date: 'Tháng ' + (date.getMonth() + 1),
                     value: totalToday,
                 });
                 console.log('incomeData', incomeData);
                 setDataIncomes(incomeData);
             } else if (optionSelected?.title == '6 năm gần nhất') {
-                console.log('optionSelected1212', optionSelected);
+                console.log('optionSelected1212232', optionSelected);
                 const incomeData = [];
                 // toi muon lặp 6 lần
                 for (let i = num + 1; i >= 1; i--) {
@@ -792,6 +769,10 @@ function Statistics() {
             info('warning', `Voucher top ${index + 1} tháng này đã được trao!`);
         } else {
             const user = top_usert[index];
+            if (user == undefined) {
+                info('error', `Không có người dùng nào trong top ${index + 1} tháng này!`);
+                return;
+            }
             const voucherCode = `${startCode}${generateRandomString()}`;
             var nextMonthDay = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
 
@@ -836,7 +817,7 @@ function Statistics() {
 
     const handleSendVoucher = async (index, value) => {
         const today = new Date();
-
+        setShowProgress(true);
         if (isSendNow) {
             await sendVoucher(index, value, today);
         } else {
@@ -846,16 +827,15 @@ function Statistics() {
                 info('warning', `Chỉ được trao quà vào ngày ${formatDateToString(newDate)}`);
             } else await sendVoucher(index, value, today);
         }
+        setShowProgress(false);
     };
 
     return (
         <div className={cx('wrapper')}>
             {contextHolder}
-            {/* <div className={cx('widgits')}>
-                {dataWidgets.map((widget, index) => (
-                    <Widget key={index} widget={widget} />
-                ))}
-            </div> */}
+            <Backdrop sx={{ color: '#fff', zIndex: 10000 }} open={showProgress}>
+                <CircularProgress color="error" />
+            </Backdrop>
             <div className={cx('top')}>
                 <h3
                     style={{
