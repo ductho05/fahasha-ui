@@ -4,7 +4,7 @@ import classNames from 'classnames/bind';
 import styles from './UpdateProduct.module.scss';
 import { TextField } from '@mui/material';
 import Button from '../../../components/Button';
-import { api } from '../../../constants';
+import { api, apiKeyEditor } from '../../../constants';
 import { useForm } from 'react-hook-form';
 import dayjs from 'dayjs';
 import { toast, ToastContainer } from 'react-toastify';
@@ -333,7 +333,7 @@ function UpdateProduct() {
                                         }}
                                     /> */}
                                 <Editor
-                                    apiKey="gbwat2ln7mhrr8jmkya2k16et8hy7c6bink00da56014cse4"
+                                    apiKey={apiKeyEditor}
                                     init={{
                                         plugins:
                                             'spellchecker tinycomments mentions anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker a11ychecker typography inlinecss',

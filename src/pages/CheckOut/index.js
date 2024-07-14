@@ -6,7 +6,7 @@ import { faCircleXmark, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames/bind';
 import styles from './CheckOut.module.scss';
 import { useForm, useController } from 'react-hook-form';
-import { apiProvinces, api, orderImages, appPath } from '../../constants';
+import { apiProvinces, api, orderImages, appPath, API_ADDRESS } from '../../constants';
 import { Link, useNavigate, Redirect, useLocation, useParams } from 'react-router-dom';
 import numeral from 'numeral';
 import { apiMaps, API_KEY, locationShop } from '../../constants';
@@ -263,7 +263,7 @@ function CheckOut() {
             const listNewCheckout = localStorage.getItem('listCkeckOut')
                 ? JSON.parse(localStorage.getItem('listCkeckOut'))
                 : listCheckouts;
-            
+
             const orderResult = await authInstance.post(`/orders/insert`, {
                 ...data1,
                 flashsales: listFlash,
@@ -425,7 +425,7 @@ function CheckOut() {
     const addCheckout = async (data, type) => {
         console.log('data21423', data, listCheckouts);
         setShowProgress(true);
-      
+
         placeOrder(data, type);
     };
 
@@ -510,10 +510,11 @@ function CheckOut() {
     }, [auto, isReload]);
 
     useEffect(() => {
-        fetch(apiProvinces)
+        fetch(`${API_ADDRESS}/api/province`)
             .then((response) => response.json())
-            .then((result) => {
-                setListProvinces(result);
+            .then((response) => {
+                // setListProvinces(result);
+                console.log("result123", response)
             })
             .catch((error) => {
                 console.error('There was a problem with the fetch operation:', error);

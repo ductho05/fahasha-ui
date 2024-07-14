@@ -131,6 +131,11 @@ const statusOptions = [
         label: 'Chưa sử dụng',
         value: true,
     },
+
+    {
+        label: 'Hết hạn',
+        value: null,
+    },
 ];
 
 const genderOptions = [
@@ -162,9 +167,10 @@ function Voucher() {
     const [isAction, setIsAction] = useState(false);
     const [gender, setGender] = useState();
     const [isInsert, setIsInsert] = useState(false);
+    const [userFilter, setUserFilter] = useState(null);
     const { data, setData } = useData();
     //const [isSuperAdmin, setIsSuperAdmin] = useState(localStorage.getItem('spc') || false);
-    const [superAdminCode, setSuperAdminCode] = useState('superadmin1811');
+    const [superAdminCode, setSuperAdminCode] = useState('');
     const [showFormLockAccount, setShowFormLockAccount] = useState(false);
     const [userLock, setUserLock] = useState({});
     const [show, setShow] = useState(false);
@@ -245,6 +251,16 @@ function Voucher() {
         return soThang;
     }
 
+    const checkExpried = (expried) => {
+        const today = new Date();
+        const expriedDate = new Date(expried);
+        if (today > expriedDate) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
     const columns = [
         {
             field: 'rowNumber',
@@ -320,7 +336,9 @@ function Voucher() {
             field: 'status',
             headerName: 'Trạng thái',
             width: 200,
-            renderCell: (params) => <p>{!params.value ? 'Đã sử dụng' : 'Chưa sử dụng'}</p>,
+            renderCell: (params) => (
+                <p>{!params.value ? 'Đã sử dụng' : !checkExpried(params.row.expried) ? 'Hết hạn' : 'Chưa sử dụng'}</p>
+            ),
         },
     ];
 
@@ -427,8 +445,13 @@ function Voucher() {
         setStatus(option);
     };
 
+    const handleUserChange = (option) => {
+        setUserFilter(option);
+    };
+
     const handleClearFilter = () => {
         setStatus(null);
+        setUserFilter(null);
 
         const productsToSort = [...data?.vouchers];
         const sortedProducts = productsToSort.sort((a, b) => b?.createdAt - a?.createdAt);
@@ -459,7 +482,7 @@ function Voucher() {
         setRows(newList2);
     };
 
-    const filterProduct = (keywords, status) => {
+    const filterProduct = (keywords, status, userFilter) => {
         let newList = data?.vouchers || [];
         // console.log('dang filter', newList);
         newList = newList.filter((product) => {
@@ -471,12 +494,25 @@ function Voucher() {
         });
 
         if (status) {
+            // console.log('status212', status);
             const list2 = newList?.filter((product) => {
-                if (status.value) {
-                    return product.status;
-                } else return !product.status;
+                if (status.value === false) {
+                    return !product.status;
+                } else if (status.value === true) {
+                    return checkExpried(product.expried) && product.status;
+                } else {
+                    return !checkExpried(product.expried) && product.status;
+                }
             });
             newList = [...list2];
+        }
+
+        if (userFilter) {
+            console.log('userFilte21r', userFilter, newList[0].user._id);
+            newList = newList.filter((product) => {
+                // console.log('userFilte21r', userFilter, product);
+                return product?.user?._id === userFilter;
+            });
         }
 
         newList !== undefined && setRows(newList); // : setRows(data.products);
@@ -486,10 +522,10 @@ function Voucher() {
 
     useEffect(() => {
         // console.log('dfyhsấasv', keywords, selectCategory, price, rate, rolefilter, status);
-        filterProduct(keywords, status);
+        filterProduct(keywords, status, userFilter);
         setSelectSort(sortOptions[0]);
         // setSelectSort
-    }, [keywords, status]);
+    }, [keywords, status, userFilter]);
 
     useEffect(() => {
         if (selectSort) {
@@ -699,7 +735,7 @@ function Voucher() {
                             >
                                 <PopperWrapper>
                                     <div className="relative h-max px-[20px] pb-[20px] pt-[30px] rounded-[12px]">
-                                        {genderfilter || rolefilter || status ? (
+                                        {genderfilter || rolefilter || status || userFilter ? (
                                             <div>
                                                 {status && (
                                                     <div className="mb-[10px] w-max px-[10px] py-[4px] rounded-[12px] flex items-center justify-center text-orange-500 border border-orange-500">
@@ -708,6 +744,17 @@ function Voucher() {
                                                         </p>
                                                         <CloseOutlined
                                                             onClick={() => setStatus(null)}
+                                                            className="ml-[8px] cursor-pointer"
+                                                        />
+                                                    </div>
+                                                )}
+                                                {userFilter && (
+                                                    <div className="mb-[10px] w-max px-[10px] py-[4px] rounded-[12px] flex items-center justify-center text-orange-500 border border-orange-500">
+                                                        <p className="text-[1.3rem] flex flex-wrap">
+                                                            ID người dùng: {userFilter}
+                                                        </p>
+                                                        <CloseOutlined
+                                                            onClick={() => setUserFilter(null)}
                                                             className="ml-[8px] cursor-pointer"
                                                         />
                                                     </div>
@@ -750,6 +797,27 @@ function Voucher() {
                                                     </Checkbox>
                                                 </div>
                                             ))}
+                                        </div>
+
+                                        <div className="border-b pt-[20px]">
+                                            <h1 className="text-[1.3rem] text-[#333] uppercase font-[600]">
+                                                Chủ sở hữu
+                                            </h1>
+                                            <div className="p-[10px]">
+                                                <Select
+                                                    style={{ width: '100%' }}
+                                                    showSearch
+                                                    placeholder="Chủ sở hữu"
+                                                    optionFilterProp="children"
+                                                    filterOption={filterOption}
+                                                    options={optionUser}
+                                                    value={userFilter}
+                                                    onChange={(value) => {
+                                                        handleUserChange(value);
+                                                        console.log('option12', value);
+                                                    }}
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 </PopperWrapper>

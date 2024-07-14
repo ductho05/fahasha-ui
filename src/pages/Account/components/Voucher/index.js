@@ -54,7 +54,7 @@ function Voucher() {
             .catch((err) => setLoading(false));
     }, []);
 
-    console.log('favoriteList', favoriteList);
+    // console.log('favoriteList', favoriteList);
 
     const checkCart = (pops) => {
         const { cart, item } = pops;
@@ -95,50 +95,60 @@ function Voucher() {
         localStorage.setItem(namecart, JSON.stringify(myCart));
     };
 
-    const handleAddToCart = (id) => {
-        //if (Object.keys(state.user).length > 0) {
-        addCart(1, id);
-        toast.success('Đã thêm sản phẩm vào giỏ hàng');
-        //setIsShowDialog(!isShowDialog);
-        //} else {
-        // setShowNolginDialog(true);
-        // }
-    };
+    // const handleAddToCart = (id) => {
+    //     //if (Object.keys(state.user).length > 0) {
+    //     addCart(1, id);
+    //     toast.success('Đã thêm sản phẩm vào giỏ hàng');
+    //     //setIsShowDialog(!isShowDialog);
+    //     //} else {
+    //     // setShowNolginDialog(true);
+    //     // }
+    // };
 
-    // them/ xoa yeu thích
-    const deleteFavorite = (productId) => {
-        setLoading(true);
-        authInstance
-            .post(`/favorites/delete`, {
-                userid: state.user._id,
-                productid: productId,
-            })
-            .then((result) => {
-                console.log('result', result);
-                if (result.data.status == 'OK') {
-                    console.log('da xoa');
-                    setFavoriteList(favoriteList.filter((item) => item.productid._id != productId));
-                    toast.success('Đã xóa sản phẩm khỏi danh sách yêu thích');
-                    setLoading(false);
-                }
-            })
-            .catch((err) => {
-                console.log('11113', err);
-                // setIsClick(false);
-                // setIsFavorite(false);
-                //  setShowNolginDialog(true);
-            });
+    // // them/ xoa yeu thích
+    // const deleteFavorite = (productId) => {
+    //     setLoading(true);
+    //     authInstance
+    //         .post(`/favorites/delete`, {
+    //             userid: state.user._id,
+    //             productid: productId,
+    //         })
+    //         .then((result) => {
+    //             console.log('result', result);
+    //             if (result.data.status == 'OK') {
+    //                 console.log('da xoa');
+    //                 setFavoriteList(favoriteList.filter((item) => item.productid._id != productId));
+    //                 toast.success('Đã xóa sản phẩm khỏi danh sách yêu thích');
+    //                 setLoading(false);
+    //             }
+    //         })
+    //         .catch((err) => {
+    //             console.log('11113', err);
+    //             // setIsClick(false);
+    //             // setIsFavorite(false);
+    //             //  setShowNolginDialog(true);
+    //         });
+    // };
+
+    const checkExpried = (expried) => {
+        const today = new Date();
+        const expriedDate = new Date(expried);
+        if (today > expriedDate) {
+            return false;
+        } else {
+            return true;
+        }
     };
 
     const FameFavorite = ({ item }) => {
         const product = item;
-        console.log('product21', product);
+
         return (
             <div className={cx('product_item')}>
                 <div
                     className={cx('thumbnail')}
                     style={{
-                        backgroundColor: !product?.status ? '#646464' : '#17a42c',
+                        backgroundColor: !product?.status || !checkExpried(product.expried) ? '#646464' : '#17a42c',
                     }}
                     onClick={() => {
                         //navigate(`/product-detail/${product._id}`);
@@ -152,12 +162,19 @@ function Voucher() {
                 <div
                     className={cx('content_voucher')}
                     style={{
-                        backgroundColor: !product?.status ? '#d0d0d0' : '#e1ffe5',
+                        backgroundColor: !product?.status || !checkExpried(product.expried) ? '#d0d0d0' : '#e1ffe5',
                     }}
                 >
                     <div className={cx('product_body')}>
                         <p className={cx('product_name')}>Mã giảm giá: {product?.code}</p>
-                        <p className={cx('author')}>Trạng thái: {!product?.status ? 'Đã sử dụng' : 'Chưa sử dụng'}</p>
+                        <p className={cx('author')}>
+                            Trạng thái:{' '}
+                            {!product?.status
+                                ? 'Đã sử dụng'
+                                : !checkExpried(product.expried)
+                                ? 'Hết hạn'
+                                : 'Chưa sử dụng'}
+                        </p>
                         <p className={cx('author')}>
                             Ưu đãi giảm: {product?.discount ? product?.discount + '%' : '[Không có thông tin]'} cho đơn
                             hàng bất kỳ
@@ -167,7 +184,7 @@ function Voucher() {
                         </p>
                         <p className={cx('quantity')}>HSD đến hết ngày: {product?.expried}</p>
                     </div>
-                    {product?.status && (
+                    {product?.status && checkExpried(product.expried) && (
                         <div className={cx('get_voucher')}>
                             <div
                                 className={cx('btn_get_voucher')}
@@ -192,7 +209,7 @@ function Voucher() {
         );
     };
 
-    console.log('favoriteList1111', data);
+    // console.log('favoriteList1111', data);
 
     return (
         <div className="p-[10px] md:p-[20px] lg:p-[40px]">

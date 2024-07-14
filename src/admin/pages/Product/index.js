@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import classNames from 'classnames/bind';
 import styles from './Product.module.scss';
 import EnhancedTable from '../../components/Table/EnhancedTable';
-import { api, appPath } from '../../../constants';
+import { api, apiKeyEditor, appPath } from '../../../constants';
 import { Rating } from '@mui/material';
 import LinearProgress from '@mui/material/LinearProgress';
 import numeral from 'numeral';
@@ -426,14 +426,16 @@ function Product() {
                         published: 'Vui lòng chọn ngày xuất bản',
                     };
                 });
-            } else if (parseInt(data.old_price) < parseInt(data.price)) {
-                setErrors((prev) => {
-                    return {
-                        ...prev,
-                        old_price: 'Giá cũ phải lớn hơn hoặc bằng giá hiện tại',
-                    };
-                });
-            } else {
+            }
+            // else if (parseInt(data.old_price) < parseInt(data.price)) {
+            //     setErrors((prev) => {
+            //         return {
+            //             ...prev,
+            //             old_price: 'Giá cũ phải lớn hơn hoặc bằng giá hiện tại',
+            //         };
+            //     });
+            // }
+            else {
                 const formData = new FormData();
                 Object.keys(data).forEach((key) => {
                     formData.append(key, data[key]);
@@ -441,6 +443,7 @@ function Product() {
                 formData.append('images', avatar);
                 formData.append('published_date', published);
                 formData.append('desciption', desciption);
+                formData.append('old_price', parseInt(data.price));
 
                 setLoading(true);
                 await authInstance
@@ -854,20 +857,7 @@ function Product() {
                             <Input placeholder="Nhập tên tác giả" />
                         </Form.Item>
 
-                        <Form.Item
-                            label="Giá hiện tại"
-                            name="price"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Nội dung này không được để trống',
-                                },
-                            ]}
-                        >
-                            <Input type="number" placeholder="Nhập giá hiện tại" min="1000" />
-                        </Form.Item>
-
-                        <Form.Item
+                        {/* <Form.Item
                             label="Giá cũ"
                             name="old_price"
                             rules={[
@@ -879,7 +869,20 @@ function Product() {
                         >
                             <Input type="number" placeholder="Nhập giá cũ" min="1000" />
                         </Form.Item>
-                        {errors.old_price && <p className="text-red-500 mt-[10px]">{errors.old_price}</p>}
+                        {errors.old_price && <p className="text-red-500 mt-[10px]">{errors.old_price}</p>} */}
+
+                        <Form.Item
+                            label="Giá"
+                            name="price"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Nội dung này không được để trống',
+                                },
+                            ]}
+                        >
+                            <Input type="number" placeholder="Nhập giá hiện tại" min="1000" />
+                        </Form.Item>
 
                         <Form.Item
                             label="Danh mục sản phẩm"
@@ -929,7 +932,7 @@ function Product() {
                         </p>
                         <div className="flex justify-start w-full">
                             <Editor
-                                apiKey="d5t4u2d5qyjye0wlx6xiu3sznmxxu7p9ltiwar6n22xi56ln"
+                                apiKey={apiKeyEditor}
                                 init={{
                                     plugins:
                                         'spellchecker tinycomments mentions anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker a11ychecker typography inlinecss',
@@ -1200,7 +1203,7 @@ function Product() {
                     </Tippy>
                 </div>
             </div>
-        
+
             {rows && (
                 <EnhancedTable
                     ischeckboxSelection={false}

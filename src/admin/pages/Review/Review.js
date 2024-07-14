@@ -23,10 +23,13 @@ import {
     Rate,
     Button,
     message,
+    Popover,
     Tooltip,
     Select,
     Checkbox,
 } from 'antd';
+import { getAuthInstance } from '../../../utils/axiosConfig';
+import { DeleteOutlined } from '@mui/icons-material';
 const cx = classNames.bind(styles);
 
 const sortOptions = [
@@ -49,58 +52,6 @@ const sortOptions = [
     {
         label: 'Lượt thích cao nhất',
         value: 'likes-desc',
-    },
-];
-
-const priceOptions = [
-    {
-        label: '0đ - 150,000 đ',
-        valueMin: 0,
-        valueMax: 150000,
-    },
-    {
-        label: '150000 đ - 300,000 đ',
-        valueMin: 150000,
-        valueMax: 300000,
-    },
-    {
-        label: '300,000 đ - 500,000 đ',
-        valueMin: 300000,
-        valueMax: 500000,
-    },
-    {
-        label: '500,000 đ - 700,000 đ',
-        valueMin: 500000,
-        valueMax: 700000,
-    },
-    {
-        label: '700.000 đ - Trở lên',
-        valueMin: 700000,
-    },
-];
-
-// const rateOptions = [1, 2, 3, 4, 5];
-
-const roleOption = [
-    {
-        label: 'Quản lý',
-        value: true,
-    },
-    {
-        label: 'Khách hàng',
-        value: false,
-    },
-];
-
-const statusOptions = [
-    {
-        label: 'Hoạt động',
-        value: false,
-    },
-
-    {
-        label: 'Tạm khóa',
-        value: true,
     },
 ];
 
@@ -147,6 +98,11 @@ function Review() {
     const [showFilter, setShowFilter] = useState(false);
     const [keywords, setKeywords] = useState(null);
     //const [rate, setRate] = useState(null);
+    const authInstance = getAuthInstance();
+
+    const popoverContent = (params) => {
+        return <div>{params.value ? params.value : '[Không có thông tin]'}</div>;
+    };
 
     const columns = [
         {
@@ -206,11 +162,31 @@ function Review() {
         {
             field: 'comment',
             headerName: 'Comment',
-            width: 250,
+            width: 200,
             sortable: false,
-            renderCell: (params) => (
-                <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : 'Trống'}</p>
-            ),
+            renderCell: (params) => {
+                // console.log('params121', params);
+                return (
+                    <Tooltip
+                        overlayInnerStyle={{
+                            color: 'black',
+                            // thanh cuộn
+                            overflowY: 'auto',
+                            overflowX: 'hidden',
+                            whiteSpace: 'pre-line',
+                            padding: '10px',
+                            maxHeight: '20vh',
+                            maxWidth: '40vw',                            
+                        }}
+                        title={popoverContent(params)}
+                        color="white"
+                    >
+                        <p className={params.value ? cx('text-container') : cx('null')}>
+                            {params.value ? params.value : 'Trống'}
+                        </p>
+                    </Tooltip>
+                );
+            },
         },
         {
             field: 'rate',
@@ -245,6 +221,49 @@ function Review() {
             //         {params.value ? params.value?.fullName : 'Trống'}
             //     </p>
             // ),
+        },
+        {
+            field: 'action',
+            headerName: 'Hành động',
+            width: 100,
+            sortable: false,
+            renderCell: (params) => (
+                <div className={cx('action')} style={{ display: 'flex' }}>
+                    <Tooltip title="Xóa đánh giá" color="red">
+                        <Button
+                            onClick={() => {
+                                // console.log('params.row._id', params.row._id);
+                                authInstance
+                                    .post(`/evaluates/delete?_id=${params.row._id}`)
+                                    .then((result) => {
+                                        // console.log(result);
+                                        if (result.data.status === 'OK') {
+                                            // setData2((prev) => ({ ...prev, vouchers: result.data.data }));
+                                            // setIsLoaded((prev) => ({ ...prev, vouchers: true }));
+                                            setData({
+                                                ...data,
+                                                evaluates: data.evaluates.filter((item) => item._id !== params.row._id),
+                                            });
+                                            message.success('Xóa thành công');
+                                        }
+                                    })
+                                    .catch((err) => {
+                                        console.error(err);
+                                        message.success('Xóa thất bại');
+                                    });
+                            }}
+                            // icon={<DeleteOutlined style={{
+                            //     fontSize: '1.5rem',
+                            //     color: 'red'
+
+                            // }}/>}
+                            className={cx('btn', 'delete')}
+                        >
+                            Xóa
+                        </Button>
+                    </Tooltip>
+                </div>
+            ),
         },
     ];
 
@@ -281,7 +300,7 @@ function Review() {
         // setPrice(null);
         setRate(null);
         // setSelectCategory(null);
-        console.log('da vo day');
+        console.log('da vo day1213');
         setGenderFilter(null);
         //setRoleFilter(null);
         //setStatus(null);
@@ -384,8 +403,6 @@ function Review() {
         }
     }, [selectSort]);
 
-    console.log('dataaa', data?.evaluates);
-
     useEffect(() => {
         // console.log('newList2111', newList2);
         if (data?.evaluates?.length > 0) {
@@ -406,6 +423,11 @@ function Review() {
             top.sort((a, b) => b.value - a.value);
             top = top.slice(0, numProduct);
             setTop_products(top);
+        } else {
+            setRows([]);
+            setTop_products([]);
+            setRate(null);
+            setGenderFilter(null);
         }
     }, [data]);
 
