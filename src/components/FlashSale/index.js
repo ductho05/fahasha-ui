@@ -36,12 +36,32 @@ function FlashSale() {
     const numFlash = 15;
     const [isLoading, setIsLoading] = useState(false);
     const [isShow, setIsShow] = useState(false); // show khi chờ 10s không có data
+
+    const moment = require('moment-timezone');
+    // Đặt múi giờ cho Việt Nam
+    const vietnamTimeZone = 'Asia/Ho_Chi_Minh';
+    // Lấy thời gian hiện tại ở Việt Nam
+    const currentTimeInVietnam = moment().tz(vietnamTimeZone);
+    // Lấy số giờ hiện tại
+    const currentHourInVietnam = currentTimeInVietnam.get('hours');
+
     // hàm load lại cục flashsale
     const reloadFlashSale = () => {
         setIsLoading(!isLoading);
     };
 
-    console.log('gift1212s', gifts);
+    const formatDateToString = (date) => {
+        if (date) {
+            date = date.$d ? date.$d : date;
+            const year = date.getUTCFullYear();
+            const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+            const day = date.toString().slice(8, 10);
+            const utcTimeString = `${year}-${month}-${day}`;
+            return utcTimeString;
+            // return date.toISOString().slice(0, 10); // Lấy YYYY-MM-DD
+        }
+        return ''; // Trả về chuỗi rỗng nếu date là null
+    };
 
     useEffect(() => {
         lottie.loadAnimation({
@@ -55,9 +75,13 @@ function FlashSale() {
 
     useEffect(() => {
         axios
-            .get(`${api}/flashsales?sort=reverse&filter=expired&num=${numFlash}`)
+            //.get(`${api}/flashsales?sort=reverse&filter=expired&num=${numFlash}`)
+            .get(
+                `${api}/flashsales?sort=reverse&num=${numFlash}&date=${formatDateToString(
+                    new Date(),
+                )}&point=${Math.floor(currentHourInVietnam / 3)}`,
+            )
             .then((res) => {
-                console.log('res.dat1312a.data', res);
                 // sau 15s nếu data trống thì show thông báo
                 setInterval(() => {
                     res.data.data.length === 0 && setIsShow(true);

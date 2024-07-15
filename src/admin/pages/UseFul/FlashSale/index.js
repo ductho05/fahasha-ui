@@ -23,6 +23,7 @@ import {
     Switch,
     Select,
     Alert,
+    Tooltip,
 } from 'antd';
 import BarChartExample from '../../../components/charts/BarChar/BarChar';
 import CustomPopconfirm from '../../../components/CustomPopconfirm/CustomPopconfirm';
@@ -77,6 +78,14 @@ function FlashSale() {
         animationData: require('../../../../assets/json/customAddFlashSale.json'),
     });
 
+    const popoverContent = (params) => {
+        return (
+            <div>
+                <p>{params.value.title ? params.value.title : '[Không có thông tin]'}</p>
+            </div>
+        );
+    };
+
     useEffect(() => {
         fetch(`${api}/categories?filter=simple`)
             .then((response) => response.json())
@@ -127,11 +136,24 @@ function FlashSale() {
 
             renderCell: (params) => {
                 return (
-                    <Popover content={params.value.title ? params.value.title : '[Không có thông tin]'} trigger="hover">
+                    <Tooltip
+                        overlayInnerStyle={{
+                            color: 'black',
+                            // thanh cuộn
+                            overflowY: 'auto',
+                            overflowX: 'hidden',
+                            whiteSpace: 'pre-line',
+                            padding: '10px',
+                            maxHeight: '20vh',
+                            maxWidth: '40vw',
+                        }}
+                        title={popoverContent(params)}
+                        color="white"
+                    >
                         <p className={cx('text-container')}>
                             {params.value.title ? params.value.title : '[Không có thông tin]'}
                         </p>
-                    </Popover>
+                    </Tooltip>
                 );
             },
         },

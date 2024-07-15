@@ -15,6 +15,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import { Dialog } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import DropMenu from '../../../components/DropMenu';
+import axios from 'axios';
 import Tippy from '@tippyjs/react/headless';
 import 'tippy.js/dist/tippy.css';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
@@ -32,6 +33,8 @@ import {
     Tooltip,
     Select,
     Checkbox,
+    Col,
+    Row,
 } from 'antd';
 import { getAuthInstance } from '../../../utils/axiosConfig';
 import { useData } from '../../../stores/DataContext';
@@ -55,35 +58,6 @@ const sortOptions = [
         value: 'newest',
     },
 ];
-
-const priceOptions = [
-    {
-        label: '0đ - 150,000 đ',
-        valueMin: 0,
-        valueMax: 150000,
-    },
-    {
-        label: '150000 đ - 300,000 đ',
-        valueMin: 150000,
-        valueMax: 300000,
-    },
-    {
-        label: '300,000 đ - 500,000 đ',
-        valueMin: 300000,
-        valueMax: 500000,
-    },
-    {
-        label: '500,000 đ - 700,000 đ',
-        valueMin: 500000,
-        valueMax: 700000,
-    },
-    {
-        label: '700.000 đ - Trở lên',
-        valueMin: 700000,
-    },
-];
-
-// const rateOptions = [1, 2, 3, 4, 5];
 
 const roleOption = [
     {
@@ -135,11 +109,13 @@ function Users() {
     const [birth, setBirth] = useState();
     const [loading, setLoading] = useState(false);
     const [isAction, setIsAction] = useState(false);
+    const [open, setOpen] = useState(false);
+    const [auto, setAuto] = useState(false);
     const [gender, setGender] = useState();
     const [isInsert, setIsInsert] = useState(false);
     const { data, setData } = useData();
     //const [isSuperAdmin, setIsSuperAdmin] = useState(localStorage.getItem('spc') || false);
-    const [superAdminCode, setSuperAdminCode] = useState('superadmin1811');
+    const [superAdminCode, setSuperAdminCode] = useState('');
     const [showFormLockAccount, setShowFormLockAccount] = useState(false);
     const [userLock, setUserLock] = useState({});
     const [show, setShow] = useState(false);
@@ -163,7 +139,11 @@ function Users() {
     const [selectSort, setSelectSort] = useState(null);
     const [showFilter, setShowFilter] = useState(false);
     const [keywords, setKeywords] = useState(null);
-    console.log('newLis2t21', newList2);
+    const [showProgress, setShowProgress] = useState(false);
+    const [isReload, setIsReload] = useState(false);
+
+    const [city, setCity] = useState('');
+    const [address, setAddress] = useState('');
 
     const columns = [
         {
@@ -227,9 +207,10 @@ function Users() {
             field: 'birth',
             headerName: 'Ngày sinh',
             width: 80,
-            renderCell: (params) => (
-                <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : 'Trống'}</p>
-            )
+            renderCell: (params) => {
+                console.log('21369821ghu', params.value);
+                return <p className={params.value ? cx('') : cx('null')}>{params.value ? params.value : 'Trống'}</p>;
+            },
         },
         {
             field: 'email',
@@ -266,8 +247,9 @@ function Users() {
             width: 110,
             renderCell: (params) => (
                 <p
-                    className={`${params ? (params.value === true ? 'text-red-500' : 'text-green-500') : 'text-green-500'
-                        }`}
+                    className={`${
+                        params ? (params.value === true ? 'text-red-500' : 'text-green-500') : 'text-green-500'
+                    }`}
                 >
                     {params ? (params.value === true ? 'Tạm khóa' : 'Hoạt động') : 'Hoạt động'}
                 </p>
@@ -336,20 +318,72 @@ function Users() {
         },
     ];
 
-    // useEffect(() => {
-    //     setRows(data?.users);
-    // }, [data]);
+    async function getCurrentLocationDetails(latitude, longitude) {
+        try {
+            const response = await axios.get(
+                `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
+            );
 
-    const fetchUsers = () => {
-        authInstance
-            .get(`/users`)
-            .then((result) => {
-                setData({ ...data, users: result.data.data });
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
+            if (response.status === 200) {
+                const data = response.data;
+
+                console.log('data142', data);
+
+                // Trích xuất thông tin về tỉnh, huyện, xã từ dữ liệu trả về
+                const address = data.display_name.split(',');
+                console.log('Thông tin chi tiết về vị trí hiện tại:');
+                console.log('Xã/Phường:', address);
+                // setAddress(address[0]);
+                // // setWards(address[1]);
+                // // setDistrics(address[2]);
+                // setCity(address[3]);
+
+                form.setFieldValue('city', address[3]);
+                form.setFieldValue('address', address[0] + ', ' + address[1] + ', ' + address[2]);
+                // cityController.field.onChange(address[3]);
+                // districsController.field.onChange(address[2]);
+                // wardsController.field.onChange(address[1]);
+                // addressController.field.onChange(address[0]);
+
+                console.log('address1212', address);
+            } else {
+                console.error('Failed to fetch data from the API');
+            }
+            setShowProgress(false);
+        } catch (error) {
+            console.error('Error:', error.message);
+            setShowProgress(false);
+        }
+    }
+
+    const [form] = Form.useForm();
+
+    // useEffect(() => {
+    //     form.setFieldValue('city', city);
+    //     form.setFieldValue('address', address);
+    // }, [city, address]);
+
+    useEffect(() => {
+        if (auto) {
+            setShowProgress(true);
+            if ('geolocation' in navigator) {
+                // Lấy vị trí hiện tại của người dùng
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+
+                    // console.log('Vị trí hiện tại của bạn:');
+                    // console.log('Latitude:', latitude);
+                    // console.log('Longitude:', longitude);
+                    getCurrentLocationDetails(latitude, longitude);
+
+                    // set city cho fiels city
+                });
+            } else {
+                console.log('Trình duyệt không hỗ trợ Geolocation.');
+            }
+        }
+    }, [auto, isReload]);
 
     useEffect(() => {
         return () => {
@@ -375,7 +409,6 @@ function Users() {
     };
 
     const onFinish = async (data) => {
-
         const formData = new FormData();
         Object.keys(data).forEach((key) => {
             formData.append(key, data[key]);
@@ -407,9 +440,10 @@ function Users() {
                 }
                 setShowDialog(false);
                 setIsInsert(false);
+                setLoading(false);
             })
             .catch((err) => {
-                console.log(err)
+                console.log(err);
                 setShowDialog(false);
                 setLoading(false);
                 toast.error(`${err?.response?.data?.message}`);
@@ -421,7 +455,7 @@ function Users() {
     };
 
     const changeDate = (date, dateString) => {
-        console.log(dateString)
+        console.log(dateString);
         setBirth(dateString);
     };
 
@@ -481,20 +515,20 @@ function Users() {
                 if (result.data.status === 'OK') {
                     handleUpdateData(result.data.data);
                     const image = userLock.isLock ? lockImage : unLockImage;
-                    await authInstance
-                        .post(`/webpush/send`, {
-                            filter: 'personal',
-                            notification: {
-                                ...value,
-                                user: userLock.id,
-                                url: `${appPath}/account/0`,
-                                image,
-                            },
-                        })
-                        .then((result) => { })
-                        .catch((err) => {
-                            console.log(err);
-                        });
+                    // await authInstance
+                    //     .post(`/webpush/send`, {
+                    //         filter: 'personal',
+                    //         notification: {
+                    //             ...value,
+                    //             user: userLock.id,
+                    //             url: `${appPath}/account/0`,
+                    //             image,
+                    //         },
+                    //     })
+                    //     .then((result) => { })
+                    //     .catch((err) => {
+                    //         console.log(err);
+                    //     });
                     toast.success('Cập nhật thành công!');
                     setShowFormLockAccount(false);
                 }
@@ -579,7 +613,7 @@ function Users() {
 
     const filterProduct = (keywords, rolefilter, genderfilter, status) => {
         let newList = [...newList2];
-        // console.log('dang filter', newList);
+        console.log('dang filter', newList);
         newList = newList.filter((product) => {
             if (keywords) {
                 return product.fullName.toLowerCase().includes(keywords.toLowerCase());
@@ -645,7 +679,8 @@ function Users() {
                 if (product.birth) {
                     return {
                         ...product,
-                        birth: chuyenDoiNgay(product.birth),
+                        // birth: chuyenDoiNgay(product.birth),
+                        birth: product.birth,
                     };
                 } else {
                     return product;
@@ -660,6 +695,9 @@ function Users() {
 
     return (
         <div className={cx('wrapper')}>
+            <Backdrop sx={{ color: '#fff', zIndex: 10000 }} open={showProgress}>
+                <CircularProgress color="error" />
+            </Backdrop>
             <Modal
                 title="Vui lòng nhập mã SupperAdmin để quản lý người dùng!"
                 open={show}
@@ -685,7 +723,9 @@ function Users() {
                     <p className={cx('btn_close')} onClick={() => setShowDialog(false)}>
                         <CloseOutlinedIcon className={cx('btn_icon')} />
                     </p>
+
                     <Form
+                        form={form}
                         name="basic"
                         labelCol={{
                             span: 5,
@@ -760,8 +800,23 @@ function Users() {
                             <Input.Password placeholder="Nhập mật khẩu" />
                         </Form.Item>
 
+                        <Form.Item label="Vị trí hiện tại">
+                            <Button
+                                wrapperCol={{
+                                    span: 24,
+                                }}
+                                onClick={() => {
+                                    setAuto(true);
+                                    setIsReload(!isReload);
+                                }}
+                            >
+                                Vị trí hiện tại
+                            </Button>
+                        </Form.Item>
+
                         <Form.Item
                             label="Địa chỉ"
+                            // value={address}
                             name="address"
                             rules={[
                                 {
@@ -775,6 +830,7 @@ function Users() {
 
                         <Form.Item
                             label="Tỉnh/Thành phố"
+                            // value={city}
                             name="city"
                             rules={[
                                 {
@@ -910,12 +966,13 @@ function Users() {
                         </Form.Item>
 
                         <Form.Item
-                            initialValue={`${userLock.hasOwnProperty('isLock')
-                                ? userLock.isLock === false
-                                    ? 'Tài khoản của bạn đã được mở khóa. Quý khách có thể mua hàng trở lại!'
+                            initialValue={`${
+                                userLock.hasOwnProperty('isLock')
+                                    ? userLock.isLock === false
+                                        ? 'Tài khoản của bạn đã được mở khóa. Quý khách có thể mua hàng trở lại!'
+                                        : 'Hệ thống xác nhận gần đây bạn hủy quá nhiều đơn hàng. Tài khoản của bạn sẽ bị tạm khóa cho đến khi được mở lại'
                                     : 'Hệ thống xác nhận gần đây bạn hủy quá nhiều đơn hàng. Tài khoản của bạn sẽ bị tạm khóa cho đến khi được mở lại'
-                                : 'Hệ thống xác nhận gần đây bạn hủy quá nhiều đơn hàng. Tài khoản của bạn sẽ bị tạm khóa cho đến khi được mở lại'
-                                }`}
+                            }`}
                             label="Mô tả"
                             name="description"
                             rules={[
@@ -960,9 +1017,9 @@ function Users() {
                         value={
                             selectSort
                                 ? {
-                                    label: selectSort.label,
-                                    value: selectSort.value,
-                                }
+                                      label: selectSort.label,
+                                      value: selectSort.value,
+                                  }
                                 : null
                         }
                     />
@@ -974,7 +1031,7 @@ function Users() {
                         className="w-[400px]"
                         placeholder="Tìm kiếm người dùng ..."
                         onChange={(e) => handleSearch(e.target.value)}
-                    // value={keywords}
+                        // value={keywords}
                     />
                 </div>
                 <div className="px-[20px] flex items-center">

@@ -42,6 +42,11 @@ import {
 import { LockOutlined, SendOutlined, FilterOutlined, UnlockOutlined, CloseOutlined } from '@ant-design/icons';
 import { Wrapper as PopperWrapper } from '../../../components/Popper';
 // import { LockOutlined, UnlockOutlined } from '@ant-design/icons';
+import styles from './Categories.module.scss';
+
+import classNames from 'classnames/bind';
+// import { useNavigate } from 'react-router-dom';
+
 
 function Categories() {
     const navigate = useNavigate();
@@ -52,6 +57,7 @@ function Categories() {
     const [success, setSuccess] = React.useState(0);
     // const navigate = useNavigate()
     const authInstance = getAuthInstance();
+    const cx = classNames.bind(styles);
 
     const [options, setOptions] = useState([]);
     const [price, setPrice] = useState(null);
@@ -198,19 +204,19 @@ function Categories() {
                         if (responseProduct.status === 200) {
                             updateData(response.data.data, responseProduct.data.data);
                             const image = response.data.data.status ? unLockImage : lockImage;
-                            await authInstance.post(`/webpush/send`, {
-                                filter: 'admin',
-                                notification: {
-                                    title: 'Thông báo',
-                                    description: `${
-                                        response.data.data.status
-                                            ? `Danh mục ${response.data.data.name} vừa được hoạt động trở lại`
-                                            : `Danh mục ${response.data.data.name} tạm thời bị khóa`
-                                    }`,
-                                    url: `${appPath}/admin/categories`,
-                                    image,
-                                },
-                            });
+                            // await authInstance.post(`/webpush/send`, {
+                            //     filter: 'admin',
+                            //     notification: {
+                            //         title: 'Thông báo',
+                            //         description: `${
+                            //             response.data.data.status
+                            //                 ? `Danh mục ${response.data.data.name} vừa được hoạt động trở lại`
+                            //                 : `Danh mục ${response.data.data.name} tạm thời bị khóa`
+                            //         }`,
+                            //         url: `${appPath}/admin/categories`,
+                            //         image,
+                            //     },
+                            // });
                             toast.success('Cập nhật thành công!');
                         }
                     }
@@ -540,61 +546,51 @@ function Categories() {
                     </Tippy>
                 </div>
             </div>
-
-            <div
-                className="mt-[10px]"
-                style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    flexDirection: 'row',
-                    // margin: '0 20px',
-                }}
-            >
-                <div
+            <div className={cx('content')} style={{
+                // backgroundColor: "pink"
+            }}>
+                {/* <div
+                    className="mt-[10px]"
                     style={{
-                        flex: 3,
-                    }}
-                >
-                    {rows && (
-                        <EnhancedTable
-                            ischeckboxSelection={false}
-                            pageSize={12}
-                            columns={columns}
-                            type="category"
-                            height="70vh"
-                            rows={rows?.map((row, index) => ({
-                                ...row,
-                                rowNumber: index + 1,
-                            }))}
-                        />
-                    )}
-                </div>
-                <div
-                    style={{
-                        flex: 2,
+                        backgroundColor: "green",
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        flexDirection: 'column',
-                        border: '1px solid #e0e0e0',
-                        borderRadius: '3px',
-                        height: '70vh',
-                        marginLeft: '10px',
+                        flexDirection: 'row',
+                        // margin: '0 20px',
                     }}
-                >
+                > */}
                     <div
                         style={{
+                            flex: 3,
+                        }}
+                    >
+                        {rows && (
+                            <EnhancedTable
+                                ischeckboxSelection={false}
+                                pageSize={12}
+                                columns={columns}
+                                type="category"
+                                height="70vh"
+                                rows={rows?.map((row, index) => ({
+                                    ...row,
+                                    rowNumber: index + 1,
+                                }))}
+                            />
+                        )}
+                    </div>
+                    <div
+                        style={{
+                            flex: 3,
+                            // backgroundColor: 'red',
                             display: 'flex',
                             justifyContent: 'center',
                             alignItems: 'center',
                             flexDirection: 'column',
-                            borderBottom: '1px solid #e0e0e0',
+                            border: '1px solid #e0e0e0',
                             borderRadius: '3px',
-                            width: '100%',
-                            flex: 2,
-                            padding: '20px',
-                            // marginBottom: '10px',
+                            height: '70vh',
+                            marginLeft: '10px',
                         }}
                     >
                         <div
@@ -603,123 +599,138 @@ function Categories() {
                                 justifyContent: 'center',
                                 alignItems: 'center',
                                 flexDirection: 'column',
-                                margin: '0 0 20px 0',
+                                borderBottom: '1px solid #e0e0e0',
+                                borderRadius: '3px',
+                                width: '100%',
+                                flex: 2,
+                                padding: '20px',
+                                // marginBottom: '10px',
                             }}
                         >
-                            <p
+                            <div
                                 style={{
-                                    fontSize: '1.8rem',
-                                    fontWeight: '600',
-                                    marginBottom: '10px',
-                                    color: '#1E90FF',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    flexDirection: 'column',
+                                    margin: '0 0 20px 0',
                                 }}
                             >
-                                Tổng số danh mục sản phẩm
-                            </p>
-                            <p
+                                <p
+                                    style={{
+                                        fontSize: '1.8rem',
+                                        fontWeight: '600',
+                                        marginBottom: '10px',
+                                        color: '#1E90FF',
+                                    }}
+                                >
+                                    Tổng số danh mục sản phẩm
+                                </p>
+                                <p
+                                    style={{
+                                        fontSize: '2.5rem',
+                                        fontWeight: '600',
+                                        color: '#696969',
+                                    }}
+                                >
+                                    {data?.categories?.length}
+                                </p>
+                            </div>
+                            <div
                                 style={{
-                                    fontSize: '2.5rem',
-                                    fontWeight: '600',
-                                    color: '#696969',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    flexDirection: 'row',
                                 }}
                             >
-                                {data?.categories?.length}
-                            </p>
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        flexDirection: 'column',
+
+                                        margin: '0 30px 0 0',
+                                    }}
+                                >
+                                    <p
+                                        style={{
+                                            fontSize: '1.6rem',
+                                            fontWeight: '600',
+                                            color: '#00CC00',
+                                            marginBottom: '10px',
+                                        }}
+                                    >
+                                        Hoạt động
+                                    </p>
+                                    <p
+                                        style={{
+                                            fontSize: '2.3rem',
+                                            fontWeight: '600',
+                                            color: '#696969',
+                                        }}
+                                    >
+                                        {pieData && pieData[0].value}
+                                    </p>
+                                </div>
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        flexDirection: 'column',
+                                        margin: '0 0 0 30px',
+                                    }}
+                                >
+                                    <p
+                                        style={{
+                                            fontSize: '1.6rem',
+                                            fontWeight: '600',
+                                            color: '#FF0033',
+                                            marginBottom: '10px',
+                                        }}
+                                    >
+                                        Ngưng bán
+                                    </p>
+                                    <p
+                                        style={{
+                                            fontSize: '2.3rem',
+                                            fontWeight: '600',
+                                            color: '#696969',
+                                        }}
+                                    >
+                                        {pieData && pieData[1].value}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                         <div
                             style={{
+                                flex: 5,
+                                width: '100%',
                                 display: 'flex',
                                 justifyContent: 'center',
                                 alignItems: 'center',
-                                flexDirection: 'row',
+                                flexDirection: 'column',
+                                // padding: '20px',
+                                // marginBottom: '10px',
                             }}
                         >
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    flexDirection: 'column',
-
-                                    margin: '0 30px 0 0',
-                                }}
-                            >
-                                <p
-                                    style={{
-                                        fontSize: '1.6rem',
-                                        fontWeight: '600',
-                                        color: '#00CC00',
-                                        marginBottom: '10px',
-                                    }}
-                                >
-                                    Hoạt động
-                                </p>
-                                <p
-                                    style={{
-                                        fontSize: '2.3rem',
-                                        fontWeight: '600',
-                                        color: '#696969',
-                                    }}
-                                >
-                                    {pieData && pieData[0].value}
-                                </p>
-                            </div>
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    flexDirection: 'column',
-                                    margin: '0 0 0 30px',
-                                }}
-                            >
-                                <p
-                                    style={{
-                                        fontSize: '1.6rem',
-                                        fontWeight: '600',
-                                        color: '#FF0033',
-                                        marginBottom: '10px',
-                                    }}
-                                >
-                                    Ngưng bán
-                                </p>
-                                <p
-                                    style={{
-                                        fontSize: '2.3rem',
-                                        fontWeight: '600',
-                                        color: '#696969',
-                                    }}
-                                >
-                                    {pieData && pieData[1].value}
-                                </p>
-                            </div>
+                            <PieChart
+                                data={
+                                    pieData || [
+                                        { name: 'Hoạt động', value: 0 },
+                                        { name: 'Ngưng bán', value: 0 },
+                                    ]
+                                }
+                            />
+                        </div>
+                        <div style={{ flex: 0.5 }}>
+                            <strong>Biểu đồ trạng thái danh mục sản phẩm</strong>
                         </div>
                     </div>
-                    <div
-                        style={{
-                            flex: 5,
-                            width: '100%',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            flexDirection: 'column',
-                            // padding: '20px',
-                            // marginBottom: '10px',
-                        }}
-                    >
-                        <PieChart
-                            data={
-                                pieData || [
-                                    { name: 'Hoạt động', value: 0 },
-                                    { name: 'Ngưng bán', value: 0 },
-                                ]
-                            }
-                        />
-                    </div>
-                    <div style={{ flex: 0.5 }}>
-                        <strong>Biểu đồ trạng thái danh mục sản phẩm</strong>
-                    </div>
-                </div>
+                {/* </div> */}
             </div>
         </div>
     );

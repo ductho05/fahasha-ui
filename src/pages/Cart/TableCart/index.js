@@ -61,6 +61,7 @@ function TableCart() {
     useEffect(() => {
         if (data?.item && code == '' && data.item.status == true && dataCart.length > 0) {
             setDiscount(data.item.discount / 100);
+            setCode(data.item.code);
             info(`Hệ thống tự động áp dụng mã giảm giá [${data.item.code}] giảm ${data.item.discount}% cho bạn`);
         }
         // else if (data?.item && code == '' && data.item.status == true && dataCart.length == 0) {
@@ -92,6 +93,16 @@ function TableCart() {
         });
     }, []);
 
+    const checkExpried = (expried) => {
+        const today = new Date();
+        const expriedDate = new Date(expried);
+        if (today > expriedDate) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
     // lấy mã giảm giá từ api
     useEffect(() => {
         setLoading(true);
@@ -99,8 +110,9 @@ function TableCart() {
             .get(`/vouchers?user=${state.user._id}&status=true`)
             .then((result) => {
                 if (result.data.status == 'OK') {
-                    setCoupon(result.data.data);
-                    console.log('resulta', result.data.data, state.user._id);
+                    const data = result?.data?.data.filter((item) => checkExpried(item.expried));
+                    setCoupon(data);
+                    // console.log('resulta', result.data.data, state.user._id);
                 }
                 setLoading(false);
             })

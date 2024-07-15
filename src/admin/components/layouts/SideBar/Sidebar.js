@@ -133,9 +133,9 @@ function SideBar({ url }) {
             ? 2
             : url.includes(`/admin/orders`)
             ? 3
-            : url.includes(`/admin/reviews`)
-            ? 4
             : url.includes(`/admin/categories`)
+            ? 4
+            : url.includes(`/admin/reviews`)
             ? 5
             : url.includes('/admin/wishlists')
             ? 6
@@ -162,9 +162,9 @@ function SideBar({ url }) {
                 ? 2
                 : url.includes(`/admin/orders`)
                 ? 3
-                : url.includes(`/admin/reviews`)
-                ? 4
                 : url.includes(`/admin/categories`)
+                ? 4
+                : url.includes(`/admin/reviews`)
                 ? 5
                 : url.includes('/admin/wishlists')
                 ? 6

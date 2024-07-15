@@ -192,7 +192,6 @@ function RegisterLogin(props) {
                         ServiceWorkerNotifi()
                         if (result.data.isManager) {
                             setTimeout(() => {
-
                                 navigate('/admin')
                             }, 1000)
                         } else {

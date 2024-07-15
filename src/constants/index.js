@@ -1,4 +1,6 @@
-export const isDeploy = true;
+export const isDeploy = process.env.NODE_ENV === 'production';
+console.log('isDeploy', isDeploy);
+export const apiKeyEditor = '6dlo2vwbazk8r83upbs5h8js3bv8uqvexpc8ls76z11zl1at';
 export const api = isDeploy
     ? 'https://bookstore-api-3hwm.onrender.com/bookstore/api/v1'
     : 'http://127.0.0.1:3000/bookstore/api/v1';

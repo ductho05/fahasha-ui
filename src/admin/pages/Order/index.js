@@ -272,7 +272,7 @@ function Order() {
         // setSelectSort
     }, [keywords]);
 
-    console.log('rows12344', rows);
+    // console.log('rows12344', rows);
     useEffect(() => {
         if (selectSort && rows?.length > 0) {
             sortProduct(selectSort);
