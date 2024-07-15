@@ -1101,7 +1101,7 @@ function CheckOut() {
                             <select {...countryController.field} className={cx('select')}>
                                 <option value="Việt Nam">Việt Nam</option>
                             </select>
-                            <p
+                            {/* <p
                                 onClick={() => {
                                     setAuto(true);
                                     setIsReload(!isReload);
@@ -1115,7 +1115,7 @@ function CheckOut() {
                                 className={cx('get_location')}
                             >
                                 Vị trí hiện tại
-                            </p>
+                            </p> */}
                         </div>
                         <p className={cx('form_error')}>{errors.country?.message}</p>
                     </div>
