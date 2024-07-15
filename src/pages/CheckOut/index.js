@@ -6,7 +6,7 @@ import { faCircleXmark, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames/bind';
 import styles from './CheckOut.module.scss';
 import { useForm, useController } from 'react-hook-form';
-import { apiProvinces, api, orderImages, appPath } from '../../constants';
+import { apiProvinces, api, orderImages, appPath, API_ADDRESS } from '../../constants';
 import { Link, useNavigate, Redirect, useLocation, useParams } from 'react-router-dom';
 import numeral from 'numeral';
 import { apiMaps, API_KEY, locationShop } from '../../constants';
@@ -590,12 +590,35 @@ function CheckOut() {
     }, []);
     // Get list product to checkout
 
+    const fetchProvince = async () => {
+
+        const response = await axios.get("https://vapi.vnappmob.com/api/province/")
+
+        if (response.status === 200) {
+            setListProvinces(response.data.results)
+        }
+    }
+
+    const fetchDistrict = async (province_id) => {
+
+        const response = await axios.get(`https://vapi.vnappmob.com/api/province/district/${province_id}`)
+
+        if (response.status === 200) {
+            setListDistrics(response.data.results)
+        }
+    }
+
+    const fetchWards = async (ward_id) => {
+
+        const response = await axios.get(`https://vapi.vnappmob.com/api/province/ward/${ward_id}`)
+
+        if (response.status === 200) {
+            setListWards(response.data.results)
+        }
+    }
+
     useEffect(() => {
-        fetch(apiProvinces)
-            .then((response) => response.json())
-            .then((result) => {
-                setListProvinces(result);
-            });
+        fetchProvince()
     }, []);
 
     useEffect(() => {
@@ -779,20 +802,30 @@ function CheckOut() {
     };
 
     useEffect(() => {
-        let province = listProvinces.find((province) => province.name == watch('city'));
-        if (province) {
-            setListDistrics(province.districts);
-        } else {
-            setListDistrics([]);
+        let province_id = 0
+        listProvinces.forEach(p => {
+            if (p.province_name == watch('city')) {
+                province_id = p.province_id
+                return
+            }
+        })
+
+        if (province_id !== 0) {
+            fetchDistrict(province_id)
         }
     }, [watch('city')]);
 
     useEffect(() => {
-        let distric = listDistrics.find((distric) => distric.name == watch('districs'));
-        if (distric) {
-            setListWards(distric.wards);
-        } else {
-            setListWards([]);
+        let district_id = 0
+        listDistrics.forEach(d => {
+            if (d.district_name == watch('districs')) {
+                district_id = d.district_id
+                return
+            }
+        })
+
+        if (district_id !== 0) {
+            fetchWards(district_id)
         }
     }, [watch('districs')]);
 
@@ -856,8 +889,8 @@ function CheckOut() {
         setValue(
             'price',
             listCheckouts.reduce((total, curr) => total + curr.quantity * curr.product.price, 0) *
-                (data?.item ? (100 - data?.item.discount) / 100 : 1) +
-                shippingCost,
+            (data?.item ? (100 - data?.item.discount) / 100 : 1) +
+            shippingCost,
         );
         setValue('shippingCost', shippingCost);
     }, [isSubmit]);
@@ -1160,9 +1193,9 @@ function CheckOut() {
                                 <option value="" selected disabled hidden>
                                     Chọn
                                 </option>
-                                {listProvinces.map((province, index) => (
-                                    <option key={index} value={province.name}>
-                                        {province.name}
+                                {listProvinces.map((province) => (
+                                    <option key={province.province_id} value={province.province_name}>
+                                        {province.province_name}
                                     </option>
                                 ))}
                             </select>
@@ -1183,9 +1216,9 @@ function CheckOut() {
                                         Chọn
                                     </option>
                                 )}
-                                {listDistrics.map((distric, index) => (
-                                    <option key={index} value={distric.name}>
-                                        {distric.name}
+                                {listDistrics.map((distric) => (
+                                    <option key={distric.district_id} value={distric.district_name}>
+                                        {distric.district_name}
                                     </option>
                                 ))}
                             </select>
@@ -1206,9 +1239,9 @@ function CheckOut() {
                                         Chọn
                                     </option>
                                 )}
-                                {listWards.map((ward, index) => (
-                                    <option key={index} value={ward.name}>
-                                        {ward.name}
+                                {listWards.map((ward) => (
+                                    <option key={ward.district_id} value={ward.ward_name}>
+                                        {ward.ward_name}
                                     </option>
                                 ))}
                             </select>
@@ -1322,12 +1355,12 @@ function CheckOut() {
                             <p className={cx('top_price', 'price_top_total')}>
                                 {watch('shipping_method')
                                     ? numeral(
-                                          Math.floor(price * (data?.item ? (100 - data?.item.discount) / 100 : 1)) +
-                                              shippingCost,
-                                      ).format('0,0[.]00 VNĐ')
+                                        Math.floor(price * (data?.item ? (100 - data?.item.discount) / 100 : 1)) +
+                                        shippingCost,
+                                    ).format('0,0[.]00 VNĐ')
                                     : numeral(
-                                          Math.floor(price * (data?.item ? (100 - data?.item.discount) / 100 : 1)),
-                                      ).format('0,0[.]00 VNĐ')}{' '}
+                                        Math.floor(price * (data?.item ? (100 - data?.item.discount) / 100 : 1)),
+                                    ).format('0,0[.]00 VNĐ')}{' '}
                                 đ
                             </p>
                         </div>

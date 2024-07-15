@@ -59,7 +59,14 @@ function SendNotice({ setOpenDialog }) {
     const onFinish = (values) => {
         if (image) {
             values.image = image
+            values.largeImage = image
         }
+
+        if (!values.user) {
+            values.user = 'all'
+        }
+
+        values.linking = values.url
 
         setLoadingSend(true)
         authInstance.post(`/webpush/send`, {

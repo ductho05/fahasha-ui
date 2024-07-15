@@ -4,6 +4,7 @@ export const api = isDeploy
     : 'http://127.0.0.1:3000/bookstore/api/v1';
 // export const api = 'http://127.0.0.1:3000/bookstore/api/v1';
 export const apiProvinces = 'https://provinces.open-api.vn/api/?depth=3';
+export const API_ADDRESS = 'http://vapi.vnappmob.com'
 export const apiMaps = 'https://api.mapbox.com/';
 // export const appPath = 'http://localhost:8080'
 
