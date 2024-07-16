@@ -57,29 +57,35 @@ function SendNotice({ setOpenDialog }) {
 
     const onFinish = (values) => {
         if (image) {
-            values.image = image;
+            values.image = image
+            values.largeImage = image
         }
 
-        setLoadingSend(true);
-        // authInstance
-        //     .post(`/webpush/send`, {
-        //         filter,
-        //         notification: values,
-        //     })
-        //     .then((result) => {
-        //         if (result.data.status == 'OK') {
-        //             message.success('Gửi thông báo thành công!');
-        //         } else {
-        //             message.error('Gửi thông thất bại!');
-        //         }
-        //         setOpenDialog(false);
-        //         setLoadingSend(false);
-        //     })
-        //     .catch(() => {
-        //         message.error('Gửi thông thất bại!');
-        //         setOpenDialog(false);
-        //         setLoadingSend(false);
-        //     });
+        if (!values.user) {
+            values.user = 'all'
+        }
+
+        values.linking = values.url
+
+        setLoadingSend(true)
+        authInstance.post(`/webpush/send`, {
+            filter,
+            notification: values
+        })
+            .then(result => {
+                if (result.data.status == "OK") {
+                    message.success("Gửi thông báo thành công!")
+                } else {
+                    message.error("Gửi thông thất bại!")
+                }
+                setOpenDialog(false)
+                setLoadingSend(false)
+            })
+            .catch(() => {
+                message.error("Gửi thông thất bại!")
+                setOpenDialog(false)
+                setLoadingSend(false)
+            })
     };
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);

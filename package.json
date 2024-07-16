@@ -104,5 +104,6 @@
     "browser": {
         "crypto": false,
         "stream": false
-    }
+    },
+    "proxy": "https://vapi.vnappmob.com"
 }

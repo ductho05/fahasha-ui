@@ -489,6 +489,33 @@ function CheckOut() {
     }
     // Get list product to checkout
 
+    const fetchProvince = async () => {
+
+        const response = await axios.get("https://vapi.vnappmob.com/api/province/")
+
+        if (response.status === 200) {
+            setListProvinces(response.data.results)
+        }
+    }
+
+    const fetchDistrict = async (province_id) => {
+
+        const response = await axios.get(`https://vapi.vnappmob.com/api/province/district/${province_id}`)
+
+        if (response.status === 200) {
+            setListDistrics(response.data.results)
+        }
+    }
+
+    const fetchWards = async (ward_id) => {
+
+        const response = await axios.get(`https://vapi.vnappmob.com/api/province/ward/${ward_id}`)
+
+        if (response.status === 200) {
+            setListWards(response.data.results)
+        }
+    }
+
     useEffect(() => {
         if (auto) {
             setShowProgress(true);
@@ -510,15 +537,7 @@ function CheckOut() {
     }, [auto, isReload]);
 
     useEffect(() => {
-        fetch(`${API_ADDRESS}/api/province`)
-            .then((response) => response.json())
-            .then((response) => {
-                // setListProvinces(result);
-                console.log("result123", response)
-            })
-            .catch((error) => {
-                console.error('There was a problem with the fetch operation:', error);
-            });
+        fetchProvince()
     }, []);
 
     useEffect(() => {
@@ -702,20 +721,30 @@ function CheckOut() {
     };
 
     useEffect(() => {
-        let province = listProvinces.find((province) => province.name == watch('city'));
-        if (province) {
-            setListDistrics(province.districts);
-        } else {
-            setListDistrics([]);
+        let province_id = 0
+        listProvinces.forEach(p => {
+            if (p.province_name == watch('city')) {
+                province_id = p.province_id
+                return
+            }
+        })
+
+        if (province_id !== 0) {
+            fetchDistrict(province_id)
         }
     }, [watch('city')]);
 
     useEffect(() => {
-        let distric = listDistrics.find((distric) => distric.name == watch('districs'));
-        if (distric) {
-            setListWards(distric.wards);
-        } else {
-            setListWards([]);
+        let district_id = 0
+        listDistrics.forEach(d => {
+            if (d.district_name == watch('districs')) {
+                district_id = d.district_id
+                return
+            }
+        })
+
+        if (district_id !== 0) {
+            fetchWards(district_id)
         }
     }, [watch('districs')]);
 
@@ -779,8 +808,8 @@ function CheckOut() {
         setValue(
             'price',
             listCheckouts.reduce((total, curr) => total + curr.quantity * curr.product.price, 0) *
-                (data?.item ? (100 - data?.item.discount) / 100 : 1) +
-                shippingCost,
+            (data?.item ? (100 - data?.item.discount) / 100 : 1) +
+            shippingCost,
         );
         setValue('shippingCost', shippingCost);
     }, [isSubmit]);
@@ -1072,7 +1101,7 @@ function CheckOut() {
                             <select {...countryController.field} className={cx('select')}>
                                 <option value="Việt Nam">Việt Nam</option>
                             </select>
-                            <p
+                            {/* <p
                                 onClick={() => {
                                     setAuto(true);
                                     setIsReload(!isReload);
@@ -1086,7 +1115,7 @@ function CheckOut() {
                                 className={cx('get_location')}
                             >
                                 Vị trí hiện tại
-                            </p>
+                            </p> */}
                         </div>
                         <p className={cx('form_error')}>{errors.country?.message}</p>
                     </div>
@@ -1098,12 +1127,11 @@ function CheckOut() {
                                 <option value={``} selected disabled hidden>
                                     {!auto ? `Chọn` : cityController.field.value}
                                 </option>
-                                {!auto &&
-                                    listProvinces.map((province, index) => (
-                                        <option key={index} value={province.name}>
-                                            {province.name}
-                                        </option>
-                                    ))}
+                                {listProvinces.map((province) => (
+                                    <option key={province.province_id} value={province.province_name}>
+                                        {province.province_name}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                         <p className={cx('form_error')}>{errors.city?.message}</p>
@@ -1122,9 +1150,9 @@ function CheckOut() {
                                         {!auto ? `Chọn` : districsController.field.value}
                                     </option>
                                 )}
-                                {listDistrics.map((distric, index) => (
-                                    <option key={index} value={distric.name}>
-                                        {distric.name}
+                                {listDistrics.map((distric) => (
+                                    <option key={distric.district_id} value={distric.district_name}>
+                                        {distric.district_name}
                                     </option>
                                 ))}
                             </select>
@@ -1145,9 +1173,9 @@ function CheckOut() {
                                         {!auto ? `Chọn` : wardsController.field.value}
                                     </option>
                                 )}
-                                {listWards.map((ward, index) => (
-                                    <option key={index} value={ward.name}>
-                                        {ward.name}
+                                {listWards.map((ward) => (
+                                    <option key={ward.district_id} value={ward.ward_name}>
+                                        {ward.ward_name}
                                     </option>
                                 ))}
                             </select>
@@ -1261,12 +1289,12 @@ function CheckOut() {
                             <p className={cx('top_price', 'price_top_total')}>
                                 {watch('shipping_method')
                                     ? numeral(
-                                          Math.floor(price * (data?.item ? (100 - data?.item.discount) / 100 : 1)) +
-                                              shippingCost,
-                                      ).format('0,0[.]00 VNĐ')
+                                        Math.floor(price * (data?.item ? (100 - data?.item.discount) / 100 : 1)) +
+                                        shippingCost,
+                                    ).format('0,0[.]00 VNĐ')
                                     : numeral(
-                                          Math.floor(price * (data?.item ? (100 - data?.item.discount) / 100 : 1)),
-                                      ).format('0,0[.]00 VNĐ')}{' '}
+                                        Math.floor(price * (data?.item ? (100 - data?.item.discount) / 100 : 1)),
+                                    ).format('0,0[.]00 VNĐ')}{' '}
                                 đ
                             </p>
                         </div>
