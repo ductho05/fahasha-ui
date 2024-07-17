@@ -605,7 +605,15 @@ function ProductDetail() {
                                     <p onClick={handleMinus} className={cx('btn_minus')}>
                                         <FontAwesomeIcon icon={faMinus} />
                                     </p>
-                                    <input type="number" value={currentQuantity} className={cx('quantity_num')} />
+                                    <input
+                                        type="number"
+                                        value={currentQuantity}
+                                        className={cx('quantity_num')}
+                                        // cho phep nhap so luong
+                                        onChange={(e) => {
+                                            setCurrentQuantity(parseInt(e.target.value));
+                                        }}
+                                    />
                                     <p onClick={handlePlus} className={cx('btn_plus')}>
                                         <FontAwesomeIcon icon={faPlus} />
                                     </p>

@@ -327,8 +327,9 @@ function CheckOut() {
                         await addUserFlash();
                         // update lại status của mã giảm giá
                         console.log('update thanh cong111', data);
-                        if (data?.item) {
-                            fetch(`${api}/vouchers/update/${data?.item._id}`, {
+                        const itemVoucher = localstorage.get('itemVoucher') ? localstorage.get('itemVoucher') : null;
+                        if (itemVoucher !== null) {
+                            fetch(`${api}/vouchers/update/${itemVoucher}`, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -346,6 +347,7 @@ function CheckOut() {
                                             status: false,
                                         },
                                     });
+                                    localStorage.removeItem('itemVoucher');
                                 })
                                 .catch((err) => console.log(err));
                         }

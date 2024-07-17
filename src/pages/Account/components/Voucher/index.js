@@ -198,6 +198,7 @@ function Voucher() {
                                         item: product,
                                     });
                                     navigate(`/cart`);
+                                    localStorage.setItem('itemVoucher', JSON.stringify(product._id));
                                 }}
                             >
                                 Sử dụng ngay

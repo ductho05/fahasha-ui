@@ -136,7 +136,7 @@ function Statistics() {
     const [top_usert, setTopUser] = useState([]);
     const [top_products, setTopProducts] = useState([]);
     const [isLoadingProduct, setIsLoadingProduct] = useState(false);
-    const spaceSizeCol = [30, 180, 120, 240, 150, 80, 100, 70, 70, 140];
+    const spaceSizeCol = [30, 180, 120, 240, 150, 80, 100, 90, 70, 140];
     const navigate = useNavigate();
     const [detail, setDetail] = useState([]);
     const [isSendNow, setIsSendNow] = useState(false);
@@ -256,16 +256,16 @@ function Statistics() {
                 return <p>{params.value}</p>;
             },
         },
-        {
-            field: 'priceElement',
-            headerName: 'Đơn giá',
-            editable: false,
-            sortable: true,
-            width: spaceSizeCol[8],
-            renderCell: (params) => {
-                return <p>{addCommasToNumber(Math.round(params.value / 1000))}K</p>;
-            },
-        },
+        // {
+        //     field: 'priceElement',
+        //     headerName: 'Đơn giá',
+        //     editable: false,
+        //     sortable: true,
+        //     width: spaceSizeCol[8],
+        //     renderCell: (params) => {
+        //         return <p>{addCommasToNumber(Math.round(params.value / 1000))}K</p>;
+        //     },
+        // },
 
         {
             field: 'statusElement',
