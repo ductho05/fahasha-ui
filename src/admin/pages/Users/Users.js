@@ -1144,7 +1144,7 @@ function Users() {
                                         <div className="border-b pt-[20px]">
                                             <h1 className="text-[1.3rem] text-[#333] uppercase font-[600]">Chức vụ</h1>
                                             {roleOption.map((option) => (
-                                                <div key={option.label} className="p-[10px]">
+                                                <div key={option.title} className="p-[10px]">
                                                     <Checkbox
                                                         onChange={() => {
                                                             handleRoleChange(option);
@@ -1152,7 +1152,7 @@ function Users() {
                                                         checked={option.value === rolefilter?.value}
                                                         className="text-[1.4rem] text-[#333] font-[500]"
                                                     >
-                                                        {option.label}
+                                                        {option.title}
                                                     </Checkbox>
                                                 </div>
                                             ))}
