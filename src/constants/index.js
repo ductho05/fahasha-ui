@@ -1,4 +1,5 @@
-export const isDeploy = process.env.NODE_ENV === 'production';
+//export const isDeploy = process.env.NODE_ENV === 'production';
+export const isDeploy = true;
 console.log('isDeploy', isDeploy);
 export const apiKeyEditor = '6dlo2vwbazk8r83upbs5h8js3bv8uqvexpc8ls76z11zl1at';
 export const api = isDeploy
